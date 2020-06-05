@@ -2,9 +2,10 @@
 
 # VContainer
 
-VContainer is an implementation lightweight DI (Dependency Injection) Container for Unity (Game Engine)  
-that has minimum and sufficient features implemented.  
-( "V" means making Unity's initial "U" more thinner and solid. )
+VContainer is an implementation of lightweight DI (Dependency Injection) Container for Unity (Game Engine),  
+that has minimum and sufficient features.  
+
+"V" means making Unity's initial "U" more thinner and solid ... !
 
 - [Thread safety](https://github.com/hadashiA/VContainer#thread-safety)
 - [Controlling Scope and Lifetime](https://github.com/hadashiA/VContainer#controlling-scope-and-lifetime)
