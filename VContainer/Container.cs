@@ -1,25 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using VContainer.Internal;
 
 namespace VContainer
 {
     public interface IObjectResolver
     {
-        object Resolve<T>();
         object Resolve(Type type);
+        IScopedObjectResolver BeginScope(Action<ContainerBuilder> configuration = null);
     }
 
-    public interface ILifetimeScope : IDisposable
+    public static class ObjectResolverExtensions
     {
-        ILifetimeScope Parent { get; }
-
-        IScopedObjectResolver BeginScope();
-        IScopedObjectResolver BeginScope(Action<ContainerBuilder> configuration);
+        public static object Resolve<T>(this IObjectResolver resolver) => resolver.Resolve(typeof(T));
     }
 
     public interface IScopedObjectResolver : IObjectResolver, IDisposable
     {
+        IObjectResolver Root { get; }
+        IScopedObjectResolver Parent { get; }
     }
 
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
@@ -34,58 +33,95 @@ namespace VContainer
         Scoped,
     }
 
-    public sealed class Container : IScopedObjectResolver
+    public sealed class ScopedContainer : IScopedObjectResolver
+    {
+        public IObjectResolver Root { get; }
+        public IScopedObjectResolver Parent { get; }
+
+        readonly IRegistry registry;
+        readonly ConcurrentDictionary<Type, Lazy<object>> sharedInstances = new ConcurrentDictionary<Type, Lazy<object>>();
+        readonly CompositeDisposable disposables = new CompositeDisposable();
+
+        internal ScopedContainer(
+            IRegistry registry,
+            IObjectResolver root,
+            IScopedObjectResolver parent = null)
+        {
+            this.registry = registry;
+            Root = root;
+            Parent = parent;
+        }
+
+        public object Resolve(Type type)
+        {
+            var registration = registry.Get(type);
+            switch (registration.Lifetime)
+            {
+                case Lifetime.Transient:
+                    return registration.Injector.CreateInstance(this);
+
+                case Lifetime.Singleton:
+                    return Root.Resolve(type);
+
+                case Lifetime.Scoped:
+                    var lazy = sharedInstances.GetOrAdd(registration.ImplementationType, _ =>
+                    {
+                        return new Lazy<object>(() => registration.Injector.CreateInstance(this));
+                    });
+                    if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable)
+                    {
+                        disposables.Add(disposable);
+                    }
+                    return lazy.Value;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public IScopedObjectResolver BeginScope(Action<ContainerBuilder> configuration = null)
+            => throw new NotImplementedException();
+
+        public void Dispose() => disposables.Dispose();
+    }
+
+    public sealed class Container : IObjectResolver, IDisposable
     {
         readonly IRegistry registry;
+        readonly IScopedObjectResolver rootScope;
+        readonly ConcurrentDictionary<Type, Lazy<object>> sharedInstances = new ConcurrentDictionary<Type, Lazy<object>>();
 
         internal Container(IRegistry registry)
         {
             this.registry = registry;
-        }
-    }
-
-    public sealed class ContainerBuilder
-    {
-        readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
-
-        public RegistrationBuilder Register<T>(Lifetime lifetime = default)
-            => Register(typeof(T), lifetime);
-
-        public RegistrationBuilder Register<TInterface, TImplement>(Lifetime lifetime = default)
-            => Register<TImplement>(lifetime).As<TInterface>();
-
-        public RegistrationBuilder Register(Type type, Lifetime lifetime = default)
-        {
-            var registrationBuilder = new RegistrationBuilder(type, lifetime);
-            registrationBuilders.Add(registrationBuilder);
-            return registrationBuilder;
+            rootScope = new ScopedContainer(registry, this);
         }
 
-        public RegistrationBuilder RegisterInstance(object instance)
+        public object Resolve(Type type)
         {
-            throw new NotImplementedException();
-        }
-
-        public IObjectResolver Build()
-        {
-            var registry = new HashTableRegistry();
-
-            foreach (var x in registrationBuilders)
+            var registration = registry.Get(type);
+            switch (registration.Lifetime)
             {
-                var registration = x.Build();
-                if (registration.InterfaceTypes?.Count > 0)
-                {
-                    foreach (var contractType in registration.InterfaceTypes)
+                case Lifetime.Transient:
+                    return registration.Injector.CreateInstance(this);
+
+                case Lifetime.Singleton:
+                    return sharedInstances.GetOrAdd(registration.ImplementationType, _ =>
                     {
-                        registry.Add(contractType, registration);
-                    }
-                }
-                else
-                {
-                    registry.Add(registration.ImplementationType, registration);
-                }
+                        return new Lazy<object>(() => registration.Injector.CreateInstance(this));
+                    }).Value;
+
+                case Lifetime.Scoped:
+                    return rootScope.Resolve(type);
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            return new Container(registry);
         }
+
+        public IScopedObjectResolver BeginScope(Action<ContainerBuilder> configuration = null)
+            => rootScope.BeginScope(configuration);
+
+        public void Dispose() => rootScope.Dispose();
     }
 }
