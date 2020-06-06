@@ -91,6 +91,18 @@ namespace VContainer.Tests
         public I2 GetPrivateProperty() => privateProperty;
     }
 
+    class DisposableServiceA : I1, IDisposable
+    {
+        public bool Disposed { get; private set; }
+        public void Dispose() => Disposed = true;
+    }
+
+    class DisposableServiceB : I2, IDisposable
+    {
+        public bool Disposed { get; private set; }
+        public void Dispose() => Disposed = true;
+    }
+
     class NoDependencyServiceA : I2
     {
     }

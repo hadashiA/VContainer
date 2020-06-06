@@ -16,6 +16,13 @@ namespace VContainer.Internal
             this.injectTypeInfo = injectTypeInfo;
         }
 
+        public void Inject(object instance, IObjectResolver resolver)
+        {
+            InjectMethods(instance, resolver);
+            InjectProperties(instance, resolver);
+            InjectFields(instance, resolver);
+        }
+
         public object CreateInstance(IObjectResolver resolver)
         {
             var parameters = injectTypeInfo.InjectConstructor.GetParameters();
@@ -26,12 +33,8 @@ namespace VContainer.Internal
             }
 
             var instance = injectTypeInfo.InjectConstructor.Invoke(parameterValues);
-            InjectMethods(instance, resolver);
-            InjectProperties(instance, resolver);
-            InjectFields(instance, resolver);
-
+            Inject(instance, resolver);
             return instance;
-
         }
 
         void InjectFields(object obj, IObjectResolver resolver)

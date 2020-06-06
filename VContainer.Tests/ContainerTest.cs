@@ -36,6 +36,25 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void ResolveScoped()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<DisposableServiceA>(Lifetime.Scoped);
+
+            var container = builder.Build();
+            var obj1 = container.Resolve<DisposableServiceA>();
+            var obj2 = container.Resolve<DisposableServiceA>();
+
+            Assert.That(obj1, Is.TypeOf<DisposableServiceA>());
+            Assert.That(obj2, Is.TypeOf<DisposableServiceA>());
+            Assert.That(obj1, Is.EqualTo(obj2));
+
+            container.Dispose();
+
+            Assert.That(obj1.Disposed, Is.True);
+        }
+
+        [Test]
         public void ResolveAsInterfaces()
         {
             var builder = new ContainerBuilder();

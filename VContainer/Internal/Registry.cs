@@ -9,7 +9,7 @@ namespace VContainer.Internal
 
     interface IRegistry
     {
-        void Add(Type interfaceType, Registration registration);
+        void Add(Registration registration);
         Registration Get(Type interfaceType);
         bool TryGet(Type interfaceType, out Registration registration);
     }
@@ -19,18 +19,18 @@ namespace VContainer.Internal
         readonly object syncRoot = new object();
         readonly Hashtable registrations = new Hashtable();
 
-        public void Add(Type service, Registration registration)
+        public void Add(Registration registration)
         {
-            try
+            if (registration.InterfaceTypes?.Count > 0)
             {
-                lock (syncRoot)
+                foreach (var contractType in registration.InterfaceTypes)
                 {
-                    registrations.Add(service, registration);
+                    Add(contractType, registration);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                throw new VContainerException($"Registration with the same key already exists: {registration}");
+                Add(registration.ImplementationType, registration);
             }
         }
 
@@ -48,6 +48,22 @@ namespace VContainer.Internal
             // ReSharper disable once InconsistentlySynchronizedField
             registration = registrations[interfaceType] as Registration;
             return registration != null;
+        }
+
+
+        void Add(Type service, Registration registration)
+        {
+            try
+            {
+                lock (syncRoot)
+                {
+                    registrations.Add(service, registration);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new VContainerException($"Registration with the same key already exists: {registration}");
+            }
         }
     }
 }

@@ -4,18 +4,18 @@ using VContainer.Internal;
 
 namespace VContainer
 {
-    public interface IObjectResolver
+    public interface IObjectResolver : IDisposable
     {
         object Resolve(Type type);
-        IScopedObjectResolver BeginScope(Action<ContainerBuilder> configuration = null);
+        IScopedObjectResolver CreateScope(Action<IContainerBuilder> configuration = null);
     }
 
     public static class ObjectResolverExtensions
     {
-        public static object Resolve<T>(this IObjectResolver resolver) => resolver.Resolve(typeof(T));
+        public static T Resolve<T>(this IObjectResolver resolver) => (T)resolver.Resolve(typeof(T));
     }
 
-    public interface IScopedObjectResolver : IObjectResolver, IDisposable
+    public interface IScopedObjectResolver : IObjectResolver
     {
         IObjectResolver Root { get; }
         IScopedObjectResolver Parent { get; }
@@ -79,13 +79,21 @@ namespace VContainer
             }
         }
 
-        public IScopedObjectResolver BeginScope(Action<ContainerBuilder> configuration = null)
-            => throw new NotImplementedException();
+        public IScopedObjectResolver CreateScope(Action<IContainerBuilder> configuration = null)
+        {
+            var containerBuilder = new ScopedContainerBuilder(registry, Root, Parent);
+            configuration?.Invoke(containerBuilder);
+            return containerBuilder.BuildScope();
+        }
 
-        public void Dispose() => disposables.Dispose();
+        public void Dispose()
+        {
+            disposables.Dispose();
+            sharedInstances.Clear();
+        }
     }
 
-    public sealed class Container : IObjectResolver, IDisposable
+    public sealed class Container : IObjectResolver
     {
         readonly IRegistry registry;
         readonly IScopedObjectResolver rootScope;
@@ -119,8 +127,8 @@ namespace VContainer
             }
         }
 
-        public IScopedObjectResolver BeginScope(Action<ContainerBuilder> configuration = null)
-            => rootScope.BeginScope(configuration);
+        public IScopedObjectResolver CreateScope(Action<IContainerBuilder> configuration = null)
+            => rootScope.CreateScope(configuration);
 
         public void Dispose() => rootScope.Dispose();
     }

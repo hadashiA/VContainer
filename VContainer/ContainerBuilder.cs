@@ -20,13 +20,49 @@ namespace VContainer
             => builder.Register<TImplement>(lifetime).As<TInterface>();
     }
 
+    public sealed class ScopedContainerBuilder : IContainerBuilder
+    {
+        readonly IRegistry registry;
+        readonly IObjectResolver root;
+        readonly IScopedObjectResolver parent;
+        readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
+
+        internal ScopedContainerBuilder(
+            IRegistry registry,
+            IObjectResolver root,
+            IScopedObjectResolver parent)
+        {
+            this.registry = registry;
+            this.root = root;
+            this.parent = parent;
+        }
+
+        public RegistrationBuilder Register(Type interfaceType, Lifetime lifetime)
+        {
+            var registrationBuilder = new RegistrationBuilder(interfaceType, lifetime);
+            registrationBuilders.Add(registrationBuilder);
+            return registrationBuilder;
+        }
+
+        public IScopedObjectResolver BuildScope()
+        {
+            foreach (var x in registrationBuilders)
+            {
+                registry.Add(x.Build());
+            }
+            return new ScopedContainer(registry, root, parent);
+        }
+
+        public IObjectResolver Build() => BuildScope();
+    }
+
     public sealed class ContainerBuilder : IContainerBuilder
     {
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
 
-        public RegistrationBuilder Register(Type type, Lifetime lifetime)
+        public RegistrationBuilder Register(Type interfaceType, Lifetime lifetime)
         {
-            var registrationBuilder = new RegistrationBuilder(type, lifetime);
+            var registrationBuilder = new RegistrationBuilder(interfaceType, lifetime);
             registrationBuilders.Add(registrationBuilder);
             return registrationBuilder;
         }
@@ -34,23 +70,10 @@ namespace VContainer
         public IObjectResolver Build()
         {
             var registry = new HashTableRegistry();
-
             foreach (var x in registrationBuilders)
             {
-                var registration = x.Build();
-                if (registration.InterfaceTypes?.Count > 0)
-                {
-                    foreach (var contractType in registration.InterfaceTypes)
-                    {
-                        registry.Add(contractType, registration);
-                    }
-                }
-                else
-                {
-                    registry.Add(registration.ImplementationType, registration);
-                }
+                registry.Add(x.Build());
             }
-
             return new Container(registry);
         }
     }

@@ -45,6 +45,8 @@
         <Compile Include="ContainerTest.cs" />
         <Compile Include="Fixtures.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="ScopedContainerTest.cs" />
+        <Compile Include="TypeAnalyzerTest.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\VContainer\VContainer.csproj">
