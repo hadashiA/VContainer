@@ -176,5 +176,19 @@ namespace VContainer.Tests
             builder.Register<NoDependencyServiceA>(Lifetime.Singleton).As<I7>();
             Assert.Throws<VContainerException>(() => builder.Build());
         }
+
+        [Test]
+        public void RegisterInstance()
+        {
+            var builder = new ContainerBuilder();
+            var instance = new NoDependencyServiceB();
+            builder.RegisterInstance<I3>(instance);
+
+            var container = builder.Build();
+            var obj1 = container.Resolve<I3>();
+            var obj2 = container.Resolve<I3>();
+            Assert.That(obj1, Is.EqualTo(instance));
+            Assert.That(obj2, Is.EqualTo(instance));
+        }
     }
 }

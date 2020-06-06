@@ -9,21 +9,36 @@ namespace VContainer
         public readonly Type ImplementationType;
         public readonly IReadOnlyList<Type> InterfaceTypes;
         public readonly Lifetime Lifetime;
-        public readonly IInjector Injector;
 
-        public Registration(
+        readonly IInjector injector;
+        readonly object specificInstance;
+
+        internal Registration(
             Type implementationType,
             IReadOnlyList<Type> interfaceTypes,
             Lifetime lifetime,
-            IInjector injector)
+            IInjector injector,
+            object specificInstance = null)
         {
             ImplementationType = implementationType;
             InterfaceTypes = interfaceTypes;
             Lifetime = lifetime;
-            Injector = injector;
+
+            this.injector = injector;
+            this.specificInstance = specificInstance;
         }
 
-        public override string ToString() => $"ConcreteType={ImplementationType.Name} ContractTypes={string.Join(", ", InterfaceTypes)} {Lifetime} {Injector.GetType().Name}";
+        public override string ToString() => $"ConcreteType={ImplementationType.Name} ContractTypes={string.Join(", ", InterfaceTypes)} {Lifetime} {injector.GetType().Name}";
+
+        public object SpawnInstance(IObjectResolver resolver)
+        {
+            if (specificInstance != null)
+            {
+                injector.Inject(specificInstance, resolver);
+                return specificInstance;
+            }
+            return injector.CreateInstance(resolver);
+        }
     }
 
     public class RegistrationBuilder
@@ -31,15 +46,24 @@ namespace VContainer
         readonly Type implementationType;
         List<Type> interfaceTypes;
         Lifetime lifetime;
+        readonly object specificInstance;
 
-        public RegistrationBuilder(Type implementationType, Lifetime lifetime = default, List<Type> interfaceTypes = null)
+        public RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
         {
             this.implementationType = implementationType;
-            this.lifetime = lifetime;
             this.interfaceTypes = interfaceTypes;
+            this.lifetime = lifetime;
         }
 
-        public Registration Build()
+        public RegistrationBuilder(object instance, List<Type> interfaceTypes = null)
+        {
+            implementationType = instance.GetType();
+            this.interfaceTypes = interfaceTypes;
+            lifetime = Lifetime.Singleton;
+            specificInstance = instance;
+        }
+
+        public virtual Registration Build()
         {
             var injector = ReflectionInjectorBuilder.Default.Build(implementationType); // TODO:
 
@@ -47,25 +71,8 @@ namespace VContainer
                 implementationType,
                 interfaceTypes,
                 lifetime,
-                injector);
-        }
-
-        public RegistrationBuilder SingleInstance()
-        {
-            lifetime = Lifetime.Singleton;
-            return this;
-        }
-
-        public RegistrationBuilder InstancePerDependency()
-        {
-            lifetime = Lifetime.Transient;
-            return this;
-        }
-
-        public RegistrationBuilder InstancePerLifetimeScope()
-        {
-            lifetime = Lifetime.Scoped;
-            return this;
+                injector,
+                specificInstance);
         }
 
         public RegistrationBuilder As<TInterface>()

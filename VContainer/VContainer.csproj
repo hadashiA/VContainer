@@ -40,8 +40,8 @@
     <ItemGroup>
         <Compile Include="Container.cs" />
         <Compile Include="ContainerBuilder.cs" />
-        <Compile Include="IInjector.cs" />
         <Compile Include="Internal\CompositeDisposable.cs" />
+        <Compile Include="Internal\IInjector.cs" />
         <Compile Include="Internal\ReflectionInjector.cs" />
         <Compile Include="Internal\Registry.cs" />
         <Compile Include="Internal\TypeAnalyzer.cs" />

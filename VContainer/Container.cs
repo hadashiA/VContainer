@@ -59,7 +59,7 @@ namespace VContainer
             switch (registration.Lifetime)
             {
                 case Lifetime.Transient:
-                    return registration.Injector.CreateInstance(this);
+                    return registration.SpawnInstance(this);
 
                 case Lifetime.Singleton:
                     return Root.Resolve(type);
@@ -67,7 +67,7 @@ namespace VContainer
                 case Lifetime.Scoped:
                     var lazy = sharedInstances.GetOrAdd(registration.ImplementationType, _ =>
                     {
-                        return new Lazy<object>(() => registration.Injector.CreateInstance(this));
+                        return new Lazy<object>(() => registration.SpawnInstance(this));
                     });
                     if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable)
                     {
@@ -129,12 +129,12 @@ namespace VContainer
             switch (registration.Lifetime)
             {
                 case Lifetime.Transient:
-                    return registration.Injector.CreateInstance(this);
+                    return registration.SpawnInstance(this);
 
                 case Lifetime.Singleton:
                     return sharedInstances.GetOrAdd(registration.ImplementationType, _ =>
                     {
-                        return new Lazy<object>(() => registration.Injector.CreateInstance(this));
+                        return new Lazy<object>(() => registration.SpawnInstance(this));
                     }).Value;
 
                 case Lifetime.Scoped:

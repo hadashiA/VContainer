@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using VContainer.Internal;
 
 namespace VContainer.Tests
 {
