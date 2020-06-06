@@ -19,6 +19,7 @@ namespace VContainer
     {
         IObjectResolver Root { get; }
         IScopedObjectResolver Parent { get; }
+        bool TryGetRegistration(Type type, out Registration registration);
     }
 
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
@@ -54,7 +55,7 @@ namespace VContainer
 
         public object Resolve(Type type)
         {
-            var registration = registry.Get(type);
+            var registration = FindRegistration(type);
             switch (registration.Lifetime)
             {
                 case Lifetime.Transient:
@@ -81,15 +82,32 @@ namespace VContainer
 
         public IScopedObjectResolver CreateScope(Action<IContainerBuilder> configuration = null)
         {
-            var containerBuilder = new ScopedContainerBuilder(registry, Root, Parent);
+            var containerBuilder = new ScopedContainerBuilder(Root, this);
             configuration?.Invoke(containerBuilder);
             return containerBuilder.BuildScope();
         }
+
+        public bool TryGetRegistration(Type type, out Registration registration)
+            => registry.TryGet(type, out registration);
 
         public void Dispose()
         {
             disposables.Dispose();
             sharedInstances.Clear();
+        }
+
+        Registration FindRegistration(Type type)
+        {
+            IScopedObjectResolver scope = this;
+            while (scope != null)
+            {
+                if (scope.TryGetRegistration(type, out var registration))
+                {
+                    return registration;
+                }
+                scope = scope.Parent;
+            }
+            throw new VContainerException($"No such registration of type: {type.FullName}");
         }
     }
 

@@ -43,8 +43,8 @@ namespace VContainer.Tests
             }
             Assert.That(rootScopeObj.Disposed, Is.True);
 
-            Assert.That(singleton1.Disposed, Is.Not.False);
-            Assert.That(singleton2.Disposed, Is.Not.False);
+            Assert.That(singleton1.Disposed, Is.False);
+            Assert.That(singleton2.Disposed, Is.False);
             Assert.That(singleton1, Is.EqualTo(singleton2));
         }
 

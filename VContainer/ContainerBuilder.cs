@@ -22,17 +22,14 @@ namespace VContainer
 
     public sealed class ScopedContainerBuilder : IContainerBuilder
     {
-        readonly IRegistry registry;
         readonly IObjectResolver root;
         readonly IScopedObjectResolver parent;
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
 
         internal ScopedContainerBuilder(
-            IRegistry registry,
             IObjectResolver root,
             IScopedObjectResolver parent)
         {
-            this.registry = registry;
             this.root = root;
             this.parent = parent;
         }
@@ -46,6 +43,7 @@ namespace VContainer
 
         public IScopedObjectResolver BuildScope()
         {
+            var registry = new HashTableRegistry();
             foreach (var x in registrationBuilders)
             {
                 registry.Add(x.Build());
