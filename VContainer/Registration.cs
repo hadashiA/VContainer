@@ -74,6 +74,33 @@ namespace VContainer
             return this;
         }
 
+        public RegistrationBuilder As<TInterface1, TInterface2>()
+        {
+            var list = (interfaceTypes ?? (interfaceTypes = new List<Type>()));
+            list.Add(typeof(TInterface1));
+            list.Add(typeof(TInterface2));
+            return this;
+        }
+
+        public RegistrationBuilder As<TInterface1, TInterface2, TInterface3>()
+        {
+            var list = (interfaceTypes ?? (interfaceTypes = new List<Type>()));
+            list.Add(typeof(TInterface1));
+            list.Add(typeof(TInterface2));
+            list.Add(typeof(TInterface3));
+            return this;
+        }
+
+        public RegistrationBuilder As<TInterface1, TInterface2, TInterface3, TInterface4>()
+        {
+            var list = (interfaceTypes ?? (interfaceTypes = new List<Type>()));
+            list.Add(typeof(TInterface1));
+            list.Add(typeof(TInterface2));
+            list.Add(typeof(TInterface3));
+            list.Add(typeof(TInterface4));
+            return this;
+        }
+
         public RegistrationBuilder AsSelf()
         {
             (interfaceTypes ?? (interfaceTypes = new List<Type>())).Add(implementationType);
