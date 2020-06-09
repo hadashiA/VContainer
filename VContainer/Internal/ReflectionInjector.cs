@@ -2,11 +2,6 @@ using System;
 
 namespace VContainer.Internal
 {
-    interface IInjectorBuilder
-    {
-        IInjector Build(Type type);
-    }
-
     sealed class ReflectionInjector : IInjector
     {
         readonly InjectTypeInfo injectTypeInfo;

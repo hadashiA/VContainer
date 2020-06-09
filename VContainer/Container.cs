@@ -7,6 +7,7 @@ namespace VContainer
     public interface IObjectResolver : IDisposable
     {
         object Resolve(Type type);
+        object Resolve(IRegistration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> configuration = null);
     }
 
@@ -19,7 +20,7 @@ namespace VContainer
     {
         IObjectResolver Root { get; }
         IScopedObjectResolver Parent { get; }
-        bool TryGetRegistration(Type type, out Registration registration);
+        bool TryGetRegistration(Type type, out IRegistration registration);
     }
 
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
@@ -31,7 +32,13 @@ namespace VContainer
     {
         Transient,
         Singleton,
-        Scoped,
+        Scoped
+    }
+
+    public enum ScopeFilter
+    {
+        Local,
+        All
     }
 
     public sealed class ScopedContainer : IScopedObjectResolver
@@ -56,13 +63,18 @@ namespace VContainer
         public object Resolve(Type type)
         {
             var registration = FindRegistration(type);
+            return Resolve(registration);
+        }
+
+        public object Resolve(IRegistration registration)
+        {
             switch (registration.Lifetime)
             {
                 case Lifetime.Transient:
                     return registration.SpawnInstance(this);
 
                 case Lifetime.Singleton:
-                    return Root.Resolve(type);
+                    return Root.Resolve(registration);
 
                 case Lifetime.Scoped:
                     var lazy = sharedInstances.GetOrAdd(registration.ImplementationType, _ =>
@@ -87,7 +99,7 @@ namespace VContainer
             return containerBuilder.BuildScope();
         }
 
-        public bool TryGetRegistration(Type type, out Registration registration)
+        public bool TryGetRegistration(Type type, out IRegistration registration)
             => registry.TryGet(type, out registration);
 
         public void Dispose()
@@ -96,7 +108,7 @@ namespace VContainer
             sharedInstances.Clear();
         }
 
-        Registration FindRegistration(Type type)
+        IRegistration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
             while (scope != null)
@@ -126,6 +138,11 @@ namespace VContainer
         public object Resolve(Type type)
         {
             var registration = registry.Get(type);
+            return Resolve(registration);
+        }
+
+        public object Resolve(IRegistration registration)
+        {
             switch (registration.Lifetime)
             {
                 case Lifetime.Transient:
@@ -138,7 +155,7 @@ namespace VContainer
                     }).Value;
 
                 case Lifetime.Scoped:
-                    return rootScope.Resolve(type);
+                    return rootScope.Resolve(registration);
 
                 default:
                     throw new ArgumentOutOfRangeException();

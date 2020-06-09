@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 
 namespace VContainer.Tests
 {
@@ -167,16 +169,6 @@ namespace VContainer.Tests
             Assert.That(((AllInjectionFeatureService)obj1).FromConstructor2, Is.InstanceOf<I7>());
         }
 
-        // TODO: コンパイル時に検知可能 ?
-        [Test]
-        [Ignore("Not implemented")]
-        public void InvalidInterface()
-        {
-            var builder = new ContainerBuilder();
-            builder.Register<NoDependencyServiceA>(Lifetime.Singleton).As<I7>();
-            Assert.Throws<VContainerException>(() => builder.Build());
-        }
-
         [Test]
         public void RegisterInstance()
         {
@@ -189,6 +181,28 @@ namespace VContainer.Tests
             var obj2 = container.Resolve<I3>();
             Assert.That(obj1, Is.EqualTo(instance));
             Assert.That(obj2, Is.EqualTo(instance));
+        }
+
+        [Test]
+        public void ResolveCollection()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Singleton);
+            builder.Register<I1, MultipleInterfaceServiceB>(Lifetime.Transient);
+
+            var container = builder.Build();
+            var enumerable = container.Resolve<IEnumerable<I1>>();
+            var e0 = enumerable.ElementAt(0);
+            var e1 = enumerable.ElementAt(1);
+            Assert.That(e0, Is.TypeOf<MultipleInterfaceServiceA>());
+            Assert.That(e1, Is.TypeOf<MultipleInterfaceServiceB>());
+
+            var list = container.Resolve<IReadOnlyList<I1>>();
+            Assert.That(list[0], Is.TypeOf<MultipleInterfaceServiceA>());
+            Assert.That(list[1], Is.TypeOf<MultipleInterfaceServiceB>());
+
+            // Singleton
+            Assert.That(list[0], Is.EqualTo(e0));
         }
     }
 }

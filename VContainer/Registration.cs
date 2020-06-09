@@ -1,14 +1,65 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using VContainer.Internal;
 
 namespace VContainer
 {
-    public sealed class Registration
+    public interface IRegistration
     {
-        public readonly Type ImplementationType;
-        public readonly IReadOnlyList<Type> InterfaceTypes;
-        public readonly Lifetime Lifetime;
+        Type ImplementationType { get; }
+        IReadOnlyList<Type> InterfaceTypes { get; }
+        Lifetime Lifetime { get; }
+        object SpawnInstance(IObjectResolver resolver);
+    }
+
+    public sealed class CollectionRegistration : IRegistration, IEnumerable<IRegistration>
+    {
+        public Type ImplementationType { get; }
+        public IReadOnlyList<Type> InterfaceTypes => interfaceTypes;
+        public Lifetime Lifetime => Lifetime.Transient; // Collection refernce is transient. Members can have each lifetimes.
+
+        readonly Type elementType;
+
+        readonly List<Type> interfaceTypes;
+        readonly IList<Registration> registrations = new List<Registration>();
+
+        public CollectionRegistration(Type elementType)
+        {
+            this.elementType = elementType;
+            ImplementationType = typeof(List<>).MakeGenericType(elementType);
+            interfaceTypes = new List<Type>
+            {
+                typeof(IEnumerable<>).MakeGenericType(elementType),
+                typeof(IReadOnlyList<>).MakeGenericType(elementType),
+            };
+        }
+
+        public void Add(Registration registration)
+        {
+            registrations.Add(registration);
+        }
+
+        public object SpawnInstance(IObjectResolver resolver)
+        {
+            var genericType = typeof(List<>).MakeGenericType(elementType);
+            var list = (IList)Activator.CreateInstance(genericType);
+            foreach (var registration in registrations)
+            {
+                list.Add(resolver.Resolve(registration));
+            }
+            return list;
+        }
+
+        public IEnumerator<IRegistration> GetEnumerator() => registrations.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    public sealed class Registration : IRegistration
+    {
+        public Type ImplementationType { get; }
+        public IReadOnlyList<Type> InterfaceTypes { get; }
+        public Lifetime Lifetime { get; }
 
         readonly IInjector injector;
         readonly object specificInstance;
