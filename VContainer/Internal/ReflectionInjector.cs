@@ -21,7 +21,7 @@ namespace VContainer.Internal
         public object CreateInstance(IObjectResolver resolver)
         {
             var parameters = injectTypeInfo.InjectConstructor.GetParameters();
-            var parameterValues = new object[parameters.Length]; // TODO: pooling
+            var parameterValues = FixedArrayPool<object>.Shared8.Rent(parameters.Length);
             for (var i = 0; i < parameters.Length; i++)
             {
                 parameterValues[i] = resolver.Resolve(parameters[i].ParameterType);
@@ -29,6 +29,8 @@ namespace VContainer.Internal
 
             var instance = injectTypeInfo.InjectConstructor.Invoke(parameterValues);
             Inject(instance, resolver);
+
+            FixedArrayPool<object>.Shared8.Return(parameterValues);
             return instance;
         }
 

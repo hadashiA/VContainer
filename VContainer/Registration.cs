@@ -43,11 +43,14 @@ namespace VContainer
         public object SpawnInstance(IObjectResolver resolver)
         {
             var genericType = typeof(List<>).MakeGenericType(elementType);
-            var list = (IList)Activator.CreateInstance(genericType);
+            var parameterValues = FixedArrayPool<object>.Shared8.Rent(1);
+            parameterValues[0] = registrations.Count;
+            var list = (IList)Activator.CreateInstance(genericType, parameterValues);
             foreach (var registration in registrations)
             {
                 list.Add(resolver.Resolve(registration));
             }
+            FixedArrayPool<object>.Shared8.Return(parameterValues);
             return list;
         }
 
@@ -92,7 +95,7 @@ namespace VContainer
         }
     }
 
-    public class RegistrationBuilder
+    public sealed class RegistrationBuilder
     {
         readonly Type implementationType;
         List<Type> interfaceTypes;
@@ -114,7 +117,7 @@ namespace VContainer
             specificInstance = instance;
         }
 
-        public virtual Registration Build()
+        public Registration Build()
         {
             var injector = ReflectionInjectorBuilder.Default.Build(implementationType); // TODO:
 

@@ -42,7 +42,6 @@ namespace VContainer
     {
         readonly IObjectResolver root;
         readonly IScopedObjectResolver parent;
-        readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
 
         internal ScopedContainerBuilder(
             IObjectResolver root,
@@ -55,7 +54,7 @@ namespace VContainer
         public IScopedObjectResolver BuildScope()
         {
             var registry = new HashTableRegistry();
-            foreach (var x in registrationBuilders)
+            foreach (var x in RegistrationBuilders)
             {
                 registry.Add(x.Build());
             }
@@ -67,26 +66,26 @@ namespace VContainer
 
     public class ContainerBuilder : IContainerBuilder
     {
-        readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
+        protected readonly IList<RegistrationBuilder> RegistrationBuilders = new List<RegistrationBuilder>();
 
         public RegistrationBuilder Register(Type implementationType, Lifetime lifetime)
         {
             var registrationBuilder = new RegistrationBuilder(implementationType, lifetime);
-            registrationBuilders.Add(registrationBuilder);
+            RegistrationBuilders.Add(registrationBuilder);
             return registrationBuilder;
         }
 
         public RegistrationBuilder RegisterInstance(object instance)
         {
             var registrationBuilder = new RegistrationBuilder(instance);
-            registrationBuilders.Add(registrationBuilder);
+            RegistrationBuilders.Add(registrationBuilder);
             return registrationBuilder;
         }
 
         public virtual IObjectResolver Build()
         {
             var registry = new HashTableRegistry();
-            foreach (var x in registrationBuilders)
+            foreach (var x in RegistrationBuilders)
             {
                 registry.Add(x.Build());
             }
