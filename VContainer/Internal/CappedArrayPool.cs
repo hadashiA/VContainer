@@ -2,14 +2,14 @@ using System.Collections.Concurrent;
 
 namespace VContainer.Internal
 {
-    public sealed class FixedArrayPool<T>
+    public sealed class CappedArrayPool<T>
     {
         public static readonly T[] EmptyArray = new T[0];
-        public static readonly FixedArrayPool<T> Shared8 = new FixedArrayPool<T>(8);
+        public static readonly CappedArrayPool<T> Shared8Limit = new CappedArrayPool<T>(8);
 
         readonly ConcurrentQueue<T[]>[] buckets;
 
-        public FixedArrayPool(int maxLength)
+        CappedArrayPool(int maxLength)
         {
             buckets = new ConcurrentQueue<T[]>[maxLength];
             for (var i = 0; i < maxLength; i++)

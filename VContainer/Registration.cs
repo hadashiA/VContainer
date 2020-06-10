@@ -43,14 +43,14 @@ namespace VContainer
         public object SpawnInstance(IObjectResolver resolver)
         {
             var genericType = typeof(List<>).MakeGenericType(elementType);
-            var parameterValues = FixedArrayPool<object>.Shared8.Rent(1);
+            var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(1);
             parameterValues[0] = registrations.Count;
             var list = (IList)Activator.CreateInstance(genericType, parameterValues);
             foreach (var registration in registrations)
             {
                 list.Add(resolver.Resolve(registration));
             }
-            FixedArrayPool<object>.Shared8.Return(parameterValues);
+            CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
             return list;
         }
 

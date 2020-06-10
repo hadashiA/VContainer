@@ -42,7 +42,7 @@
         <Compile Include="ContainerBuilder.cs" />
         <Compile Include="Internal\CompositeDisposable.cs" />
         <Compile Include="Internal\IInjector.cs" />
-        <Compile Include="Internal\FixedArrayPool.cs" />
+        <Compile Include="Internal\CappedArrayPool.cs" />
         <Compile Include="Internal\ReflectionInjector.cs" />
         <Compile Include="Internal\Registry.cs" />
         <Compile Include="Internal\TypeAnalyzer.cs" />
