@@ -4,7 +4,6 @@ using NUnit.Framework;
 
 namespace VContainer.Tests
 {
-    [TestFixture]
     public class ContainerTest
     {
         [Test]
