@@ -1,0 +1,29 @@
+name: Build
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        unity: ['2019.3.15f1']
+        include:
+        - unity: 2019.3.15f1
+          lisence: UNITY_LISENCE_2019_3_BASE64
+    container:
+      image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
+    env:
+      UNITY_BIN: /opt/Unity/Editor/Unity
+    steps:
+    - uses: actions/checkout@v2
+    - run: mkdir ./tmp
+    - name: Decode Unity Lisence File
+      run: echo -n $UNITY_LISENCE_BASE64 | base64 --decode > ./tmp/ulf
+      env:
+        UNITY_LICENSE_BASE64: ${{ secrets[matrix.license] }}
+    - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/ulf || exit 0
+    - name: Build UnitTest(Linux64, mono)
+      run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod UnitTestBuilder.BuildUnitTest /headless /ScriptBackend mono /BuildTarget StandaloneLinux64
+    - name: Execute UnitTest
+      run: ./VContainer/bin/UnitTest/StandaloneLinux64_Mono2x/test

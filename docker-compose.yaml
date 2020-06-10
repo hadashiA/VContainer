@@ -1,0 +1,8 @@
+version: '3'
+services:
+  unity:
+    image: gableroux/unity3d:2019.3.15f1
+    volumes:
+    - .:/VContainer
+    working_dir: /VContainer/tmp
+    command: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile
