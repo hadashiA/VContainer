@@ -9,7 +9,7 @@ namespace VContainer.Unity
 
     sealed class PlayerLoopRunner
     {
-        const int InitialBufferSize = 16;
+        const int InitialBufferSize = 8;
 
         readonly object syncRoot = new object();
 
@@ -30,7 +30,7 @@ namespace VContainer.Unity
                     }
                 }
                 Array.Resize(ref items, length * 2);
-                Array.Resize(ref runningBuffer, length * 2);
+                Array.Resize(ref runningBuffer, items.Length);
                 items[length] = item;
             }
         }
@@ -47,7 +47,11 @@ namespace VContainer.Unity
             lock (syncRoot)
             {
                 // TODO:
-                Array.Copy(items, 0, runningBuffer, 0, length);
+                // Array.Copy(items, 0, runningBuffer, 0, length);
+                for (var i = 0; i < length; i++)
+                {
+                    runningBuffer[i] = items[i];
+                }
             }
 
             for (var i = 0; i < length; i++)
