@@ -9,7 +9,9 @@ VContainer is an implementation of lightweight DI (Dependency Injection) Contain
 - Fast resolve. Minimum GC allocation. (For using reflection. Because it targets Unity IL2CPP.)
 - Extra small code size. Few internal types. 
 - Application can freely create nested Lifetime Scope
-- Container is Immutable. The container build phasae can be running on background thread.
+- Immutable Container.
+  - Resolve is thread safe
+  - Container build phasae can be running on background thread.
 
 ## Installation
 
