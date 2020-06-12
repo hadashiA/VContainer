@@ -204,5 +204,22 @@ namespace VContainer.Tests
             // Singleton
             Assert.That(list[0], Is.EqualTo(e0));
         }
+
+        [Test]
+        public void ResolveOnceAsCollection()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Singleton);
+
+            var container = builder.Build();
+            var enumerable = container.Resolve<IEnumerable<I1>>();
+            var e0 = enumerable.ElementAt(0);
+            Assert.That(e0, Is.TypeOf<MultipleInterfaceServiceA>());
+            Assert.That(enumerable.Count(), Is.EqualTo(1));
+
+            var list = container.Resolve<IReadOnlyList<I1>>();
+            Assert.That(list[0], Is.TypeOf<MultipleInterfaceServiceA>());
+            Assert.That(list.Count, Is.EqualTo(1));
+        }
     }
 }

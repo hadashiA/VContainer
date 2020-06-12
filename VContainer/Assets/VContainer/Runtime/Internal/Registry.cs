@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace VContainer.Internal
 {
@@ -12,7 +11,6 @@ namespace VContainer.Internal
     interface IRegistry
     {
         void Add(Registration registration);
-        IRegistration Get(Type interfaceType);
         bool TryGet(Type interfaceType, out IRegistration registration);
     }
 
@@ -36,22 +34,43 @@ namespace VContainer.Internal
             }
         }
 
-        public IRegistration Get(Type interfaceType)
-        {
-            if (registrations[interfaceType] is IRegistration registration)
-            {
-                return registration;
-            }
-            throw new VContainerException($"No such registration of type: {interfaceType.FullName}");
-        }
-
         public bool TryGet(Type interfaceType, out IRegistration registration)
         {
-            // ReSharper disable once InconsistentlySynchronizedField
-            registration = registrations[interfaceType] as IRegistration;
-            return registration != null;
-        }
+            while (true)
+            {
+                // ReSharper disable once InconsistentlySynchronizedField
+                registration = registrations[interfaceType] as IRegistration;
 
+                // Auto fallback to collection..
+                if (registration is null &&
+                    interfaceType.IsGenericType &&
+                    (typeof(IEnumerable).IsAssignableFrom(interfaceType) ||
+                     interfaceType.GetGenericTypeDefinition().IsEquivalentTo(typeof(IReadOnlyList<>))))
+                {
+                    var elementType = interfaceType.GetGenericArguments()[0];
+                    // ReSharper disable once InconsistentlySynchronizedField
+                    if (registrations[elementType] is Registration elementRegistration)
+                    {
+                        registration = new CollectionRegistration(elementType) { elementRegistration };
+                        lock (syncRoot)
+                        {
+                            foreach (var collectionType in registration.InterfaceTypes)
+                            {
+                                try
+                                {
+                                    registrations.Add(collectionType, registration);
+                                }
+                                catch (ArgumentException)
+                                {
+                                    throw new VContainerException($"Registration with the same key already exists: {collectionType} {registration}");
+                                }
+                            }
+                        }
+                    }
+                }
+                return registration != null;
+            }
+        }
 
         void Add(Type service, Registration registration)
         {
@@ -72,9 +91,9 @@ namespace VContainer.Internal
                             {
                                 registrations.Add(collectionType, collectionRegistration);
                             }
-                            catch (ArgumentException _)
+                            catch (ArgumentException)
                             {
-                                throw new VContainerException($"Registration with the same key already exists: {registration}");
+                                throw new VContainerException($"Registration with the same key already exists: {collectionType} {registration}");
                             }
                         }
                         break;

@@ -140,8 +140,11 @@ namespace VContainer
 
         public object Resolve(Type type)
         {
-            var registration = registry.Get(type);
-            return Resolve(registration);
+            if (registry.TryGet(type, out var registration))
+            {
+                return Resolve(registration);
+            }
+            throw new VContainerException($"No such registration of type: {type.FullName}");
         }
 
         public object Resolve(IRegistration registration)
