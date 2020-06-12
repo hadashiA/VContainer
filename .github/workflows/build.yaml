@@ -26,5 +26,6 @@ jobs:
     - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/ulf || exit 0
     - name: Build UnitTest(Linux64, mono)
       run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod UnitTestBuilder.BuildUnitTest /headless /ScriptBackend mono /BuildTarget StandaloneLinux64
+      working-directory: VContainer
     - name: Execute UnitTest
       run: ./VContainer/bin/UnitTest/StandaloneLinux64_Mono2x/test
