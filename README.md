@@ -2,14 +2,14 @@
 
 # VContainer
 
-VContainer is an implementation of lightweight DI (Dependency Injection) Container for Unity (Game Engine),  
-that has minimum and sufficient features.  
+VContainer is an implementation of lightweight DI (Dependency Injection) Container for Unity (Game Engine).
 
 "V" means making Unity's initial "U" more thinner and solid ... !
 
-- [Thread safety](https://github.com/hadashiA/VContainer#thread-safety)
-- [Controlling Scope and Lifetime](https://github.com/hadashiA/VContainer#controlling-scope-and-lifetime)
-- [Comparison with Zenject](https://github.com/hadashiA/VContainer#comparison-with)
+- Fast resolve. Minimum GC allocation. (For using reflection. Because it targets Unity IL2CPP.)
+- Extra small code size. Few internal types. 
+- Application can freely create nested Lifetime Scope
+- Container is Immutable. The container build phasae can be running on background thread.
 
 ## Installation
 

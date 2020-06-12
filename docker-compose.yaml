@@ -1,8 +1,15 @@
 version: '3'
 services:
-  unity:
+  alf:
     image: gableroux/unity3d:2019.3.15f1
     volumes:
     - .:/VContainer
     working_dir: /VContainer/tmp
     command: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile
+  lisence_test:
+    image: gableroux/unity3d:2019.3.15f1
+    volumes:
+    - .:/VContainer
+    working_dir: /VContainer
+    command: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2019.3.15f1.ulf || exit 0
+    

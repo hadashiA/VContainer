@@ -113,7 +113,7 @@ namespace VContainer
         {
             implementationType = instance.GetType();
             this.interfaceTypes = interfaceTypes;
-            lifetime = Lifetime.Singleton;
+            lifetime = Lifetime.Scoped;
             specificInstance = instance;
         }
 

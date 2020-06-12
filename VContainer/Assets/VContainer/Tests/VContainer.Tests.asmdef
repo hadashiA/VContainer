@@ -7,7 +7,8 @@
     ],
     "includePlatforms": [],
     "excludePlatforms": [
-        "Android"
+        "Android",
+        "LinuxStandalone64"
     ],
     "allowUnsafeCode": false,
     "overrideReferences": true,

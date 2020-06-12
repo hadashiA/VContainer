@@ -20,9 +20,9 @@ jobs:
     - run: mkdir ./tmp
     - name: Decode Unity Lisence File
       run: echo -n $UNITY_LISENCE_BASE64 | base64 --decode > ./tmp/ulf
-      run: cat ./tmp/ulf
       env:
         UNITY_LICENSE_BASE64: ${{ secrets[matrix.license] }}
+    - run: ls ./tmp/ulf
     - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/ulf || exit 0
     - name: Build UnitTest(Linux64, mono)
       run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -projectPath . -executeMethod UnitTestBuilder.BuildUnitTest /headless /ScriptBackend mono /BuildTarget StandaloneLinux64

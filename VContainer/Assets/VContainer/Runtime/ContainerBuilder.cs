@@ -28,7 +28,7 @@ namespace VContainer
             where TImplement : TInterface1, TInterface2, TInterface3
             => builder.Register<TImplement>(lifetime).As<TInterface1, TInterface2, TInterface3>();
 
-        public static RegistrationBuilder RegisterInstance<TInterface>(this IContainerBuilder builder, object instance)
+        public static RegistrationBuilder RegisterInstance<TInterface>(this IContainerBuilder builder, TInterface instance)
             => builder.RegisterInstance(instance).As<TInterface>();
 
         public static RegistrationBuilder RegisterInstance<TInterface1, TInterface2>(this IContainerBuilder builder, object instance)

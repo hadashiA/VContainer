@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace VContainer.Internal
 {
-    public readonly struct InjectTypeInfo
+    public sealed class InjectTypeInfo
     {
         public readonly Type Type;
         public readonly TypeInfo TypeInfo;
