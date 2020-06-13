@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace VContainer.Unity
 {
@@ -9,81 +10,84 @@ namespace VContainer.Unity
 
     sealed class PlayerLoopRunner
     {
-        const int InitialBufferSize = 8;
+        readonly Queue<IPlayerLoopItem> runningQueue = new Queue<IPlayerLoopItem>();
+        readonly Queue<IPlayerLoopItem> waitingQueue = new Queue<IPlayerLoopItem>();
 
-        readonly object syncRoot = new object();
+        readonly object runningGate = new object();
+        readonly object waitingAndStateGate = new object();
 
-        IPlayerLoopItem[] items = new IPlayerLoopItem[InitialBufferSize];
-        IPlayerLoopItem[] runningBuffer = new IPlayerLoopItem[InitialBufferSize];
+        bool running;
 
         public void Dispatch(IPlayerLoopItem item)
         {
-            lock (syncRoot)
+            lock (waitingAndStateGate)
             {
-                var length = items.Length;
-                for (var i = 0; i < length; i++)
+                if (running)
                 {
-                    if (items[i] is null)
-                    {
-                        items[i] = item;
-                        return;
-                    }
+                    waitingQueue.Enqueue(item);
+                    return;
                 }
-                Array.Resize(ref items, length * 2);
-                Array.Resize(ref runningBuffer, items.Length);
-                items[length] = item;
+            }
+
+            lock (runningGate)
+            {
+                runningQueue.Enqueue(item);
             }
         }
 
         public void Run()
         {
-            var length = 0;
-            lock (syncRoot)
+            lock (waitingAndStateGate)
             {
-                length = items.Length;
+                running = true;
             }
-            if (length == 0) return;
 
-            lock (syncRoot)
+            var hasNext = false;
+            lock (runningGate)
             {
-                // TODO:
-                // Array.Copy(items, 0, runningBuffer, 0, length);
-                for (var i = 0; i < length; i++)
+                hasNext = runningQueue.Count > 0;
+            }
+
+            while (hasNext)
+            {
+                IPlayerLoopItem item;
+                lock (runningGate)
                 {
-                    runningBuffer[i] = items[i];
+                    item = runningQueue.Dequeue();
                 }
-            }
 
-            for (var i = 0; i < length; i++)
-            {
-                var item = runningBuffer[i];
                 var continuous = false;
                 try
                 {
-                    continuous = item?.MoveNext() ?? false;
+                    continuous = item.MoveNext();
                 }
                 catch (Exception ex)
                 {
                     UnityEngine.Debug.LogException(ex);
                 }
-                if (!continuous)
+
+                if (continuous)
                 {
-                    // TODO:
-                    lock (syncRoot)
+                    lock (waitingAndStateGate)
                     {
-                        items[i] = null;
+                        waitingQueue.Enqueue(item);
                     }
                 }
-            }
-        }
 
-        public void Clear()
-        {
-            lock (syncRoot)
-            {
-                for (var i = 0; i < items.Length; i++)
+                lock (runningGate)
                 {
-                    items[i] = null;
+                    hasNext = runningQueue.Count > 0;
+                }
+            }
+
+            lock (runningGate)
+            lock (waitingAndStateGate)
+            {
+                running = false;
+                while (waitingQueue.Count > 0)
+                {
+                    var item = waitingQueue.Dequeue();
+                    runningQueue.Enqueue(item);
                 }
             }
         }
