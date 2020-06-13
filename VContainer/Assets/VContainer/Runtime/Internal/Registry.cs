@@ -46,7 +46,12 @@ namespace VContainer.Internal
                 }
 
                 // Auto falling back to collection..
-                if (interfaceType.IsGenericType && interfaceType.GetInterface("IEnumerable") != null)
+                if (interfaceType.IsGenericType &&
+                    // (interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                    //  interfaceType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
+                    // Optimize for mono runtime
+                    interfaceType.GetInterface("IEnumerable") != null
+                    )
                 {
                     var elementType = interfaceType.GetGenericArguments()[0];
                     // ReSharper disable once InconsistentlySynchronizedField

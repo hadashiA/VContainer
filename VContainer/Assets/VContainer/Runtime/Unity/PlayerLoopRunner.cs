@@ -42,20 +42,14 @@ namespace VContainer.Unity
                 running = true;
             }
 
-            var hasNext = false;
+            var item = default(IPlayerLoopItem);
             lock (runningGate)
             {
-                hasNext = runningQueue.Count > 0;
+                item = runningQueue.Count > 0 ? runningQueue.Dequeue() : null;
             }
 
-            while (hasNext)
+            while (item != null)
             {
-                IPlayerLoopItem item;
-                lock (runningGate)
-                {
-                    item = runningQueue.Dequeue();
-                }
-
                 var continuous = false;
                 try
                 {
@@ -76,7 +70,7 @@ namespace VContainer.Unity
 
                 lock (runningGate)
                 {
-                    hasNext = runningQueue.Count > 0;
+                    item = runningQueue.Count > 0 ? runningQueue.Dequeue() : null;
                 }
             }
 
@@ -86,8 +80,8 @@ namespace VContainer.Unity
                 running = false;
                 while (waitingQueue.Count > 0)
                 {
-                    var item = waitingQueue.Dequeue();
-                    runningQueue.Enqueue(item);
+                    var waitingItem = waitingQueue.Dequeue();
+                    runningQueue.Enqueue(waitingItem);
                 }
             }
         }
