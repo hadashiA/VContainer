@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -221,6 +222,37 @@ namespace VContainer.Tests
             var obj2 = container.Resolve<I3>();
             Assert.That(obj1, Is.EqualTo(instance));
             Assert.That(obj2, Is.EqualTo(instance));
+        }
+
+        [Test]
+        public void RegisterMultipleDisposables()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
+            builder.Register<IDisposable, DisposableServiceB>(Lifetime.Scoped);
+
+            var container = builder.Build();
+            var disposables = container.Resolve<IReadOnlyList<IDisposable>>();
+            container.Dispose();
+
+            Assert.That(disposables[0], Is.TypeOf<DisposableServiceA>());
+            Assert.That(disposables[1], Is.TypeOf<DisposableServiceB>());
+            Assert.That(disposables[0], Is.InstanceOf<IDisposable>());
+            Assert.That(disposables[1], Is.InstanceOf<IDisposable>());
+            Assert.That(((DisposableServiceA)disposables[0]).Disposed, Is.True);
+            Assert.That(((DisposableServiceB)disposables[1]).Disposed, Is.True);
+        }
+
+        [Test]
+        public void RegisterConflictImplementationTypes()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
+
+            Assert.Throws<VContainerException>(() =>
+            {
+                builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
+            });
         }
     }
 }
