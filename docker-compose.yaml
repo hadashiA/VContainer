@@ -6,10 +6,14 @@ services:
     - .:/VContainer
     working_dir: /VContainer/tmp
     command: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile
-  lisence_test:
+  test:
     image: gableroux/unity3d:2019.3.15f1
     volumes:
     - .:/VContainer
     working_dir: /VContainer
-    command: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2019.3.15f1.ulf || exit 0
+    command: >
+      /bin/sh -c "
+        /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2019.3.15f1.ulf ||
+        /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -projectPath ./VContainer -executeMethod UnitTestBuilder.BuildUnitTest /headless /ScriptBackend mono /BuildTarget StandaloneLinux64
+      "
     

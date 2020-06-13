@@ -4,11 +4,12 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{F328EB2F-65D0-4CE0-8445-302345D67A2C}</ProjectGuid>
+        <ProjectGuid>{3A9E7E07-322A-4D15-BBED-66BDF3A00F03}</ProjectGuid>
+        <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>VContainer</RootNamespace>
-        <AssemblyName>VContainer.Standalone</AssemblyName>
+        <RootNamespace>VContainer.StandaloneTests</RootNamespace>
+        <AssemblyName>VContainer.StandaloneTests</AssemblyName>
         <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
@@ -36,6 +37,9 @@
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
         <Reference Include="System.Xml" />
+        <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
+            <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
+        </Reference>
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Properties\AssemblyInfo.cs" />
@@ -49,9 +53,12 @@
     </Target>
     -->
     <ItemGroup>
-        <Compile Include="..\VContainer\Assets\VContainer\Runtime\**\*.cs"
-                 Exclude="
-..\VContainer\Assets\VContainer\Runtime\Unity\**\*.cs;
-" />
+        <Compile Include="..\VContainer\Assets\VContainer\Tests\**\*.cs" Exclude="&#xA;..\VContainer\Assets\VContainer\Tests\Unity\**\*.cs;&#xA;" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\VContainer.Standalone\VContainer.Standalone.csproj">
+        <Project>{f328eb2f-65d0-4ce0-8445-302345d67a2c}</Project>
+        <Name>VContainer.Standalone</Name>
+      </ProjectReference>
     </ItemGroup>
 </Project>

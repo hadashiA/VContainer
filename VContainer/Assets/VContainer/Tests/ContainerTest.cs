@@ -169,19 +169,6 @@ namespace VContainer.Tests
             Assert.That(((AllInjectionFeatureService)obj1).FromConstructor2, Is.InstanceOf<I7>());
         }
 
-        [Test]
-        public void RegisterInstance()
-        {
-            var builder = new ContainerBuilder();
-            var instance = new NoDependencyServiceB();
-            builder.RegisterInstance<I3>(instance);
-
-            var container = builder.Build();
-            var obj1 = container.Resolve<I3>();
-            var obj2 = container.Resolve<I3>();
-            Assert.That(obj1, Is.EqualTo(instance));
-            Assert.That(obj2, Is.EqualTo(instance));
-        }
 
         [Test]
         public void ResolveCollection()
@@ -220,6 +207,20 @@ namespace VContainer.Tests
             var list = container.Resolve<IReadOnlyList<I1>>();
             Assert.That(list[0], Is.TypeOf<MultipleInterfaceServiceA>());
             Assert.That(list.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void RegisterInstance()
+        {
+            var builder = new ContainerBuilder();
+            var instance = new NoDependencyServiceB();
+            builder.RegisterInstance<I3>(instance);
+
+            var container = builder.Build();
+            var obj1 = container.Resolve<I3>();
+            var obj2 = container.Resolve<I3>();
+            Assert.That(obj1, Is.EqualTo(instance));
+            Assert.That(obj2, Is.EqualTo(instance));
         }
     }
 }
