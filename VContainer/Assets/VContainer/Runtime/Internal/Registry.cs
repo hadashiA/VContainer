@@ -14,7 +14,7 @@ namespace VContainer.Internal
         bool TryGet(Type interfaceType, out IRegistration registration);
     }
 
-    public class HashTableRegistry : IRegistry
+    public sealed class HashTableRegistry : IRegistry
     {
         readonly object syncRoot = new object();
         readonly Hashtable registrations = new Hashtable();
@@ -36,37 +36,42 @@ namespace VContainer.Internal
 
         public bool TryGet(Type interfaceType, out IRegistration registration)
         {
-            // ReSharper disable once InconsistentlySynchronizedField
-            registration = registrations[interfaceType] as IRegistration;
-
-            // Auto fallback to collection..
-            if (registration is null &&
-                interfaceType.IsGenericType &&
-                (typeof(IEnumerable).IsAssignableFrom(interfaceType) ||
-                 interfaceType.GetGenericTypeDefinition().IsEquivalentTo(typeof(IReadOnlyList<>))))
+            while (true)
             {
-                var elementType = interfaceType.GetGenericArguments()[0];
                 // ReSharper disable once InconsistentlySynchronizedField
-                if (registrations[elementType] is Registration elementRegistration)
+                registration = registrations[interfaceType] as IRegistration;
+                if (registration != null)
                 {
-                    registration = new CollectionRegistration(elementType) { elementRegistration };
-                    lock (syncRoot)
+                    return true;
+                }
+
+                // Auto falling back to collection..
+                if (interfaceType.IsGenericType && interfaceType.GetInterface("IEnumerable") != null)
+                {
+                    var elementType = interfaceType.GetGenericArguments()[0];
+                    // ReSharper disable once InconsistentlySynchronizedField
+                    if (registrations[elementType] is Registration elementRegistration)
                     {
-                        foreach (var collectionType in registration.InterfaceTypes)
+                        registration = new CollectionRegistration(elementType) { elementRegistration };
+                        lock (syncRoot)
                         {
-                            try
+                            foreach (var collectionType in registration.InterfaceTypes)
                             {
-                                registrations.Add(collectionType, registration);
-                            }
-                            catch (ArgumentException)
-                            {
-                                throw new VContainerException($"Registration with the same key already exists: {collectionType} {registration}");
+                                try
+                                {
+                                    registrations.Add(collectionType, registration);
+                                }
+                                catch (ArgumentException)
+                                {
+                                    throw new VContainerException($"Registration with the same key already exists: {collectionType} {registration}");
+                                }
                             }
                         }
+                        continue;
                     }
                 }
+                return false;
             }
-            return registration != null;
         }
 
         void Add(Type service, Registration registration)

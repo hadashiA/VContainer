@@ -242,17 +242,5 @@ namespace VContainer.Tests
             Assert.That(((DisposableServiceA)disposables[0]).Disposed, Is.True);
             Assert.That(((DisposableServiceB)disposables[1]).Disposed, Is.True);
         }
-
-        [Test]
-        public void RegisterConflictImplementationTypes()
-        {
-            var builder = new ContainerBuilder();
-            builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
-
-            Assert.Throws<VContainerException>(() =>
-            {
-                builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
-            });
-        }
     }
 }
