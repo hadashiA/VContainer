@@ -40,10 +40,7 @@ namespace VContainer.Internal
             {
                 // ReSharper disable once InconsistentlySynchronizedField
                 registration = registrations[interfaceType] as IRegistration;
-                if (registration != null)
-                {
-                    return true;
-                }
+                if (registration != null) return true;
 
                 // Auto falling back to collection..
                 if (interfaceType.IsGenericType &&
@@ -57,21 +54,9 @@ namespace VContainer.Internal
                     // ReSharper disable once InconsistentlySynchronizedField
                     if (registrations[elementType] is Registration elementRegistration)
                     {
-                        registration = new CollectionRegistration(elementType) { elementRegistration };
-                        lock (syncRoot)
-                        {
-                            foreach (var collectionType in registration.InterfaceTypes)
-                            {
-                                try
-                                {
-                                    registrations.Add(collectionType, registration);
-                                }
-                                catch (ArgumentException)
-                                {
-                                    throw new VContainerException($"Registration with the same key already exists: {collectionType} {registration}");
-                                }
-                            }
-                        }
+                        var collectionRegistration = new CollectionRegistration(elementType) { elementRegistration };
+                        AddCollection(collectionRegistration);
+                        registration = collectionRegistration;
                         continue;
                     }
                 }
@@ -95,21 +80,7 @@ namespace VContainer.Internal
                     // ReSharper disable once InconsistentlySynchronizedField
                     var collectionRegistration = registrations[collectionService] as CollectionRegistration ??
                                                  new CollectionRegistration(service) { exists, registration };
-
-                    lock (syncRoot)
-                    {
-                        foreach (var collectionType in collectionRegistration.InterfaceTypes)
-                        {
-                            try
-                            {
-                                registrations.Add(collectionType, collectionRegistration);
-                            }
-                            catch (ArgumentException)
-                            {
-                                throw new VContainerException($"Registration with the same key already exists: {collectionType} {registration}");
-                            }
-                        }
-                    }
+                    AddCollection(collectionRegistration);
                     break;
                 case null:
                     lock (syncRoot)
@@ -117,6 +88,24 @@ namespace VContainer.Internal
                         registrations.Add(service, registration);
                     }
                     break;
+            }
+        }
+
+        void AddCollection(CollectionRegistration collectionRegistration)
+        {
+            lock (syncRoot)
+            {
+                foreach (var collectionType in collectionRegistration.InterfaceTypes)
+                {
+                    try
+                    {
+                        registrations.Add(collectionType, collectionRegistration);
+                    }
+                    catch (ArgumentException)
+                    {
+                        throw new VContainerException($"Registration with the same key already exists: {collectionType} {collectionRegistration}");
+                    }
+                }
             }
         }
     }

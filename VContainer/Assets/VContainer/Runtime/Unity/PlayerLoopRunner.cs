@@ -37,9 +37,15 @@ namespace VContainer.Unity
 
         public void Run()
         {
+            lock (runningGate)
             lock (waitingAndStateGate)
             {
                 running = true;
+                while (waitingQueue.Count > 0)
+                {
+                    var waitingItem = waitingQueue.Dequeue();
+                    runningQueue.Enqueue(waitingItem);
+                }
             }
 
             var item = default(IPlayerLoopItem);
@@ -74,15 +80,9 @@ namespace VContainer.Unity
                 }
             }
 
-            lock (runningGate)
             lock (waitingAndStateGate)
             {
                 running = false;
-                while (waitingQueue.Count > 0)
-                {
-                    var waitingItem = waitingQueue.Dequeue();
-                    runningQueue.Enqueue(waitingItem);
-                }
             }
         }
     }
