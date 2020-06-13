@@ -17,7 +17,7 @@ namespace VContainer.Internal
     public sealed class HashTableRegistry : IRegistry
     {
         readonly object syncRoot = new object();
-        readonly Hashtable registrations = new Hashtable();
+        readonly Hashtable registrations = new Hashtable(64);
 
         public void Add(Registration registration)
         {

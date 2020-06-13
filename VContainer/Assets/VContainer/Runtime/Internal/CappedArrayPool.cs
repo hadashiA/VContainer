@@ -36,9 +36,10 @@ namespace VContainer.Internal
             if (length > buckets.Length)
                 return new T[length]; // Not supported
 
+            var i = length - 1;
+
             lock (syncRoot)
             {
-                var i = length - 1;
                 var bucket = buckets[i];
                 var tail = tails[i];
                 if (tail < 0)
