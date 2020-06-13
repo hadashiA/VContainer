@@ -114,9 +114,6 @@
  <Reference Include="UnityEngine.IMGUIModule">
  <HintPath>/Applications/Unity/2019.4.0f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.IMGUIModule.dll</HintPath>
  </Reference>
- <Reference Include="UnityEngine.ImageConversionModule">
- <HintPath>/Applications/Unity/2019.4.0f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.ImageConversionModule.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.InputModule">
  <HintPath>/Applications/Unity/2019.4.0f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.InputModule.dll</HintPath>
  </Reference>
@@ -134,9 +131,6 @@
  </Reference>
  <Reference Include="UnityEngine.ProfilerModule">
  <HintPath>/Applications/Unity/2019.4.0f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.ProfilerModule.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.ScreenCaptureModule">
- <HintPath>/Applications/Unity/2019.4.0f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.ScreenCaptureModule.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.SharedInternalsModule">
  <HintPath>/Applications/Unity/2019.4.0f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.SharedInternalsModule.dll</HintPath>
