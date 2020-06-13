@@ -58,13 +58,14 @@ namespace VContainer.Internal
             foreach (var method in injectTypeInfo.InjectMethods)
             {
                 var parameters = method.GetParameters();
-                var parameterValues = new object[parameters.Length];
+                var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameters.Length);
                 for (var i = 0; i < parameters.Length; i++)
                 {
                     parameterValues[i] = resolver.Resolve(parameters[i].ParameterType);
                 }
 
                 method.Invoke(obj, parameterValues);
+                CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
             }
         }
     }

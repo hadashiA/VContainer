@@ -36,32 +36,28 @@ namespace VContainer.Internal
 
         public bool TryGet(Type interfaceType, out IRegistration registration)
         {
-            while (true)
-            {
-                // ReSharper disable once InconsistentlySynchronizedField
-                registration = registrations[interfaceType] as IRegistration;
-                if (registration != null) return true;
+            // ReSharper disable once InconsistentlySynchronizedField
+            registration = registrations[interfaceType] as IRegistration;
+            if (registration != null) return true;
 
-                // Auto falling back to collection..
-                if (interfaceType.IsGenericType &&
-                    // (interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
-                    //  interfaceType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
-                    // Optimize for mono runtime
-                    interfaceType.GetInterface("IEnumerable") != null
-                    )
+            // Auto falling back to collection..
+            if (interfaceType.IsGenericType &&
+                // (interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                //  interfaceType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
+                // Optimize for mono runtime
+                interfaceType.GetInterface("IEnumerable") != null
+                )
+            {
+                var elementType = interfaceType.GetGenericArguments()[0];
+                // ReSharper disable once InconsistentlySynchronizedField
+                if (registrations[elementType] is Registration elementRegistration)
                 {
-                    var elementType = interfaceType.GetGenericArguments()[0];
-                    // ReSharper disable once InconsistentlySynchronizedField
-                    if (registrations[elementType] is Registration elementRegistration)
-                    {
-                        var collectionRegistration = new CollectionRegistration(elementType) { elementRegistration };
-                        AddCollection(collectionRegistration);
-                        registration = collectionRegistration;
-                        continue;
-                    }
+                    var collectionRegistration = new CollectionRegistration(elementType) { elementRegistration };
+                    AddCollection(collectionRegistration);
+                    return TryGet(interfaceType, out registration);
                 }
-                return false;
             }
+            return false;
         }
 
         void Add(Type service, Registration registration)
