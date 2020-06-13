@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace VContainer.Unity
 {
@@ -14,15 +15,15 @@ namespace VContainer.Unity
         readonly Queue<IPlayerLoopItem> waitingQueue = new Queue<IPlayerLoopItem>();
 
         readonly object runningGate = new object();
-        readonly object waitingAndStateGate = new object();
+        readonly object waitingGate = new object();
 
-        bool running;
+        int running;
 
         public void Dispatch(IPlayerLoopItem item)
         {
-            lock (waitingAndStateGate)
+            if (running == 1)
             {
-                if (running)
+                lock (waitingGate)
                 {
                     waitingQueue.Enqueue(item);
                     return;
@@ -37,10 +38,11 @@ namespace VContainer.Unity
 
         public void Run()
         {
+            Interlocked.Exchange(ref running, 1);
+
             lock (runningGate)
-            lock (waitingAndStateGate)
+            lock (waitingGate)
             {
-                running = true;
                 while (waitingQueue.Count > 0)
                 {
                     var waitingItem = waitingQueue.Dequeue();
@@ -68,7 +70,7 @@ namespace VContainer.Unity
 
                 if (continuous)
                 {
-                    lock (waitingAndStateGate)
+                    lock (waitingGate)
                     {
                         waitingQueue.Enqueue(item);
                     }
@@ -80,10 +82,7 @@ namespace VContainer.Unity
                 }
             }
 
-            lock (waitingAndStateGate)
-            {
-                running = false;
-            }
+            Interlocked.Exchange(ref running, 0);
         }
     }
 }
