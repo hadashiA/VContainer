@@ -6,8 +6,8 @@ namespace VContainer
 {
     public interface IContainerBuilder
     {
-        RegistrationBuilder Register(Type interfaceType, Lifetime lifetime);
-        RegistrationBuilder RegisterInstance(object instance);
+        RegistrationBuilder Register<T>(Lifetime lifetime);
+        RegistrationBuilder RegisterInstance<T>(T instance);
         IObjectResolver Build();
     }
 
@@ -41,16 +41,16 @@ namespace VContainer
     {
         protected readonly IList<RegistrationBuilder> RegistrationBuilders = new List<RegistrationBuilder>();
 
-        public RegistrationBuilder Register(Type implementationType, Lifetime lifetime)
+        public RegistrationBuilder Register<T>(Lifetime lifetime)
         {
-            var registrationBuilder = new RegistrationBuilder(implementationType, lifetime);
+            var registrationBuilder = new RegistrationBuilder(typeof(T), lifetime);
             RegistrationBuilders.Add(registrationBuilder);
             return registrationBuilder;
         }
 
-        public RegistrationBuilder RegisterInstance(object instance)
+        public RegistrationBuilder RegisterInstance<T>(T instance)
         {
-            var registrationBuilder = new RegistrationBuilder(instance);
+            var registrationBuilder = new RegistrationBuilder(typeof(T), instance);
             RegistrationBuilders.Add(registrationBuilder);
             return registrationBuilder;
         }

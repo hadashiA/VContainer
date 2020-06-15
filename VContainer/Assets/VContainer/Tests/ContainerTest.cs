@@ -248,11 +248,9 @@ namespace VContainer.Tests
         {
             var builder = new ContainerBuilder();
             builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
+            builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
 
-            Assert.Throws<VContainerException>(() =>
-            {
-                builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
-            });
+            Assert.Throws<VContainerException>(() => builder.Build());
         }
     }
 }

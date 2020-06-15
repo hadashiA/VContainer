@@ -10,6 +10,6 @@ namespace VContainer
 
     interface IInjectorBuilder
     {
-        IInjector Build(Type type);
+        IInjector Build(Type type, bool skipConstructor);
     }
 }

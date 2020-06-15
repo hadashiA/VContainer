@@ -32,33 +32,36 @@ namespace VContainer.Internal
 
     static class TypeAnalyzer
     {
-        public static InjectTypeInfo Analyze(Type type)
+        public static InjectTypeInfo Analyze(Type type, bool skipConstructor = false)
         {
             var injectConstructor = default(ConstructorInfo);
             var typeInfo = type.GetTypeInfo();
 
-            // Constructor, single [Inject] constructor -> single most parameters constuctor
-            var injectConstructors = typeInfo.DeclaredConstructors.Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null).ToArray();
-            if (injectConstructors.Length == 0)
+            if (!skipConstructor)
             {
-                var grouped = typeInfo.DeclaredConstructors.Where(x => !x.IsStatic).GroupBy(x => x.GetParameters().Length).OrderByDescending(x => x.Key).FirstOrDefault();
-                if (grouped == null)
+                // Constructor, single [Inject] constructor -> single most parameters constuctor
+                var injectConstructors = typeInfo.DeclaredConstructors.Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null).ToArray();
+                if (injectConstructors.Length == 0)
                 {
-                    throw new VContainerException($"Type does not found injectable constructor, type: {type.Name}");
+                    var grouped = typeInfo.DeclaredConstructors.Where(x => !x.IsStatic).GroupBy(x => x.GetParameters().Length).OrderByDescending(x => x.Key).FirstOrDefault();
+                    if (grouped == null)
+                    {
+                        throw new VContainerException($"Type does not found injectable constructor, type: {type.Name}");
+                    }
+                    if (grouped.Count() != 1)
+                    {
+                        throw new VContainerException($"Type found multiple ambiguous constructors, type: {type.Name}");
+                    }
+                    injectConstructor = grouped.First();
                 }
-                if (grouped.Count() != 1)
+                else if (injectConstructors.Length == 1)
                 {
-                    throw new VContainerException($"Type found multiple ambiguous constructors, type: {type.Name}");
+                    injectConstructor = injectConstructors[0];
                 }
-                injectConstructor = grouped.First();
-            }
-            else if (injectConstructors.Length == 1)
-            {
-                injectConstructor = injectConstructors[0];
-            }
-            else
-            {
-                throw new VContainerException("Type found multiple [Inject] marked constructors, type:" + type.Name);
+                else
+                {
+                    throw new VContainerException("Type found multiple [Inject] marked constructors, type:" + type.Name);
+                }
             }
 
             // Fields, [Inject] Only

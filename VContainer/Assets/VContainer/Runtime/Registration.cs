@@ -37,6 +37,13 @@ namespace VContainer
 
         public void Add(Registration registration)
         {
+            foreach (var x in registrations)
+            {
+                if (x.ImplementationType == registration.ImplementationType)
+                {
+                    throw new VContainerException($"Conflict implementation type : {registration}");
+                }
+            }
             registrations.Add(registration);
         }
 
@@ -109,17 +116,16 @@ namespace VContainer
             this.lifetime = lifetime;
         }
 
-        public RegistrationBuilder(object instance, List<Type> interfaceTypes = null)
+        public RegistrationBuilder(Type implementationType, object instance)
         {
-            implementationType = instance.GetType();
-            this.interfaceTypes = interfaceTypes;
+            this.implementationType = implementationType;
             lifetime = Lifetime.Scoped;
             specificInstance = instance;
         }
 
         public Registration Build()
         {
-            var injector = ReflectionInjectorBuilder.Default.Build(implementationType); // TODO:
+            var injector = ReflectionInjectorBuilder.Default.Build(implementationType, specificInstance != null);
 
             return new Registration(
                 implementationType,
@@ -131,13 +137,13 @@ namespace VContainer
 
         public RegistrationBuilder As<TInterface>()
         {
-            (interfaceTypes ?? (interfaceTypes = new List<Type>())).Add(typeof(TInterface));
+            (interfaceTypes ??= new List<Type>()).Add(typeof(TInterface));
             return this;
         }
 
         public RegistrationBuilder As<TInterface1, TInterface2>()
         {
-            var list = (interfaceTypes ?? (interfaceTypes = new List<Type>()));
+            var list = (interfaceTypes ??= new List<Type>());
             list.Add(typeof(TInterface1));
             list.Add(typeof(TInterface2));
             return this;
@@ -145,7 +151,7 @@ namespace VContainer
 
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3>()
         {
-            var list = (interfaceTypes ?? (interfaceTypes = new List<Type>()));
+            var list = (interfaceTypes ??= new List<Type>());
             list.Add(typeof(TInterface1));
             list.Add(typeof(TInterface2));
             list.Add(typeof(TInterface3));
@@ -154,7 +160,7 @@ namespace VContainer
 
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3, TInterface4>()
         {
-            var list = (interfaceTypes ?? (interfaceTypes = new List<Type>()));
+            var list = (interfaceTypes ??= new List<Type>());
             list.Add(typeof(TInterface1));
             list.Add(typeof(TInterface2));
             list.Add(typeof(TInterface3));
@@ -164,7 +170,13 @@ namespace VContainer
 
         public RegistrationBuilder AsSelf()
         {
-            (interfaceTypes ?? (interfaceTypes = new List<Type>())).Add(implementationType);
+            (interfaceTypes ??= new List<Type>()).Add(implementationType);
+            return this;
+        }
+
+        public RegistrationBuilder AsImplementedInterfaces()
+        {
+            interfaceTypes.AddRange(implementationType.GetInterfaces());
             return this;
         }
     }

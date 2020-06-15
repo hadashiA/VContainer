@@ -4,6 +4,8 @@ namespace VContainer.Internal
 {
     public sealed class CappedArrayPool<T>
     {
+        const int InitialBucketSize = 4;
+
         public static readonly T[] EmptyArray = new T[0];
         public static readonly CappedArrayPool<T> Shared8Limit = new CappedArrayPool<T>(8);
 
@@ -17,12 +19,11 @@ namespace VContainer.Internal
             tails = new int[maxLength];
             for (var i = 0; i < maxLength; i++)
             {
-                buckets[i] = new[]
+                var arrayLength = i + 1;
+                buckets[i] = new T[InitialBucketSize][];
+                for (var j = 0; j < InitialBucketSize; j++)
                 {
-                    new T[i + 1],
-                    new T[i + 1],
-                    new T[i + 1],
-                    new T[i + 1]
+                    buckets[i][j] = new T[arrayLength];
                 };
                 tails[i] = buckets[i].Length - 1;
             }
@@ -42,12 +43,17 @@ namespace VContainer.Internal
             {
                 var bucket = buckets[i];
                 var tail = tails[i];
-                if (tail < 0)
+                if (tail >= bucket.Length)
                 {
-                    throw new NotSupportedException();
+                    Array.Resize(ref bucket, bucket.Length * 2);
+                    for (var j = tail; j < bucket.Length; j++)
+                    {
+                        bucket[j] = new T[length];
+                    }
                 }
+
                 var result = bucket[tail];
-                tails[i] -= 1;
+                tails[i] += 1;
                 return result;
             }
         }
@@ -61,7 +67,7 @@ namespace VContainer.Internal
             {
                 var i = array.Length - 1;
                 var bucket = buckets[i];
-                var tail = (tails[i] += 1);
+                var tail = (tails[i] -= 1);
                 bucket[tail] = array;
             }
         }

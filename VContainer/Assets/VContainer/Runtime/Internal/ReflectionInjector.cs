@@ -74,9 +74,9 @@ namespace VContainer.Internal
     {
         public static ReflectionInjectorBuilder Default = new ReflectionInjectorBuilder();
 
-        public IInjector Build(Type type)
+        public IInjector Build(Type type, bool skipConstructor)
         {
-            var injectTypeInfo = TypeAnalyzer.Analyze(type);
+            var injectTypeInfo = TypeAnalyzer.Analyze(type, skipConstructor);
             return new ReflectionInjector(injectTypeInfo);
         }
     }

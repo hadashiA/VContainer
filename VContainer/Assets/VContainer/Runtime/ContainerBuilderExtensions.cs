@@ -2,9 +2,6 @@ namespace VContainer
 {
     public static class ContainerBuilderExtensions
     {
-        public static RegistrationBuilder Register<T>(this IContainerBuilder builder, Lifetime lifetime)
-            => builder.Register(typeof(T), lifetime);
-
         public static RegistrationBuilder Register<TInterface, TImplement>(
             this IContainerBuilder builder,
             Lifetime lifetime)
