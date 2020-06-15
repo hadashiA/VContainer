@@ -52,9 +52,9 @@ namespace VContainer
         public IScopedObjectResolver Parent { get; }
 
         readonly IRegistry registry;
-        readonly Hashtable sharedInstances = new Hashtable(32);
+        readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
         readonly CompositeDisposable disposables = new CompositeDisposable();
-        readonly object syncRoot = new object();
+        readonly Func<IRegistration, Lazy<object>> createInstance;
 
         internal ScopedContainer(
             IRegistry registry,
@@ -64,6 +64,7 @@ namespace VContainer
             this.registry = registry;
             Root = root;
             Parent = parent;
+            createInstance = CreateInstance;
         }
 
         public object Resolve(Type type)
@@ -83,20 +84,12 @@ namespace VContainer
                     return Root.Resolve(registration);
 
                 case Lifetime.Scoped:
-                    lock (syncRoot)
+                    var lazy = sharedInstances.GetOrAdd(registration, createInstance);
+                    if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable)
                     {
-                        var instance = sharedInstances[registration.ImplementationType];
-                        if (instance is null)
-                        {
-                            instance = registration.SpawnInstance(this);
-                            if (instance is IDisposable disposable)
-                            {
-                                disposables.Add(disposable);
-                            }
-                            sharedInstances.Add(registration.ImplementationType, instance);
-                        }
-                        return instance;
+                        disposables.Add(disposable);
                     }
+                    return lazy.Value;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -131,19 +124,26 @@ namespace VContainer
             }
             throw new VContainerException($"No such registration of type: {type.FullName}");
         }
+
+        Lazy<object> CreateInstance(IRegistration registration)
+        {
+            return new Lazy<object>(() => registration.SpawnInstance(this));
+        }
     }
 
     public sealed class Container : IObjectResolver
     {
         readonly IRegistry registry;
         readonly IScopedObjectResolver rootScope;
-        readonly object syncRoot = new object();
-        readonly Hashtable sharedInstances = new Hashtable(16);
+        readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
+        readonly Func<IRegistration, Lazy<object>> createInstance;
 
         internal Container(IRegistry registry)
         {
             this.registry = registry;
             rootScope = new ScopedContainer(registry, this);
+
+            createInstance = CreateInstance;
         }
 
         public object Resolve(Type type)
@@ -161,17 +161,8 @@ namespace VContainer
             {
                 case Lifetime.Transient:
                     return registration.SpawnInstance(this);
-
                 case Lifetime.Singleton:
-                    lock (syncRoot)
-                    {
-                        if (!(sharedInstances[registration.ImplementationType] is object instance))
-                        {
-                            instance = registration.SpawnInstance(this);
-                            sharedInstances.Add(registration.ImplementationType, instance);
-                        }
-                        return instance;
-                    }
+                    return sharedInstances.GetOrAdd(registration, createInstance).Value;
                 case Lifetime.Scoped:
                     return rootScope.Resolve(registration);
 
@@ -184,5 +175,10 @@ namespace VContainer
             => rootScope.CreateScope(configuration);
 
         public void Dispose() => rootScope.Dispose();
+
+        Lazy<object> CreateInstance(IRegistration registration)
+        {
+            return new Lazy<object>(() => registration.SpawnInstance(this));
+        }
     }
 }
