@@ -13,6 +13,43 @@ namespace VContainer
         object SpawnInstance(IObjectResolver resolver);
     }
 
+    public sealed class Registration : IRegistration
+    {
+        public Type ImplementationType { get; }
+        public IReadOnlyList<Type> InterfaceTypes { get; }
+        public Lifetime Lifetime { get; }
+
+        readonly IInjector injector;
+        readonly object specificInstance;
+
+        internal Registration(
+            Type implementationType,
+            IReadOnlyList<Type> interfaceTypes,
+            Lifetime lifetime,
+            IInjector injector,
+            object specificInstance = null)
+        {
+            ImplementationType = implementationType;
+            InterfaceTypes = interfaceTypes;
+            Lifetime = lifetime;
+
+            this.injector = injector;
+            this.specificInstance = specificInstance;
+        }
+
+        public override string ToString() => $"ConcreteType={ImplementationType.Name} ContractTypes={string.Join(", ", InterfaceTypes)} {Lifetime} {injector.GetType().Name}";
+
+        public object SpawnInstance(IObjectResolver resolver)
+        {
+            if (specificInstance != null)
+            {
+                injector.Inject(specificInstance, resolver);
+                return specificInstance;
+            }
+            return injector.CreateInstance(resolver);
+        }
+    }
+
     public sealed class CollectionRegistration : IRegistration, IEnumerable<IRegistration>
     {
         public Type ImplementationType { get; }
@@ -63,43 +100,6 @@ namespace VContainer
 
         public IEnumerator<IRegistration> GetEnumerator() => registrations.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
-
-    public sealed class Registration : IRegistration
-    {
-        public Type ImplementationType { get; }
-        public IReadOnlyList<Type> InterfaceTypes { get; }
-        public Lifetime Lifetime { get; }
-
-        readonly IInjector injector;
-        readonly object specificInstance;
-
-        internal Registration(
-            Type implementationType,
-            IReadOnlyList<Type> interfaceTypes,
-            Lifetime lifetime,
-            IInjector injector,
-            object specificInstance = null)
-        {
-            ImplementationType = implementationType;
-            InterfaceTypes = interfaceTypes;
-            Lifetime = lifetime;
-
-            this.injector = injector;
-            this.specificInstance = specificInstance;
-        }
-
-        public override string ToString() => $"ConcreteType={ImplementationType.Name} ContractTypes={string.Join(", ", InterfaceTypes)} {Lifetime} {injector.GetType().Name}";
-
-        public object SpawnInstance(IObjectResolver resolver)
-        {
-            if (specificInstance != null)
-            {
-                injector.Inject(specificInstance, resolver);
-                return specificInstance;
-            }
-            return injector.CreateInstance(resolver);
-        }
     }
 
     public sealed class RegistrationBuilder
