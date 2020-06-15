@@ -4,6 +4,6 @@ namespace VContainer.Unity
 {
     public abstract class VContainerInstaller : MonoBehaviour
     {
-        public abstract void Install(IContainerBuilder builder);
+        public abstract void Install(ContainerBuilderUnity builder);
     }
 }

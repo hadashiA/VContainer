@@ -21,18 +21,20 @@ namespace VContainer.Unity
             {
                 Container = parentScope.Container.CreateScope(builder =>
                 {
+                    var decoratedBuilder = new ContainerBuilderUnity(builder, this);
                     foreach (var installer in installers)
                     {
-                        installer.Install(builder);
+                        installer.Install(decoratedBuilder);
                     }
                 });
             }
             else
             {
-                var builder = new ContainerBuilder();
+                var builder = new VContainer.ContainerBuilder();
+                var decoratedBuilder = new ContainerBuilderUnity(builder, this);
                 foreach (var installer in installers)
                 {
-                    installer.Install(builder);
+                    installer.Install(decoratedBuilder);
                 }
                 Container = builder.Build();
             }

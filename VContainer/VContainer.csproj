@@ -68,6 +68,7 @@
      <Compile Include="Assets\VContainer\Runtime\Internal\Registry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\TypeAnalyzer.cs" />
      <Compile Include="Assets\VContainer\Runtime\Registration.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Unity\ContainerBuilderUnity.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopHelper.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopItem.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopRunner.cs" />
