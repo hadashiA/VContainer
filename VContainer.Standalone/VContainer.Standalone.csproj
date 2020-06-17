@@ -3,9 +3,6 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="..\VContainer\Assets\VContainer\Runtime\**\*.cs"
-                 Exclude="
-..\VContainer\Assets\VContainer\Runtime\Unity\**\*.cs;
-" />
+        <Compile Include="..\VContainer\Assets\VContainer\Runtime\**\*.cs" Exclude="&#xA;..\VContainer\Assets\VContainer\Runtime\Unity\**\*.cs;&#xA;" />
     </ItemGroup>
 </Project>

@@ -257,9 +257,7 @@ namespace VContainer.Tests
         public void RegisterInvalidInterface()
         {
             var builder = new ContainerBuilder();
-            builder.Register<NoDependencyServiceA>(Lifetime.Scoped).As<I1>();
-
-            Assert.Throws<VContainerException>(() => builder.Build());
+            Assert.Throws<VContainerException>(() => builder.Register<NoDependencyServiceA>(Lifetime.Scoped).As<I1>());
         }
 
         [Test]
