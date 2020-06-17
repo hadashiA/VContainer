@@ -40,78 +40,34 @@ namespace VContainer
         public RegistrationBuilder As<TInterface>()
         {
             // TODO: Check at compilation time
-            if (!typeof(TInterface).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface)}");
-            }
-            interfaceTypes = interfaceTypes ?? new List<Type>();
-            interfaceTypes.Add(typeof(TInterface));
+            AddInterfaceType(typeof(TInterface));
             return this;
         }
 
         public RegistrationBuilder As<TInterface1, TInterface2>()
         {
             // TODO: Check at compilation time
-            if (!typeof(TInterface1).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface1)}");
-            }
-            if (!typeof(TInterface2).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface2)}");
-            }
-
-            interfaceTypes = interfaceTypes ?? new List<Type>();
-            interfaceTypes.Add(typeof(TInterface1));
-            interfaceTypes.Add(typeof(TInterface2));
+            AddInterfaceType(typeof(TInterface1));
+            AddInterfaceType(typeof(TInterface2));
             return this;
         }
 
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3>()
         {
-            if (!typeof(TInterface1).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface1)}");
-            }
-            if (!typeof(TInterface2).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface2)}");
-            }
-            if (!typeof(TInterface3).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface3)}");
-            }
-
-            interfaceTypes = interfaceTypes ?? new List<Type>();
-            interfaceTypes.Add(typeof(TInterface1));
-            interfaceTypes.Add(typeof(TInterface2));
-            interfaceTypes.Add(typeof(TInterface3));
+            // TODO: Check at compilation time
+            AddInterfaceType(typeof(TInterface1));
+            AddInterfaceType(typeof(TInterface2));
+            AddInterfaceType(typeof(TInterface3));
             return this;
         }
 
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3, TInterface4>()
         {
-            if (!typeof(TInterface1).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface1)}");
-            }
-            if (!typeof(TInterface2).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface2)}");
-            }
-            if (!typeof(TInterface3).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface3)}");
-            }
-            if (!typeof(TInterface4).IsAssignableFrom(implementationType))
-            {
-                throw new VContainerException($"{implementationType.FullName} is not assignable from {typeof(TInterface4)}");
-            }
-            interfaceTypes = interfaceTypes ?? new List<Type>();
-            interfaceTypes.Add(typeof(TInterface1));
-            interfaceTypes.Add(typeof(TInterface2));
-            interfaceTypes.Add(typeof(TInterface3));
-            interfaceTypes.Add(typeof(TInterface4));
+            // TODO: Check at compilation time
+            AddInterfaceType(typeof(TInterface1));
+            AddInterfaceType(typeof(TInterface2));
+            AddInterfaceType(typeof(TInterface3));
+            AddInterfaceType(typeof(TInterface4));
             return this;
         }
 
@@ -124,8 +80,19 @@ namespace VContainer
 
         public RegistrationBuilder AsImplementedInterfaces()
         {
+            interfaceTypes = interfaceTypes ?? new List<Type>();
             interfaceTypes.AddRange(implementationType.GetInterfaces());
             return this;
+        }
+
+        void AddInterfaceType(Type interfaceType)
+        {
+            if (!interfaceType.IsAssignableFrom(implementationType))
+            {
+                throw new VContainerException($"{implementationType.FullName} is not assignable from {interfaceType.FullName}");
+            }
+            interfaceTypes = interfaceTypes ?? new List<Type>();
+            interfaceTypes.Add(interfaceType);
         }
    }
 }
