@@ -90,11 +90,17 @@ namespace VContainer
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(1);
             parameterValues[0] = registrations.Count;
             var list = (IList)Activator.CreateInstance(genericType, parameterValues);
-            foreach (var registration in registrations)
+            try
             {
-                list.Add(resolver.Resolve(registration));
+                foreach (var registration in registrations)
+                {
+                    list.Add(resolver.Resolve(registration));
+                }
             }
-            CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
+            finally
+            {
+                CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
+            }
             return list;
         }
 
@@ -105,9 +111,9 @@ namespace VContainer
     public sealed class RegistrationBuilder
     {
         readonly Type implementationType;
-        List<Type> interfaceTypes;
-        Lifetime lifetime;
+        readonly Lifetime lifetime;
         readonly object specificInstance;
+        List<Type> interfaceTypes;
 
         public RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
         {

@@ -252,5 +252,25 @@ namespace VContainer.Tests
 
             Assert.Throws<VContainerException>(() => builder.Build());
         }
+
+        [Test]
+        public void RegisterInvalidInterface()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<NoDependencyServiceA>(Lifetime.Scoped).As<I1>();
+
+            Assert.Throws<VContainerException>(() => builder.Build());
+        }
+
+        [Test]
+        public void ErrorMessageIncludesDependency()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<AllInjectionFeatureService>(Lifetime.Scoped);
+
+            var container = builder.Build();
+            Assert.Throws<VContainerException>(() => container.Resolve<AllInjectionFeatureService>(),
+                "Failed to resolve VContainer.Tests.AllInjectionFeatureService : No such registration of type: VContainer.Tests.I6");
+       }
     }
 }

@@ -64,7 +64,10 @@ namespace VContainer
             this.registry = registry;
             Root = root;
             Parent = parent;
-            createInstance = CreateInstance;
+            createInstance = registration =>
+            {
+                return new Lazy<object>(() => registration.SpawnInstance(this));
+            };
         }
 
         public object Resolve(Type type)
@@ -124,11 +127,6 @@ namespace VContainer
             }
             throw new VContainerException($"No such registration of type: {type.FullName}");
         }
-
-        Lazy<object> CreateInstance(IRegistration registration)
-        {
-            return new Lazy<object>(() => registration.SpawnInstance(this));
-        }
     }
 
     public sealed class Container : IObjectResolver
@@ -142,8 +140,10 @@ namespace VContainer
         {
             this.registry = registry;
             rootScope = new ScopedContainer(registry, this);
-
-            createInstance = CreateInstance;
+            createInstance = registration =>
+            {
+                return new Lazy<object>(() => registration.SpawnInstance(this));
+            };
         }
 
         public object Resolve(Type type)
@@ -165,7 +165,6 @@ namespace VContainer
                     return sharedInstances.GetOrAdd(registration, createInstance).Value;
                 case Lifetime.Scoped:
                     return rootScope.Resolve(registration);
-
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -176,9 +175,5 @@ namespace VContainer
 
         public void Dispose() => rootScope.Dispose();
 
-        Lazy<object> CreateInstance(IRegistration registration)
-        {
-            return new Lazy<object>(() => registration.SpawnInstance(this));
-        }
     }
 }

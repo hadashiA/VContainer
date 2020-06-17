@@ -22,16 +22,27 @@ namespace VContainer.Internal
         {
             var parameters = injectTypeInfo.InjectConstructor.GetParameters();
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameters.Length);
-            for (var i = 0; i < parameters.Length; i++)
+            try
             {
-                parameterValues[i] = resolver.Resolve(parameters[i].ParameterType);
+                for (var i = 0; i < parameters.Length; i++)
+                {
+                    try
+                    {
+                        parameterValues[i] = resolver.Resolve(parameters[i].ParameterType);
+                    }
+                    catch (VContainerException ex)
+                    {
+                        throw new VContainerException($"Failed to resolve {injectTypeInfo.Type.FullName} : {ex.Message}");
+                    }
+                }
+                var instance = injectTypeInfo.InjectConstructor.Invoke(parameterValues);
+                Inject(instance, resolver);
+                return instance;
             }
-
-            var instance = injectTypeInfo.InjectConstructor.Invoke(parameterValues);
-            Inject(instance, resolver);
-
-            CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
-            return instance;
+            finally
+            {
+                CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
+            }
         }
 
         void InjectFields(object obj, IObjectResolver resolver)
@@ -59,13 +70,25 @@ namespace VContainer.Internal
             {
                 var parameters = method.GetParameters();
                 var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameters.Length);
-                for (var i = 0; i < parameters.Length; i++)
+                try
                 {
-                    parameterValues[i] = resolver.Resolve(parameters[i].ParameterType);
+                    for (var i = 0; i < parameters.Length; i++)
+                    {
+                        try
+                        {
+                            parameterValues[i] = resolver.Resolve(parameters[i].ParameterType);
+                        }
+                        catch (VContainerException ex)
+                        {
+                            throw new VContainerException($"Failed to resolve {injectTypeInfo.Type.FullName} : {ex.Message}");
+                        }
+                    }
+                    method.Invoke(obj, parameterValues);
                 }
-
-                method.Invoke(obj, parameterValues);
-                CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
+                finally
+                {
+                    CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
+                }
             }
         }
     }

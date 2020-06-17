@@ -21,7 +21,7 @@ namespace VContainer.Unity
 
         public void Dispatch(IPlayerLoopItem item)
         {
-            if (running == 1)
+            if (Interlocked.CompareExchange(ref running, 1, 1) == 1)
             {
                 lock (waitingGate)
                 {
