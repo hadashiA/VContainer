@@ -63,12 +63,11 @@ namespace VContainer.Internal
             if (array.Length <= 0 || array.Length > buckets.Length)
                 return;
 
+            var i = array.Length - 1;
             lock (syncRoot)
             {
-                var i = array.Length - 1;
-                var bucket = buckets[i];
-                var tail = (tails[i] -= 1);
-                bucket[tail] = array;
+                if (tails[i] > 0)
+                    tails[i] -= 1;
             }
         }
     }

@@ -41,20 +41,21 @@ namespace VContainer.Internal
             if (registration != null) return true;
 
             // Auto falling back to collection..
-            if (interfaceType.IsGenericType &&
-                // (interfaceType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
-                //  interfaceType.GetGenericTypeDefinition() == typeof(IReadOnlyList<>))
-                // Optimize for mono runtime
-                interfaceType.GetInterface("IEnumerable") != null
-                )
+            if (interfaceType.IsGenericType)
             {
-                var elementType = interfaceType.GetGenericArguments()[0];
-                // ReSharper disable once InconsistentlySynchronizedField
-                if (registrations[elementType] is Registration elementRegistration)
+                // TODO:
+                var genericType = interfaceType.GetGenericTypeDefinition();
+                if (genericType == typeof(IEnumerable<>) ||
+                    genericType == typeof(IReadOnlyList<>))
                 {
-                    var collectionRegistration = new CollectionRegistration(elementType) { elementRegistration };
-                    AddCollection(collectionRegistration);
-                    return TryGet(interfaceType, out registration);
+                    var elementType = interfaceType.GetGenericArguments()[0];
+                    // ReSharper disable once InconsistentlySynchronizedField
+                    if (registrations[elementType] is Registration elementRegistration)
+                    {
+                        var collectionRegistration = new CollectionRegistration(elementType) { elementRegistration };
+                        AddCollection(collectionRegistration);
+                        return TryGet(interfaceType, out registration);
+                    }
                 }
             }
             return false;

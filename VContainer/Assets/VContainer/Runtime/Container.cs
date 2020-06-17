@@ -13,7 +13,7 @@ namespace VContainer
     {
         object Resolve(Type type);
         object Resolve(IRegistration registration);
-        IScopedObjectResolver CreateScope(Action<IContainerBuilder> configuration = null);
+        IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
     }
 
     public static class ObjectResolverExtensions
@@ -95,10 +95,10 @@ namespace VContainer
             }
         }
 
-        public IScopedObjectResolver CreateScope(Action<IContainerBuilder> configuration = null)
+        public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
         {
             var containerBuilder = new ScopedContainerBuilder(Root, this);
-            configuration?.Invoke(containerBuilder);
+            installation?.Invoke(containerBuilder);
             return containerBuilder.BuildScope();
         }
 
@@ -171,8 +171,8 @@ namespace VContainer
             }
         }
 
-        public IScopedObjectResolver CreateScope(Action<IContainerBuilder> configuration = null)
-            => rootScope.CreateScope(configuration);
+        public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
+            => rootScope.CreateScope(installation);
 
         public void Dispose() => rootScope.Dispose();
 

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VContainer.Unity
@@ -6,7 +8,7 @@ namespace VContainer.Unity
     public sealed class ContainerBuilderUnity : IContainerBuilder
     {
         readonly IContainerBuilder builder;
-        readonly VContainerLifetimeScope lifetimeScope;
+        readonly LifetimeScope lifetimeScope;
 
         GameObject[] RootGameObjects
         {
@@ -22,7 +24,7 @@ namespace VContainer.Unity
 
         public ContainerBuilderUnity(
             IContainerBuilder builder,
-            VContainerLifetimeScope lifetimeScope)
+            LifetimeScope lifetimeScope)
         {
             this.builder = builder;
             this.lifetimeScope = lifetimeScope;
@@ -47,6 +49,11 @@ namespace VContainer.Unity
             }
 
             return RegisterInstance(component);
+        }
+
+        public RegistrationBuilder RegisterPrefab(Component component, Transform parent = null)
+        {
+            throw new NotImplementedException();
         }
     }
 }

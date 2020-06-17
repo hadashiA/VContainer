@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace VContainer.Unity
 {
-    public abstract class VContainerInstaller : MonoBehaviour
+    public abstract class ScriptableObjectInstaller : ScriptableObject, IInstaller
     {
         public abstract void Install(ContainerBuilderUnity builder);
     }

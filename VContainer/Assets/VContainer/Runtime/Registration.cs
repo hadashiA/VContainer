@@ -137,40 +137,42 @@ namespace VContainer
 
         public RegistrationBuilder As<TInterface>()
         {
-            (interfaceTypes ??= new List<Type>()).Add(typeof(TInterface));
+            interfaceTypes = interfaceTypes ?? new List<Type>();
+            interfaceTypes.Add(typeof(TInterface));
             return this;
         }
 
         public RegistrationBuilder As<TInterface1, TInterface2>()
         {
-            var list = (interfaceTypes ??= new List<Type>());
-            list.Add(typeof(TInterface1));
-            list.Add(typeof(TInterface2));
+            interfaceTypes = interfaceTypes ?? new List<Type>();
+            interfaceTypes.Add(typeof(TInterface1));
+            interfaceTypes.Add(typeof(TInterface2));
             return this;
         }
 
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3>()
         {
-            var list = (interfaceTypes ??= new List<Type>());
-            list.Add(typeof(TInterface1));
-            list.Add(typeof(TInterface2));
-            list.Add(typeof(TInterface3));
+            interfaceTypes = interfaceTypes ?? new List<Type>();
+            interfaceTypes.Add(typeof(TInterface1));
+            interfaceTypes.Add(typeof(TInterface2));
+            interfaceTypes.Add(typeof(TInterface3));
             return this;
         }
 
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3, TInterface4>()
         {
-            var list = (interfaceTypes ??= new List<Type>());
-            list.Add(typeof(TInterface1));
-            list.Add(typeof(TInterface2));
-            list.Add(typeof(TInterface3));
-            list.Add(typeof(TInterface4));
+            interfaceTypes = interfaceTypes ?? new List<Type>();
+            interfaceTypes.Add(typeof(TInterface1));
+            interfaceTypes.Add(typeof(TInterface2));
+            interfaceTypes.Add(typeof(TInterface3));
+            interfaceTypes.Add(typeof(TInterface4));
             return this;
         }
 
         public RegistrationBuilder AsSelf()
         {
-            (interfaceTypes ??= new List<Type>()).Add(implementationType);
+            interfaceTypes = interfaceTypes ?? new List<Type>();
+            interfaceTypes.Add(implementationType);
             return this;
         }
 
