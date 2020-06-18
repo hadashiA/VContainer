@@ -190,6 +190,12 @@ namespace VContainer.Tests
 
             // Singleton
             Assert.That(list[0], Is.EqualTo(e0));
+
+            // TODO:
+            var emptyEnumerable = container.Resolve<IEnumerable<I7>>();
+            var emptyList = container.Resolve<IReadOnlyList<I7>>();
+            Assert.That(emptyEnumerable.Any(), Is.False);
+            Assert.That(emptyList.Count, Is.EqualTo(0));
         }
 
         [Test]

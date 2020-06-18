@@ -4,8 +4,11 @@ namespace VContainer
 {
     public sealed class VContainerException : Exception
     {
-        public VContainerException(string message) : base(message)
+        public readonly Type InvalidType;
+
+        public VContainerException(Type invalidType, string message) : base(message)
         {
+            InvalidType = invalidType;
         }
     }
 }

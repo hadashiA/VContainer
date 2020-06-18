@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using VContainer.Internal;
@@ -125,7 +124,7 @@ namespace VContainer
                 }
                 scope = scope.Parent;
             }
-            throw new VContainerException($"No such registration of type: {type.FullName}");
+            throw new VContainerException(type, $"No such registration of type: {type.FullName}");
         }
     }
 
@@ -152,7 +151,7 @@ namespace VContainer
             {
                 return Resolve(registration);
             }
-            throw new VContainerException($"No such registration of type: {type.FullName}");
+            throw new VContainerException(type, $"No such registration of type: {type.FullName}");
         }
 
         public object Resolve(IRegistration registration)

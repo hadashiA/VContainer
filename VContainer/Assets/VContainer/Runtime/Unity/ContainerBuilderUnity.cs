@@ -35,6 +35,8 @@ namespace VContainer.Unity
 
         public RegistrationBuilder Register<T>(Lifetime lifetime) => builder.Register<T>(lifetime);
         public RegistrationBuilder RegisterInstance<T>(T instance) => builder.RegisterInstance(instance);
+        public void RegisterContainer() => builder.RegisterContainer();
+
         public IObjectResolver Build() => builder.Build();
 
         public RegistrationBuilder RegisterComponentInHierarchy<T>()
@@ -42,13 +44,13 @@ namespace VContainer.Unity
             var component = default(T);
             foreach (var x in RootGameObjects)
             {
-                component = x.GetComponent<T>();
+                component = x.GetComponentInChildren<T>(true);
                 if (component != null) break;
             }
 
             if (component == null)
             {
-                throw new VContainerException($"Component {typeof(T)} is not in this scene {scene}");
+                throw new VContainerException(typeof(T), $"Component {typeof(T)} is not in this scene {scene.path}");
             }
 
             return RegisterInstance(component);

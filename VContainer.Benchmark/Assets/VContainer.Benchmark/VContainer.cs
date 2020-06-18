@@ -25,7 +25,8 @@ namespace Vcontainer.Benchmark
                     container.Resolve<ISingleton2>();
                     container.Resolve<ISingleton3>();
                 })
-                .ProfilerMarkers()
+                .WarmupCount(10)
+                .MeasurementCount(10)
                 .Run();
         }
 

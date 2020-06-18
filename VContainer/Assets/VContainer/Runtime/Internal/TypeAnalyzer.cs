@@ -46,11 +46,11 @@ namespace VContainer.Internal
                     var grouped = typeInfo.DeclaredConstructors.Where(x => !x.IsStatic).GroupBy(x => x.GetParameters().Length).OrderByDescending(x => x.Key).FirstOrDefault();
                     if (grouped == null)
                     {
-                        throw new VContainerException($"Type does not found injectable constructor, type: {type.Name}");
+                        throw new VContainerException(type, $"Type does not found injectable constructor, type: {type.Name}");
                     }
                     if (grouped.Count() != 1)
                     {
-                        throw new VContainerException($"Type found multiple ambiguous constructors, type: {type.Name}");
+                        throw new VContainerException(type, $"Type found multiple ambiguous constructors, type: {type.Name}");
                     }
                     injectConstructor = grouped.First();
                 }
@@ -60,7 +60,7 @@ namespace VContainer.Internal
                 }
                 else
                 {
-                    throw new VContainerException("Type found multiple [Inject] marked constructors, type:" + type.Name);
+                    throw new VContainerException(type, "Type found multiple [Inject] marked constructors, type:" + type.Name);
                 }
             }
 

@@ -14,6 +14,27 @@ namespace VContainer.Internal
         bool TryGet(Type interfaceType, out IRegistration registration);
     }
 
+    static class IRegistryExtensions
+    {
+        public static void AddSystemRegistration(
+            this IRegistry registry,
+            IObjectResolver container,
+            bool includesContainer)
+        {
+            if (includesContainer)
+            {
+                var containerType = container.GetType();
+                var injector = new NullInjector(container);
+                registry.Add(new Registration(
+                    containerType,
+                    new List<Type>{ typeof(IObjectResolver) },
+                    Lifetime.Transient,
+                    injector,
+                    container));
+            }
+        }
+    }
+
     public sealed class HashTableRegistry : IRegistry
     {
         readonly object syncRoot = new object();
@@ -75,9 +96,15 @@ namespace VContainer.Internal
                 case Registration exists:
                     var collectionService = typeof(IEnumerable<>).MakeGenericType(service);
                     // ReSharper disable once InconsistentlySynchronizedField
-                    var collectionRegistration = registrations[collectionService] as CollectionRegistration ??
-                                                 new CollectionRegistration(service) { exists, registration };
-                    AddCollection(collectionRegistration);
+                    if (registrations[collectionService] is CollectionRegistration collectionRegistration)
+                    {
+                        collectionRegistration.Add(registration);
+                    }
+                    else
+                    {
+                        collectionRegistration = new CollectionRegistration(service) { exists, registration };
+                        AddCollection(collectionRegistration);
+                    }
                     break;
                 case null:
                     lock (syncRoot)
@@ -100,7 +127,7 @@ namespace VContainer.Internal
                     }
                     catch (ArgumentException)
                     {
-                        throw new VContainerException($"Registration with the same key already exists: {collectionType} {collectionRegistration}");
+                        throw new VContainerException(collectionType, $"Registration with the same key already exists: {collectionType} {collectionRegistration}");
                     }
                 }
             }

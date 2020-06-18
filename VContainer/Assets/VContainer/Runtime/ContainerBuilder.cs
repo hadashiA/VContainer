@@ -7,6 +7,7 @@ namespace VContainer
     {
         RegistrationBuilder Register<T>(Lifetime lifetime);
         RegistrationBuilder RegisterInstance<T>(T instance);
+        void RegisterContainer();
         IObjectResolver Build();
     }
 
@@ -30,7 +31,9 @@ namespace VContainer
             {
                 registry.Add(x.Build());
             }
-            return new ScopedContainer(registry, root, parent);
+            var container = new ScopedContainer(registry, root, parent);
+            registry.AddSystemRegistration(container, ContainerRegistered);
+            return container;
         }
 
         public override IObjectResolver Build() => BuildScope();
@@ -39,6 +42,8 @@ namespace VContainer
     public class ContainerBuilder : IContainerBuilder
     {
         protected readonly IList<RegistrationBuilder> RegistrationBuilders = new List<RegistrationBuilder>();
+
+        protected bool ContainerRegistered;
 
         public RegistrationBuilder Register<T>(Lifetime lifetime)
         {
@@ -54,6 +59,8 @@ namespace VContainer
             return registrationBuilder;
         }
 
+        public void RegisterContainer() => ContainerRegistered = true;
+
         public virtual IObjectResolver Build()
         {
             var registry = new HashTableRegistry();
@@ -61,7 +68,9 @@ namespace VContainer
             {
                 registry.Add(x.Build());
             }
-            return new Container(registry);
+            var container = new Container(registry);
+            registry.AddSystemRegistration(container, ContainerRegistered);
+            return container;
         }
     }
 }

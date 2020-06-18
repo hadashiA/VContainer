@@ -78,7 +78,7 @@ namespace VContainer
             {
                 if (x.ImplementationType == registration.ImplementationType)
                 {
-                    throw new VContainerException($"Conflict implementation type : {registration}");
+                    throw new VContainerException(registration.ImplementationType, $"Conflict implementation type : {registration}");
                 }
             }
             registrations.Add(registration);

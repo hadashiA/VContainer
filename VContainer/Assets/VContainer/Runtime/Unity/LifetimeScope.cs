@@ -30,21 +30,21 @@ namespace VContainer.Unity
         public static LifetimeScope ProjectRoot => ProjectRootLazy.Value;
 
         static readonly Lazy<LifetimeScope> ProjectRootLazy = new Lazy<LifetimeScope>(LoadProjectRoot);
-        static readonly ConcurrentDictionary<string, ExtraInstaller> Extensions = new ConcurrentDictionary<string, ExtraInstaller>();
+        static readonly ConcurrentDictionary<string, ExtraInstaller> ExtraInstallers = new ConcurrentDictionary<string, ExtraInstaller>();
 
-        public static ExtendScope BeginLoading(Action<ContainerBuilderUnity> installing, string key = "")
+        public static ExtendScope Push(Action<ContainerBuilderUnity> installing, string key = "")
         {
             return new ExtendScope(new ActionInstaller(installing), key);
         }
 
-        public static ExtendScope BeginLoading(IInstaller installer, string key = "")
+        public static ExtendScope Push(IInstaller installer, string key = "")
         {
             return new ExtendScope(installer, key);
         }
 
         public static void EnqueueExtra(IInstaller installer, string key = "")
         {
-            Extensions.AddOrUpdate(key,
+            ExtraInstallers.AddOrUpdate(key,
                 new ExtraInstaller { installer },
                 (_, binding) =>
                 {
@@ -53,10 +53,7 @@ namespace VContainer.Unity
                 });
         }
 
-        public static void RemoveExtra(string key)
-        {
-            Extensions.TryRemove(key, out _);
-        }
+        public static void RemoveExtra(string key) => ExtraInstallers.TryRemove(key, out _);
 
         static LifetimeScope LoadProjectRoot()
         {
@@ -64,16 +61,20 @@ namespace VContainer.Unity
             var prefabs = Resources.LoadAll(ProjectRootResourcePath, typeof(GameObject));
             if (prefabs.Length > 1)
             {
-                throw new VContainerException($"{ProjectRootResourcePath} resource is duplicated!");
+                throw new VContainerException(null, $"{ProjectRootResourcePath} resource is duplicated!");
             }
 
-            var prefab = prefabs.FirstOrDefault();
+            var prefab = (GameObject)prefabs.FirstOrDefault();
             if (prefab == null)
             {
                 return null;
             }
 
-            var gameObject = (GameObject)Instantiate(prefab);
+            if (prefab.activeSelf)
+            {
+                prefab.SetActive(false);
+            }
+            var gameObject = Instantiate(prefab);
             DontDestroyOnLoad(gameObject);
             return gameObject.GetComponent<LifetimeScope>();
         }
@@ -85,9 +86,10 @@ namespace VContainer.Unity
 
         void Awake()
         {
-            if (GetRuntimeParent() is LifetimeScope parentScope)
+            var runtimeParent = GetRuntimeParent();
+            if (runtimeParent != null)
             {
-                Container = parentScope.Container.CreateScope(InstallTo);
+                Container = runtimeParent.Container.CreateScope(InstallTo);
             }
             else
             {
@@ -131,10 +133,11 @@ namespace VContainer.Unity
                 installer.Install(decoratedBuilder);
             }
 
-            if (Extensions.TryRemove(Key, out var extraInstaller))
+            if (ExtraInstallers.TryRemove(Key, out var extraInstaller))
             {
                 extraInstaller.Install(decoratedBuilder);
             }
+            Container = decoratedBuilder.Build();
         }
 
         LifetimeScope GetRuntimeParent()
@@ -142,7 +145,7 @@ namespace VContainer.Unity
             if (parent != null)
                 return parent;
 
-            if (parentKey != null && parentKey != Key)
+            if (!string.IsNullOrEmpty(parentKey) && parentKey != Key)
             {
                 for (var i = 0; i < SceneManager.sceneCount; i++)
                 {
@@ -158,91 +161,115 @@ namespace VContainer.Unity
                             {
                                 if (parentKey == other.Key)
                                 {
-                                    return parent;
+                                    return other;
                                 }
                             }
                         }
                     }
                 }
-                throw new VContainerException($"LifetimeScope parent key `{parentKey}` is not found in any scene");
+                throw new VContainerException(null, $"LifetimeScope parent key `{parentKey}` is not found in any scene");
             }
 
-            return ProjectRoot;
+            if (ProjectRoot != null && ProjectRoot != this)
+            {
+                if (!ProjectRoot.gameObject.activeSelf)
+                {
+                    ProjectRoot.gameObject.SetActive(true);
+                }
+                return ProjectRoot;
+            }
+            return null;
         }
 
         void DispatchPlayerLoopItems()
         {
             try
             {
-                var initializables = Container.Resolve<IEnumerable<IInitializable>>();
-                var loopItem = new InitializationLoopItem(initializables);
+                var markers = Container.Resolve<IEnumerable<IInitializable>>();
+                var loopItem = new InitializationLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Initialization, loopItem);
             }
-            catch (VContainerException) { }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IInitializable>))
+            {
+            }
 
             try
             {
-                var postInitializables = Container.Resolve<IEnumerable<IPostInitializable>>();
-                var loopItem = new PostInitializationLoopItem(postInitializables);
+                var markers = Container.Resolve<IEnumerable<IPostInitializable>>();
+                var loopItem = new PostInitializationLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
             }
-            catch (VContainerException) { }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostInitializable>))
+            {
+            }
 
             try
             {
-                var fixedTickables = Container.Resolve<IEnumerable<IFixedTickable>>();
-                var loopItem = new FixedTickableLoopItem(fixedTickables);
+                var markers = Container.Resolve<IEnumerable<IFixedTickable>>();
+                var loopItem = new FixedTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.FixedUpdate, loopItem);
             }
-            catch (VContainerException) { }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IFixedTickable>))
+            {
+            }
 
             try
             {
-                var postFixedTickables = Container.Resolve<IEnumerable<IPostFixedTickable>>();
-                var loopItem = new PostFixedTickableLoopItem(postFixedTickables);
+                var markers = Container.Resolve<IEnumerable<IPostFixedTickable>>();
+                var loopItem = new PostFixedTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
             }
-            catch (VContainerException) { }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostFixedTickable>))
+            {
+            }
 
             try
             {
-                var tickables = Container.Resolve<IEnumerable<ITickable>>();
-                var loopItem = new TickableLoopItem(tickables);
+                var markers = Container.Resolve<IEnumerable<ITickable>>();
+                var loopItem = new TickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Update, loopItem);
             }
-            catch (VContainerException) { }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ITickable>))
+            {
+            }
 
             try
             {
-                var postTickables = Container.Resolve<IEnumerable<IPostTickable>>();
-                var loopItem = new PostTickableLoopItem(postTickables);
+                var markers = Container.Resolve<IEnumerable<IPostTickable>>();
+                var loopItem = new PostTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostUpdate, loopItem);
             }
-            catch (VContainerException) { }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostTickable>))
+            {
+            }
 
             try
             {
-                var lateTickables = Container.Resolve<IEnumerable<ILateTickable>>();
-                var loopItem = new LateTickableLoopItem(lateTickables);
+                var markers = Container.Resolve<IEnumerable<ILateTickable>>();
+                var loopItem = new LateTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, loopItem);
             }
-            catch (VContainerException) { }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ILateTickable>))
+            {
+            }
 
             try
             {
-                var postLateTickables = Container.Resolve<IEnumerable<IPostLateTickable>>();
-                var loopItem = new PostLateTickableLoopItem(postLateTickables);
+                var markers = Container.Resolve<IEnumerable<IPostLateTickable>>();
+                var loopItem = new PostLateTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
-            catch (VContainerException) { }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostLateTickable>))
+            {
+            }
         }
     }
 }
