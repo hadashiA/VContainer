@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using Unity.PerformanceTesting;
-using UnityEngine.Profiling;
 using VContainer;
 using VContainer.Benchmark.Fixtures;
 

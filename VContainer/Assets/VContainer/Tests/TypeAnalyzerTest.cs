@@ -47,16 +47,16 @@ namespace VContainer.Tests
         {
             {
                 var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasNoConstructor));
-                Assert.That(injectTypeInfo.InjectConstructor.GetParameters().Length, Is.EqualTo(0));
+                Assert.That(injectTypeInfo.InjectConstructor.ParameterInfos.Length, Is.EqualTo(0));
             }
 
             {
                 var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasNoAttributeConstructor));
-                Assert.That(injectTypeInfo.InjectConstructor.GetParameters().Length, Is.EqualTo(2));
+                Assert.That(injectTypeInfo.InjectConstructor.ParameterInfos.Length, Is.EqualTo(2));
             }
             {
                 var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasInjectConstructor));
-                Assert.That(injectTypeInfo.InjectConstructor.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
+                Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
             }
         }
     }

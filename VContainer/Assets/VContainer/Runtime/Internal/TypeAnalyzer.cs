@@ -149,7 +149,7 @@ namespace VContainer.Internal
 
             return new InjectTypeInfo(
                 type,
-                new InjectConstructorInfo(injectConstructor),
+                injectConstructor != null ? new InjectConstructorInfo(injectConstructor) : null,
                 injectFields,
                 injectProperties,
                 injectMethods);

@@ -26,13 +26,9 @@ namespace VContainer
 
         public IScopedObjectResolver BuildScope()
         {
-            var registry = new HashTableRegistry();
-            foreach (var x in RegistrationBuilders)
-            {
-                registry.Add(x.Build());
-            }
+            var registry = FixedTypeKeyHashTableRegistry.Build(RegistrationBuilders);
             var container = new ScopedContainer(registry, root, parent);
-            registry.AddSystemRegistration(container, ContainerRegistered);
+            // registry.AddSystemRegistration(container, ContainerRegistered);
             return container;
         }
 
@@ -63,13 +59,9 @@ namespace VContainer
 
         public virtual IObjectResolver Build()
         {
-            var registry = new HashTableRegistry();
-            foreach (var x in RegistrationBuilders)
-            {
-                registry.Add(x.Build());
-            }
+            var registry = FixedTypeKeyHashTableRegistry.Build(RegistrationBuilders);
             var container = new Container(registry);
-            registry.AddSystemRegistration(container, ContainerRegistered);
+            // registry.AddSystemRegistration(container, ContainerRegistered);
             return container;
         }
     }

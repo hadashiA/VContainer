@@ -63,11 +63,15 @@
      <Compile Include="Assets\VContainer\Runtime\ContainerBuilderExtensions.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\CappedArrayPool.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\CompositeDisposable.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTable.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTableRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\IInjector.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Internal\IRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\ReflectionInjector.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\Registry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\TypeAnalyzer.cs" />
      <Compile Include="Assets\VContainer\Runtime\Registration.cs" />
+     <Compile Include="Assets\VContainer\Runtime\RegistrationBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ActionInstaller.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ContainerBuilderUnity.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ExtraInstaller.cs" />
