@@ -1,6 +1,5 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace VContainer.Unity
 {
@@ -8,26 +7,30 @@ namespace VContainer.Unity
     public sealed class ContainerBuilderUnity : IContainerBuilder
     {
         readonly IContainerBuilder builder;
-        readonly LifetimeScope lifetimeScope;
+        Scene scene;
 
         GameObject[] RootGameObjects
         {
             get
             {
                 if (rootGameObjects == null)
-                    rootGameObjects = lifetimeScope.gameObject.scene.GetRootGameObjects();
+                    rootGameObjects = scene.GetRootGameObjects();
                 return rootGameObjects;
             }
         }
 
         GameObject[] rootGameObjects;
 
-        public ContainerBuilderUnity(
-            IContainerBuilder builder,
-            LifetimeScope lifetimeScope)
+        public ContainerBuilderUnity(Scene scene)
+        {
+            builder = new ContainerBuilder();
+            this.scene = scene;
+        }
+
+        public ContainerBuilderUnity(IContainerBuilder builder, Scene scene)
         {
             this.builder = builder;
-            this.lifetimeScope = lifetimeScope;
+            this.scene = scene;
         }
 
         public RegistrationBuilder Register<T>(Lifetime lifetime) => builder.Register<T>(lifetime);
@@ -45,15 +48,10 @@ namespace VContainer.Unity
 
             if (component == null)
             {
-                throw new VContainerException($"Component {typeof(T)} is not in this scene {lifetimeScope.gameObject.scene}");
+                throw new VContainerException($"Component {typeof(T)} is not in this scene {scene}");
             }
 
             return RegisterInstance(component);
-        }
-
-        public RegistrationBuilder RegisterPrefab(Component component, Transform parent = null)
-        {
-            throw new NotImplementedException();
         }
     }
 }

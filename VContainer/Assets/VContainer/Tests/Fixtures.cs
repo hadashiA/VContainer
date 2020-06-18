@@ -174,4 +174,16 @@ namespace VContainer.Tests
     class MultipleInterfaceServiceB : I1, I2, I3
     {
     }
+
+    class HasDefaultValue
+    {
+        [Inject]
+        I2 privateFieldHasDefault = new NoDependencyServiceA();
+
+        [Inject]
+        I3 privatePropertyHasDefault { get; set; } = new NoDependencyServiceB();
+
+        public I2 GetPrivateFieldHasDefault() => privateFieldHasDefault;
+        public I3 GetPrivatePropertyHasDefault() => privatePropertyHasDefault;
+    }
 }

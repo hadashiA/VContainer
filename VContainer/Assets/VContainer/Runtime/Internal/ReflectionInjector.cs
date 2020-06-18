@@ -49,8 +49,11 @@ namespace VContainer.Internal
         {
             foreach (var f in injectTypeInfo.InjectFields)
             {
-                var fieldValue = resolver.Resolve(f.FieldType);
-                f.SetValue(obj, fieldValue);
+                // if (f.GetValue())
+                {
+                    var fieldValue = resolver.Resolve(f.FieldType);
+                    f.SetValue(obj, fieldValue);
+                }
             }
         }
 
@@ -65,7 +68,6 @@ namespace VContainer.Internal
 
         void InjectMethods(object obj, IObjectResolver resolver)
         {
-            // methods
             foreach (var method in injectTypeInfo.InjectMethods)
             {
                 var parameters = method.GetParameters();

@@ -2,6 +2,9 @@ using System;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
+// #if UNITY_EDITOR
+// using UnityEditor;
+// #endif
 
 namespace VContainer.Unity
 {

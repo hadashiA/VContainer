@@ -120,7 +120,7 @@ namespace VContainer.Unity
 
         void InstallTo(IContainerBuilder builder)
         {
-            var decoratedBuilder = new ContainerBuilderUnity(builder, this);
+            var decoratedBuilder = new ContainerBuilderUnity(builder, gameObject.scene);
             foreach (var installer in monoInstallers)
             {
                 installer.Install(decoratedBuilder);
