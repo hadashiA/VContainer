@@ -4,6 +4,26 @@ using System.Reflection;
 
 namespace VContainer.Internal
 {
+    static class InjectTypeInfoCache<T>
+    {
+        static InjectTypeInfoCache()
+        {
+            Value = TypeAnalyzer.Analyze(typeof(T), false);
+        }
+
+        public static readonly InjectTypeInfo Value;
+    }
+
+    static class InjectTypeInfoCacheWithoutConstructor<T>
+    {
+        static InjectTypeInfoCacheWithoutConstructor()
+        {
+            Value = TypeAnalyzer.Analyze(typeof(T), true);
+        }
+
+        public static readonly InjectTypeInfo Value;
+    }
+
     public sealed class InjectTypeInfo
     {
         public readonly Type Type;

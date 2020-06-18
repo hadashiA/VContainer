@@ -24,8 +24,8 @@ namespace Vcontainer.Benchmark
                     container.Resolve<ISingleton2>();
                     container.Resolve<ISingleton3>();
                 })
-                .WarmupCount(10)
-                .MeasurementCount(10)
+                .WarmupCount(100)
+                .MeasurementCount(100)
                 .Run();
         }
 
