@@ -4,45 +4,90 @@ using System.Reflection;
 
 namespace VContainer.Internal
 {
-    static class InjectTypeInfoCache<T>
-    {
-        static InjectTypeInfoCache()
-        {
-            Value = TypeAnalyzer.Analyze(typeof(T), false);
-        }
+    // static class InjectTypeInfoCache<T>
+    // {
+    //     static InjectTypeInfoCache()
+    //     {
+    //         Value = TypeAnalyzer.Analyze(typeof(T), false);
+    //     }
+    //
+    //     public static readonly InjectTypeInfo Value;
+    // }
+    //
+    // static class InjectTypeInfoCacheWithoutConstructor<T>
+    // {
+    //     static InjectTypeInfoCacheWithoutConstructor()
+    //     {
+    //         Value = TypeAnalyzer.Analyze(typeof(T), true);
+    //     }
+    //
+    //     public static readonly InjectTypeInfo Value;
+    // }
 
-        public static readonly InjectTypeInfo Value;
+    sealed class InjectConstructorInfo
+    {
+        public readonly ConstructorInfo ConstructorInfo;
+        public readonly ParameterInfo[] ParameterInfos;
+
+        public InjectConstructorInfo(ConstructorInfo constructorInfo)
+        {
+            ConstructorInfo = constructorInfo;
+            ParameterInfos = constructorInfo.GetParameters();
+        }
     }
 
-    static class InjectTypeInfoCacheWithoutConstructor<T>
+    sealed class InjectMethodInfo
     {
-        static InjectTypeInfoCacheWithoutConstructor()
-        {
-            Value = TypeAnalyzer.Analyze(typeof(T), true);
-        }
+        public readonly MethodInfo MethodInfo;
+        public readonly ParameterInfo[] ParameterInfos;
 
-        public static readonly InjectTypeInfo Value;
+        public InjectMethodInfo(MethodInfo methodInfo)
+        {
+            MethodInfo = methodInfo;
+            ParameterInfos = methodInfo.GetParameters();
+        }
     }
 
-    public sealed class InjectTypeInfo
+    sealed class InjectFieldInfo
+    {
+        public readonly FieldInfo FieldInfo;
+
+        public InjectFieldInfo(FieldInfo fieldInfo)
+        {
+            FieldInfo = fieldInfo;
+        }
+    }
+
+    sealed class InjectPropertyInfo
+    {
+        public readonly PropertyInfo PropertyInfo;
+        // public readonly MethodInfo Getter;
+        // public readonly MethodInfo Setter;
+
+        public InjectPropertyInfo(PropertyInfo propertyInfo)
+        {
+            PropertyInfo = propertyInfo;
+            // Getter = propertyInfo.GetMethod;
+            // Setter = propertyInfo.SetMethod;
+        }
+    }
+
+    sealed class InjectTypeInfo
     {
         public readonly Type Type;
-        public readonly TypeInfo TypeInfo;
-        public readonly ConstructorInfo InjectConstructor;
-        public readonly FieldInfo[] InjectFields;
-        public readonly PropertyInfo[] InjectProperties;
-        public readonly MethodInfo[] InjectMethods;
+        public readonly InjectConstructorInfo InjectConstructor;
+        public readonly InjectFieldInfo[] InjectFields;
+        public readonly InjectPropertyInfo[] InjectProperties;
+        public readonly InjectMethodInfo[] InjectMethods;
 
         public InjectTypeInfo(
             Type type,
-            TypeInfo typeInfo,
-            ConstructorInfo injectConstructor,
-            FieldInfo[] injectFields,
-            PropertyInfo[] injectProperties,
-            MethodInfo[] injectMethods)
+            InjectConstructorInfo injectConstructor,
+            InjectFieldInfo[] injectFields,
+            InjectPropertyInfo[] injectProperties,
+            InjectMethodInfo[] injectMethods)
         {
             Type = type;
-            TypeInfo = typeInfo;
             InjectConstructor = injectConstructor;
             InjectFields = injectFields;
             InjectProperties = injectProperties;
@@ -84,19 +129,27 @@ namespace VContainer.Internal
                 }
             }
 
+            // Methods, [Inject] Only
+            var injectMethods = type.GetRuntimeMethods()
+                .Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null)
+                .Select(x => new InjectMethodInfo(x))
+                .ToArray();
+
             // Fields, [Inject] Only
-            var injectFields = type.GetRuntimeFields().Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null).ToArray();
+            var injectFields = type.GetRuntimeFields()
+                .Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null)
+                .Select(x => new InjectFieldInfo(x))
+                .ToArray();
 
             // Properties, [Inject] only
-            var injectProperties = type.GetRuntimeProperties().Where(x => x.SetMethod != null && x.GetCustomAttribute<InjectAttribute>(true) != null).ToArray();
-
-            // Methods, [Inject] Only
-            var injectMethods = type.GetRuntimeMethods().Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null).ToArray();
+            var injectProperties = type.GetRuntimeProperties()
+                .Where(x => x.SetMethod != null && x.GetCustomAttribute<InjectAttribute>(true) != null)
+                .Select(x => new InjectPropertyInfo(x))
+                .ToArray();
 
             return new InjectTypeInfo(
                 type,
-                typeInfo,
-                injectConstructor,
+                new InjectConstructorInfo(injectConstructor),
                 injectFields,
                 injectProperties,
                 injectMethods);
