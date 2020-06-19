@@ -41,7 +41,7 @@ namespace VContainer
     {
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
 
-        bool conterinerRegistered;
+        protected bool conterinerRegistered;
 
         public RegistrationBuilder Register<T>(Lifetime lifetime)
         {
@@ -64,21 +64,21 @@ namespace VContainer
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             var container = new Container(registry);
-            // registry.AddSystemRegistration(container, ContainerRegistered);
             return container;
         }
 
-        protected Registration[] BuildRegistrations()
+        protected IReadOnlyList<IRegistration> BuildRegistrations()
         {
-            if (conterinerRegistered)
-            {
-
-            }
-
-            return registrationBuilders
+            var registrations = registrationBuilders
                 .AsParallel()
                 .Select(x => x.Build())
-                .ToArray();
+                .ToList();
+
+            if (conterinerRegistered)
+            {
+                registrations.Add(ContainerRegistration.Default);
+            }
+            return registrations;
         }
     }
 }

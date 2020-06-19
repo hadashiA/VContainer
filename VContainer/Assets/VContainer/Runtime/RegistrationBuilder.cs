@@ -25,7 +25,7 @@ namespace VContainer
             specificInstance = instance;
         }
 
-        public Registration Build()
+        public IRegistration Build()
         {
             var injector = ReflectionInjectorBuilder.Default.Build(implementationType, specificInstance != null);
 

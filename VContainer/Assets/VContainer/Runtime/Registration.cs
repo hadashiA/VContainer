@@ -59,7 +59,7 @@ namespace VContainer
         readonly Type elementType;
 
         readonly List<Type> interfaceTypes;
-        readonly IList<Registration> registrations = new List<Registration>();
+        readonly IList<IRegistration> registrations = new List<IRegistration>();
 
         public CollectionRegistration(Type elementType)
         {
@@ -72,7 +72,7 @@ namespace VContainer
             };
         }
 
-        public void Add(Registration registration)
+        public void Add(IRegistration registration)
         {
             foreach (var x in registrations)
             {
@@ -106,5 +106,15 @@ namespace VContainer
 
         public IEnumerator<IRegistration> GetEnumerator() => registrations.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    public sealed class ContainerRegistration : IRegistration
+    {
+        public static ContainerRegistration Default = new ContainerRegistration();
+
+        public Type ImplementationType => typeof(IObjectResolver);
+        public IReadOnlyList<Type> InterfaceTypes { get; }
+        public Lifetime Lifetime => Lifetime.Transient;
+        public object SpawnInstance(IObjectResolver resolver) => resolver;
     }
 }

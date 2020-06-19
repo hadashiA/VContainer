@@ -274,6 +274,18 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void RegisterSystem()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+            builder.RegisterContainer();
+
+            var container = builder.Build();
+            var resolve = container.Resolve<IObjectResolver>();
+            Assert.That(resolve, Is.EqualTo(container));
+        }
+
+        [Test]
         public void RegisterConflictImplementations()
         {
             var builder = new ContainerBuilder();

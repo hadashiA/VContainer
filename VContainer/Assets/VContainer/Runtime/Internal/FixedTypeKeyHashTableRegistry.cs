@@ -8,7 +8,7 @@ namespace VContainer.Internal
     {
         readonly FixedTypeKeyHashtable<IRegistration> hashTable;
 
-        public static FixedTypeKeyHashTableRegistry Build(IReadOnlyList<Registration> registrations)
+        public static FixedTypeKeyHashTableRegistry Build(IReadOnlyList<IRegistration> registrations)
         {
             var dictionary = new Dictionary<Type, IRegistration>(registrations.Count * 2);
             foreach (var registration in registrations)
@@ -30,7 +30,7 @@ namespace VContainer.Internal
             return new FixedTypeKeyHashTableRegistry(hashTable);
         }
 
-        static void AddToDictionary(IDictionary<Type, IRegistration> dictionary, Type service, Registration registration)
+        static void AddToDictionary(IDictionary<Type, IRegistration> dictionary, Type service, IRegistration registration)
         {
             if (dictionary.TryGetValue(service, out var exists))
             {
