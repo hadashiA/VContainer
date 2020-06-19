@@ -34,7 +34,7 @@ namespace VContainer.Unity
         }
 
         public RegistrationBuilder Register<T>(Lifetime lifetime) => builder.Register<T>(lifetime);
-        public RegistrationBuilder RegisterInstance<T>(T instance) => builder.RegisterInstance(instance);
+        public RegistrationBuilder RegisterInstance(object instance) => builder.RegisterInstance(instance);
         public void RegisterContainer() => builder.RegisterContainer();
 
         public IObjectResolver Build() => builder.Build();

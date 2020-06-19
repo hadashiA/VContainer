@@ -8,12 +8,11 @@ namespace VContainer.Internal
     {
         readonly FixedTypeKeyHashtable<IRegistration> hashTable;
 
-        public static FixedTypeKeyHashTableRegistry Build(IList<RegistrationBuilder> registrationBuilders)
+        public static FixedTypeKeyHashTableRegistry Build(IReadOnlyList<Registration> registrations)
         {
-            var dictionary = new Dictionary<Type, IRegistration>(registrationBuilders.Count * 2);
-            foreach (var registrationBuilder in registrationBuilders)
+            var dictionary = new Dictionary<Type, IRegistration>(registrations.Count * 2);
+            foreach (var registration in registrations)
             {
-                var registration = registrationBuilder.Build();
                 if (registration.InterfaceTypes?.Count > 0)
                 {
                     foreach (var interfaceType in registration.InterfaceTypes)

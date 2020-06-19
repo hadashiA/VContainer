@@ -11,16 +11,16 @@ namespace VContainer
         readonly object specificInstance;
         List<Type> interfaceTypes;
 
-        public RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
+        internal RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
         {
             this.implementationType = implementationType;
             this.interfaceTypes = interfaceTypes;
             this.lifetime = lifetime;
         }
 
-        public RegistrationBuilder(Type implementationType, object instance)
+        internal RegistrationBuilder(object instance)
         {
-            this.implementationType = implementationType;
+            implementationType = instance.GetType();
             lifetime = Lifetime.Scoped;
             specificInstance = instance;
         }
