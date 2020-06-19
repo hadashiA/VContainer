@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        unity: ['2019.3.15f1']
+        unity: ['2019.4.0f1']
         include:
-        - unity: 2019.3.15f1
-          license: UNITY_LISENCE_2019_3_BASE64
+        - unity: 2019.4.0f1
+          license: UNITY_LISENCE_2019_4_BASE64
     container:
       image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
     env:
