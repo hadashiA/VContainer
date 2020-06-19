@@ -4,37 +4,37 @@ using VContainer.Internal;
 
 namespace VContainer
 {
-    public sealed class RegistrationBuilder
+    public class RegistrationBuilder
     {
-        readonly Type implementationType;
-        readonly Lifetime lifetime;
-        readonly object specificInstance;
-        List<Type> interfaceTypes;
+        protected readonly Type ImplementationType;
+        protected readonly Lifetime Lifetime;
+        protected readonly object SpecificInstance;
+        protected List<Type> InterfaceTypes;
 
         internal RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
         {
-            this.implementationType = implementationType;
-            this.interfaceTypes = interfaceTypes;
-            this.lifetime = lifetime;
+            this.ImplementationType = implementationType;
+            this.InterfaceTypes = interfaceTypes;
+            this.Lifetime = lifetime;
         }
 
         internal RegistrationBuilder(object instance)
         {
-            implementationType = instance.GetType();
-            lifetime = Lifetime.Scoped;
-            specificInstance = instance;
+            ImplementationType = instance.GetType();
+            Lifetime = Lifetime.Scoped;
+            SpecificInstance = instance;
         }
 
-        public IRegistration Build()
+        public virtual IRegistration Build()
         {
-            var injector = ReflectionInjectorBuilder.Default.Build(implementationType);
+            var injector = ReflectionInjectorBuilder.Default.Build(ImplementationType);
 
             return new Registration(
-                implementationType,
-                interfaceTypes,
-                lifetime,
+                ImplementationType,
+                InterfaceTypes,
+                Lifetime,
                 injector,
-                specificInstance);
+                SpecificInstance);
         }
 
         public RegistrationBuilder As<TInterface>()
@@ -73,26 +73,26 @@ namespace VContainer
 
         public RegistrationBuilder AsSelf()
         {
-            interfaceTypes = interfaceTypes ?? new List<Type>();
-            interfaceTypes.Add(implementationType);
+            InterfaceTypes = InterfaceTypes ?? new List<Type>();
+            InterfaceTypes.Add(ImplementationType);
             return this;
         }
 
         public RegistrationBuilder AsImplementedInterfaces()
         {
-            interfaceTypes = interfaceTypes ?? new List<Type>();
-            interfaceTypes.AddRange(implementationType.GetInterfaces());
+            InterfaceTypes = InterfaceTypes ?? new List<Type>();
+            InterfaceTypes.AddRange(ImplementationType.GetInterfaces());
             return this;
         }
 
         void AddInterfaceType(Type interfaceType)
         {
-            if (!interfaceType.IsAssignableFrom(implementationType))
+            if (!interfaceType.IsAssignableFrom(ImplementationType))
             {
-                throw new VContainerException(interfaceType, $"{implementationType.FullName} is not assignable from {interfaceType.FullName}");
+                throw new VContainerException(interfaceType, $"{ImplementationType.FullName} is not assignable from {interfaceType.FullName}");
             }
-            interfaceTypes = interfaceTypes ?? new List<Type>();
-            interfaceTypes.Add(interfaceType);
+            InterfaceTypes = InterfaceTypes ?? new List<Type>();
+            InterfaceTypes.Add(interfaceType);
         }
    }
 }

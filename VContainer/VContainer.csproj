@@ -75,7 +75,8 @@
      <Compile Include="Assets\VContainer\Runtime\Registration.cs" />
      <Compile Include="Assets\VContainer\Runtime\RegistrationBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ActionInstaller.cs" />
-     <Compile Include="Assets\VContainer\Runtime\Unity\ContainerBuilderUnity.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Unity\ComponentRegistration.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Unity\ComponentRegistrationBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ExtraInstaller.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\IFactory.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\IInstaller.cs" />
@@ -85,6 +86,7 @@
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopItem.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopRunner.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ScriptableObjectInstaller.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Unity\UnityContainerBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\VContainerException.cs" />
      <None Include="Assets\VContainer\Runtime\VContainer.asmdef" />
  <Reference Include="UnityEditor.UI">
@@ -269,6 +271,9 @@
  </Reference>
  <Reference Include="UnityEngine.XRModule">
  <HintPath>/Applications/Unity/2019.4.1f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEditor.VR">
+ <HintPath>/Applications/Unity/2019.4.1f1/Unity.app/Contents/UnityExtensions/Unity/UnityVR/Editor/UnityEditor.VR.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.Graphs">
  <HintPath>/Applications/Unity/2019.4.1f1/Unity.app/Contents/Managed/UnityEditor.Graphs.dll</HintPath>

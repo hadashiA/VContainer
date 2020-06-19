@@ -32,7 +32,7 @@ namespace VContainer.Unity
         static readonly Lazy<LifetimeScope> ProjectRootLazy = new Lazy<LifetimeScope>(LoadProjectRoot);
         static readonly ConcurrentDictionary<string, ExtraInstaller> ExtraInstallers = new ConcurrentDictionary<string, ExtraInstaller>();
 
-        public static ExtendScope Push(Action<ContainerBuilderUnity> installing, string key = "")
+        public static ExtendScope Push(Action<UnityContainerBuilder> installing, string key = "")
         {
             return new ExtendScope(new ActionInstaller(installing), key);
         }
@@ -107,7 +107,7 @@ namespace VContainer.Unity
 
         public void CreateScopeFromPrefab(
             LifetimeScope childPrefab,
-            Action<ContainerBuilderUnity> configuration = null,
+            Action<UnityContainerBuilder> configuration = null,
             string lookUpKey = null)
         {
             if (childPrefab.gameObject.activeSelf)
@@ -122,7 +122,7 @@ namespace VContainer.Unity
 
         void InstallTo(IContainerBuilder builder)
         {
-            var decoratedBuilder = new ContainerBuilderUnity(builder, gameObject.scene);
+            var decoratedBuilder = new UnityContainerBuilder(builder, gameObject.scene);
             foreach (var installer in monoInstallers)
             {
                 installer.Install(decoratedBuilder);

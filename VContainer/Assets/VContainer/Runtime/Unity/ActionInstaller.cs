@@ -4,17 +4,17 @@ namespace VContainer.Unity
 {
     public sealed class ActionInstaller : IInstaller
     {
-        public static implicit operator ActionInstaller(Action<ContainerBuilderUnity> installation)
+        public static implicit operator ActionInstaller(Action<UnityContainerBuilder> installation)
             => new ActionInstaller(installation);
 
-        readonly Action<ContainerBuilderUnity> configuration;
+        readonly Action<UnityContainerBuilder> configuration;
 
-        public ActionInstaller(Action<ContainerBuilderUnity> configuration)
+        public ActionInstaller(Action<UnityContainerBuilder> configuration)
         {
             this.configuration = configuration;
         }
 
-        public void Install(ContainerBuilderUnity builder)
+        public void Install(UnityContainerBuilder builder)
         {
             configuration(builder);
         }

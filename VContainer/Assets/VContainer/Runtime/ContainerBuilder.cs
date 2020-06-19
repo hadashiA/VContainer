@@ -8,6 +8,7 @@ namespace VContainer
     {
         RegistrationBuilder Register<T>(Lifetime lifetime);
         RegistrationBuilder RegisterInstance(object instance);
+        RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
         void RegisterContainer();
         IObjectResolver Build();
     }
@@ -44,15 +45,13 @@ namespace VContainer
         protected bool conterinerRegistered;
 
         public RegistrationBuilder Register<T>(Lifetime lifetime)
-        {
-            var registrationBuilder = new RegistrationBuilder(typeof(T), lifetime);
-            registrationBuilders.Add(registrationBuilder);
-            return registrationBuilder;
-        }
+            => Register(new RegistrationBuilder(typeof(T), lifetime));
 
         public RegistrationBuilder RegisterInstance(object instance)
+            => Register(new RegistrationBuilder(instance));
+
+        public RegistrationBuilder Register(RegistrationBuilder registrationBuilder)
         {
-            var registrationBuilder = new RegistrationBuilder(instance);
             registrationBuilders.Add(registrationBuilder);
             return registrationBuilder;
         }

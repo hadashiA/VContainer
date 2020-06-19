@@ -30,7 +30,7 @@ namespace VContainer.Unity
 
         public void Add(IInstaller installer) => extraInstallers.Add(installer);
 
-        public void Install(ContainerBuilderUnity builder)
+        public void Install(UnityContainerBuilder builder)
         {
             foreach (var installer in extraInstallers)
             {

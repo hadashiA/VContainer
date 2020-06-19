@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 namespace VContainer.Unity
 {
     // Decorate Unity features
-    public sealed class ContainerBuilderUnity : IContainerBuilder
+    public sealed class UnityContainerBuilder : IContainerBuilder
     {
         readonly IContainerBuilder builder;
         Scene scene;
@@ -21,13 +21,13 @@ namespace VContainer.Unity
 
         GameObject[] rootGameObjects;
 
-        public ContainerBuilderUnity(Scene scene)
+        public UnityContainerBuilder(Scene scene)
         {
             builder = new ContainerBuilder();
             this.scene = scene;
         }
 
-        public ContainerBuilderUnity(IContainerBuilder builder, Scene scene)
+        public UnityContainerBuilder(IContainerBuilder builder, Scene scene)
         {
             this.builder = builder;
             this.scene = scene;
@@ -35,11 +35,13 @@ namespace VContainer.Unity
 
         public RegistrationBuilder Register<T>(Lifetime lifetime) => builder.Register<T>(lifetime);
         public RegistrationBuilder RegisterInstance(object instance) => builder.RegisterInstance(instance);
+        public RegistrationBuilder Register(RegistrationBuilder registrationBuilder) => builder.Register(registrationBuilder);
+
         public void RegisterContainer() => builder.RegisterContainer();
 
         public IObjectResolver Build() => builder.Build();
 
-        public RegistrationBuilder RegisterComponentInHierarchy<T>()
+        public RegistrationBuilder RegisterComponentInHierarchy<T>() where T : Component
         {
             var component = default(T);
             foreach (var x in RootGameObjects)
@@ -55,5 +57,29 @@ namespace VContainer.Unity
 
             return RegisterInstance(component);
         }
-    }
+
+        public ComponentRegistrationBuilder RegisterComponentOnNewGameObject<T>(
+            Lifetime lifetime,
+            string newGameObjectName = null)
+            where T : Component
+        {
+            var registrationBuilder = new ComponentRegistrationBuilder(
+                newGameObjectName,
+                typeof(T),
+                lifetime);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
+
+        public ComponentRegistrationBuilder RegisterComponentInNewPrefab<T>(T prefab, Lifetime lifetime)
+            where T : Component
+        {
+            var registrationBuilder = new ComponentRegistrationBuilder(
+                prefab,
+                typeof(T),
+                lifetime);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
+   }
 }
