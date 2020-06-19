@@ -70,19 +70,22 @@ namespace VContainer
         protected IReadOnlyList<IRegistration> BuildRegistrations()
         {
             var registrations = registrationBuilders
-                .AsParallel()
+                // .AsParallel()
                 .Select(x => x.Build())
                 .ToList();
+
+            // registrations
+            //     .AsParallel()
+            //     .ForAll(x => TypeAnalyzer.CheckCircularDependency(x.ImplementationType));
+            foreach (var x in registrations)
+            {
+                TypeAnalyzer.CheckCircularDependency(x.ImplementationType);
+            }
 
             if (conterinerRegistered)
             {
                 registrations.Add(ContainerRegistration.Default);
             }
-
-            registrations
-                .AsParallel()
-                .ForAll(x => TypeAnalyzer.CheckCircularDependency(x.ImplementationType));
-
             return registrations;
         }
     }

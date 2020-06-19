@@ -47,22 +47,19 @@ namespace VContainer.Internal
 
         void InjectFields(object obj, IObjectResolver resolver)
         {
-            foreach (var f in injectTypeInfo.InjectFields)
+            foreach (var x in injectTypeInfo.InjectFields)
             {
-                // if (f.GetValue())
-                {
-                    var fieldValue = resolver.Resolve(f.FieldInfo.FieldType);
-                    f.FieldInfo.SetValue(obj, fieldValue);
-                }
+                var fieldValue = resolver.Resolve(x.FieldType);
+                x.SetValue(obj, fieldValue);
             }
         }
 
         void InjectProperties(object obj, IObjectResolver resolver)
         {
-            foreach (var prop in injectTypeInfo.InjectProperties)
+            foreach (var x in injectTypeInfo.InjectProperties)
             {
-                var propValue = resolver.Resolve(prop.PropertyInfo.PropertyType);
-                prop.PropertyInfo.SetValue(obj, propValue);
+                var propValue = resolver.Resolve(x.PropertyType);
+                x.SetValue(obj, propValue);
             }
         }
 

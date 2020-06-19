@@ -213,6 +213,7 @@ namespace VContainer.Tests
         }
 
         [Test]
+        [Ignore("Optimize")]
         public void ResolveOptional()
         {
             var builder = new ContainerBuilder();
@@ -320,7 +321,9 @@ namespace VContainer.Tests
             builder.Register<HasCircularDependency1>(Lifetime.Transient);
             builder.Register<HasCircularDependency2>(Lifetime.Transient);
 
-            Assert.Throws<AggregateException>(() => builder.Build());
+            // Assert.Throws<AggregateException>(() => builder.Build());
+            Assert.Throws<VContainerException>(() => builder.Build(),
+                "Circular dependency detected! type: VContainer.Tests.HasCircularDependency1");
         }
     }
 }

@@ -6,26 +6,6 @@ using System.Reflection;
 
 namespace VContainer.Internal
 {
-    // static class InjectTypeInfoCache<T>
-    // {
-    //     static InjectTypeInfoCache()
-    //     {
-    //         Value = TypeAnalyzer.Analyze(typeof(T), false);
-    //     }
-    //
-    //     public static readonly InjectTypeInfo Value;
-    // }
-    //
-    // static class InjectTypeInfoCacheWithoutConstructor<T>
-    // {
-    //     static InjectTypeInfoCacheWithoutConstructor()
-    //     {
-    //         Value = TypeAnalyzer.Analyze(typeof(T), true);
-    //     }
-    //
-    //     public static readonly InjectTypeInfo Value;
-    // }
-
     sealed class InjectConstructorInfo
     {
         public readonly ConstructorInfo ConstructorInfo;
@@ -50,44 +30,42 @@ namespace VContainer.Internal
         }
     }
 
-    sealed class InjectFieldInfo
-    {
-        public readonly FieldInfo FieldInfo;
-
-        public InjectFieldInfo(FieldInfo fieldInfo)
-        {
-            FieldInfo = fieldInfo;
-        }
-    }
-
-    sealed class InjectPropertyInfo
-    {
-        public readonly PropertyInfo PropertyInfo;
-        // public readonly MethodInfo Getter;
-        // public readonly MethodInfo Setter;
-
-        public InjectPropertyInfo(PropertyInfo propertyInfo)
-        {
-            PropertyInfo = propertyInfo;
-            // Getter = propertyInfo.GetMethod;
-            // Setter = propertyInfo.SetMethod;
-        }
-    }
+    // sealed class InjectFieldInfo
+    // {
+    //     public readonly FieldInfo FieldInfo;
+    //
+    //     public InjectFieldInfo(FieldInfo fieldInfo)
+    //     {
+    //         FieldInfo = fieldInfo;
+    //     }
+    // }
+    //
+    // sealed class InjectPropertyInfo
+    // {
+    //     public readonly PropertyInfo PropertyInfo;
+    //     public readonly bool HasGetter;
+    //
+    //     public InjectPropertyInfo(PropertyInfo propertyInfo)
+    //     {
+    //         PropertyInfo = propertyInfo;
+    //         HasGetter = propertyInfo.GetMethod != null;
+    //     }
+    // }
 
     sealed class InjectTypeInfo
     {
         public readonly Type Type;
         public readonly InjectConstructorInfo InjectConstructor;
-        public readonly InjectFieldInfo[] InjectFields;
-        public readonly InjectPropertyInfo[] InjectProperties;
         public readonly InjectMethodInfo[] InjectMethods;
+        public readonly FieldInfo[] InjectFields;
+        public readonly PropertyInfo[] InjectProperties;
 
         public InjectTypeInfo(
             Type type,
             InjectConstructorInfo injectConstructor,
-            InjectFieldInfo[] injectFields,
-            InjectPropertyInfo[] injectProperties,
-            InjectMethodInfo[] injectMethods)
+            InjectMethodInfo[] injectMethods,
+            FieldInfo[] injectFields,
+            PropertyInfo[] injectProperties)
         {
             Type = type;
             InjectConstructor = injectConstructor;
@@ -111,7 +89,7 @@ namespace VContainer.Internal
             // Constructor, single [Inject] constructor -> single most parameters constuctor
             var constructors = typeInfo.DeclaredConstructors;
             var injectConstructors = constructors
-                .Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null)
+                .Where(x => x.IsDefined(typeof(InjectAttribute), true))
                 .ToArray();
             if (injectConstructors.Length == 0)
             {
@@ -141,28 +119,26 @@ namespace VContainer.Internal
 
             // Methods, [Inject] Only
             var injectMethods = type.GetRuntimeMethods()
-                .Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null)
+                .Where(x => x.IsDefined(typeof(InjectAttribute), true))
                 .Select(x => new InjectMethodInfo(x))
                 .ToArray();
 
             // Fields, [Inject] Only
             var injectFields = type.GetRuntimeFields()
-                .Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null)
-                .Select(x => new InjectFieldInfo(x))
+                .Where(x => x.IsDefined(typeof(InjectAttribute), true))
                 .ToArray();
 
             // Properties, [Inject] only
             var injectProperties = type.GetRuntimeProperties()
-                .Where(x => x.SetMethod != null && x.GetCustomAttribute<InjectAttribute>(true) != null)
-                .Select(x => new InjectPropertyInfo(x))
+                .Where(x => x.SetMethod != null && x.IsDefined(typeof(InjectAttribute)))
                 .ToArray();
 
             return new InjectTypeInfo(
                 type,
-                injectConstructor != null ? new InjectConstructorInfo(injectConstructor) : null,
+                new InjectConstructorInfo(injectConstructor),
+                injectMethods,
                 injectFields,
-                injectProperties,
-                injectMethods);
+                injectProperties);
         }
 
         public static void CheckCircularDependency(Type type)
@@ -170,7 +146,7 @@ namespace VContainer.Internal
             var stack = StackPool<Type>.Default.Rent();
             try
             {
-                CheckCircularDependencyInternal(type, stack);
+                CheckCircularDependencyRecursive(type, stack);
             }
             finally
             {
@@ -178,7 +154,7 @@ namespace VContainer.Internal
             }
         }
 
-        static void CheckCircularDependencyInternal(Type type, Stack<Type> stack)
+        static void CheckCircularDependencyRecursive(Type type, Stack<Type> stack)
         {
             if (stack.Any(x => x == type))
             {
@@ -189,22 +165,22 @@ namespace VContainer.Internal
             {
                 foreach (var x in injectTypeInfo.InjectConstructor.ParameterInfos)
                 {
-                    CheckCircularDependencyInternal(x.ParameterType, stack);
+                    CheckCircularDependencyRecursive(x.ParameterType, stack);
                 }
                 foreach (var methodInfo in injectTypeInfo.InjectMethods)
                 {
                     foreach (var x in methodInfo.ParameterInfos)
                     {
-                        CheckCircularDependencyInternal(x.ParameterType, stack);
+                        CheckCircularDependencyRecursive(x.ParameterType, stack);
                     }
                 }
                 foreach (var x in injectTypeInfo.InjectFields)
                 {
-                    CheckCircularDependencyInternal(x.FieldInfo.FieldType, stack);
+                    CheckCircularDependencyRecursive(x.FieldType, stack);
                 }
                 foreach (var x in injectTypeInfo.InjectProperties)
                 {
-                    CheckCircularDependencyInternal(x.PropertyInfo.PropertyType, stack);
+                    CheckCircularDependencyRecursive(x.PropertyType, stack);
                 }
             }
             stack.Pop();
