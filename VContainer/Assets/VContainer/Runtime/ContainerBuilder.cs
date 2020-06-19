@@ -78,6 +78,11 @@ namespace VContainer
             {
                 registrations.Add(ContainerRegistration.Default);
             }
+
+            registrations
+                .AsParallel()
+                .ForAll(x => TypeAnalyzer.CheckCircularDependency(x.ImplementationType));
+
             return registrations;
         }
     }

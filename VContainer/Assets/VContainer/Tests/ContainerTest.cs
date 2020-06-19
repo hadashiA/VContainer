@@ -312,5 +312,15 @@ namespace VContainer.Tests
             Assert.Throws<VContainerException>(() => container.Resolve<AllInjectionFeatureService>(),
                 "Failed to resolve VContainer.Tests.AllInjectionFeatureService : No such registration of type: VContainer.Tests.I6");
        }
+
+        [Test]
+        public void CircularDependency()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<HasCircularDependency1>(Lifetime.Transient);
+            builder.Register<HasCircularDependency2>(Lifetime.Transient);
+
+            Assert.Throws<AggregateException>(() => builder.Build());
+        }
     }
 }

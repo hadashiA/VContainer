@@ -186,4 +186,26 @@ namespace VContainer.Tests
         public I2 GetPrivateFieldHasDefault() => privateFieldHasDefault;
         public I3 GetPrivatePropertyHasDefault() => privatePropertyHasDefault;
     }
+
+    class HasCircularDependency1
+    {
+        public HasCircularDependency1(HasCircularDependency2 dependency2)
+        {
+            if (dependency2 == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class HasCircularDependency2
+    {
+        public HasCircularDependency2(HasCircularDependency1 dependency1)
+        {
+            if (dependency1 == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
 }

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -97,36 +99,44 @@ namespace VContainer.Internal
 
     static class TypeAnalyzer
     {
-        public static InjectTypeInfo Analyze(Type type, bool skipConstructor = false)
+        static readonly ConcurrentDictionary<Type, InjectTypeInfo> Cache = new ConcurrentDictionary<Type, InjectTypeInfo>();
+
+        public static InjectTypeInfo AnalyzeWithCache(Type type) => Cache.GetOrAdd(type, Analyze);
+
+        public static InjectTypeInfo Analyze(Type type)
         {
             var injectConstructor = default(ConstructorInfo);
             var typeInfo = type.GetTypeInfo();
 
-            if (!skipConstructor)
+            // Constructor, single [Inject] constructor -> single most parameters constuctor
+            var constructors = typeInfo.DeclaredConstructors;
+            var injectConstructors = constructors
+                .Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null)
+                .ToArray();
+            if (injectConstructors.Length == 0)
             {
-                // Constructor, single [Inject] constructor -> single most parameters constuctor
-                var injectConstructors = typeInfo.DeclaredConstructors.Where(x => x.GetCustomAttribute<InjectAttribute>(true) != null).ToArray();
-                if (injectConstructors.Length == 0)
+                var grouped = constructors
+                    .Where(x => !x.IsStatic)
+                    .GroupBy(x => x.GetParameters().Length)
+                    .OrderByDescending(x => x.Key)
+                    .FirstOrDefault();
+                if (grouped == null)
                 {
-                    var grouped = typeInfo.DeclaredConstructors.Where(x => !x.IsStatic).GroupBy(x => x.GetParameters().Length).OrderByDescending(x => x.Key).FirstOrDefault();
-                    if (grouped == null)
-                    {
-                        throw new VContainerException(type, $"Type does not found injectable constructor, type: {type.Name}");
-                    }
-                    if (grouped.Count() != 1)
-                    {
-                        throw new VContainerException(type, $"Type found multiple ambiguous constructors, type: {type.Name}");
-                    }
-                    injectConstructor = grouped.First();
+                    throw new VContainerException(type, $"Type does not found injectable constructor, type: {type.Name}");
                 }
-                else if (injectConstructors.Length == 1)
+                if (grouped.Count() != 1)
                 {
-                    injectConstructor = injectConstructors[0];
+                    throw new VContainerException(type, $"Type found multiple ambiguous constructors, type: {type.Name}");
                 }
-                else
-                {
-                    throw new VContainerException(type, "Type found multiple [Inject] marked constructors, type:" + type.Name);
-                }
+                injectConstructor = grouped.First();
+            }
+            else if (injectConstructors.Length == 1)
+            {
+                injectConstructor = injectConstructors[0];
+            }
+            else
+            {
+                throw new VContainerException(type, "Type found multiple [Inject] marked constructors, type:" + type.Name);
             }
 
             // Methods, [Inject] Only
@@ -153,6 +163,51 @@ namespace VContainer.Internal
                 injectFields,
                 injectProperties,
                 injectMethods);
+        }
+
+        public static void CheckCircularDependency(Type type)
+        {
+            var stack = StackPool<Type>.Default.Rent();
+            try
+            {
+                CheckCircularDependencyInternal(type, stack);
+            }
+            finally
+            {
+                StackPool<Type>.Default.Return(stack);
+            }
+        }
+
+        static void CheckCircularDependencyInternal(Type type, Stack<Type> stack)
+        {
+            if (stack.Any(x => x == type))
+            {
+                throw new VContainerException(type, $"Circular dependency detected! type: {type.FullName}");
+            }
+            stack.Push(type);
+            if (Cache.TryGetValue(type, out var injectTypeInfo))
+            {
+                foreach (var x in injectTypeInfo.InjectConstructor.ParameterInfos)
+                {
+                    CheckCircularDependencyInternal(x.ParameterType, stack);
+                }
+                foreach (var methodInfo in injectTypeInfo.InjectMethods)
+                {
+                    foreach (var x in methodInfo.ParameterInfos)
+                    {
+                        CheckCircularDependencyInternal(x.ParameterType, stack);
+                    }
+                }
+                foreach (var x in injectTypeInfo.InjectFields)
+                {
+                    CheckCircularDependencyInternal(x.FieldInfo.FieldType, stack);
+                }
+                foreach (var x in injectTypeInfo.InjectProperties)
+                {
+                    CheckCircularDependencyInternal(x.PropertyInfo.PropertyType, stack);
+                }
+            }
+            stack.Pop();
         }
     }
 }

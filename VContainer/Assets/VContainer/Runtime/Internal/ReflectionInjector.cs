@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 
 namespace VContainer.Internal
 {
@@ -101,36 +100,10 @@ namespace VContainer.Internal
     {
         public static readonly ReflectionInjectorBuilder Default = new ReflectionInjectorBuilder();
 
-        // readonly ConcurrentDictionary<Type, ReflectionInjector> cache = new ConcurrentDictionary<Type, ReflectionInjector>();
-        //
-        // static readonly Func<Type, ReflectionInjector> Factory = type =>
-        // {
-        //     var injectTypeInfo = TypeAnalyzer.Analyze(type, false);
-        //     return new ReflectionInjector(injectTypeInfo);
-        // };
-        //
-        // static readonly Func<Type, ReflectionInjector> FactorySkipConstructor = type =>
-        // {
-        //     var injectTypeInfo = TypeAnalyzer.Analyze(type, true);
-        //     return new ReflectionInjector(injectTypeInfo);
-        // };
-
-        public IInjector Build(Type type, bool skipConstructor)
+        public IInjector Build(Type type)
         {
-            // No cache
-            var injectTypeInfo = TypeAnalyzer.Analyze(type, skipConstructor);
-
-            // Dictionary cache
-            // return cache.GetOrAdd(type, skipConstructor ? FactorySkipConstructor : Factory);
-
-            // Static type cache
-            // var cacheType = skipConstructor
-            //     ? typeof(InjectTypeInfoCacheWithoutConstructor<>)
-            //     : typeof(InjectTypeInfoCache<>);
-            //
-            // var genericCacheType = cacheType.MakeGenericType(type);
-            // var injectTypeInfo = (InjectTypeInfo)genericCacheType.GetField("Value").GetValue(null);
+            var injectTypeInfo = TypeAnalyzer.AnalyzeWithCache(type);
             return new ReflectionInjector(injectTypeInfo);
-        }
+       }
     }
 }

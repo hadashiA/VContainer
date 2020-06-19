@@ -10,22 +10,6 @@ namespace VContainer
 
     interface IInjectorBuilder
     {
-        IInjector Build(Type type, bool skipConstructor);
-    }
-
-    class NullInjector : IInjector
-    {
-        public readonly object instance;
-
-        public NullInjector(object instance)
-        {
-            this.instance = instance;
-        }
-
-        public void Inject(object _, IObjectResolver resolver)
-        {
-        }
-
-        public object CreateInstance(IObjectResolver resolver) => instance;
+        IInjector Build(Type type);
     }
 }
