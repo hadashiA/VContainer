@@ -23,8 +23,9 @@ jobs:
         echo -n $UNITY_LICENSE_FILE_BASE64 | base64 --decode > ./tmp/ulf
       env:
         UNITY_LICENSE_FILE_BASE64: ${{ secrets[matrix.license] }}
-    - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/ulf || exit 0
-    - name: Run Tests
-      run: $UNITY_BIN -runTests -quit -batchmode -nographics -silent-crashes -logFile -projectPath ./VContainer -testResults ./tmp/TestResults.xml -testPlatform StandaloneLinux64
+    - name: Load License
+      run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/ulf || exit 0
+    # - name: Run Tests
+    #   run: $UNITY_BIN -runTests -batchmode -nographics -silent-crashes -logFile -projectPath ./VContainer -testResults ./tmp/TestResults.xml -testPlatform StandaloneLinux64
     - name: Run Performance Tests
-      run: $UNITY_BIN -runTests -quit -batchmode -nographics -projectPath ./VContainer.Benchmark -testResults tmp/PerformanceTestResults.xml -testPlatform StandaloneLinux64
+      run: $UNITY_BIN -runTests -batchmode -nographics -projectPath ./VContainer.Benchmark -testResults tmp/PerformanceTestResults.xml -testPlatform StandaloneLinux64 -script -scriptbackend=il2cpp
