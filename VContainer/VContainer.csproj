@@ -58,6 +58,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\VContainer\Runtime\AssemblyInfo.cs" />
      <Compile Include="Assets\VContainer\Runtime\Container.cs" />
      <Compile Include="Assets\VContainer\Runtime\ContainerBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\ContainerBuilderExtensions.cs" />

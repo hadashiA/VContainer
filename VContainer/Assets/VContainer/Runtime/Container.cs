@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 using VContainer.Internal;
-
-[assembly: InternalsVisibleTo("VContainer.Tests")]
-[assembly: InternalsVisibleTo("VContainer.StandaloneTests")]
 
 namespace VContainer
 {
