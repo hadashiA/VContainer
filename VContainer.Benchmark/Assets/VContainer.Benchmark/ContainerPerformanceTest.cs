@@ -23,6 +23,9 @@ namespace Vcontainer.Benchmark
                     zenjectContainer.Resolve<ISingleton1>();
                     zenjectContainer.Resolve<ISingleton2>();
                     zenjectContainer.Resolve<ISingleton3>();
+                    zenjectContainer.Resolve<ISingleton1>();
+                    zenjectContainer.Resolve<ISingleton2>();
+                    zenjectContainer.Resolve<ISingleton3>();
                 })
                 .SampleGroup("Zenject")
                 .WarmupCount(100)
@@ -41,6 +44,113 @@ namespace Vcontainer.Benchmark
                     container.Resolve<ISingleton1>();
                     container.Resolve<ISingleton2>();
                     container.Resolve<ISingleton3>();
+                    container.Resolve<ISingleton1>();
+                    container.Resolve<ISingleton2>();
+                    container.Resolve<ISingleton3>();
+                })
+                .SampleGroup("VContainer")
+                .WarmupCount(100)
+                .MeasurementCount(100)
+                .Run();
+        }
+
+        [Test]
+        [Performance]
+        public void ResolveTransient()
+        {
+            var zenjectContainer = new DiContainer();
+            zenjectContainer.Bind<ITransient1>().To<Transient1>().AsTransient();
+            zenjectContainer.Bind<ITransient2>().To<Transient2>().AsTransient();
+            zenjectContainer.Bind<ITransient3>().To<Transient3>().AsTransient();
+
+            Measure
+                .Method(() =>
+                {
+                    zenjectContainer.Resolve<ITransient1>();
+                    zenjectContainer.Resolve<ITransient2>();
+                    zenjectContainer.Resolve<ITransient3>();
+                    zenjectContainer.Resolve<ITransient1>();
+                    zenjectContainer.Resolve<ITransient2>();
+                    zenjectContainer.Resolve<ITransient3>();
+                })
+                .SampleGroup("Zenject")
+                .WarmupCount(100)
+                .MeasurementCount(100)
+                .Run();
+
+            var builder = new ContainerBuilder();
+            builder.Register<ITransient1, Transient1>(Lifetime.Transient);
+            builder.Register<ITransient2, Transient2>(Lifetime.Transient);
+            builder.Register<ITransient3, Transient3>(Lifetime.Transient);
+            var container = builder.Build();
+
+            Measure
+                .Method(() =>
+                {
+                    container.Resolve<ITransient1>();
+                    container.Resolve<ITransient2>();
+                    container.Resolve<ITransient3>();
+                    container.Resolve<ITransient1>();
+                    container.Resolve<ITransient2>();
+                    container.Resolve<ITransient3>();
+                })
+                .SampleGroup("VContainer")
+                .WarmupCount(100)
+                .MeasurementCount(100)
+                .Run();
+        }
+
+        [Test]
+        [Performance]
+        public void ResolveCombined()
+        {
+            var zenjectContainer = new DiContainer();
+            zenjectContainer.Bind<ISingleton1>().To<Singleton1>().AsSingle();
+            zenjectContainer.Bind<ISingleton2>().To<Singleton2>().AsSingle();
+            zenjectContainer.Bind<ISingleton3>().To<Singleton3>().AsSingle();
+            zenjectContainer.Bind<ITransient1>().To<Transient1>().AsTransient();
+            zenjectContainer.Bind<ITransient2>().To<Transient2>().AsTransient();
+            zenjectContainer.Bind<ITransient3>().To<Transient3>().AsTransient();
+            zenjectContainer.Bind<ICombined1>().To<Combined1>().AsTransient();
+            zenjectContainer.Bind<ICombined2>().To<Combined2>().AsTransient();
+            zenjectContainer.Bind<ICombined3>().To<Combined3>().AsTransient();
+
+            Measure
+                .Method(() =>
+                {
+                    zenjectContainer.Resolve<ICombined1>();
+                    zenjectContainer.Resolve<ICombined2>();
+                    zenjectContainer.Resolve<ICombined3>();
+                    zenjectContainer.Resolve<ICombined1>();
+                    zenjectContainer.Resolve<ICombined2>();
+                    zenjectContainer.Resolve<ICombined3>();
+                })
+                .SampleGroup("Zenject")
+                .WarmupCount(100)
+                .MeasurementCount(100)
+                .Run();
+
+            var builder = new ContainerBuilder();
+            builder.Register<ISingleton1, Singleton1>(Lifetime.Singleton);
+            builder.Register<ISingleton2, Singleton2>(Lifetime.Singleton);
+            builder.Register<ISingleton3, Singleton3>(Lifetime.Singleton);
+            builder.Register<ITransient1, Transient1>(Lifetime.Transient);
+            builder.Register<ITransient2, Transient2>(Lifetime.Transient);
+            builder.Register<ITransient3, Transient3>(Lifetime.Transient);
+            builder.Register<ICombined1, Combined1>(Lifetime.Transient);
+            builder.Register<ICombined2, Combined2>(Lifetime.Transient);
+            builder.Register<ICombined3, Combined3>(Lifetime.Transient);
+            var container = builder.Build();
+
+            Measure
+                .Method(() =>
+                {
+                    container.Resolve<ICombined1>();
+                    container.Resolve<ICombined2>();
+                    container.Resolve<ICombined3>();
+                    container.Resolve<ICombined1>();
+                    container.Resolve<ICombined2>();
+                    container.Resolve<ICombined3>();
                 })
                 .SampleGroup("VContainer")
                 .WarmupCount(100)
@@ -73,6 +183,9 @@ namespace Vcontainer.Benchmark
                     zenjectContainer.Resolve<IComplex1>();
                     zenjectContainer.Resolve<IComplex2>();
                     zenjectContainer.Resolve<IComplex3>();
+                    zenjectContainer.Resolve<IComplex1>();
+                    zenjectContainer.Resolve<IComplex2>();
+                    zenjectContainer.Resolve<IComplex3>();
                     UnityEngine.Profiling.Profiler.EndSample();
                 })
                 .SampleGroup("Zenject")
@@ -100,6 +213,9 @@ namespace Vcontainer.Benchmark
                 .Method(() =>
                 {
                     UnityEngine.Profiling.Profiler.BeginSample("VContainer.ResolveComplex");
+                    container.Resolve<IComplex1>();
+                    container.Resolve<IComplex2>();
+                    container.Resolve<IComplex3>();
                     container.Resolve<IComplex1>();
                     container.Resolve<IComplex2>();
                     container.Resolve<IComplex3>();
