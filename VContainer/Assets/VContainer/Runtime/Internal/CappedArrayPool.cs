@@ -24,7 +24,7 @@ namespace VContainer.Internal
                 for (var j = 0; j < InitialBucketSize; j++)
                 {
                     buckets[i][j] = new T[arrayLength];
-                };
+                }
                 tails[i] = buckets[i].Length - 1;
             }
         }

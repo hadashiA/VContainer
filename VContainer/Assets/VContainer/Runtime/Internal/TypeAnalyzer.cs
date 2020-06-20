@@ -126,11 +126,13 @@ namespace VContainer.Internal
             // Fields, [Inject] Only
             var injectFields = type.GetRuntimeFields()
                 .Where(x => x.IsDefined(typeof(InjectAttribute), true))
+                // .Select(x => new InjectFieldInfo(x))
                 .ToArray();
 
             // Properties, [Inject] only
             var injectProperties = type.GetRuntimeProperties()
                 .Where(x => x.SetMethod != null && x.IsDefined(typeof(InjectAttribute)))
+                // .Select(x => new InjectPropertyInfo(x))
                 .ToArray();
 
             return new InjectTypeInfo(
@@ -156,7 +158,7 @@ namespace VContainer.Internal
 
         static void CheckCircularDependencyRecursive(Type type, Stack<Type> stack)
         {
-            if (stack.Any(x => x == type))
+            if (stack.Contains(type))
             {
                 throw new VContainerException(type, $"Circular dependency detected! type: {type.FullName}");
             }

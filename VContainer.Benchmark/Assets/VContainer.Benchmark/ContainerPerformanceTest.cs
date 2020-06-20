@@ -8,6 +8,8 @@ namespace Vcontainer.Benchmark
 {
     public class ContainerPerformanceTest
     {
+        const int N = 10_000;
+
         [Test]
         [Performance]
         public void ResolveSingleton()
@@ -20,16 +22,14 @@ namespace Vcontainer.Benchmark
             Measure
                 .Method(() =>
                 {
-                    zenjectContainer.Resolve<ISingleton1>();
-                    zenjectContainer.Resolve<ISingleton2>();
-                    zenjectContainer.Resolve<ISingleton3>();
-                    zenjectContainer.Resolve<ISingleton1>();
-                    zenjectContainer.Resolve<ISingleton2>();
-                    zenjectContainer.Resolve<ISingleton3>();
+                    for (var i = 0; i < N; i++)
+                    {
+                        zenjectContainer.Resolve<ISingleton1>();
+                        zenjectContainer.Resolve<ISingleton2>();
+                        zenjectContainer.Resolve<ISingleton3>();
+                    }
                 })
                 .SampleGroup("Zenject")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 .Run();
 
             var builder = new ContainerBuilder();
@@ -41,16 +41,14 @@ namespace Vcontainer.Benchmark
             Measure
                 .Method(() =>
                 {
-                    container.Resolve<ISingleton1>();
-                    container.Resolve<ISingleton2>();
-                    container.Resolve<ISingleton3>();
-                    container.Resolve<ISingleton1>();
-                    container.Resolve<ISingleton2>();
-                    container.Resolve<ISingleton3>();
+                    for (var i = 0; i < N; i++)
+                    {
+                        container.Resolve<ISingleton1>();
+                        container.Resolve<ISingleton2>();
+                        container.Resolve<ISingleton3>();
+                    }
                 })
                 .SampleGroup("VContainer")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 .Run();
         }
 
@@ -66,16 +64,14 @@ namespace Vcontainer.Benchmark
             Measure
                 .Method(() =>
                 {
-                    zenjectContainer.Resolve<ITransient1>();
-                    zenjectContainer.Resolve<ITransient2>();
-                    zenjectContainer.Resolve<ITransient3>();
-                    zenjectContainer.Resolve<ITransient1>();
-                    zenjectContainer.Resolve<ITransient2>();
-                    zenjectContainer.Resolve<ITransient3>();
+                    for (var i = 0; i < N; i++)
+                    {
+                        zenjectContainer.Resolve<ITransient1>();
+                        zenjectContainer.Resolve<ITransient2>();
+                        zenjectContainer.Resolve<ITransient3>();
+                    }
                 })
                 .SampleGroup("Zenject")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 .Run();
 
             var builder = new ContainerBuilder();
@@ -87,16 +83,14 @@ namespace Vcontainer.Benchmark
             Measure
                 .Method(() =>
                 {
-                    container.Resolve<ITransient1>();
-                    container.Resolve<ITransient2>();
-                    container.Resolve<ITransient3>();
-                    container.Resolve<ITransient1>();
-                    container.Resolve<ITransient2>();
-                    container.Resolve<ITransient3>();
+                    for (var i = 0; i < N; i++)
+                    {
+                        container.Resolve<ITransient1>();
+                        container.Resolve<ITransient2>();
+                        container.Resolve<ITransient3>();
+                    }
                 })
                 .SampleGroup("VContainer")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 .Run();
         }
 
@@ -118,16 +112,14 @@ namespace Vcontainer.Benchmark
             Measure
                 .Method(() =>
                 {
-                    zenjectContainer.Resolve<ICombined1>();
-                    zenjectContainer.Resolve<ICombined2>();
-                    zenjectContainer.Resolve<ICombined3>();
-                    zenjectContainer.Resolve<ICombined1>();
-                    zenjectContainer.Resolve<ICombined2>();
-                    zenjectContainer.Resolve<ICombined3>();
+                    for (var i = 0; i < N; i++)
+                    {
+                        zenjectContainer.Resolve<ICombined1>();
+                        zenjectContainer.Resolve<ICombined2>();
+                        zenjectContainer.Resolve<ICombined3>();
+                    }
                 })
                 .SampleGroup("Zenject")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 .Run();
 
             var builder = new ContainerBuilder();
@@ -145,16 +137,14 @@ namespace Vcontainer.Benchmark
             Measure
                 .Method(() =>
                 {
-                    container.Resolve<ICombined1>();
-                    container.Resolve<ICombined2>();
-                    container.Resolve<ICombined3>();
-                    container.Resolve<ICombined1>();
-                    container.Resolve<ICombined2>();
-                    container.Resolve<ICombined3>();
+                    for (var i = 0; i < N; i++)
+                    {
+                        container.Resolve<ICombined1>();
+                        container.Resolve<ICombined2>();
+                        container.Resolve<ICombined3>();
+                    }
                 })
                 .SampleGroup("VContainer")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 .Run();
         }
 
@@ -179,18 +169,14 @@ namespace Vcontainer.Benchmark
             Measure
                 .Method(() =>
                 {
-                    UnityEngine.Profiling.Profiler.BeginSample("Zenject.ResolveComplex");
-                    zenjectContainer.Resolve<IComplex1>();
-                    zenjectContainer.Resolve<IComplex2>();
-                    zenjectContainer.Resolve<IComplex3>();
-                    zenjectContainer.Resolve<IComplex1>();
-                    zenjectContainer.Resolve<IComplex2>();
-                    zenjectContainer.Resolve<IComplex3>();
-                    UnityEngine.Profiling.Profiler.EndSample();
+                    for (var i = 0; i < N; i++)
+                    {
+                        zenjectContainer.Resolve<IComplex1>();
+                        zenjectContainer.Resolve<IComplex2>();
+                        zenjectContainer.Resolve<IComplex3>();
+                    }
                 })
                 .SampleGroup("Zenject")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 // .GC()
                 .Run();
 
@@ -212,75 +198,101 @@ namespace Vcontainer.Benchmark
             Measure
                 .Method(() =>
                 {
-                    UnityEngine.Profiling.Profiler.BeginSample("VContainer.ResolveComplex");
-                    container.Resolve<IComplex1>();
-                    container.Resolve<IComplex2>();
-                    container.Resolve<IComplex3>();
-                    container.Resolve<IComplex1>();
-                    container.Resolve<IComplex2>();
-                    container.Resolve<IComplex3>();
-                    UnityEngine.Profiling.Profiler.EndSample();
+                    // UnityEngine.Profiling.Profiler.BeginSample("VContainer Resolve(Complex)");
+                    for (var i = 0; i < N; i++)
+                    {
+                        container.Resolve<IComplex1>();
+                        container.Resolve<IComplex2>();
+                        container.Resolve<IComplex3>();
+                    }
+                    // UnityEngine.Profiling.Profiler.EndSample();
                 })
                 .SampleGroup("VContainer")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 // .GC()
                 .Run();
         }
 
+        // [Test]
+        // [Performance]
+        // public void ResolveComplex_VContainer()
+        // {
+        //     var builder = new ContainerBuilder();
+        //     builder.Register<IFirstService, FirstService>(Lifetime.Singleton);
+        //     builder.Register<ISecondService, SecondService>(Lifetime.Singleton);
+        //     builder.Register<IThirdService, ThirdService>(Lifetime.Singleton);
+        //     builder.Register<ISubObjectA, SubObjectA>(Lifetime.Transient);
+        //     builder.Register<ISubObjectB, SubObjectB>(Lifetime.Transient);
+        //     builder.Register<ISubObjectC, SubObjectC>(Lifetime.Transient);
+        //     builder.Register<IComplex1, Complex1>(Lifetime.Transient);
+        //     builder.Register<IComplex2, Complex2>(Lifetime.Transient);
+        //     builder.Register<IComplex3, Complex3>(Lifetime.Transient);
+        //     builder.Register<ISubObjectOne, SubObjectOne>(Lifetime.Transient);
+        //     builder.Register<ISubObjectTwo, SubObjectTwo>(Lifetime.Transient);
+        //     builder.Register<ISubObjectThree, SubObjectThree>(Lifetime.Transient);
+        //     var container = builder.Build();
+        //
+        //     Measure
+        //         .Method(() =>
+        //         {
+        //             UnityEngine.Profiling.Profiler.BeginSample("VContainer");
+        //             container.Resolve<IComplex1>();
+        //             container.Resolve<IComplex2>();
+        //             container.Resolve<IComplex3>();
+        //             UnityEngine.Profiling.Profiler.EndSample();
+        //         })
+        //         .Run();
+        // }
 
         [Test]
         [Performance]
-        public void RegisterComplex()
+        public void ContainerBuildComplex()
         {
             Measure
                 .Method(() =>
                 {
-                    UnityEngine.Profiling.Profiler.BeginSample("Zenject.RegisterComplex");
-                    var zenjectContainer = new DiContainer();
-                    zenjectContainer.Bind<IFirstService>().To<FirstService>().AsSingle();
-                    zenjectContainer.Bind<ISecondService>().To<SecondService>().AsSingle();
-                    zenjectContainer.Bind<IThirdService>().To<ThirdService>().AsSingle();
-                    zenjectContainer.Bind<ISubObjectA>().To<SubObjectA>().AsTransient();
-                    zenjectContainer.Bind<ISubObjectB>().To<SubObjectB>().AsTransient();
-                    zenjectContainer.Bind<ISubObjectC>().To<SubObjectC>().AsTransient();
-                    zenjectContainer.Bind<IComplex1>().To<Complex1>().AsTransient();
-                    zenjectContainer.Bind<IComplex2>().To<Complex2>().AsTransient();
-                    zenjectContainer.Bind<IComplex3>().To<Complex3>().AsTransient();
-                    zenjectContainer.Bind<ISubObjectOne>().To<SubObjectOne>().AsTransient();
-                    zenjectContainer.Bind<ISubObjectTwo>().To<SubObjectTwo>().AsTransient();
-                    zenjectContainer.Bind<ISubObjectThree>().To<SubObjectThree>().AsTransient();
-                    UnityEngine.Profiling.Profiler.EndSample();
+                    for (var i = 0; i < N; i++)
+                    {
+                        var zenjectContainer = new DiContainer();
+                        zenjectContainer.Bind<IFirstService>().To<FirstService>().AsSingle();
+                        zenjectContainer.Bind<ISecondService>().To<SecondService>().AsSingle();
+                        zenjectContainer.Bind<IThirdService>().To<ThirdService>().AsSingle();
+                        zenjectContainer.Bind<ISubObjectA>().To<SubObjectA>().AsTransient();
+                        zenjectContainer.Bind<ISubObjectB>().To<SubObjectB>().AsTransient();
+                        zenjectContainer.Bind<ISubObjectC>().To<SubObjectC>().AsTransient();
+                        zenjectContainer.Bind<IComplex1>().To<Complex1>().AsTransient();
+                        zenjectContainer.Bind<IComplex2>().To<Complex2>().AsTransient();
+                        zenjectContainer.Bind<IComplex3>().To<Complex3>().AsTransient();
+                        zenjectContainer.Bind<ISubObjectOne>().To<SubObjectOne>().AsTransient();
+                        zenjectContainer.Bind<ISubObjectTwo>().To<SubObjectTwo>().AsTransient();
+                        zenjectContainer.Bind<ISubObjectThree>().To<SubObjectThree>().AsTransient();
+                    }
                 })
                 .SampleGroup("Zenject")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 // .GC()
                 .Run();
 
             Measure
                 .Method(() =>
                 {
-                    UnityEngine.Profiling.Profiler.BeginSample("VContainer.RegisterComplex");
-                    var builder = new ContainerBuilder();
-                    builder.Register<IFirstService, FirstService>(Lifetime.Singleton);
-                    builder.Register<ISecondService, SecondService>(Lifetime.Singleton);
-                    builder.Register<IThirdService, ThirdService>(Lifetime.Singleton);
-                    builder.Register<ISubObjectA, SubObjectA>(Lifetime.Transient);
-                    builder.Register<ISubObjectB, SubObjectB>(Lifetime.Transient);
-                    builder.Register<ISubObjectC, SubObjectC>(Lifetime.Transient);
-                    builder.Register<IComplex1, Complex1>(Lifetime.Transient);
-                    builder.Register<IComplex2, Complex2>(Lifetime.Transient);
-                    builder.Register<IComplex3, Complex3>(Lifetime.Transient);
-                    builder.Register<ISubObjectOne, SubObjectOne>(Lifetime.Transient);
-                    builder.Register<ISubObjectTwo, SubObjectTwo>(Lifetime.Transient);
-                    builder.Register<ISubObjectThree, SubObjectThree>(Lifetime.Transient);
-                    _ = builder.Build();
-                    UnityEngine.Profiling.Profiler.EndSample();
+                    for (var i = 0; i < N; i++)
+                    {
+                        var builder = new ContainerBuilder();
+                        builder.Register<IFirstService, FirstService>(Lifetime.Singleton);
+                        builder.Register<ISecondService, SecondService>(Lifetime.Singleton);
+                        builder.Register<IThirdService, ThirdService>(Lifetime.Singleton);
+                        builder.Register<ISubObjectA, SubObjectA>(Lifetime.Transient);
+                        builder.Register<ISubObjectB, SubObjectB>(Lifetime.Transient);
+                        builder.Register<ISubObjectC, SubObjectC>(Lifetime.Transient);
+                        builder.Register<IComplex1, Complex1>(Lifetime.Transient);
+                        builder.Register<IComplex2, Complex2>(Lifetime.Transient);
+                        builder.Register<IComplex3, Complex3>(Lifetime.Transient);
+                        builder.Register<ISubObjectOne, SubObjectOne>(Lifetime.Transient);
+                        builder.Register<ISubObjectTwo, SubObjectTwo>(Lifetime.Transient);
+                        builder.Register<ISubObjectThree, SubObjectThree>(Lifetime.Transient);
+                        _ = builder.Build();
+                    }
                 })
                 .SampleGroup("VContainer")
-                .WarmupCount(100)
-                .MeasurementCount(100)
                 // .GC()
                 .Run();
         }

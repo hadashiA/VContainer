@@ -14,7 +14,7 @@ services:
     command: >
       /bin/sh -c "
         /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2019.4.0f1.ulf ||
-        /opt/Unity/Editor/Unity -runTests -batchmode -nographics -silent-crashes -logFile -projectPath ./VContainer -testResults ./tmp/TestResults.xml -testPlatform StandaloneLinux64 -scriptbackend=mono
+        /opt/Unity/Editor/Unity -runTests -batchmode -nographics -logFile -projectPath ./VContainer -testResults ./tmp/TestResults.xml -testPlatform StandaloneLinux64 -buildTarget StandaloneLinux64 -scriptbackend=mono
       "
   performance-test:
     image: gableroux/unity3d:2019.4.0f1
@@ -24,5 +24,5 @@ services:
     command: >
       /bin/sh -c "
         /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2019.4.0f1.ulf ||
-        /opt/Unity/Editor/Unity -runTests -batchmode -nographics -projectPath ./VContainer.Benchmark -testResults tmp/PerformanceTestResults.xml -testPlatform StandaloneLinux64 -scriptbackend=mono
+        /opt/Unity/Editor/Unity -runTests -batchmode -nographics -projectPath ./VContainer.Benchmark -testResults tmp/PerformanceTestResults-linux.xml -testPlatform StandaloneLinux64 -buildTarget StandaloneLinux64 -scriptbackend=il2cpp
       "

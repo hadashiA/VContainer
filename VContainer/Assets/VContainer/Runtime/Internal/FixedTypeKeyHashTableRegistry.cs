@@ -36,9 +36,9 @@ namespace VContainer.Internal
             {
                 switch (exists)
                 {
-                    case CollectionRegistration existsCollection:
-                        existsCollection.Add(registration);
-                        break;
+                    // case CollectionRegistration existsCollection:
+                    //     existsCollection.Add(registration);
+                    //     break;
                     case Registration existsRegistration:
                         var collectionService = typeof(IEnumerable<>).MakeGenericType(service);
                         if (dictionary.TryGetValue(collectionService, out var collectionRegistration))

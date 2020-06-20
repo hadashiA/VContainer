@@ -35,7 +35,7 @@ namespace VContainer.Internal
                         throw new VContainerException(injectTypeInfo.Type, $"Failed to resolve {injectTypeInfo.Type.FullName} : {ex.Message}");
                     }
                 }
-                var instance = injectTypeInfo.InjectConstructor.ConstructorInfo.Invoke(parameterValues);
+                var instance = injectTypeInfo.InjectConstructor.Factory(parameterValues);
                 Inject(instance, resolver);
                 return instance;
             }
@@ -83,7 +83,7 @@ namespace VContainer.Internal
                             throw new VContainerException(parameterType, $"Failed to resolve {injectTypeInfo.Type.FullName} : {ex.Message}");
                         }
                     }
-                    method.MethodInfo.Invoke(obj, parameterValues);
+                    method.Invoke(obj, parameterValues);
                 }
                 finally
                 {

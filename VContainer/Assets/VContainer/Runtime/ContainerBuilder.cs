@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using VContainer.Internal;
 
 namespace VContainer
@@ -31,7 +30,6 @@ namespace VContainer
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             var container = new ScopedContainer(registry, root, parent);
-            // registry.AddSystemRegistration(container, ContainerRegistered);
             return container;
         }
 
@@ -68,12 +66,18 @@ namespace VContainer
 
         protected IReadOnlyList<IRegistration> BuildRegistrations()
         {
-            var registrations = registrationBuilders
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
+            var registrations = registrationBuilders
                 .AsParallel()
-#endif
                 .Select(x => x.Build())
                 .ToList();
+#else
+            var registrations = new List<IRegistration>(registrationBuilders.Count);
+            foreach (var registrationBuilder in registrationBuilders)
+            {
+                registrations.Add(registrationBuilder.Build());
+            }
+#endif
 
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
             registrations
