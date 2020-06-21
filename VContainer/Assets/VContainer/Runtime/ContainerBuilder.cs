@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using VContainer.Internal;
+#if VCONTAINER_PARALLEL_CONTAINER_BUILD
+using System.Threading.Tasks;
+#endif
 
 namespace VContainer
 {
@@ -66,23 +69,23 @@ namespace VContainer
 
         protected IReadOnlyList<IRegistration> BuildRegistrations()
         {
-            var registrations = new List<IRegistration>(registrationBuilders.Count);
-#if VCONTAINER_PARALLEL
+#if VCONTAINER_PARALLEL_CONTAINER_BUILD
+            var a = new IRegistration[registrationBuilders.Count];
             Parallel.For(0, registrationBuilders.Count, i =>
             {
-                var registration = registrationBuilders[i].Build();
-                lock (registrations)
-                    registrations.Add(registration);
-
+                a[i] = registrationBuilders[i].Build();
             });
+
+            var registrations = new List<IRegistration>(a);
 #else
+            var registrations = new List<IRegistration>(registrationBuilders.Count);
             foreach (var registrationBuilder in registrationBuilders)
             {
                 registrations.Add(registrationBuilder.Build());
             }
 #endif
 
-#if VCONTAINER_PARALLEL
+#if VCONTAINER_PARALLEL_CONTAINER_BUILD
             Parallel.For(0, registrations.Count, i =>
             {
                 TypeAnalyzer.CheckCircularDependency(registrations[i].ImplementationType);

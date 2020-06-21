@@ -35,29 +35,29 @@ namespace VContainer.Internal
         }
     }
 
-    sealed class InjectFieldInfo
-    {
-        public readonly Type FieldType;
-        public readonly Action<object, object> Setter;
-
-        public InjectFieldInfo(FieldInfo fieldInfo)
-        {
-            FieldType = fieldInfo.FieldType;
-            Setter = fieldInfo.SetValue;
-        }
-    }
-
-    sealed class InjectPropertyInfo
-    {
-        public readonly Type PropertyType;
-        public readonly Action<object, object> Setter;
-
-        public InjectPropertyInfo(PropertyInfo propertyInfo)
-        {
-            PropertyType = propertyInfo.PropertyType;
-            Setter = propertyInfo.SetValue;
-        }
-    }
+    // sealed class InjectFieldInfo
+    // {
+    //     public readonly Type FieldType;
+    //     public readonly Action<object, object> Setter;
+    //
+    //     public InjectFieldInfo(FieldInfo fieldInfo)
+    //     {
+    //         FieldType = fieldInfo.FieldType;
+    //         Setter = fieldInfo.SetValue;
+    //     }
+    // }
+    //
+    // sealed class InjectPropertyInfo
+    // {
+    //     public readonly Type PropertyType;
+    //     public readonly Action<object, object> Setter;
+    //
+    //     public InjectPropertyInfo(PropertyInfo propertyInfo)
+    //     {
+    //         PropertyType = propertyInfo.PropertyType;
+    //         Setter = propertyInfo.SetValue;
+    //     }
+    // }
 
     sealed class InjectTypeInfo
     {
