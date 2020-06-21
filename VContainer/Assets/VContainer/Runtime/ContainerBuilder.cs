@@ -40,7 +40,7 @@ namespace VContainer
     {
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
 
-        protected bool conterinerRegistered;
+        bool conterinerRegistered;
 
         public RegistrationBuilder Register<T>(Lifetime lifetime)
             => Register(new RegistrationBuilder(typeof(T), lifetime));
@@ -66,23 +66,27 @@ namespace VContainer
 
         protected IReadOnlyList<IRegistration> BuildRegistrations()
         {
-#if VCONTAINER_PARALLEL_CONTAINER_BUILD
-            var registrations = registrationBuilders
-                .AsParallel()
-                .Select(x => x.Build())
-                .ToList();
-#else
             var registrations = new List<IRegistration>(registrationBuilders.Count);
+#if VCONTAINER_PARALLEL
+            Parallel.For(0, registrationBuilders.Count, i =>
+            {
+                var registration = registrationBuilders[i].Build();
+                lock (registrations)
+                    registrations.Add(registration);
+
+            });
+#else
             foreach (var registrationBuilder in registrationBuilders)
             {
                 registrations.Add(registrationBuilder.Build());
             }
 #endif
 
-#if VCONTAINER_PARALLEL_CONTAINER_BUILD
-            registrations
-                .AsParallel()
-                .ForAll(x => TypeAnalyzer.CheckCircularDependency(x.ImplementationType));
+#if VCONTAINER_PARALLEL
+            Parallel.For(0, registrations.Count, i =>
+            {
+                TypeAnalyzer.CheckCircularDependency(registrations[i].ImplementationType);
+            });
 #else
             foreach (var x in registrations)
             {

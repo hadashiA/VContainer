@@ -56,7 +56,7 @@ namespace VContainer.Tests
             }
             {
                 var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasInjectConstructor));
-                Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
+                // Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
             }
         }
     }
