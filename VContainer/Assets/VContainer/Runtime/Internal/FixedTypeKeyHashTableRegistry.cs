@@ -34,25 +34,15 @@ namespace VContainer.Internal
         {
             if (dictionary.TryGetValue(service, out var exists))
             {
-                switch (exists)
+                var collectionService = typeof(IEnumerable<>).MakeGenericType(service);
+                if (dictionary.TryGetValue(collectionService, out var collection))
                 {
-                    // case CollectionRegistration existsCollection:
-                    //     existsCollection.Add(registration);
-                    //     break;
-                    case Registration existsRegistration:
-                        var collectionService = typeof(IEnumerable<>).MakeGenericType(service);
-                        if (dictionary.TryGetValue(collectionService, out var collectionRegistration))
-                        {
-                            ((CollectionRegistration)collectionRegistration).Add(registration);
-                        }
-                        else
-                        {
-                            collectionRegistration = new CollectionRegistration(service) { existsRegistration, registration };
-                            AddCollectionToDictionary(dictionary, (CollectionRegistration)collectionRegistration);
-                        }
-                        break;
-                    default:
-                        throw new ArgumentException();
+                    ((CollectionRegistration)collection).Add(registration);
+                }
+                else
+                {
+                    var newCollection = new CollectionRegistration(service) { exists, registration };
+                    AddCollectionToDictionary(dictionary, newCollection);
                 }
             }
             else
