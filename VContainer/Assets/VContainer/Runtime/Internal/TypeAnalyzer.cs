@@ -84,9 +84,12 @@ namespace VContainer.Internal
 
     static class TypeAnalyzer
     {
+        public static InjectTypeInfo AnalyzeWithCache(Type type) => Cache.GetOrAdd(type, Analyze);
+
         static readonly ConcurrentDictionary<Type, InjectTypeInfo> Cache = new ConcurrentDictionary<Type, InjectTypeInfo>();
 
-        public static InjectTypeInfo AnalyzeWithCache(Type type) => Cache.GetOrAdd(type, Analyze);
+        [ThreadStatic]
+        static Stack<Type> circularDependencyChecker = new Stack<Type>(128);
 
         public static InjectTypeInfo Analyze(Type type)
         {
@@ -168,15 +171,11 @@ namespace VContainer.Internal
 
         public static void CheckCircularDependency(Type type)
         {
-            var stack = StackPool<Type>.Default.Rent();
-            try
-            {
-                CheckCircularDependencyRecursive(type, stack);
-            }
-            finally
-            {
-                StackPool<Type>.Default.Return(stack);
-            }
+            // ThreadStatic
+            if (circularDependencyChecker == null)
+                circularDependencyChecker = new Stack<Type>(128);
+            circularDependencyChecker.Clear();
+            CheckCircularDependencyRecursive(type, circularDependencyChecker);
         }
 
         static void CheckCircularDependencyRecursive(Type type, Stack<Type> stack)

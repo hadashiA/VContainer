@@ -45,15 +45,12 @@ namespace VContainer
 
         bool contarinerRegistered;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public RegistrationBuilder Register<T>(Lifetime lifetime)
             => Register(new RegistrationBuilder(typeof(T), lifetime));
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public RegistrationBuilder RegisterInstance(object instance)
             => Register(new RegistrationBuilder(instance));
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public RegistrationBuilder Register(RegistrationBuilder registrationBuilder)
         {
             registrationBuilders.Add(registrationBuilder);

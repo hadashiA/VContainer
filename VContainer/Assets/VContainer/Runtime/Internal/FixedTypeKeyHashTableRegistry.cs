@@ -6,58 +6,65 @@ namespace VContainer.Internal
 {
     public sealed class FixedTypeKeyHashTableRegistry : IRegistry
     {
+        [ThreadStatic]
+        static IDictionary<Type, IRegistration> buildBuffer = new Dictionary<Type, IRegistration>(128);
+
         readonly FixedTypeKeyHashtable<IRegistration> hashTable;
 
         public static FixedTypeKeyHashTableRegistry Build(IReadOnlyList<IRegistration> registrations)
         {
-            var dictionary = new Dictionary<Type, IRegistration>(registrations.Count * 2);
+            // ThreadStatic
+            if (buildBuffer == null)
+                buildBuffer = new Dictionary<Type, IRegistration>(128);
+            buildBuffer.Clear();
+
             foreach (var registration in registrations)
             {
                 if (registration.InterfaceTypes?.Count > 0)
                 {
                     foreach (var interfaceType in registration.InterfaceTypes)
                     {
-                        AddToDictionary(dictionary, interfaceType, registration);
+                        AddToBuildBuffer(buildBuffer, interfaceType, registration);
                     }
                 }
                 else
                 {
-                    AddToDictionary(dictionary, registration.ImplementationType, registration);
+                    AddToBuildBuffer(buildBuffer, registration.ImplementationType, registration);
                 }
             }
 
-            var hashTable = new FixedTypeKeyHashtable<IRegistration>(dictionary.ToArray());
+            var hashTable = new FixedTypeKeyHashtable<IRegistration>(buildBuffer.ToArray());
             return new FixedTypeKeyHashTableRegistry(hashTable);
         }
 
-        static void AddToDictionary(IDictionary<Type, IRegistration> dictionary, Type service, IRegistration registration)
+        static void AddToBuildBuffer(IDictionary<Type, IRegistration> buf, Type service, IRegistration registration)
         {
-            if (dictionary.TryGetValue(service, out var exists))
+            if (buf.TryGetValue(service, out var exists))
             {
                 var collectionService = typeof(IEnumerable<>).MakeGenericType(service);
-                if (dictionary.TryGetValue(collectionService, out var collection))
+                if (buf.TryGetValue(collectionService, out var collection))
                 {
                     ((CollectionRegistration)collection).Add(registration);
                 }
                 else
                 {
                     var newCollection = new CollectionRegistration(service) { exists, registration };
-                    AddCollectionToDictionary(dictionary, newCollection);
+                    AddCollectionToBuildBuffer(buf, newCollection);
                 }
             }
             else
             {
-                dictionary.Add(service, registration);
+                buf.Add(service, registration);
             }
         }
 
-        static void AddCollectionToDictionary(IDictionary<Type, IRegistration> dictionary, CollectionRegistration collectionRegistration)
+        static void AddCollectionToBuildBuffer(IDictionary<Type, IRegistration> buf, CollectionRegistration collectionRegistration)
         {
             foreach (var collectionType in collectionRegistration.InterfaceTypes)
             {
                 try
                 {
-                    dictionary.Add(collectionType, collectionRegistration);
+                    buf.Add(collectionType, collectionRegistration);
                 }
                 catch (ArgumentException)
                 {
