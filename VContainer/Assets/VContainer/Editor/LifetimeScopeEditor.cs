@@ -272,7 +272,9 @@ namespace VContainer.Editor
                 }
             }
 
+            var _ = containerBuilder.Build();
             UnityEngine.Debug.Log($"<color=green>[VContainer] Validation success {target.name}</color>");
+            EditorUtility.DisplayDialog("LifetimeScope validation", "Success", "OK");
         }
     }
 }
