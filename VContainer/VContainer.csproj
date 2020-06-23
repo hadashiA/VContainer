@@ -66,6 +66,7 @@
      <Compile Include="Assets\VContainer\Runtime\Internal\CompositeDisposable.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTable.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTableRegistry.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Internal\GCCollectScope.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\HashTableRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\IInjector.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\IRegistry.cs" />
