@@ -30,12 +30,13 @@ namespace VContainer.Unity
         [SerializeField]
         bool buildOnAwake = true;
 
-        const string ProjectRootResourcePath = "ProjectLifetimeScope";
+        public const string ProjectRootResourcePath = "ProjectLifetimeScope";
 
         public static LifetimeScope ProjectRoot => ProjectRootLazy.Value;
 
         static readonly Lazy<LifetimeScope> ProjectRootLazy = new Lazy<LifetimeScope>(LoadProjectRoot);
         static readonly ConcurrentDictionary<string, ExtraInstaller> ExtraInstallers = new ConcurrentDictionary<string, ExtraInstaller>();
+        static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
 
         public static ExtendScope Push(Action<UnityContainerBuilder> installing, string key = "")
         {
@@ -45,6 +46,30 @@ namespace VContainer.Unity
         public static ExtendScope Push(IInstaller installer, string key = "")
         {
             return new ExtendScope(installer, key);
+        }
+
+        public static LifetimeScope FindByKey(string key)
+        {
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                if (scene.isLoaded)
+                {
+                    scene.GetRootGameObjects(GameObjectBuffer);
+                    foreach (var root in GameObjectBuffer)
+                    {
+                        var others = root.GetComponentsInChildren<LifetimeScope>();
+                        foreach (var other in others)
+                        {
+                            if (key == other.key)
+                            {
+                                return other;
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         public static void EnqueueExtra(IInstaller installer, string key = "")
@@ -88,7 +113,7 @@ namespace VContainer.Unity
         public string Key => key;
 
         readonly CompositeDisposable disposable = new CompositeDisposable();
-        readonly List<GameObject> gameObjectBuffer = new List<GameObject>(32);
+        readonly List<IInstaller> extraInstallers = new List<IInstaller>();
 
         void Awake()
         {
@@ -118,19 +143,28 @@ namespace VContainer.Unity
             DispatchPlayerLoopItems();
         }
 
-        public void CreateScopeFromPrefab(
-            LifetimeScope childPrefab,
-            Action<UnityContainerBuilder> configuration = null,
-            string lookUpKey = null)
+        public GameObject CreateChild(string key = null, Action<UnityContainerBuilder> installation = null)
         {
-            if (childPrefab.gameObject.activeSelf)
+            if (installation != null)
             {
-                childPrefab.gameObject.SetActive(false);
+                return CreateChild(key, new ActionInstaller(installation));
             }
-            var child = Instantiate(childPrefab, transform, false);
+            return CreateChild(key, (IInstaller)null);
+        }
+
+        public GameObject CreateChild(string key = "", IInstaller installer = null)
+        {
+            var childGameObject = new GameObject("LifeTimeScope (Child)");
+            childGameObject.SetActive(false);
+            childGameObject.transform.SetParent(transform, false);
+            var child = childGameObject.AddComponent<LifetimeScope>();
+            if (installer != null)
+            {
+                child.extraInstallers.Add(installer);
+            }
             child.parent = this;
-            child.key = lookUpKey;
-            child.gameObject.SetActive(true);
+            childGameObject.SetActive(true);
+            return childGameObject;
         }
 
         void InstallTo(IContainerBuilder builder)
@@ -142,6 +176,11 @@ namespace VContainer.Unity
             }
 
             foreach (var installer in scriptableObjectInstallers)
+            {
+                installer.Install(decoratedBuilder);
+            }
+
+            foreach (var installer in extraInstallers)
             {
                 installer.Install(decoratedBuilder);
             }
@@ -160,25 +199,10 @@ namespace VContainer.Unity
 
             if (!string.IsNullOrEmpty(parentKey) && parentKey != key)
             {
-                for (var i = 0; i < SceneManager.sceneCount; i++)
+                var found = FindByKey(parentKey);
+                if (found != null)
                 {
-                    var scene = SceneManager.GetSceneAt(i);
-                    if (scene.isLoaded)
-                    {
-                        gameObjectBuffer.Clear();
-                        scene.GetRootGameObjects(gameObjectBuffer);
-                        foreach (var root in gameObjectBuffer)
-                        {
-                            var others = root.GetComponentsInChildren<LifetimeScope>();
-                            foreach (var other in others)
-                            {
-                                if (parentKey == other.key || parentKey == AutoReferenceKey)
-                                {
-                                    return other;
-                                }
-                            }
-                        }
-                    }
+                    return found;
                 }
                 throw new VContainerException(null, $"LifetimeScope parent key `{parentKey}` is not found in any scene");
             }
