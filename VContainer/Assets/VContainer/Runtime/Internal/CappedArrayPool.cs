@@ -11,7 +11,7 @@ namespace VContainer.Internal
 
         readonly T[][][] buckets;
         readonly object syncRoot = new object();
-        int[] tails;
+        readonly int[] tails;
 
         CappedArrayPool(int maxLength)
         {
@@ -46,13 +46,9 @@ namespace VContainer.Internal
                 if (tail >= bucket.Length)
                 {
                     Array.Resize(ref bucket, bucket.Length * 2);
-                    for (var j = tail; j < bucket.Length; j++)
-                    {
-                        bucket[j] = new T[length];
-                    }
                 }
 
-                var result = bucket[tail];
+                var result = bucket[tail] ?? new T[length];
                 tails[i] += 1;
                 return result;
             }

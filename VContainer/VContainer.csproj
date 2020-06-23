@@ -70,7 +70,6 @@
      <Compile Include="Assets\VContainer\Runtime\Internal\IInjector.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\IRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\ReflectionInjector.cs" />
-     <Compile Include="Assets\VContainer\Runtime\Internal\StackPool.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\TypeAnalyzer.cs" />
      <Compile Include="Assets\VContainer\Runtime\Registration.cs" />
      <Compile Include="Assets\VContainer\Runtime\RegistrationBuilder.cs" />

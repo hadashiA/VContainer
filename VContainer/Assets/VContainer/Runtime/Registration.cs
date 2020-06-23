@@ -110,10 +110,10 @@ namespace VContainer
 
     public sealed class ContainerRegistration : IRegistration
     {
-        public static ContainerRegistration Default = new ContainerRegistration();
+        public static readonly ContainerRegistration Default = new ContainerRegistration();
 
         public Type ImplementationType => typeof(IObjectResolver);
-        public IReadOnlyList<Type> InterfaceTypes { get; }
+        public IReadOnlyList<Type> InterfaceTypes => null;
         public Lifetime Lifetime => Lifetime.Transient;
         public object SpawnInstance(IObjectResolver resolver) => resolver;
     }

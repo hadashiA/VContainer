@@ -10,6 +10,8 @@ namespace VContainer.Unity
 {
     public sealed class LifetimeScope : MonoBehaviour
     {
+        public const string AutoReferenceKey = "__auto__";
+
         [SerializeField]
         MonoInstaller[] monoInstallers;
 
@@ -17,13 +19,16 @@ namespace VContainer.Unity
         ScriptableObjectInstaller[] scriptableObjectInstallers;
 
         [SerializeField]
-        LifetimeScope parent;
+        string key = "";
 
         [SerializeField]
-        string parentKey;
+        public LifetimeScope parent;
 
         [SerializeField]
-        public string Key = "";
+        public string parentKey;
+
+        [SerializeField]
+        bool buildOnAwake = true;
 
         const string ProjectRootResourcePath = "ProjectLifetimeScope";
 
@@ -80,11 +85,26 @@ namespace VContainer.Unity
         }
 
         public IObjectResolver Container { get; private set; }
+        public string Key => key;
 
         readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<GameObject> gameObjectBuffer = new List<GameObject>(32);
 
         void Awake()
+        {
+            if (buildOnAwake)
+            {
+                Build();
+            }
+        }
+
+        void OnDestroy()
+        {
+            disposable.Dispose();
+            Container.Dispose();
+        }
+
+        public void Build()
         {
             var runtimeParent = GetRuntimeParent();
             if (runtimeParent != null)
@@ -95,14 +115,7 @@ namespace VContainer.Unity
             {
                 InstallTo(new ContainerBuilder());
             }
-
             DispatchPlayerLoopItems();
-        }
-
-        void OnDestroy()
-        {
-            disposable.Dispose();
-            Container.Dispose();
         }
 
         public void CreateScopeFromPrefab(
@@ -116,7 +129,7 @@ namespace VContainer.Unity
             }
             var child = Instantiate(childPrefab, transform, false);
             child.parent = this;
-            child.Key = lookUpKey;
+            child.key = lookUpKey;
             child.gameObject.SetActive(true);
         }
 
@@ -133,7 +146,7 @@ namespace VContainer.Unity
                 installer.Install(decoratedBuilder);
             }
 
-            if (ExtraInstallers.TryRemove(Key, out var extraInstaller))
+            if (ExtraInstallers.TryRemove(key, out var extraInstaller))
             {
                 extraInstaller.Install(decoratedBuilder);
             }
@@ -145,7 +158,7 @@ namespace VContainer.Unity
             if (parent != null)
                 return parent;
 
-            if (!string.IsNullOrEmpty(parentKey) && parentKey != Key)
+            if (!string.IsNullOrEmpty(parentKey) && parentKey != key)
             {
                 for (var i = 0; i < SceneManager.sceneCount; i++)
                 {
@@ -159,7 +172,7 @@ namespace VContainer.Unity
                             var others = root.GetComponentsInChildren<LifetimeScope>();
                             foreach (var other in others)
                             {
-                                if (parentKey == other.Key)
+                                if (parentKey == other.key || parentKey == AutoReferenceKey)
                                 {
                                     return other;
                                 }
