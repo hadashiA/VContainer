@@ -1,3 +1,6 @@
+using System;
+using VContainer.Internal;
+
 namespace VContainer
 {
     public static class ContainerBuilderExtensions
@@ -33,5 +36,9 @@ namespace VContainer
         public static RegistrationBuilder RegisterInstance<TInterface1, TInterface2, TInterface3>(
             this IContainerBuilder builder, object instance)
             => builder.RegisterInstance(instance).As<TInterface1, TInterface2, TInterface3>();
+
+        public static RegistrationBuilder RegisterGCCollect(this IContainerBuilder builder)
+            => builder.RegisterInstance<IDisposable>(new GCCollectScope());
+
     }
 }

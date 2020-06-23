@@ -169,6 +169,5 @@ namespace VContainer
             => rootScope.CreateScope(installation);
 
         public void Dispose() => rootScope.Dispose();
-
     }
 }
