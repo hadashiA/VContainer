@@ -48,6 +48,23 @@ namespace VContainer.Unity
             return new ExtendScope(installer, key);
         }
 
+        public static LifetimeScope FindByKey(string key, Scene scene)
+        {
+            scene.GetRootGameObjects(GameObjectBuffer);
+            foreach (var root in GameObjectBuffer)
+            {
+                var others = root.GetComponentsInChildren<LifetimeScope>();
+                foreach (var other in others)
+                {
+                    if (key == other.key)
+                    {
+                        return other;
+                    }
+                }
+            }
+            return null;
+        }
+
         public static LifetimeScope FindByKey(string key)
         {
             for (var i = 0; i < SceneManager.sceneCount; i++)
@@ -55,18 +72,9 @@ namespace VContainer.Unity
                 var scene = SceneManager.GetSceneAt(i);
                 if (scene.isLoaded)
                 {
-                    scene.GetRootGameObjects(GameObjectBuffer);
-                    foreach (var root in GameObjectBuffer)
-                    {
-                        var others = root.GetComponentsInChildren<LifetimeScope>();
-                        foreach (var other in others)
-                        {
-                            if (key == other.key)
-                            {
-                                return other;
-                            }
-                        }
-                    }
+                    var result = FindByKey(key, scene);
+                    if (result != null)
+                        return result;
                 }
             }
             return null;
