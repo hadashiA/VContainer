@@ -135,10 +135,14 @@ namespace VContainer.Editor
                 var monoInstaller = element.objectReferenceValue as MonoInstaller;
                 if (monoInstaller != null)
                 {
-                    var attached = ((LifetimeScope)target).gameObject.GetComponent(monoInstaller.GetType());
-                    if (attached != null)
+                    var instanceId = monoInstaller.GetInstanceID();
+                    var attaches = ((LifetimeScope)target).gameObject.GetComponents(monoInstaller.GetType());
+                    foreach (var attached in attaches)
                     {
-                        DestroyImmediate(attached);
+                        if (attached.GetInstanceID() == instanceId)
+                        {
+                            DestroyImmediate(attached);
+                        }
                     }
                 }
                 element.objectReferenceValue = null;
