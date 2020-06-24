@@ -8,10 +8,13 @@ namespace VContainer
 {
     public interface IContainerBuilder
     {
+        object ApplicationOrigin { get; set; }
+
         RegistrationBuilder Register<T>(Lifetime lifetime);
         RegistrationBuilder RegisterInstance(object instance);
         RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
         void RegisterContainer();
+
         IObjectResolver Build();
     }
 
@@ -41,6 +44,8 @@ namespace VContainer
 
     public class ContainerBuilder : IContainerBuilder
     {
+        public object ApplicationOrigin { get; set; }
+
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
 
         bool containerRegistered;

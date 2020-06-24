@@ -12,7 +12,7 @@ namespace VContainer.Editor
             "\n" +
             "public sealed class #SCRIPTNAME# : MonoInstaller\n" +
             "{\n" +
-            "    public override void Install(UnityContainerBuilder builder)\n" +
+            "    public override void Install(IContainerBuilder builder)\n" +
             "    {\n" +
             "    }\n" +
             "}\n";

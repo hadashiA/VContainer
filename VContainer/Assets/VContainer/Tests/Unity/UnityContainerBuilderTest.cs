@@ -11,6 +11,7 @@ namespace VContainer.Tests.Unity
         [Test]
         public void RegisterComponentInHierarchy()
         {
+            var lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
             var go1 = new GameObject("Parent");
             var go2 = new GameObject("Child A");
             var go3 = new GameObject("Child B");
@@ -20,7 +21,7 @@ namespace VContainer.Tests.Unity
 
             go3.AddComponent<SampleMonoBehaviour>();
 
-            var builder = new UnityContainerBuilder(SceneManager.GetActiveScene());
+            var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
             builder.RegisterComponentInHierarchy<SampleMonoBehaviour>();
 
             var container = builder.Build();
@@ -34,7 +35,7 @@ namespace VContainer.Tests.Unity
         {
             {
                 var go1 = new GameObject("Parent");
-                var builder = new UnityContainerBuilder(SceneManager.GetActiveScene());
+                var builder = new ContainerBuilder();
                 builder.RegisterComponentOnNewGameObject<SampleMonoBehaviour>(Lifetime.Transient, "hoge")
                     .UnderTransform(go1.transform);
 
@@ -51,7 +52,7 @@ namespace VContainer.Tests.Unity
             }
 
             {
-                var builder = new UnityContainerBuilder(SceneManager.GetActiveScene());
+                var builder = new ContainerBuilder();
                 builder.RegisterComponentOnNewGameObject<SampleMonoBehaviour>(Lifetime.Scoped, "hoge");
 
                 var container = builder.Build();
@@ -74,7 +75,7 @@ namespace VContainer.Tests.Unity
             var prefab = new GameObject("Sample").AddComponent<SampleMonoBehaviour>();
             {
                 var go1 = new GameObject("Parent");
-                var builder = new UnityContainerBuilder(SceneManager.GetActiveScene());
+                var builder = new ContainerBuilder();
                 builder.RegisterComponentInNewPrefab(prefab, Lifetime.Transient)
                     .UnderTransform(go1.transform);
 
@@ -91,7 +92,7 @@ namespace VContainer.Tests.Unity
             }
 
             {
-                var builder = new UnityContainerBuilder(SceneManager.GetActiveScene());
+                var builder = new ContainerBuilder();
                 builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
 
                 var container = builder.Build();

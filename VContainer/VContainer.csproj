@@ -79,6 +79,7 @@
      <Compile Include="Assets\VContainer\Runtime\Unity\ComponentRegistration.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ComponentRegistrationBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ExtraInstaller.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Unity\IContainerBuilderUnityExtensions.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\IFactory.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\IInstaller.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\LifetimeScope.cs" />
@@ -87,7 +88,6 @@
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopItem.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopRunner.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ScriptableObjectInstaller.cs" />
-     <Compile Include="Assets\VContainer\Runtime\Unity\UnityContainerBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\VContainerException.cs" />
      <None Include="Assets\VContainer\Runtime\VContainer.asmdef" />
  <Reference Include="UnityEditor.UI">

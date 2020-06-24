@@ -253,7 +253,8 @@ namespace VContainer.Editor
 
         void Validate()
         {
-            var containerBuilder = new UnityContainerBuilder(((LifetimeScope)target).gameObject.scene);
+            var containerBuilder = new ContainerBuilder { ApplicationOrigin = target };
+
 
             for (var i = 0; i < monoInstallerList.count; i++)
             {

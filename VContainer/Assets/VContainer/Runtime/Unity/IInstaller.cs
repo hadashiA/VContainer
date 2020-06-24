@@ -2,6 +2,6 @@ namespace VContainer.Unity
 {
     public interface IInstaller
     {
-        void Install(UnityContainerBuilder builder);
+        void Install(IContainerBuilder builder);
     }
 }

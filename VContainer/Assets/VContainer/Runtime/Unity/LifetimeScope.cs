@@ -13,10 +13,10 @@ namespace VContainer.Unity
         public const string AutoReferenceKey = "__auto__";
 
         [SerializeField]
-        MonoInstaller[] monoInstallers;
+        MonoInstaller[] monoInstallers = {};
 
         [SerializeField]
-        ScriptableObjectInstaller[] scriptableObjectInstallers;
+        ScriptableObjectInstaller[] scriptableObjectInstallers = {};
 
         [SerializeField]
         string key = "";
@@ -38,7 +38,7 @@ namespace VContainer.Unity
         static readonly ConcurrentDictionary<string, ExtraInstaller> ExtraInstallers = new ConcurrentDictionary<string, ExtraInstaller>();
         static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
 
-        public static ExtendScope Push(Action<UnityContainerBuilder> installing, string key = "")
+        public static ExtendScope Push(Action<IContainerBuilder> installing, string key = "")
         {
             return new ExtendScope(new ActionInstaller(installing), key);
         }
@@ -95,7 +95,6 @@ namespace VContainer.Unity
 
         static LifetimeScope LoadProjectRoot()
         {
-            UnityEngine.Debug.Log($"VContainer try to load project root: {ProjectRootResourcePath}");
             var prefabs = Resources.LoadAll(ProjectRootResourcePath, typeof(GameObject));
             if (prefabs.Length > 1)
             {
@@ -142,16 +141,20 @@ namespace VContainer.Unity
             var runtimeParent = GetRuntimeParent();
             if (runtimeParent != null)
             {
-                Container = runtimeParent.Container.CreateScope(InstallTo);
+                Container = runtimeParent.Container.CreateScope(builder =>
+                {
+                    builder.ApplicationOrigin = this;
+                    InstallTo(builder);
+                });
             }
             else
             {
-                InstallTo(new ContainerBuilder());
+                InstallTo(new ContainerBuilder { ApplicationOrigin = this });
             }
             DispatchPlayerLoopItems();
         }
 
-        public GameObject CreateChild(string key = null, Action<UnityContainerBuilder> installation = null)
+        public GameObject CreateChild(string key = null, Action<IContainerBuilder> installation = null)
         {
             if (installation != null)
             {
@@ -177,27 +180,26 @@ namespace VContainer.Unity
 
         void InstallTo(IContainerBuilder builder)
         {
-            var decoratedBuilder = new UnityContainerBuilder(builder, gameObject.scene);
             foreach (var installer in monoInstallers)
             {
-                installer.Install(decoratedBuilder);
+                installer.Install(builder);
             }
 
             foreach (var installer in scriptableObjectInstallers)
             {
-                installer.Install(decoratedBuilder);
+                installer.Install(builder);
             }
 
             foreach (var installer in extraInstallers)
             {
-                installer.Install(decoratedBuilder);
+                installer.Install(builder);
             }
 
             if (ExtraInstallers.TryRemove(key, out var extraInstaller))
             {
-                extraInstaller.Install(decoratedBuilder);
+                extraInstaller.Install(builder);
             }
-            Container = decoratedBuilder.Build();
+            Container = builder.Build();
         }
 
         LifetimeScope GetRuntimeParent()

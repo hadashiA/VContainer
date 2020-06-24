@@ -6,7 +6,7 @@ namespace VContainer.Unity
 {
     public readonly struct ExtendScope : IDisposable
     {
-        public readonly string key;
+        readonly string key;
 
         public ExtendScope(IInstaller installer, string key = "")
         {
@@ -22,7 +22,6 @@ namespace VContainer.Unity
 
     public sealed class ExtraInstaller : IInstaller, IEnumerable<IInstaller>
     {
-        public readonly string TargetKey = "";
         readonly IList<IInstaller> extraInstallers = new List<IInstaller>();
 
         public IEnumerator<IInstaller> GetEnumerator() => extraInstallers.GetEnumerator();
@@ -30,7 +29,7 @@ namespace VContainer.Unity
 
         public void Add(IInstaller installer) => extraInstallers.Add(installer);
 
-        public void Install(UnityContainerBuilder builder)
+        public void Install(IContainerBuilder builder)
         {
             foreach (var installer in extraInstallers)
             {
