@@ -43,7 +43,7 @@ namespace VContainer
     {
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
 
-        bool contarinerRegistered;
+        bool containerRegistered;
 
         public RegistrationBuilder Register<T>(Lifetime lifetime)
             => Register(new RegistrationBuilder(typeof(T), lifetime));
@@ -57,7 +57,7 @@ namespace VContainer
             return registrationBuilder;
         }
 
-        public void RegisterContainer() => contarinerRegistered = true;
+        public void RegisterContainer() => containerRegistered = true;
 
         public virtual IObjectResolver Build()
         {
@@ -96,7 +96,7 @@ namespace VContainer
                 TypeAnalyzer.CheckCircularDependency(x.ImplementationType);
             }
 #endif
-            if (contarinerRegistered)
+            if (containerRegistered)
             {
                 registrations.Add(ContainerRegistration.Default);
             }
