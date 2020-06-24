@@ -275,6 +275,54 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void RegisterWithParameter()
+        {
+            {
+                var paramValue = new NoDependencyServiceA();
+                var builder = new ContainerBuilder();
+                builder.Register<ServiceA>(Lifetime.Scoped)
+                    .WithParameter<I2>(paramValue);
+
+                var container = builder.Build();
+                var resolved = container.Resolve<ServiceA>();
+                Assert.That(resolved.Service2, Is.EqualTo(paramValue));
+            }
+
+            {
+                var paramValue = new NoDependencyServiceA();
+                var builder = new ContainerBuilder();
+                builder.Register<ServiceA>(Lifetime.Scoped)
+                    .WithParameter("service2", paramValue);
+
+                var container = builder.Build();
+                var resolved = container.Resolve<ServiceA>();
+                Assert.That(resolved.Service2, Is.EqualTo(paramValue));
+            }
+
+            {
+                var paramValue = new NoDependencyServiceA();
+                var builder = new ContainerBuilder();
+                builder.Register<HasMethodInjection>(Lifetime.Scoped)
+                    .WithParameter<I2>(paramValue);
+
+                var container = builder.Build();
+                var resolved = container.Resolve<HasMethodInjection>();
+                Assert.That(resolved.Service2, Is.EqualTo(paramValue));
+            }
+
+            {
+                var paramValue = new NoDependencyServiceA();
+                var builder = new ContainerBuilder();
+                builder.Register<HasMethodInjection>(Lifetime.Scoped)
+                    .WithParameter("service2", paramValue);
+
+                var container = builder.Build();
+                var resolved = container.Resolve<HasMethodInjection>();
+                Assert.That(resolved.Service2, Is.EqualTo(paramValue));
+            }
+        }
+
+        [Test]
         public void RegisterSystem()
         {
             var builder = new ContainerBuilder();

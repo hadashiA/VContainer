@@ -48,8 +48,9 @@ namespace VContainer.Unity
 
             return new ComponentRegistration(
                 ImplementationType,
-                InterfaceTypes,
                 Lifetime,
+                InterfaceTypes,
+                Parameters,
                 injector,
                 destination);
         }

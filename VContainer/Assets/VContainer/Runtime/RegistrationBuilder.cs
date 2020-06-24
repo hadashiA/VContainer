@@ -9,7 +9,9 @@ namespace VContainer
         protected readonly Type ImplementationType;
         protected readonly Lifetime Lifetime;
         protected readonly object SpecificInstance;
+
         protected List<Type> InterfaceTypes;
+        protected List<IInjectParameter> Parameters;
 
         internal RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
         {
@@ -31,8 +33,9 @@ namespace VContainer
 
             return new Registration(
                 ImplementationType,
-                InterfaceTypes,
                 Lifetime,
+                InterfaceTypes,
+                Parameters,
                 injector,
                 SpecificInstance);
         }
@@ -83,6 +86,32 @@ namespace VContainer
             InterfaceTypes = InterfaceTypes ?? new List<Type>();
             InterfaceTypes.AddRange(ImplementationType.GetInterfaces());
             return this;
+        }
+
+        public RegistrationBuilder As(params Type[] interfaceTypes)
+        {
+            InterfaceTypes = InterfaceTypes ?? new List<Type>();
+            InterfaceTypes.AddRange(interfaceTypes);
+            return this;
+        }
+
+        public RegistrationBuilder WithParameter(string name, object value)
+        {
+            Parameters = Parameters ?? new List<IInjectParameter>();
+            Parameters.Add(new NamedParameter(name, value));
+            return this;
+        }
+
+        public RegistrationBuilder WithParameter(Type type, object value)
+        {
+            Parameters = Parameters ?? new List<IInjectParameter>();
+            Parameters.Add(new TypedParameter(type, value));
+            return this;
+        }
+
+        public RegistrationBuilder WithParameter<TParam>(object value)
+        {
+            return WithParameter(typeof(TParam), value);
         }
 
         void AddInterfaceType(Type interfaceType)

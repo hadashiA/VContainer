@@ -113,23 +113,29 @@ namespace VContainer.Tests
 
     class ServiceA : I4
     {
+        public readonly I2 Service2;
+
         public ServiceA(I2 service2)
         {
             if (service2 is null)
             {
                 throw new ArgumentNullException(nameof(service2));
             }
+            Service2 = service2;
         }
     }
 
     class ServiceB : I5
     {
+        public readonly I3 Service3;
+
         public ServiceB(I3 service3)
         {
             if (service3 is null)
             {
                 throw new ArgumentNullException(nameof(service3));
             }
+            Service3 = service3;
         }
     }
 
@@ -206,6 +212,17 @@ namespace VContainer.Tests
             {
                 throw new ArgumentException();
             }
+        }
+    }
+
+    class HasMethodInjection : I1
+    {
+        public I2 Service2;
+
+        [Inject]
+        public void MethodInjectable1(I2 service2)
+        {
+            Service2 = service2;
         }
     }
 }

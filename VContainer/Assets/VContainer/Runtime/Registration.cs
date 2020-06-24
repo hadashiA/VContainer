@@ -20,14 +20,17 @@ namespace VContainer
         public Lifetime Lifetime { get; }
 
         readonly IInjector injector;
+
+        readonly IReadOnlyList<IInjectParameter> parameters;
         readonly object specificInstance;
 
         internal Registration(
             Type implementationType,
-            IReadOnlyList<Type> interfaceTypes,
             Lifetime lifetime,
+            IReadOnlyList<Type> interfaceTypes,
+            IReadOnlyList<IInjectParameter> parameters,
             IInjector injector,
-            object specificInstance = null)
+            object specificInstance)
         {
             ImplementationType = implementationType;
             InterfaceTypes = interfaceTypes;
@@ -35,6 +38,7 @@ namespace VContainer
 
             this.injector = injector;
             this.specificInstance = specificInstance;
+            this.parameters = parameters;
         }
 
         public override string ToString() => $"ConcreteType={ImplementationType.Name} ContractTypes={string.Join(", ", InterfaceTypes)} {Lifetime} {injector.GetType().Name}";
@@ -43,10 +47,10 @@ namespace VContainer
         {
             if (specificInstance != null)
             {
-                injector.Inject(specificInstance, resolver);
+                injector.Inject(specificInstance, resolver, parameters);
                 return specificInstance;
             }
-            return injector.CreateInstance(resolver);
+            return injector.CreateInstance(resolver, parameters);
         }
     }
 

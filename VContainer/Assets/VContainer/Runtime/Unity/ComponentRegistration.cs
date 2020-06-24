@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
@@ -30,22 +31,25 @@ namespace VContainer.Unity
     public sealed class ComponentRegistration : IRegistration
     {
         public Type ImplementationType { get; }
-        public IReadOnlyList<Type> InterfaceTypes { get; }
         public Lifetime Lifetime { get; }
+        public IReadOnlyList<Type> InterfaceTypes { get; }
+        public IReadOnlyList<IInjectParameter> Parameters;
 
         readonly IInjector injector;
         readonly ComponentDestination destination;
 
         internal ComponentRegistration(
             Type implementationType,
-            IReadOnlyList<Type> interfaceTypes,
             Lifetime lifetime,
+            IReadOnlyList<Type> interfaceTypes,
+            IReadOnlyList<IInjectParameter> parameters,
             IInjector injector,
             ComponentDestination destination)
         {
             ImplementationType = implementationType;
-            InterfaceTypes = interfaceTypes;
             Lifetime = lifetime;
+            InterfaceTypes = interfaceTypes;
+            Parameters = parameters;
             this.injector = injector;
             this.destination = destination;
         }
@@ -70,7 +74,7 @@ namespace VContainer.Unity
                 }
                 component = gameObject.AddComponent(ImplementationType);
             }
-            injector.Inject(component, resolver);
+            injector.Inject(component, resolver, Parameters);
             return component;
         }
     }

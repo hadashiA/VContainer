@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace VContainer.Internal
 {
@@ -11,24 +12,39 @@ namespace VContainer.Internal
             this.injectTypeInfo = injectTypeInfo;
         }
 
-        public void Inject(object instance, IObjectResolver resolver)
+        public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
-            InjectMethods(instance, resolver);
+            InjectMethods(instance, resolver, parameters);
             InjectProperties(instance, resolver);
             InjectFields(instance, resolver);
         }
 
-        public object CreateInstance(IObjectResolver resolver)
+        public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
-            var parameters = injectTypeInfo.InjectConstructor.ParameterInfos;
-            var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameters.Length);
+            var parameterInfos = injectTypeInfo.InjectConstructor.ParameterInfos;
+            var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameterInfos.Length);
             try
             {
-                for (var i = 0; i < parameters.Length; i++)
+                for (var i = 0; i < parameterInfos.Length; i++)
                 {
+                    var set = false;
+                    var parameterInfo = parameterInfos[i];
+                    if (parameters != null)
+                    {
+                        foreach (var x in parameters)
+                        {
+                            if (!x.Match(parameterInfo)) continue;
+                            parameterValues[i] = x.Value;
+                            set = true;
+                            break;
+                        }
+                    }
+
+                    if (set) continue;
+
                     try
                     {
-                        parameterValues[i] = resolver.Resolve(parameters[i].ParameterType);
+                        parameterValues[i] = resolver.Resolve(parameterInfo.ParameterType);
                     }
                     catch (VContainerException ex)
                     {
@@ -36,7 +52,7 @@ namespace VContainer.Internal
                     }
                 }
                 var instance = injectTypeInfo.InjectConstructor.Factory(parameterValues);
-                Inject(instance, resolver);
+                Inject(instance, resolver, parameters);
                 return instance;
             }
             finally
@@ -69,20 +85,37 @@ namespace VContainer.Internal
             }
         }
 
-        void InjectMethods(object obj, IObjectResolver resolver)
+        void InjectMethods(object obj, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
             if (injectTypeInfo.InjectMethods == null)
                 return;
 
             foreach (var method in injectTypeInfo.InjectMethods)
             {
-                var parameters = method.ParameterInfos;
-                var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameters.Length);
+                var parameterInfos = method.ParameterInfos;
+                var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameterInfos.Length);
                 try
                 {
-                    for (var i = 0; i < parameters.Length; i++)
+                    for (var i = 0; i < parameterInfos.Length; i++)
                     {
-                        var parameterType = parameters[i].ParameterType;
+                        var set = false;
+                        var parameterInfo = parameterInfos[i];
+                        if (parameters != null)
+                        {
+                            foreach (var x in parameters)
+                            {
+                                if (x.Match(parameterInfo))
+                                {
+                                    parameterValues[i] = x.Value;
+                                    set = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (set) continue;
+
+                        var parameterType = parameterInfo.ParameterType;
                         try
                         {
                             parameterValues[i] = resolver.Resolve(parameterType);
