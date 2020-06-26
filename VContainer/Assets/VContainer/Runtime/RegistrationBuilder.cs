@@ -41,38 +41,16 @@ namespace VContainer
         }
 
         public RegistrationBuilder As<TInterface>()
-        {
-            // TODO: Check at compilation time
-            AddInterfaceType(typeof(TInterface));
-            return this;
-        }
+            => As(typeof(TInterface));
 
         public RegistrationBuilder As<TInterface1, TInterface2>()
-        {
-            // TODO: Check at compilation time
-            AddInterfaceType(typeof(TInterface1));
-            AddInterfaceType(typeof(TInterface2));
-            return this;
-        }
+            => As(typeof(TInterface1), typeof(TInterface2));
 
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3>()
-        {
-            // TODO: Check at compilation time
-            AddInterfaceType(typeof(TInterface1));
-            AddInterfaceType(typeof(TInterface2));
-            AddInterfaceType(typeof(TInterface3));
-            return this;
-        }
+            => As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
 
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3, TInterface4>()
-        {
-            // TODO: Check at compilation time
-            AddInterfaceType(typeof(TInterface1));
-            AddInterfaceType(typeof(TInterface2));
-            AddInterfaceType(typeof(TInterface3));
-            AddInterfaceType(typeof(TInterface4));
-            return this;
-        }
+            => As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3), typeof(TInterface4));
 
         public RegistrationBuilder AsSelf()
         {
@@ -85,6 +63,27 @@ namespace VContainer
         {
             InterfaceTypes = InterfaceTypes ?? new List<Type>();
             InterfaceTypes.AddRange(ImplementationType.GetInterfaces());
+            return this;
+        }
+
+        public RegistrationBuilder As(Type interfaceType)
+        {
+            AddInterfaceType(interfaceType);
+            return this;
+        }
+
+        public RegistrationBuilder As(Type interfaceType1, Type interfaceType2)
+        {
+            AddInterfaceType(interfaceType1);
+            AddInterfaceType(interfaceType2);
+            return this;
+        }
+
+        public RegistrationBuilder As(Type interfaceType1, Type interfaceType2, Type interfaceType3)
+        {
+            AddInterfaceType(interfaceType1);
+            AddInterfaceType(interfaceType2);
+            AddInterfaceType(interfaceType3);
             return this;
         }
 
