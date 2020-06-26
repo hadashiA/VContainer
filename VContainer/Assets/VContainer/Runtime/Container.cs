@@ -23,22 +23,11 @@ namespace VContainer
         bool TryGetRegistration(Type type, out IRegistration registration);
     }
 
-    [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class InjectAttribute : Attribute
-    {
-    }
-
     public enum Lifetime
     {
         Transient,
         Singleton,
         Scoped
-    }
-
-    public enum ScopeFilter
-    {
-        Local,
-        All
     }
 
     public sealed class ScopedContainer : IScopedObjectResolver
