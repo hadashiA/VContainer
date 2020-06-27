@@ -213,25 +213,6 @@ namespace VContainer.Tests
         }
 
         [Test]
-        [Ignore("Optimize")]
-        public void ResolveOptional()
-        {
-            var builder = new ContainerBuilder();
-
-            var a = new NoDependencyServiceA();
-            var b = new NoDependencyServiceB();
-            builder.RegisterInstance<I2>(a);
-            builder.RegisterInstance<I3>(b);
-
-            builder.Register<HasDefaultValue>(Lifetime.Singleton);
-            var container = builder.Build();
-
-            var hasDefaultValue = container.Resolve<HasDefaultValue>();
-            Assert.That(hasDefaultValue.GetPrivateFieldHasDefault(), Is.Not.EqualTo(a));
-            Assert.That(hasDefaultValue.GetPrivatePropertyHasDefault(), Is.Not.EqualTo(b));
-        }
-
-        [Test]
         public void RegisterInstance()
         {
             var builder = new ContainerBuilder();
