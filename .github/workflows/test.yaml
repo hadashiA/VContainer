@@ -1,15 +1,28 @@
-name: Build
+name: Test
 
 on: push
 
 jobs:
-  test:
+  build-dotnet:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      NUGET_XMLDOC_MODE: skip
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.101
+      - run: dotnet test -c Debug ./VContainer.StandaloneTests
+
+  test-unity:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        unity: ['2019.4.0f1']
+        unity: ['2019.4.1f1']
         include:
-        - unity: 2019.4.0f1
+        - unity: 2019.4.1f1
           license: UNITY_LISENCE_2019_4_BASE64
     container:
       image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
