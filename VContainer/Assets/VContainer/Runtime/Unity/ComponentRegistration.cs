@@ -60,6 +60,10 @@ namespace VContainer.Unity
             var parent = destination.GetParent();
             if (destination.Prefab != null)
             {
+                if (destination.Prefab.gameObject.activeSelf)
+                {
+                    destination.Prefab.gameObject.SetActive(false);
+                }
                 component = UnityEngine.Object.Instantiate(destination.Prefab, parent);
             }
             else
@@ -68,6 +72,7 @@ namespace VContainer.Unity
                     ? ImplementationType.Name
                     : destination.NewGameObjectName;
                 var gameObject = new GameObject(name);
+                gameObject.SetActive(false);
                 if (parent != null)
                 {
                     gameObject.transform.SetParent(parent);
@@ -75,6 +80,7 @@ namespace VContainer.Unity
                 component = gameObject.AddComponent(ImplementationType);
             }
             injector.Inject(component, resolver, Parameters);
+            component.gameObject.SetActive(true);
             return component;
         }
     }
