@@ -3,7 +3,7 @@ name: Test
 on: push
 
 jobs:
-  build-dotnet:
+  test-dotnet:
     runs-on: ubuntu-latest
     env:
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -16,29 +16,29 @@ jobs:
           dotnet-version: 3.1.101
       - run: dotnet test -c Debug ./VContainer.StandaloneTests
 
-  test-unity:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        unity: ['2019.4.1f1']
-        include:
-        - unity: 2019.4.1f1
-          license: UNITY_LISENCE_2019_4_BASE64
-    container:
-      image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
-    env:
-      UNITY_BIN: /opt/Unity/Editor/Unity
-    steps:
-    - uses: actions/checkout@v2
-    - name: Decode Unity License File
-      run: |
-        mkdir ./tmp
-        echo -n $UNITY_LICENSE_FILE_BASE64 | base64 --decode > ./tmp/ulf
-      env:
-        UNITY_LICENSE_FILE_BASE64: ${{ secrets[matrix.license] }}
-    - name: Load License
-      run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/ulf || exit 0
-    - name: Run Tests
-      run: $UNITY_BIN -runTests -quit -batchmode -silent-crashes -nographics -silent-crashes -logFile -projectPath ./VContainer -testResults ./tmp/TestResults.xml -testPlatform StandaloneLinux64 -scriptbackend=mono
-    - name: Run Performance Tests
-      run: $UNITY_BIN -runTests -batchmode -nographics -projectPath ./VContainer.Benchmark -testResults tmp/PerformanceTestResults.xml -testPlatform StandaloneLinux64 -script -scriptbackend=mono
+  # test-unity:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       unity: ['2019.4.1f1']
+  #       include:
+  #       - unity: 2019.4.1f1
+  #         license: UNITY_LISENCE_2019_4_BASE64
+  #   container:
+  #     image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
+  #   env:
+  #     UNITY_BIN: /opt/Unity/Editor/Unity
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Decode Unity License File
+  #     run: |
+  #       mkdir ./tmp
+  #       echo -n $UNITY_LICENSE_FILE_BASE64 | base64 --decode > ./tmp/ulf
+  #     env:
+  #       UNITY_LICENSE_FILE_BASE64: ${{ secrets[matrix.license] }}
+  #   - name: Load License
+  #     run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/ulf || exit 0
+  #   - name: Run Tests
+  #     run: $UNITY_BIN -runTests -quit -batchmode -silent-crashes -nographics -silent-crashes -logFile -projectPath ./VContainer -testResults ./tmp/TestResults.xml -testPlatform StandaloneLinux64 -scriptbackend=mono
+  #   - name: Run Performance Tests
+  #     run: $UNITY_BIN -runTests -batchmode -nographics -projectPath ./VContainer.Benchmark -testResults tmp/PerformanceTestResults.xml -testPlatform StandaloneLinux64 -script -scriptbackend=mono

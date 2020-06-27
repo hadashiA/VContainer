@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  build-unity:
+    strategy:
+      matrix:
+        unity: ['2019.4.0f1']
+        include:
+          - unity: 2019.4.0f1
+            license: UNITY_LISENCE_2019_4_BASE64
+    runs-on: ubuntu-latest
+    container:
+      # with linux-il2cpp. image from https://hub.docker.com/r/gableroux/unity3d/tags
+      image: gableroux/unity3d:${{ matrix.unity }}-linux-il2cpp
+    steps:
+      - uses: actions/checkout@v2
+      - name: Decode Unity License File
+        run: |
+          mkdir ./tmp
+          echo -n $UNITY_LICENSE_FILE_BASE64 | base64 --decode > ./tmp/ulf
+        env:
+          UNITY_LICENSE_FILE_BASE64: ${{ secrets[matrix.license] }}
+      - run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile .Unity.ulf || exit 0
+
+      # set release tag(*.*.*) to env.GIT_TAG
+      - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
+
+      # Execute scripts: Export Package
+      - name: Export unitypackage
+        run: /opt/Unity/Editor/Unity -batchmode -nographics -logFile -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./VContainer
+        working-directory: VContainer
+
+      # Store artifacts.
+      - uses: actions/upload-artifact@v2
+        with:
+          name: VContainer.${{ env.GIT_TAG }}.unitypackage
+          path: ./VContainer/VContainer.${{ env.GIT_TAG }}.unitypackage
+
+  create-release:
+    needs: [build-unity]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
+
+      # Create Releases
+      - uses: actions/create-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Ver.${{ github.ref }}
+
+      # Download(All) Artifacts to current directory
+      - uses: actions/download-artifact@v2-preview
+
+      # Upload to Releases(unitypackage)
+      - uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./VContainer.${{ env.GIT_TAG }}.unitypackage/UniTask.${{ env.GIT_TAG }}.unitypackage
+          asset_name: VContainer.${{ env.GIT_TAG }}.unitypackage
+          asset_content_type: application/octet-stream
