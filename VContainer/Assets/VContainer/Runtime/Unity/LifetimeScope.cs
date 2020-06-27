@@ -154,16 +154,7 @@ namespace VContainer.Unity
             DispatchPlayerLoopItems();
         }
 
-        public GameObject CreateChild(string key = null, Action<IContainerBuilder> installation = null)
-        {
-            if (installation != null)
-            {
-                return CreateChild(key, new ActionInstaller(installation));
-            }
-            return CreateChild(key, (IInstaller)null);
-        }
-
-        public GameObject CreateChild(string key = "", IInstaller installer = null)
+        public LifetimeScope CreateChild(string key = "", IInstaller installer = null)
         {
             var childGameObject = new GameObject("LifeTimeScope (Child)");
             childGameObject.SetActive(false);
@@ -175,7 +166,45 @@ namespace VContainer.Unity
             }
             child.parent = this;
             childGameObject.SetActive(true);
-            return childGameObject;
+            return child;
+        }
+
+        public LifetimeScope CreateChild(string key = null, Action<IContainerBuilder> installation = null)
+        {
+            if (installation != null)
+            {
+                return CreateChild(key, new ActionInstaller(installation));
+            }
+            return CreateChild(key, (IInstaller)null);
+        }
+
+        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
+        {
+            if (prefab.gameObject.activeSelf && prefab.buildOnAwake)
+            {
+                prefab.gameObject.SetActive(false);
+            }
+
+            var child = Instantiate(prefab, transform, false);
+            if (installer != null)
+            {
+                child.extraInstallers.Add(installer);
+            }
+            child.parent = this;
+            if (!child.gameObject.activeSelf)
+            {
+                child.gameObject.SetActive(true);
+            }
+            return child;
+        }
+
+        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation = null)
+        {
+            if (installation != null)
+            {
+                return CreateChildFromPrefab(prefab, new ActionInstaller(installation));
+            }
+            return CreateChildFromPrefab(prefab, (IInstaller)null);
         }
 
         void InstallTo(IContainerBuilder builder)
