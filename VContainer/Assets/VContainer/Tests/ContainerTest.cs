@@ -191,8 +191,9 @@ namespace VContainer.Tests
             // Singleton
             Assert.That(list[0], Is.EqualTo(e0));
 
-            // Empty is error
-            Assert.Throws<VContainerException>(() => container.Resolve<IEnumerable<I7>>());
+            // Empty
+            var empty = container.Resolve<IEnumerable<I7>>();
+            Assert.That(empty, Is.Empty);
         }
 
         [Test]
