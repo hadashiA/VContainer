@@ -36,8 +36,8 @@ namespace VContainer.Editor
                 var keyProp = serializedObject.FindProperty("key");
                 EditorGUILayout.PropertyField(keyProp);
 
-                var autoBuildProp = serializedObject.FindProperty("buildOnAwake");
-                EditorGUILayout.PropertyField(autoBuildProp);
+                var autoRunProp = serializedObject.FindProperty("autoRun");
+                EditorGUILayout.PropertyField(autoRunProp);
 
                 var parentProp = serializedObject.FindProperty("parent");
                 var parentKeyProp = serializedObject.FindProperty("parentKey");

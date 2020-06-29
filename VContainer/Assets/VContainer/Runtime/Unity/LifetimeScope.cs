@@ -28,7 +28,7 @@ namespace VContainer.Unity
         public string parentKey;
 
         [SerializeField]
-        bool buildOnAwake = true;
+        bool autoRun = true;
 
         public const string ProjectRootResourcePath = "ProjectLifetimeScope";
 
@@ -124,7 +124,7 @@ namespace VContainer.Unity
 
         void Awake()
         {
-            if (buildOnAwake)
+            if (autoRun)
             {
                 Build();
             }
@@ -180,7 +180,7 @@ namespace VContainer.Unity
 
         public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
         {
-            if (prefab.gameObject.activeSelf && prefab.buildOnAwake)
+            if (prefab.gameObject.activeSelf && prefab.autoRun)
             {
                 prefab.gameObject.SetActive(false);
             }
