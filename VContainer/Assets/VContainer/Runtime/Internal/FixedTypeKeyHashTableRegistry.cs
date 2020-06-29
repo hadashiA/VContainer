@@ -92,12 +92,14 @@ namespace VContainer.Internal
                     genericType == typeof(IReadOnlyList<>))
                 {
                     var elementType = interfaceType.GetGenericArguments()[0];
+                    var collectionRegistration = new CollectionRegistration(elementType);
                     // ReSharper disable once InconsistentlySynchronizedField
                     if (hashTable.TryGet(elementType, out var elementRegistration))
                     {
-                        registration = new CollectionRegistration(elementType) { (Registration)elementRegistration };
-                        return true;
+                        collectionRegistration.Add(elementRegistration);
                     }
+                    registration = collectionRegistration;
+                    return true;
                 }
             }
             return false;
