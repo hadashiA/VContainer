@@ -48,6 +48,8 @@ namespace VContainer.Unity
             return new ExtendScope(installer, key);
         }
 
+        public static LifetimeScope FindDefault(Scene scene) => FindByKey("", scene);
+
         public static LifetimeScope FindByKey(string key, Scene scene)
         {
             scene.GetRootGameObjects(GameObjectBuffer);
@@ -122,8 +124,11 @@ namespace VContainer.Unity
         readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<IInstaller> extraInstallers = new List<IInstaller>();
 
+        LifetimeScope runtimeParent;
+
         void Awake()
         {
+            runtimeParent = GetRuntimeParent();
             if (autoRun)
             {
                 Build();
@@ -138,7 +143,11 @@ namespace VContainer.Unity
 
         public void Build()
         {
-            var runtimeParent = GetRuntimeParent();
+            if (runtimeParent == null)
+            {
+                runtimeParent = GetRuntimeParent();
+            }
+
             if (runtimeParent != null)
             {
                 Container = runtimeParent.Container.CreateScope(builder =>
