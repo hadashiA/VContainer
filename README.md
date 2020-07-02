@@ -57,9 +57,10 @@ Then, if your class receives dependencies externally, need help from outside.
 DI is a technique that facilitates a place to resolve dependencies completely outside.
 
 Terminology:
-- Composition Root : The place where you make settings to resolve dependencies.
-- Auto-wiring : It is a function that allows you to manage services in the container with minimal configuration. DI library usually does this.
-- IoC (Inversion of Control) : Make the object with control flow responsibility an entry point. In simple and traditional programming, the entry point is where the responsibility for interrupting user input is. What this means for "Inversion".
+- **DI Container:** Have dependent references all at once and execute auto-wiring.
+- **Composition Root:** The place where you make settings to resolve dependencies.
+- **Auto-wiring:** It is a function that allows you to manage services in the container with minimal configuration. DI library usually does this.
+- **IoC (Inversion of Control):** Make the object with control flow responsibility an entry point. In simple and traditional programming, the entry point is where the responsibility for interrupting user input is. What this means for "Inversion".
 
 Note:
 - Don't try to DI what an object should hide inside. What's hidden is leaking and the design is getting worse.
