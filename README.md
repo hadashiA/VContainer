@@ -42,19 +42,16 @@ Following is a deep profiler Unity result sample.
 ## What is DI ?
 
 DI (Dependency Injection) is a general technique in OOP that all about removing uninteresting dependencies from your code.  
-It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.
-
+It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.  
 In all programming paradigms, the basic design is, weak module coupling and strong module cohesion.
 
-How does OOP do this?
-
+How does OOP do this?  
 As you know, OOP(Object Oriented Programming) does it through objects.
 1. Objects hides the details of its responsibility (encapsulation).
 2. Objects transfer work outside their responsibilities to other objects
 
 Actually, There is a problem in doing this fundamentally.  
 If you write the delegation object in the class code, it means tight coupling at the source code level.
-
 The only way to exclude a non-interesting dependency from a source file is to pass the dependency from outside.
 
 So who passes the dependency?
@@ -138,8 +135,7 @@ namespace MyGame
 ```
 
 Note:  
-VContainer always required a `Lifetime` argument explicitly.  
-This gives us transparency and consistency.
+- VContainer always required a `Lifetime` argument explicitly. This gives us transparency and consistency.
 
 **3. Create LifetimeScope**
 
@@ -635,11 +631,10 @@ it has following behaviours:
 - For `LifeTime.Transient`
   - Instance creating for each resolving.
   - If parent and child have the same type, child will prioritize itself.
-  - Instance will be different for each child.
 - For `Lifetime.Scoped`:
-  - If same child, returns same instance.
-  - If parent and child have the same type, child will prioritize itself.
   - Instance will be different for each child.
+      - If same child, returns same instance.
+      - If parent and child have the same type, child will prioritize itself.
   - When a `LifetimeScope` is destroyed, objects with `IDisposable` implemented are called `Dispose()`.
 
 :warning: If scene is alive and only `LifetimeScope` is destroyed, MonoBehaviour registered as `Lifetime.Scoped` is not automatically destroyed.
