@@ -138,7 +138,7 @@ namespace VContainer.Unity
         void OnDestroy()
         {
             disposable.Dispose();
-            Container.Dispose();
+            Container?.Dispose();
         }
 
         public void Build()
