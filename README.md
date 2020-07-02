@@ -43,21 +43,18 @@ Following is a deep profiler Unity result sample.
 
 DI (Dependency Injection) is a general technique in OOP that all about removing uninteresting dependencies from your code.  
 It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.  
-In all programming paradigms, the basic design is, weak module coupling and strong module cohesion.
 
-How does OOP do this?  
+In all programming paradigms, the basic design is, weak module coupling and strong module cohesion.
 As you know, OOP(Object Oriented Programming) does it through objects.
 1. Objects hides the details of its responsibility (encapsulation).
 2. Objects transfer work outside their responsibilities to other objects
 
 Actually, There is a problem in doing this fundamentally.  
 If you write the delegation object in the class code, it means tight coupling at the source code level.
-The only way to exclude a non-interesting dependency from a source file is to pass the dependency from outside.
+The only way to exclude a non-interesting dependency from a class is to pass from outside.
 
-So who passes the dependency?
-If your class receives dependencies externally, need help from outside.
-
-DI, is a technique that facilitates a place to resolve dependencies completely outside.
+Then, if your class receives dependencies externally, need help from outside.  
+DI is a technique that facilitates a place to resolve dependencies completely outside.
 
 Terminology:
 - Composition Root : The place where you make settings to resolve dependencies.
