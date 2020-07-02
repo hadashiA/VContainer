@@ -64,7 +64,7 @@ Terminology:
 
 Note:
 - Don't try to DI what an object should hide inside. What's hidden is leaking and the design is getting worse.
-- DI is not a specific magic. Creating your own Composition Root without using the library is called `Poor man's DI` or `DIY DI`.  This is **not** an anti-pattern.
+- The word DI does not necessarily mean magic or library. Creating your own Composition Root without using the library is called `Poor man's DI` or `DIY DI`.  This is **not** an anti-pattern.
 
 Further reading:
 - [Lightweight IoC Container for Unity - Seba's Lab](https://www.sebaslab.com/ioc-container-unity-part-1/)
