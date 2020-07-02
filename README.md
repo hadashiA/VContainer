@@ -456,6 +456,8 @@ builder.Register<ServiceA>(Lifetime.Singleton)
     .AsImplementedInterfaces();
 ```
 
+It can resolve like this:
+
 ```csharp
 class ClassA
 {
@@ -475,6 +477,8 @@ builder.Register<ServiceA>(Lifetime.Singleton)
     .AsImplementedInterfaces()
     .AsSelf();
 ```
+
+It can resolve like this:
 
 ```csharp
 class ClassA
@@ -496,10 +500,23 @@ class ClassB
 #### Register instance
 
 ```csharp
+// ...
+var obj = new ServiceA();
+// ...
+
 builder.RegisterInstance(obj);
 ```
 
 Note that `RegisterIntance` always `Scoped` lifetime. So it has no arguments.
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(ServiceA serviceA) { /* ... */ }
+}
+```
 
 **Register instance as interface**
 
@@ -522,6 +539,17 @@ builder.Register<SomeService>(lifetime.Singleton)
     .WithParameter<string>("http://example.com");
 ```
 
+Or, You can parameter name as a key.
+
+```csharp
+builder.Register<SomeService>(Lifetime.Singleton)
+    .WithParameter("url", "http://example.com");
+```
+
+
+It can resolve like this:
+
+
 ```csharp
 class SomeService
 {
@@ -537,15 +565,6 @@ class OtherClass
     // ! Error 
     public OtherClass(string hogehoge) { /* ... */ }
 }
-```
-
-OR
-
-You can parameter name as a key.
-
-```csharp
-builder.Register<SomeService>(Lifetime.Singleton)
-    .WithParameter("url", "http://example.com");
 ```
 
 
