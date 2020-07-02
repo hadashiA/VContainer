@@ -763,6 +763,9 @@ VContainer has own PlayerLoop sub systems.
 
 If you register a class that implements the marker interface, it will be scheduled in Unity's PlayerLoop cycle.
 
+Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: `IInitilizable` etc)
+
+
 The following interfaces and timings are available.
 
 - `IInitializable`     : Nearly `Start`
