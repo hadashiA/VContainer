@@ -18,6 +18,9 @@ namespace VContainer.Unity
             List<Type> interfaceTypes = null)
             : base(implementationType, lifetime, interfaceTypes)
         {
+            InterfaceTypes = InterfaceTypes ?? new List<Type>();
+            InterfaceTypes.Add(typeof(MonoBehaviour));
+            InterfaceTypes.Add(ImplementationType);
         }
 
         internal ComponentRegistrationBuilder(
@@ -25,7 +28,7 @@ namespace VContainer.Unity
             Type implementationType,
             Lifetime lifetime,
             List<Type> interfaceTypes = null)
-            : base(implementationType, lifetime, interfaceTypes)
+            : this(implementationType, lifetime, interfaceTypes)
         {
             this.prefab = prefab;
         }
@@ -35,7 +38,7 @@ namespace VContainer.Unity
             Type implementationType,
             Lifetime lifetime,
             List<Type> interfaceTypes = null)
-            : base(implementationType, lifetime, interfaceTypes)
+            : this(implementationType, lifetime, interfaceTypes)
         {
             this.gameObjectName = gameObjectName;
         }
