@@ -582,8 +582,6 @@ class OtherClass
 
 **Register from MonoInstaller's `[SerializeField]`**
 
-Also use `RegisterInstance()`.
-
 ```csharp
 [SerializeField]
 YourBehaviour yourBehaviour;
