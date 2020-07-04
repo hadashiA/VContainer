@@ -15,9 +15,9 @@ namespace VContainer
 
         internal RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
         {
-            this.ImplementationType = implementationType;
-            this.InterfaceTypes = interfaceTypes;
-            this.Lifetime = lifetime;
+            ImplementationType = implementationType;
+            InterfaceTypes = interfaceTypes;
+            Lifetime = lifetime;
         }
 
         internal RegistrationBuilder(object instance)
