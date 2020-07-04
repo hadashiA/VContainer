@@ -506,7 +506,7 @@ class GameController : IInitializable, ITickable, IDisposable { /* ... */ }
 builder.RegisterEntryPoint<GameController>(Lifetime.Singleton);
 ```
 
-Not that this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
+Note that this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
 
 #### Register instance
 
