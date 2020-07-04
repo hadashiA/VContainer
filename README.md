@@ -12,7 +12,7 @@
 
 ![](docs/unity_performance_test_result.png)
 
-- This benchmark was run by [Performance Testing Extension for Unity Test Runner](https://docs.unity3d.com/Packages/com.unity.test-framework.performance@1.0/manual/index.html).  Test cases is [here](./VContainer.Benchmark).
+- This benchmark was run by [Performance Testing Extension for Unity Test Runner](https://docs.unity3d.com/Packages/com.unity.test-framework.performance@1.0/manual/index.html).  Test cases is [here](VContainer.Benchmark).
 - :warning: This benchmark does not use Zenject's Reflection baking.
   - Currently, VContainer does not support pre-build IL weaving or C# code generation optimizations, but it is planned for a future version.
   - VContainer does all type-analyze in Container Build phase. To reduce main thread blokcing time, you can consider [Async Contaienr Build](#async-contaienr-build).
@@ -42,7 +42,7 @@ Following is a deep profiler Unity result sample.
 ## What is DI ?
 
 DI (Dependency Injection) is a general technique in OOP that all about removing uninteresting dependencies from your code.  
-It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.  
+It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.
 
 In all programming paradigms, the basic design is, weak module coupling and strong module cohesion.
 As you know, OOP(Object Oriented Programming) does it through objects.
@@ -79,7 +79,7 @@ Further reading:
   - Or add this to your `Package/manifest.json`
     - `"jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer"`
 - unitypackage
-  - The releases page provides downloadable .unitypackage files.
+  - The [releases](https://github.com/hadashiA/VContainer/releases) page provides downloadable .unitypackage files.
 
 ## Getting Started
 
@@ -138,7 +138,7 @@ namespace MyGame
 }
 ```
 
-Note:  
+Note:
 - VContainer always required a `Lifetime` argument explicitly. This gives us transparency and consistency.
 
 **3. Create LifetimeScope**
@@ -224,19 +224,11 @@ As such, it's a good practice to keep any side effect entry points through the m
 We should register this as `ITickable` marker.
 
 ```csharp
-builder.Register<GamePresenter>(Lifetime.Singleton)
-    .As<ITickable>();
+builder.RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)    
 ```
 
-Marker interface is a bit noisy to specify, so we will automate it below.
-
-```csharp
-builder.Register<GamePresenter>(Lifetime.Singleton)
-    .AsImplementedInterfaces();
-```
-
-
-**Recommendation:**
+Note:
+- `RegisterEntryPoint<GamePresenter>` is an alias to register interfaces related to Unity's PlayerLoop event. ( Simular to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
 - Registering lifecycle events without relying on MonoBehaciour facilitates decupling of domain logic and presentation !
 
 
@@ -435,7 +427,7 @@ class ClassA
 } 
 ```
 
-**Register as multiple Interface**
+#### Register as multiple Interface
 
 ```csharp
 builder.Register<ServiceA>(Lifetime.Singleton)
@@ -456,7 +448,7 @@ class ClassB
 }
 ```
 
-**Register all implemented interfaces automatically**
+####  Register all implemented interfaces automatically
 
 ```csharp
 builder.Register<ServiceA>(Lifetime.Singleton)
@@ -477,7 +469,7 @@ class ClassB
 }
 ```
 
-**Register all implemented interfaces and concrete type**
+#### Register all implemented interfaces and concrete type
 
 ```csharp
 builder.Register<ServiceA>(Lifetime.Singleton)
@@ -504,6 +496,18 @@ class ClassB
 }
 ```
 
+#### Register lifecycle marker interfaces
+
+```csharp
+class GameController : IInitializable, ITickable, IDisposable { /* ... */ }
+```
+
+```csharp
+builder.RegisterEntryPoint<GameController>(Lifetime.Singleton);
+```
+
+Not that this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
+
 #### Register instance
 
 ```csharp
@@ -525,7 +529,7 @@ class ClassA
 }
 ```
 
-**Register instance as interface**
+####  Register instance as interface
 
 ```csharp
 builder.RegisterInstance<IInputPort>(serviceA);
@@ -574,12 +578,9 @@ class OtherClass
 }
 ```
 
-
 #### Register `UnityEngine.Object`
 
 **Register from MonoInstaller's `[SerializeField]`**
-
-Also use `RegisterInstance()`.
 
 ```csharp
 [SerializeField]
@@ -587,7 +588,7 @@ YourBehaviour yourBehaviour;
 
 // ...
 
-builder.RegisterInstance(yourBehaviour);
+builder.RegisterComponent(yourBehaviour);
 ```
 
 **Register from scene with `LifetimeScope`**
