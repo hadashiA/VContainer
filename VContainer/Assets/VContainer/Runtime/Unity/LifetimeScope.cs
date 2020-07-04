@@ -160,6 +160,7 @@ namespace VContainer.Unity
             {
                 InstallTo(new ContainerBuilder { ApplicationOrigin = this });
             }
+
             DispatchPlayerLoopItems();
         }
 
@@ -237,6 +238,7 @@ namespace VContainer.Unity
             {
                 extraInstaller.Install(builder);
             }
+
             Container = builder.Build();
         }
 
@@ -353,6 +355,14 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
             catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostLateTickable>))
+            {
+            }
+
+            try
+            {
+                var _ = Container.Resolve<IEnumerable<MonoBehaviour>>();
+            }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<MonoBehaviour>))
             {
             }
         }
