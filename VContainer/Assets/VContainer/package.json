@@ -1,7 +1,7 @@
 {
   "name": "jp.hadashikick.vcontainer",
   "displayName": "VContainer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "unity": "2019.1",
   "description": "Lightweight DI (Dependency Injection) Container for Unity.",
   "keywords": ["DI", "Dependency Injection", "DI Container"],
