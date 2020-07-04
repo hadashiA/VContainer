@@ -91,8 +91,7 @@ The basic way for integrating VContainer into your application is:
 - When playing scene, LifetimeScope automatically build Container and dispatch to the own PlayerLoopSystem.
 
 Note:
-Normally, "scope" is repeatedly created and destroyed during the game.  
-`LifetimeScope` assumes this and has a parent-child relationship.
+- Normally, "scope" is repeatedly created and destroyed during the game. `LifetimeScope` assumes this and has a parent-child relationship.
 
 **1. Write a class that depends on other classes**
 
@@ -118,7 +117,8 @@ Next, let's write a setting that can auto-wiring the class. This place is called
 - Right click in a folder within the Project Tab and Choose **Create -> C# Script**.
 - Name it `GameInstaller.cs`.
 
-Note that VContainer will automatically template C# scripts ending in `Installer`.
+Note 
+- VContainer will automatically template C# scripts ending in `Installer`.
 
 You instruct `builder` and register the class above.
 
@@ -181,7 +181,7 @@ builder.Register<HelloWorldService>(Lifetime.Singleton);
 ```
 
 Note:  
-Press Validate button, you can check for missing dependencies.
+- Press Validate button, you can check for missing dependencies.
 
 ![](docs/screenshot_validate_button.png)
 
@@ -221,10 +221,11 @@ Now, `Tick()` will be executed at the timing of Unity's Update.
 
 As such, it's a good practice to keep any side effect entry points through the marker interface.
 
-We should register this as `ITickable` marker.
+We should register this as running on Unity's life cycle events.
 
-```csharp
-builder.RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)    
+```diff
+- builder.Register<GamePresenter>(Lifetime.Singleton);
++ builder.RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)    
 ```
 
 Note:
