@@ -679,11 +679,12 @@ If you want to destroy with `LifetimeScope`, make it a child transform of `Lifet
 You can parent it by specifying a `LifetimeScope` object before loading the scene.
 
 ```csharp
-var parent = LifetimeScope.FindDefault();
+var current = LifetimeScope.FindDefault();
 
 // The LifetimeScope generated inside this block will have the specified parent
-using (LifetimeScope.PushParent(parent))
+using (LifetimeScope.PushParent(current))
 {
+    // If this scene has a LifetimeScope, its parent will be `current`.
     var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
     while (!loading.isDone)
     {
@@ -691,7 +692,7 @@ using (LifetimeScope.PushParent(parent))
     }
 }
 
-using (LifetimeScope.PushParent(parent))
+using (LifetimeScope.PushParent(current))
 {
     // UniTask example 
     await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
