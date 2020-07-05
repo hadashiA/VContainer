@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace VContainer.Unity
 {
-    public readonly struct ExtendScope : IDisposable
+    public readonly struct ExtraInstallationScope : IDisposable
     {
         readonly string key;
 
-        public ExtendScope(IInstaller installer, string key = "")
+        public ExtraInstallationScope(IInstaller installer, string key = "")
         {
             this.key = key;
             LifetimeScope.EnqueueExtra(installer, key);

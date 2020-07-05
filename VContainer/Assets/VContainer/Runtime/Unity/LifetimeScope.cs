@@ -10,6 +10,12 @@ namespace VContainer.Unity
 {
     public sealed class LifetimeScope : MonoBehaviour
     {
+        public readonly struct ParentOverrideScope : IDisposable
+        {
+            public ParentOverrideScope(LifetimeScope nextParent) => OverrideParent = nextParent;
+            public void Dispose() => OverrideParent = null;
+        }
+
         public const string AutoReferenceKey = "__auto__";
 
         [SerializeField]
@@ -38,15 +44,15 @@ namespace VContainer.Unity
         static readonly ConcurrentDictionary<string, ExtraInstaller> ExtraInstallers = new ConcurrentDictionary<string, ExtraInstaller>();
         static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
 
-        public static ExtendScope Push(Action<IContainerBuilder> installing, string key = "")
-        {
-            return new ExtendScope(new ActionInstaller(installing), key);
-        }
+        static LifetimeScope OverrideParent;
 
-        public static ExtendScope Push(IInstaller installer, string key = "")
-        {
-            return new ExtendScope(installer, key);
-        }
+        public static ParentOverrideScope PushParent(LifetimeScope parent) => new ParentOverrideScope(parent);
+
+        public static ExtraInstallationScope Push(Action<IContainerBuilder> installing, string key = "")
+            => new ExtraInstallationScope(new ActionInstaller(installing), key);
+
+        public static ExtraInstallationScope Push(IInstaller installer, string key = "")
+            => new ExtraInstallationScope(installer, key);
 
         public static LifetimeScope FindDefault(Scene scene) => FindByKey("", scene);
 
@@ -119,16 +125,16 @@ namespace VContainer.Unity
         }
 
         public IObjectResolver Container { get; private set; }
+        public LifetimeScope Parent { get; private set; }
         public string Key => key;
 
         readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<IInstaller> extraInstallers = new List<IInstaller>();
 
-        LifetimeScope runtimeParent;
 
         void Awake()
         {
-            runtimeParent = GetRuntimeParent();
+          Parent = GetRuntimeParent();
             if (autoRun)
             {
                 Build();
@@ -143,14 +149,14 @@ namespace VContainer.Unity
 
         public void Build()
         {
-            if (runtimeParent == null)
+            if (Parent == null)
             {
-                runtimeParent = GetRuntimeParent();
+                Parent = GetRuntimeParent();
             }
 
-            if (runtimeParent != null)
+            if (Parent != null)
             {
-                Container = runtimeParent.Container.CreateScope(builder =>
+                Container = Parent.Container.CreateScope(builder =>
                 {
                     builder.ApplicationOrigin = this;
                     InstallTo(builder);
@@ -164,7 +170,7 @@ namespace VContainer.Unity
             DispatchPlayerLoopItems();
         }
 
-        public LifetimeScope CreateChild(string key = "", IInstaller installer = null)
+        public LifetimeScope CreateChild(string childKey = null, IInstaller installer = null)
         {
             var childGameObject = new GameObject("LifeTimeScope (Child)");
             childGameObject.SetActive(false);
@@ -175,17 +181,18 @@ namespace VContainer.Unity
                 child.extraInstallers.Add(installer);
             }
             child.parent = this;
+            child.key = childKey;
             childGameObject.SetActive(true);
             return child;
         }
 
-        public LifetimeScope CreateChild(string key = null, Action<IContainerBuilder> installation = null)
+        public LifetimeScope CreateChild(string childKey = null, Action<IContainerBuilder> installation = null)
         {
             if (installation != null)
             {
-                return CreateChild(key, new ActionInstaller(installation));
+                return CreateChild(childKey, new ActionInstaller(installation));
             }
-            return CreateChild(key, (IInstaller)null);
+            return CreateChild(childKey, (IInstaller)null);
         }
 
         public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
@@ -244,6 +251,10 @@ namespace VContainer.Unity
 
         LifetimeScope GetRuntimeParent()
         {
+            var nextParent = OverrideParent;
+            if (nextParent != null)
+                return nextParent;
+
             if (parent != null)
                 return parent;
 
