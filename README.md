@@ -507,7 +507,8 @@ class GameController : IInitializable, ITickable, IDisposable { /* ... */ }
 builder.RegisterEntryPoint<GameController>(Lifetime.Singleton);
 ```
 
-Note that this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
+Note:
+- this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
 
 #### Register instance
 
@@ -519,7 +520,8 @@ var obj = new ServiceA();
 builder.RegisterInstance(obj);
 ```
 
-Note that `RegisterIntance` always `Scoped` lifetime. So it has no arguments.
+Note 
+- `RegisterIntance` always `Scoped` lifetime. So it has no arguments.
 
 It can resolve like this:
 
@@ -531,6 +533,8 @@ class ClassA
 ```
 
 ####  Register instance as interface
+
+Allow `As*` decrelations.
 
 ```csharp
 builder.RegisterInstance<IInputPort>(serviceA);
@@ -579,7 +583,7 @@ class OtherClass
 }
 ```
 
-#### Register `UnityEngine.Object`
+#### Register `MonoBehaviour`
 
 **Register from MonoInstaller's `[SerializeField]`**
 
@@ -592,14 +596,17 @@ YourBehaviour yourBehaviour;
 builder.RegisterComponent(yourBehaviour);
 ```
 
+Note:
+- `RegisterComponent` simular to `RegisterInstance`. The only difference is that MonoBehaviour registered with `RegisterComponent` will be injected even if not Resolved.
+
 **Register from scene with `LifetimeScope`**
 
 ```csharp
 builder.RegisterComponentInHierarchy<YourBehaviour>();
 ```
 
-Note that `RegisterComponentInHierarchy` always `.Scoped` lifetime.  
-Because lifetime is equal to the scene.
+Note
+- `RegisterComponentInHierarchy` always `.Scoped` lifetime. Because lifetime is equal to the scene.
 
 **Register component that Instantiate from prefab when resolving**
 
@@ -713,7 +720,17 @@ var childLifetimeScope = lifetimeScope.CreateChild(installer);
 var childLifetimeScope = lifetimeScope.CreateChild("CHILD NAME", builder => 
 {
     // ...
-})
+});
+
+// Create from LifetimeScope prefab
+var childLifetimeScope = lifetimeScope.CreateChildFromPrefab(prefab);
+
+// Allow extra registrations
+var childLifetimeScope = lifetimeScope.CreateChildFromPrefab(prefab, builder =>
+{
+    // Extra Registration
+});
+
 
 // Dispose child scope
 UnityEngine.Object.Destroy(childLifetimeScope.gameObject);
