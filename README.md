@@ -33,7 +33,7 @@ Following is a deep profiler Unity result sample.
 - [Getting Started](#getting-started)
 - [Resolving](#resolving)
 - [Registering](#registering)
-- [Controlling Object Lifetime](#controlling-object-lifetime)
+- [Controlling Scope and Lifetime](#controlling-scope-and-lifetime)
 - [Dispatching Unity Lifecycle](#dispatching-unity-lifecycle)
 - [Installers](#installers)
 - [Optimization](#optimization)
@@ -651,7 +651,7 @@ builder.RegisterComponentFromInNewPrefab<YourBehaviour>(Lifetime.Scoped)
 
 ```
 
-## Controlling Object Lifetime
+## Controlling Scope and Lifetime
 
 `LifetimeScope` can build parent-child relationship.  
 it has following behaviours:
