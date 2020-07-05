@@ -117,7 +117,7 @@ Next, let's write a setting that can auto-wiring the class. This place is called
 - Right click in a folder within the Project Tab and Choose **Create -> C# Script**.
 - Name it `GameInstaller.cs`.
 
-Note 
+Note:
 - VContainer will automatically template C# scripts ending in `Installer`.
 
 You instruct `builder` and register the class above.
@@ -180,7 +180,7 @@ builder.Register<HelloWorldService>(Lifetime.Singleton);
 + builder.Register<GamePresenter>(Lifetime.Singleton);
 ```
 
-Note:  
+Note:
 - Press Validate button, you can check for missing dependencies.
 
 ![](docs/screenshot_validate_button.png)
@@ -520,7 +520,7 @@ var obj = new ServiceA();
 builder.RegisterInstance(obj);
 ```
 
-Note 
+Note:
 - `RegisterIntance` always `Scoped` lifetime. So it has no arguments.
 
 It can resolve like this:
@@ -605,7 +605,7 @@ Note:
 builder.RegisterComponentInHierarchy<YourBehaviour>();
 ```
 
-Note
+Note:
 - `RegisterComponentInHierarchy` always `.Scoped` lifetime. Because lifetime is equal to the scene.
 
 **Register component that Instantiate from prefab when resolving**
@@ -673,6 +673,32 @@ it has following behaviours:
 If you want to destroy with `LifetimeScope`, make it a child transform of `LifetimeScope` or consider implement IDisposable.
 
 ### How to make an Additive scene a child
+
+#### How to set the parent when loading a scene
+
+You can parent it by specifying a `LifetimeScope` object before loading the scene.
+
+```csharp
+var parent = LifetimeScope.FindDefault();
+
+// The LifetimeScope generated inside this block will have the specified parent
+using (LifetimeScope.PushParent(parent))
+{
+    var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+    while (!loading.isDone)
+    {
+        yield return null;
+    }
+}
+
+using (LifetimeScope.PushParent(parent))
+{
+    // UniTask example 
+    await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+}
+```
+
+#### How to pre-set the parent of a scene using a key
 
 `LifetimeScope` can set a unique identifier as a character string. `Key`.  
 If you want to set the relationship between `LifetimeScopes` in the scene, use the reference by keys.
