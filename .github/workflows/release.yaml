@@ -22,7 +22,6 @@ jobs:
     - uses: pCYSl5EDgo/create-unitypackage@master
       with:
         package-path: VContainer.${{ env.GIT_TAG }}.unitypackage
-        package-path: VContainer.unitypackage
         include-files: VContainer/metaList
     - uses: actions/upload-artifact@v2
       with:
