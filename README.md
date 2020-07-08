@@ -41,7 +41,7 @@ Following is a deep profiler Unity result sample.
 
 ## What is DI ?
 
-DI (Dependency Injection) is a general technique in OOP that all about removing uninteresting dependencies from your code.  
+DI (Dependency Injection) is a general technique in OOP that all about removing uninteresting dependencies from your code.
 It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.
 
 In all programming paradigms, the basic design is, weak module coupling and strong module cohesion.
@@ -49,11 +49,11 @@ As you know, OOP(Object Oriented Programming) does it through objects.
 1. Objects hides the details of its responsibility (encapsulation).
 2. Objects transfer work outside their responsibilities to other objects
 
-Actually, There is a problem in doing this fundamentally.  
+Actually, There is a problem in doing this fundamentally.
 If you write the delegation object in the class code, it means tight coupling at the source code level.
 The only way to exclude a non-interesting dependency from a class is to pass from outside.
 
-Then, if your class receives dependencies externally, need help from outside.  
+Then, if your class receives dependencies externally, need help from outside.
 DI is a technique that facilitates a place to resolve dependencies completely outside.
 
 Terminology:
@@ -187,10 +187,10 @@ Note:
 
 **5. Execute your registerd object on PlayerLoopSystem**
 
-To write an application in Unity, we have to interrupt Unity's lifecycle events.  
+To write an application in Unity, we have to interrupt Unity's lifecycle events.
 (Typically MonoBehaviour's Start / Update / OnDestroy / etc..)
 
-Objects registered with VContainer can do this independently of MonoBehaviour.  
+Objects registered with VContainer can do this independently of MonoBehaviour.
 This is done automatically by implementing and registering some marker interfaces.
 
 ```diff
@@ -225,13 +225,26 @@ We should register this as running on Unity's life cycle events.
 
 ```diff
 - builder.Register<GamePresenter>(Lifetime.Singleton);
-+ builder.RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)    
++ builder.RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)
 ```
 
 Note:
 - `RegisterEntryPoint<GamePresenter>` is an alias to register interfaces related to Unity's PlayerLoop event. ( Simular to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
 - Registering lifecycle events without relying on MonoBehaciour facilitates decupling of domain logic and presentation !
 
+If you have multiple EntryPoints, you can also use the following declaration as grouping.
+
+```csharp
+builder.UseEntryPoints(Lifetime.Singleton, entryPoints =>
+{
+    entryPoints.Add<GamePresenter>();
+    // entryPoints.Add<OtherSingletonEntryPointA>();
+    // entryPoints.Add<OtherSingletonEntryPointB>();
+    // entryPoints.Add<OtherSingletonEntryPointC>();
+})
+```
+
+This makes it clearer that EntryPoints are given special treatment by design.
 
 ## Resolving
 
@@ -251,9 +264,9 @@ class ClassA
     readonly IServiceA serviceA;
     readonly IServiceB serviceB;
     readonly SomeUnityComponent component;
-     
+
     public ClassA(
-        IServiceA serviceA, 
+        IServiceA serviceA,
         IServiceB serviceB,
         SomeUnityComponent component)
     {
@@ -270,7 +283,7 @@ To prevent this problem, add the `[Inject]` Attribute explicitly.
 ```csharp
     [Inject]
     public ClassA(
-        IServiceA serviceA, 
+        IServiceA serviceA,
         IServiceB serviceB,
         SomeUnityComponent component)
     {
@@ -281,7 +294,7 @@ To prevent this problem, add the `[Inject]` Attribute explicitly.
 Note:
 - If class has multiple constructors, the one with `[Inject]` has priority.
 
-**Recommendation:**  
+**Recommendation:**
 Use Constructor Injection whenever possible.
 The constructor & readonly field idiom is:
 - The instantiated object has a compiler-level guarantee that the dependencies have been resolved.
@@ -305,35 +318,35 @@ public class SomeBehaviour : MonoBehaviour
     {
         speed = settings.speed;
     }
-} 
+}
 ```
 
-**Recommendation:**  
-Consider whether injection to MonoBehaviour is necessary.  
+**Recommendation:**
+Consider whether injection to MonoBehaviour is necessary.
 In a code base where domain logic and presentation are well decoupled, MonoBehaviour should act as a View component.
 
 In my opinion, View components should only be responsible for rendering and should be flexible.
 
-Of course, In order for the View component to work, it needs to pass state at runtime.  
+Of course, In order for the View component to work, it needs to pass state at runtime.
 But the "state" of an object and its dependency of functionality of other objects are different.
 
 It's enough to pass the state as arguments instead of `[Inject]`.
 
 ### Property / Field Injection
 
-If the object has a local default and Inject is optional,  
+If the object has a local default and Inject is optional,
 Property/Field Injection can be used.
 
 ```csharp
 class ClassA
 {
     [Inject]
-    IServiceA serviceA { get; set; } // Will be overwritten if something is registered. 
+    IServiceA serviceA { get; set; } // Will be overwritten if something is registered.
 
     public ClassA()
     {
         serviceA = ServiceA.GoodLocalDefault;
-    }        
+    }
 }
 ```
 
@@ -391,7 +404,7 @@ See more information: [Controlling Object Lifetime](#controlling-object-lifetime
 
 ### Register method family
 
-There are various ways to use Register.  
+There are various ways to use Register.
 Let's take the following complex type as an example.
 
 ```csharp
@@ -424,8 +437,8 @@ It can resolve like this:
 ```csharp
 class ClassA
 {
-    public ClassA(IServiceA serviceA) { /* ... */ } 
-} 
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
 ```
 
 #### Register as multiple Interface
@@ -510,6 +523,25 @@ builder.RegisterEntryPoint<GameController>(Lifetime.Singleton);
 Note:
 - this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
 
+If you have multiple EntryPoints, you have the option to use the following declaration as grouping.
+
+```csharp
+builder.UseEntryPoints(Lifetime.Scoped, entryPoints =>
+{
+   entryPoints.Add<ScopedEntryPointA>();
+   entryPoints.Add<ScopedEntryPointB>();
+   entryPoints.Add<ScopedEntryPointC>().AsSelf();
+});
+```
+
+This is the same as:
+
+```csharp
+builder.RegisterEntryPoint<ScopedEntryPointA>(Lifetime.Scoped);
+builder.RegisterEntryPoint<ScopedEntryPointB>(Lifetime.Scoped);
+builder.RegisterEntryPoint<ScopedEntryPointC>(Lifetime.Scoped).AsSelf();
+```
+
 #### Register instance
 
 ```csharp
@@ -541,9 +573,9 @@ builder.RegisterInstance<IInputPort>(serviceA);
 
 builder.RegisterInstance(serviceA)
     .As<IServiceA, IInputPort>;
-    
+
 builder.RegisterInstance()
-    .AsImplementedInterfaces();    
+    .AsImplementedInterfaces();
 ```
 
 #### Register type-specific parameters
@@ -578,7 +610,7 @@ This Register is with only `SomeService`.
 ```csharp
 class OtherClass
 {
-    // ! Error 
+    // ! Error
     public OtherClass(string hogehoge) { /* ... */ }
 }
 ```
@@ -651,9 +683,30 @@ builder.RegisterComponentFromInNewPrefab<YourBehaviour>(Lifetime.Scoped)
 
 ```
 
+### Grouping MonoBehaviour's Registration
+
+```csharp
+builder.UseComponents(components =>
+{
+    components.AddInstance(yourBehaviour);
+    components.AddInHierarchy<YourBehaviour>();
+    components.AddFromNewPrefab(prefab, Lifetime.Scoped);
+    components.AddOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
+})
+```
+
+This is the same as:
+
+```csharp
+builder.RegisterComponent(yourBehaviour);
+builder.RegisterComponentInHierarchy<YourBehaviour>();
+builder.RegisterComponentFromNewPrefab(prefab, Lifetime.Scoped);
+builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
+```
+
 ## Controlling Scope and Lifetime
 
-`LifetimeScope` can build parent-child relationship.  
+`LifetimeScope` can build parent-child relationship.
 it has following behaviours:
 
 - If registered object is not found, `LifetimeScope` will look for a parent `LifetimeScope`.
@@ -694,26 +747,26 @@ using (LifetimeScope.PushParent(current))
 
 using (LifetimeScope.PushParent(current))
 {
-    // UniTask example 
+    // UniTask example
     await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
 }
 ```
 
 #### How to pre-set the parent of a scene using a key
 
-`LifetimeScope` can set a unique identifier as a character string. `Key`.  
+`LifetimeScope` can set a unique identifier as a character string. `Key`.
 If you want to set the relationship between `LifetimeScopes` in the scene, use the reference by keys.
 
-In base scene.  
+In base scene.
 ![](./docs/screenshot_lifetimescope_parent.png)
 
-In additional scene.  
+In additional scene.
 ![](./docs/screenshot_lifetimescope_child.png)
 
 
 ### How to generate child with code first
 
-Child can also be generated from code.  
+Child can also be generated from code.
 Can be used to get a reference to the `LifetimeScope` if the key is set.
 
 ```csharp
@@ -733,7 +786,7 @@ And below is an example of creating a child.
 var childLifetimeScope = lifetimeScope.CreateChild();
 
 // Create a extra registered child
-var childLifetimeScope = lifetimeScope.CreateChild(builder => 
+var childLifetimeScope = lifetimeScope.CreateChild(builder =>
 {
     builder.Register<ExtraClass>(Lifetime.Scoped);
     builder.RegisterInstance(extraInstance);
@@ -741,10 +794,10 @@ var childLifetimeScope = lifetimeScope.CreateChild(builder =>
 });
 
 // Create a extra registered child with IInstaller.
-var childLifetimeScope = lifetimeScope.CreateChild(installer); 
+var childLifetimeScope = lifetimeScope.CreateChild(installer);
 
-// Create a named child 
-var childLifetimeScope = lifetimeScope.CreateChild("CHILD NAME", builder => 
+// Create a named child
+var childLifetimeScope = lifetimeScope.CreateChild("CHILD NAME", builder =>
 {
     // ...
 });
@@ -772,11 +825,11 @@ For example, when context is finalized after assets are loaded asynchronously.
 In that case you could use:
 
 ```csharp
-using (LifetimeScope.Push(builder => 
+using (LifetimeScope.Push(builder =>
 {
     // Register for the next scene not yet loaded
     builder.RegisterInstance(extraInstance);
-    builder.Register<ExtraType>(Lifetime.Scoped); 
+    builder.Register<ExtraType>(Lifetime.Scoped);
 }))
 {
     // Load the scene here.
@@ -790,11 +843,11 @@ using (LifetimeScope.Push(builder =>
 
 ```csharp
 // Example with UniTask
-using (LifetimeScope.Push(builder => 
+using (LifetimeScope.Push(builder =>
 {
     // Register for the next scene not yet loaded
     builder.RegisterInstance(extraInstance);
-    builder.Register<ExtraType>(Lifetime.Scoped); 
+    builder.Register<ExtraType>(Lifetime.Scoped);
 }))
 {
     // Load the scene here
@@ -985,7 +1038,7 @@ class GameInstaller : MonoInstaller
 
 ### Parallel Container Build
 
-If you enable `VCONTAINER_PARALLEL_CONTAINER_BUILD` compilation flag,  
+If you enable `VCONTAINER_PARALLEL_CONTAINER_BUILD` compilation flag,
 VCOntainer will perform container builds in Parallel.
 
 This is the solution when you have a lot of objects to register.
