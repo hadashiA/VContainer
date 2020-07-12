@@ -1,5 +1,8 @@
 # VContainer
 
+![](https://github.com/hadashiA/VContainer/workflows/Test/badge.svg)
+[![openupm](https://img.shields.io/npm/v/jp.hadashikick.vcontainer?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/jp.hadashikick.vcontainer/)
+
 **VContainer** is an DI (Dependency Injection) library running on Unity (Game Engine).
 
 "V" means making Unity's initial "U" more thinner and solid ... !
@@ -26,6 +29,12 @@ Following is a deep profiler Unity result sample.
 
 ![](docs/screenshot_profiler_zenject.png)
 
+## Changes to v0.1.0
+
+- From 0.0.x, the API of LifetimeScope has changed.
+  - [Obsolete MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
+  - If you are using an earlier version, please check [Getting Started](#getting-started) again.
+
 ## Index
 
 - [What is DI ?](#what-is-di-)
@@ -35,13 +44,12 @@ Following is a deep profiler Unity result sample.
 - [Registering](#registering)
 - [Controlling Scope and Lifetime](#controlling-scope-and-lifetime)
 - [Dispatching Unity Lifecycle](#dispatching-unity-lifecycle)
-- [Installers](#installers)
 - [Optimization](#optimization)
 - [Best Practices and Recommendations](#best-practices-and-recommendations)
 
 ## What is DI ?
 
-DI (Dependency Injection) is a general technique in OOP that all about removing uninteresting dependencies from your code.
+DI (Dependency Injection) is a general technique in OOP that all about removing unconcerned dependencies from your code.
 It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.
 
 In all programming paradigms, the basic design is, weak module coupling and strong module cohesion.
@@ -51,7 +59,7 @@ As you know, OOP(Object Oriented Programming) does it through objects.
 
 Actually, There is a problem in doing this fundamentally.
 If you write the delegation object in the class code, it means tight coupling at the source code level.
-The only way to exclude a non-interesting dependency from a class is to pass from outside.
+The only way to exclude a unconcerned dependency from a class is to pass from outside.
 
 Then, if your class receives dependencies externally, need help from outside.
 DI is a technique that facilitates a place to resolve dependencies completely outside.
@@ -85,9 +93,8 @@ Further reading:
 
 The basic way for integrating VContainer into your application is:
 
-- Create `LifetimeScope` component in your scene. It has one Container and one scope.
-- Write C# code to register dependencies. This is the composition root, called `Installer` like Zenject.
-- Add the above installer into `LifetimeScope`.
+- Create a component that inherits `LifetimeScope` in your scene. It has one container and one scope.
+- Register dependencies with C# code in a subclass of LifetimeScope. This is the composition root.
 - When playing scene, LifetimeScope automatically build Container and dispatch to the own PlayerLoopSystem.
 
 Note:
@@ -112,13 +119,13 @@ namespace MyGame
 
 **2. Define composition root**
 
-Next, let's write a setting that can auto-wiring the class. This place is called an Installer.
+Next, let's write a setting that can auto-wiring the class.
 
 - Right click in a folder within the Project Tab and Choose **Create -> C# Script**.
-- Name it `GameInstaller.cs`.
+- Name it `GameLifetimeScope.cs`.
 
 Note:
-- VContainer will automatically template C# scripts ending in `Installer`.
+- VContainer will automatically template C# scripts ending in `*LifetimeScope`.
 
 You instruct `builder` and register the class above.
 
@@ -128,9 +135,9 @@ using VContainer.Unity;
 
 namespace MyGame
 {
-    public class GameInstaller : MonoInstaller
+    public sealed class GameLifetimeScope : LifetimeScope
     {
-        public override void Install(IContainerBuilder builder)
+        protected override void Configure(IContainerBuilder builder)
         {
 +            builder.Register<HelloWorldService>(Lifetime.Singleton);
         }
@@ -141,14 +148,13 @@ namespace MyGame
 Note:
 - VContainer always required a `Lifetime` argument explicitly. This gives us transparency and consistency.
 
-**3. Create LifetimeScope**
+**3. Create GameObject attached your LifetimeScope**
 
-Right Click inside the Hierarchy tab and select **VContainer -> Lifetime Scope**.
+Right Click inside the Hierarchy tab and select **Create Empty**. And name `GameLifetimeScope` it.
 
-Then attach your installer.
+Then attach your LifetimeScope.
 
-![](docs/screenshot_add_monoinstaller.gif)
-
+![](docs/screenshot_gamelifetimescope.png)
 
 **4. How to use your new HelloWorldService  ?**
 
@@ -179,11 +185,6 @@ And let's also register this class.
 builder.Register<HelloWorldService>(Lifetime.Singleton);
 + builder.Register<GamePresenter>(Lifetime.Singleton);
 ```
-
-Note:
-- Press Validate button, you can check for missing dependencies.
-
-![](docs/screenshot_validate_button.png)
 
 **5. Execute your registerd object on PlayerLoopSystem**
 
@@ -572,7 +573,7 @@ Allow `As*` decrelations.
 builder.RegisterInstance<IInputPort>(serviceA);
 
 builder.RegisterInstance(serviceA)
-    .As<IServiceA, IInputPort>;
+    .As<IServiceA, IInputPort>();
 
 builder.RegisterInstance()
     .AsImplementedInterfaces();
@@ -617,7 +618,7 @@ class OtherClass
 
 #### Register `MonoBehaviour`
 
-**Register from MonoInstaller's `[SerializeField]`**
+**Register from LifetimeScope's `[SerializeField]`**
 
 ```csharp
 [SerializeField]
@@ -704,6 +705,57 @@ builder.RegisterComponentFromNewPrefab(prefab, Lifetime.Scoped);
 builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
 ```
 
+### ScriptableObject Integration
+
+It is useful to register the setting information saved as Asset as follows.
+
+```csharp
+[Serializable]
+public class CameraSettings
+{
+    public float MoveSpeed = 10f;
+    public float DefaultDistance = 5f;
+    public float ZoomMax = 20f;
+    public float ZoomMin = 5f;
+}
+
+[Serializable]
+public class ActorSettings
+{
+    public float MoveSpeed = 0.5f;
+    public float FlyingTime = 2f;
+    public Vector3 FlyingInitialVelocity = Vector3.zero;
+}
+
+[CreateAssetMenu(fileName = "GameSettings", menuName = "MyGame/Settings")]
+public class GameSettings : ScriptableObject
+{
+    [SerializeField]
+    public FieldCameraSettings cameraSetting
+
+    [SerializeField]
+    public ActorSettings actorSettings;
+}
+```
+
+And
+- Create `GameSettings` assets from menu.
+- Attach any `LifetimeScope` it.
+
+```csharp
+public class SomeLifetimeScope : LifetimeScope
+{
+    [SerializeField]
+    GameSettings settings;
+
+    protected override void Configure(IContainerBuilder builder)
+    {
+        builder.RegisterInstance(settings.cameraSettings);
+        builder.RegisterInstance(settings.actorSettings);
+    }
+}
+```
+
 ## Controlling Scope and Lifetime
 
 `LifetimeScope` can build parent-child relationship.
@@ -732,10 +784,11 @@ If you want to destroy with `LifetimeScope`, make it a child transform of `Lifet
 You can parent it by specifying a `LifetimeScope` object before loading the scene.
 
 ```csharp
-var current = LifetimeScope.FindDefault();
+// Find LifetimeScope by type in all loaded scenes
+var parent = LifetimeScope.Find<BaseLifetimeScope>();
 
 // The LifetimeScope generated inside this block will have the specified parent
-using (LifetimeScope.PushParent(current))
+using (LifetimeScope.PushParent(parent))
 {
     // If this scene has a LifetimeScope, its parent will be `current`.
     var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
@@ -745,7 +798,7 @@ using (LifetimeScope.PushParent(current))
     }
 }
 
-using (LifetimeScope.PushParent(current))
+using (LifetimeScope.PushParent(parent))
 {
     // UniTask example
     await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
@@ -754,15 +807,15 @@ using (LifetimeScope.PushParent(current))
 
 #### How to pre-set the parent of a scene using a key
 
-`LifetimeScope` can set a unique identifier as a character string. `Key`.
-If you want to set the relationship between `LifetimeScopes` in the scene, use the reference by keys.
+`LifetimeScope` can be serialized with the parent type in any other scene specified.
 
 In base scene.
-![](./docs/screenshot_lifetimescope_parent.png)
+
+![](./docs/screenshot_baselifetimescope.png)
 
 In additional scene.
-![](./docs/screenshot_lifetimescope_child.png)
 
+![](./docs/screenshot_childlifetimescope.gif)
 
 ### How to generate child with code first
 
@@ -770,13 +823,7 @@ Child can also be generated from code.
 Can be used to get a reference to the `LifetimeScope` if the key is set.
 
 ```csharp
-var lifetimeScope = LifetimeScpe.FindByKey("Key");
-```
-
-Or, If you have only one LifetimeScope with no keys in your scene, you can use:
-
-```csharp
-var lifetimeScope = LifetimeScope.FindDefault(scene);
+var lifetimeScope = LifetimeScope.Find<BaseLifetimeScope>();
 ```
 
 And below is an example of creating a child.
@@ -794,13 +841,15 @@ var childLifetimeScope = lifetimeScope.CreateChild(builder =>
 });
 
 // Create a extra registered child with IInstaller.
-var childLifetimeScope = lifetimeScope.CreateChild(installer);
-
-// Create a named child
-var childLifetimeScope = lifetimeScope.CreateChild("CHILD NAME", builder =>
+class ChildInstaller : IInstaller
 {
-    // ...
-});
+    public void Install(IContainerBuilder builder)
+    {
+        // ...
+    }
+}
+
+var childLifetimeScope = lifetimeScope.CreateChild(childInstaller);
 
 // Create from LifetimeScope prefab
 var childLifetimeScope = lifetimeScope.CreateChildFromPrefab(prefab);
@@ -856,12 +905,27 @@ using (LifetimeScope.Push(builder =>
 
 ```
 
+```csharp
+// Use registration as type
+class FooInstaller : IInstaller
+{
+    public void Install(IContainerBuilder builder)
+    {
+        builder.Register<ExtraType>(Lifetime.Scoped);
+    }
+}
+
+using (LifetimeScope.Push(fooInstaller)
+{
+    // ...
+}
+```
+
 ### Project Root
 
 You can create a parent for all LifetimeScopes in your scene.
 
-To do so, create a `LifetimeScope` prefab in a folder named `Resources` in Assets and name it "ProjectLifetimeScope".
-Also use `Create -> VContaienr -> Project root LifetimeScope` .
+To do so, create a `LifetimeScope` subclass prefab in a folder named `Resources` in Assets and name it "ProjectLifetimeScope".
 
 ## Dispatching Unity Lifecycle
 
@@ -891,72 +955,6 @@ And
 
 Note:
 - [Unity - Manual: Order of Execution for Event Functions](https://docs.unity3d.com/Manual/ExecutionOrder.html)
-
-## Installers
-
-Installer is the place to write the settings to register.
-
-In Unity, objects depend on the scene and Assets,
-It is possible to create an installer as `MonoBehaviour` and an installer as `ScriptableObject`.
-
-Use MonoBehavoiur for Scene-dependent Installers, and ScriptableObject for scene-independent but asset-dependent projects in your project.
-
-
-
-### `MonoInstaller`
-
-[Getting Started](#getting-started) includes an example for this.
-
-### `ScriptableObjectInstaller`
-
-First, write a script like this:
-
-```csharp
-   [Serializable]
-    public class CameraSettings
-    {
-        public float MoveSpeed = 10f;
-        public float DefaultDistance = 5f;
-        public float ZoomMax = 20f;
-        public float ZoomMin = 5f;
-    }
-
-    [Serializable]
-    public class ActorSettings
-    {
-        public float MoveSpeed = 0.5f;
-        public float FlyingTime = 2f;
-        public Vector3 FlyingInitialVelocity = Vector3.zero;
-    }
-
-    [CreateAssetMenu(fileName = "GameSettings", menuName = "MyGame/Settings")]
-    public class GameSettingsInstaller : ScriptableObjectInstaller
-    {
-        [SerializeField]
-        FieldCameraSettings cameraSettings;
-
-        [SerializeField]
-        ActorSettings actorSettings;
-
-        public override void Install(IContainerBuilder builder)
-        {
-            builder.RegisterInstance(cameraSettings);
-            builder.RegisterInstance(actorSettings);
-        }
-    }
-}
-```
-
-And
-- Create `GameSettingsInstaller` assets from menu.
-- Attach any `LifetimeScope` it.
-
-### `IInstaller`
-
-Following api can receive any type implemented `IInstaller`.
-
-- `LifetimeScope.CreateChild()`
-- `LifetimeScope.Push()`
 
 ## Comparing VContainer to Zenject
 
@@ -1017,17 +1015,19 @@ If this causes an error, use Awake instead.
 For example:
 
 ```csharp
-class GameInstaller : MonoInstaller
+class GameLifetimeScope : LifetimeScope
 {
     Ground groundInScene;
 
-    void Awake()
+    protected override void Awake()
     {
         // Run main thread.
         groundInScene = FindObjectOfType<Ground>();
+
+        base.Awake();
     }
 
-    public override void Install(IContainerBuilder builder)
+    protected override void Configure(IContainerBuilder builder)
     {
         // It can run background thread.
         builder.RegisterInstance(groundInScene);
