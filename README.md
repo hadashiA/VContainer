@@ -1002,9 +1002,9 @@ To reduce main thread blocking time for your game:
 For example:
 
 ```csharp
-await LoadSceneAsync(...);
+var nextScene = await LoadSceneAsync(...);
 
-var lifetimeScope = LifetimeScope.FindDefault();
+var lifetimeScope = LifetimeScope.Find<MyLifetimeScope>(nextScene.Scene);
 
 // Your async solution here.
 await UniTask.Run(() => lifetimeScope.Build());
