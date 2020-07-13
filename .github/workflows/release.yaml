@@ -27,6 +27,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         path: VContainer.${{ env.GIT_TAG }}.unitypackage
+        name: VContainer.${{ env.GIT_TAG }}.unitypackage
 
   create-release:
     needs: [build-unity]
