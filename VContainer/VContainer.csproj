@@ -84,6 +84,7 @@
      <Compile Include="Assets\VContainer\Runtime\Unity\IFactory.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\IInstaller.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\LifetimeScope.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Unity\ParentReference.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopHelper.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopItem.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopRunner.cs" />

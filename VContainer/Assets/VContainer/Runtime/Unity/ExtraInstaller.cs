@@ -1,22 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace VContainer.Unity
 {
-    public readonly struct ExtraInstallationScope : IDisposable
-    {
-        public ExtraInstallationScope(IInstaller installer)
-        {
-            LifetimeScope.EnqueueExtra(installer);
-        }
-
-        void IDisposable.Dispose()
-        {
-            LifetimeScope.RemoveExtra();
-        }
-    }
-
     public sealed class ExtraInstaller : IInstaller, IEnumerable<IInstaller>
     {
         readonly IList<IInstaller> extraInstallers = new List<IInstaller>();

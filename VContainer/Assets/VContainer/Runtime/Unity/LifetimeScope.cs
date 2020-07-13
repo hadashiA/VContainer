@@ -15,34 +15,10 @@ namespace VContainer.Unity
             public void Dispose() => overrideParent = null;
         }
 
-        [Serializable]
-        public struct ParentReference : ISerializationCallbackReceiver
+        public readonly struct ExtraInstallationScope : IDisposable
         {
-            [SerializeField]
-            public string TypeName;
-
-            [NonSerialized]
-            public LifetimeScope Object;
-
-            public Type Type { get; private set; }
-
-            void ISerializationCallbackReceiver.OnBeforeSerialize()
-            {
-                TypeName = Type?.FullName;
-            }
-
-            void ISerializationCallbackReceiver.OnAfterDeserialize()
-            {
-                if (!string.IsNullOrEmpty(TypeName))
-                {
-                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        Type = assembly.GetType(TypeName);
-                        if (Type != null)
-                            break;
-                    }
-                }
-            }
+            public ExtraInstallationScope(IInstaller installer) => EnqueueExtra(installer);
+            void IDisposable.Dispose() => RemoveExtra();
         }
 
         [SerializeField]
@@ -103,25 +79,20 @@ namespace VContainer.Unity
             return null;
         }
 
-        public static void EnqueueExtra(IInstaller installer)
+        static void EnqueueExtra(IInstaller installer)
         {
             lock (SyncRoot)
             {
                 if (extraInstaller != null)
-                {
                     extraInstaller.Add(installer);
-                }
                 else
-                {
                     extraInstaller = new ExtraInstaller { installer };
-                }
             }
         }
 
-        public static void RemoveExtra()
+        static void RemoveExtra()
         {
-            lock (SyncRoot)
-                extraInstaller = null;
+            lock (SyncRoot) extraInstaller = null;
         }
 
         static LifetimeScope LoadProjectRoot()
