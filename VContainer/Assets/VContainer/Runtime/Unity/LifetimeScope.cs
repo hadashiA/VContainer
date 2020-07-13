@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,30 +7,46 @@ using VContainer.Internal;
 
 namespace VContainer.Unity
 {
-    public sealed class LifetimeScope : MonoBehaviour
+    public class LifetimeScope : MonoBehaviour
     {
         public readonly struct ParentOverrideScope : IDisposable
         {
-            public ParentOverrideScope(LifetimeScope nextParent) => OverrideParent = nextParent;
-            public void Dispose() => OverrideParent = null;
+            public ParentOverrideScope(LifetimeScope nextParent) => overrideParent = nextParent;
+            public void Dispose() => overrideParent = null;
         }
 
-        public const string AutoReferenceKey = "__auto__";
+        [Serializable]
+        public struct ParentReference : ISerializationCallbackReceiver
+        {
+            [SerializeField]
+            public string TypeName;
+
+            [NonSerialized]
+            public LifetimeScope Object;
+
+            public Type Type { get; private set; }
+
+            void ISerializationCallbackReceiver.OnBeforeSerialize()
+            {
+                TypeName = Type?.FullName;
+            }
+
+            void ISerializationCallbackReceiver.OnAfterDeserialize()
+            {
+                if (!string.IsNullOrEmpty(TypeName))
+                {
+                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                    {
+                        Type = assembly.GetType(TypeName);
+                        if (Type != null)
+                            break;
+                    }
+                }
+            }
+        }
 
         [SerializeField]
-        MonoInstaller[] monoInstallers = {};
-
-        [SerializeField]
-        ScriptableObjectInstaller[] scriptableObjectInstallers = {};
-
-        [SerializeField]
-        string key = "";
-
-        [SerializeField]
-        public LifetimeScope parent;
-
-        [SerializeField]
-        public string parentKey;
+        public ParentReference parentReference;
 
         [SerializeField]
         bool autoRun = true;
@@ -41,46 +56,46 @@ namespace VContainer.Unity
         public static LifetimeScope ProjectRoot => ProjectRootLazy.Value;
 
         static readonly Lazy<LifetimeScope> ProjectRootLazy = new Lazy<LifetimeScope>(LoadProjectRoot);
-        static readonly ConcurrentDictionary<string, ExtraInstaller> ExtraInstallers = new ConcurrentDictionary<string, ExtraInstaller>();
         static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
 
-        static LifetimeScope OverrideParent;
+        static LifetimeScope overrideParent;
+        static ExtraInstaller extraInstaller;
+        static readonly object SyncRoot = new object();
 
         public static ParentOverrideScope PushParent(LifetimeScope parent) => new ParentOverrideScope(parent);
 
-        public static ExtraInstallationScope Push(Action<IContainerBuilder> installing, string key = "")
-            => new ExtraInstallationScope(new ActionInstaller(installing), key);
+        public static ExtraInstallationScope Push(Action<IContainerBuilder> installing)
+            => new ExtraInstallationScope(new ActionInstaller(installing));
 
-        public static ExtraInstallationScope Push(IInstaller installer, string key = "")
-            => new ExtraInstallationScope(installer, key);
+        public static ExtraInstallationScope Push(IInstaller installer)
+            => new ExtraInstallationScope(installer);
 
-        public static LifetimeScope FindDefault(Scene scene) => FindByKey("", scene);
+        public static LifetimeScope Find<T>(Scene scene) where T : LifetimeScope
+            => Find(typeof(T), scene);
 
-        public static LifetimeScope FindByKey(string key, Scene scene)
+        public static LifetimeScope Find<T>() where T : LifetimeScope
+            => Find(typeof(T));
+
+        static LifetimeScope Find(Type type, Scene scene)
         {
             scene.GetRootGameObjects(GameObjectBuffer);
             foreach (var root in GameObjectBuffer)
             {
-                var others = root.GetComponentsInChildren<LifetimeScope>();
-                foreach (var other in others)
-                {
-                    if (key == other.key)
-                    {
-                        return other;
-                    }
-                }
+                var found = root.GetComponentInChildren(type) as LifetimeScope;
+                if (found != null)
+                    return found;
             }
             return null;
         }
 
-        public static LifetimeScope FindByKey(string key)
+        static LifetimeScope Find(Type type)
         {
             for (var i = 0; i < SceneManager.sceneCount; i++)
             {
                 var scene = SceneManager.GetSceneAt(i);
                 if (scene.isLoaded)
                 {
-                    var result = FindByKey(key, scene);
+                    var result = Find(type, scene);
                     if (result != null)
                         return result;
                 }
@@ -88,21 +103,30 @@ namespace VContainer.Unity
             return null;
         }
 
-        public static void EnqueueExtra(IInstaller installer, string key = "")
+        public static void EnqueueExtra(IInstaller installer)
         {
-            ExtraInstallers.AddOrUpdate(key,
-                new ExtraInstaller { installer },
-                (_, binding) =>
+            lock (SyncRoot)
+            {
+                if (extraInstaller != null)
                 {
-                    binding.Add(installer);
-                    return binding;
-                });
+                    extraInstaller.Add(installer);
+                }
+                else
+                {
+                    extraInstaller = new ExtraInstaller { installer };
+                }
+            }
         }
 
-        public static void RemoveExtra(string key) => ExtraInstallers.TryRemove(key, out _);
+        public static void RemoveExtra()
+        {
+            lock (SyncRoot)
+                extraInstaller = null;
+        }
 
         static LifetimeScope LoadProjectRoot()
         {
+            UnityEngine.Debug.Log($"VContainer try to load {ProjectRootResourcePath}");
             var prefabs = Resources.LoadAll(ProjectRootResourcePath, typeof(GameObject));
             if (prefabs.Length > 1)
             {
@@ -126,33 +150,33 @@ namespace VContainer.Unity
 
         public IObjectResolver Container { get; private set; }
         public LifetimeScope Parent { get; private set; }
-        public string Key => key;
 
         readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<IInstaller> extraInstallers = new List<IInstaller>();
 
-
-        void Awake()
+        protected virtual void Awake()
         {
-          Parent = GetRuntimeParent();
+            Parent = GetRuntimeParent();
             if (autoRun)
             {
                 Build();
             }
         }
 
-        void OnDestroy()
+        protected virtual void OnDestroy()
         {
             disposable.Dispose();
             Container?.Dispose();
         }
 
+        protected virtual void Configure(IContainerBuilder builder)
+        {
+        }
+
         public void Build()
         {
             if (Parent == null)
-            {
                 Parent = GetRuntimeParent();
-            }
 
             if (Parent != null)
             {
@@ -170,7 +194,7 @@ namespace VContainer.Unity
             DispatchPlayerLoopItems();
         }
 
-        public LifetimeScope CreateChild(string childKey = null, IInstaller installer = null)
+        public LifetimeScope CreateChild(IInstaller installer = null)
         {
             var childGameObject = new GameObject("LifeTimeScope (Child)");
             childGameObject.SetActive(false);
@@ -180,19 +204,18 @@ namespace VContainer.Unity
             {
                 child.extraInstallers.Add(installer);
             }
-            child.parent = this;
-            child.key = childKey;
+            child.parentReference.Object = this;
             childGameObject.SetActive(true);
             return child;
         }
 
-        public LifetimeScope CreateChild(string childKey = null, Action<IContainerBuilder> installation = null)
+        public LifetimeScope CreateChild(Action<IContainerBuilder> installation = null)
         {
             if (installation != null)
             {
-                return CreateChild(childKey, new ActionInstaller(installation));
+                return CreateChild(new ActionInstaller(installation));
             }
-            return CreateChild(childKey, (IInstaller)null);
+            return CreateChild((IInstaller)null);
         }
 
         public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
@@ -207,7 +230,7 @@ namespace VContainer.Unity
             {
                 child.extraInstallers.Add(installer);
             }
-            child.parent = this;
+            child.parentReference.Object = this;
             if (!child.gameObject.activeSelf)
             {
                 child.gameObject.SetActive(true);
@@ -226,46 +249,39 @@ namespace VContainer.Unity
 
         void InstallTo(IContainerBuilder builder)
         {
-            foreach (var installer in monoInstallers)
-            {
-                installer.Install(builder);
-            }
-
-            foreach (var installer in scriptableObjectInstallers)
-            {
-                installer.Install(builder);
-            }
+            Configure(builder);
 
             foreach (var installer in extraInstallers)
             {
                 installer.Install(builder);
             }
 
-            if (ExtraInstallers.TryRemove(key, out var extraInstaller))
+            ExtraInstaller extraInstaller;
+            lock (SyncRoot)
             {
-                extraInstaller.Install(builder);
+                extraInstaller = LifetimeScope.extraInstaller;
             }
-
+            extraInstaller?.Install(builder);
             Container = builder.Build();
         }
 
         LifetimeScope GetRuntimeParent()
         {
-            var nextParent = OverrideParent;
+            var nextParent = overrideParent;
             if (nextParent != null)
                 return nextParent;
 
-            if (parent != null)
-                return parent;
+            if (parentReference.Object != null)
+                return parentReference.Object;
 
-            if (!string.IsNullOrEmpty(parentKey) && parentKey != key)
+            if (parentReference.Type != null && parentReference.Type != GetType())
             {
-                var found = FindByKey(parentKey);
+                var found = Find(parentReference.Type);
                 if (found != null)
                 {
                     return found;
                 }
-                throw new VContainerException(null, $"LifetimeScope parent key `{parentKey}` is not found in any scene");
+                throw new VContainerException(null, $"LifetimeScope parent `{parentReference.Type.FullName}` is not found in any scene");
             }
 
             if (ProjectRoot != null && ProjectRoot != this)

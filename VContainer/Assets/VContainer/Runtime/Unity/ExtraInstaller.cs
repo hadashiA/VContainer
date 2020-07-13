@@ -6,17 +6,14 @@ namespace VContainer.Unity
 {
     public readonly struct ExtraInstallationScope : IDisposable
     {
-        readonly string key;
-
-        public ExtraInstallationScope(IInstaller installer, string key = "")
+        public ExtraInstallationScope(IInstaller installer)
         {
-            this.key = key;
-            LifetimeScope.EnqueueExtra(installer, key);
+            LifetimeScope.EnqueueExtra(installer);
         }
 
         void IDisposable.Dispose()
         {
-            LifetimeScope.RemoveExtra(key);
+            LifetimeScope.RemoveExtra();
         }
     }
 

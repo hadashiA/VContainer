@@ -10,9 +10,9 @@ namespace VContainer.Editor
             "using VContainer;\n" +
             "using VContainer.Unity;\n" +
             "\n" +
-            "public sealed class #SCRIPTNAME# : MonoInstaller\n" +
+            "public sealed class #SCRIPTNAME# : LifetimeScope\n" +
             "{\n" +
-            "    public override void Install(IContainerBuilder builder)\n" +
+            "    protected override void Configure(IContainerBuilder builder)\n" +
             "    {\n" +
             "    }\n" +
             "}\n";
@@ -39,7 +39,7 @@ namespace VContainer.Editor
             }
 
             var fullPath = Path.Combine(Application.dataPath, scriptPath);
-            if (scriptPath.EndsWith("Installer.cs"))
+            if (scriptPath.EndsWith("LifetimeScope.cs"))
             {
                 var content = MonoInstallerTemplate.Replace("#SCRIPTNAME#", basename);
                 File.WriteAllText(fullPath, content);
