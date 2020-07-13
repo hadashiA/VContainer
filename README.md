@@ -29,7 +29,7 @@ Following is a deep profiler Unity result sample.
 
 ![](docs/screenshot_profiler_zenject.png)
 
-## Changes to v0.1.0
+## Breaking Changes to v0.1.x
 
 - From 0.0.x, the API of LifetimeScope has changed.
   - [Obsolete MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
@@ -220,7 +220,9 @@ using VContainer.Unity;
 
 Now, `Tick()` will be executed at the timing of Unity's Update.
 
-As such, it's a good practice to keep any side effect entry points through the marker interface.
+As such, it's a good practice to keep any side effect entry points through the marker interface.  
+
+( By design, for MonoBehaviour is enough to use Start / Update etc. The marker interface of VContainer is a function to separate the entry point of domain logic and presentation logic. )
 
 We should register this as running on Unity's life cycle events.
 
@@ -230,8 +232,8 @@ We should register this as running on Unity's life cycle events.
 ```
 
 Note:
-- `RegisterEntryPoint<GamePresenter>` is an alias to register interfaces related to Unity's PlayerLoop event. ( Simular to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
-- Registering lifecycle events without relying on MonoBehaciour facilitates decupling of domain logic and presentation !
+- `RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)` is an alias to register interfaces related to Unity's PlayerLoop event. ( Simular to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
+- Registering lifecycle events without relying on MonoBehaviour facilitates decupling of domain logic and presentation !
 
 If you have multiple EntryPoints, you can also use the following declaration as grouping.
 
@@ -1000,9 +1002,9 @@ To reduce main thread blocking time for your game:
 For example:
 
 ```csharp
-await LoadSceneAsync(...);
+var nextScene = await LoadSceneAsync(...);
 
-var lifetimeScope = LifetimeScope.FindDefault();
+var lifetimeScope = LifetimeScope.Find<MyLifetimeScope>(nextScene.Scene);
 
 // Your async solution here.
 await UniTask.Run(() => lifetimeScope.Build());
