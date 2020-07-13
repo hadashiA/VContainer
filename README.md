@@ -29,7 +29,7 @@ Following is a deep profiler Unity result sample.
 
 ![](docs/screenshot_profiler_zenject.png)
 
-## Changes to v0.1.x
+## Breaking Changes to v0.1.x
 
 - From 0.0.x, the API of LifetimeScope has changed.
   - [Obsolete MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
