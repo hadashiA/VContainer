@@ -220,7 +220,9 @@ using VContainer.Unity;
 
 Now, `Tick()` will be executed at the timing of Unity's Update.
 
-As such, it's a good practice to keep any side effect entry points through the marker interface.
+As such, it's a good practice to keep any side effect entry points through the marker interface.  
+
+( By design, for MonoBehaviour is enough to use Start / Update etc. The marker interface of VContainer is a function to separate the entry point of domain logic and presentation logic. )
 
 We should register this as running on Unity's life cycle events.
 
@@ -230,8 +232,8 @@ We should register this as running on Unity's life cycle events.
 ```
 
 Note:
-- `RegisterEntryPoint<GamePresenter>` is an alias to register interfaces related to Unity's PlayerLoop event. ( Simular to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
-- Registering lifecycle events without relying on MonoBehaciour facilitates decupling of domain logic and presentation !
+- `RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)` is an alias to register interfaces related to Unity's PlayerLoop event. ( Simular to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
+- Registering lifecycle events without relying on MonoBehaviour facilitates decupling of domain logic and presentation !
 
 If you have multiple EntryPoints, you can also use the following declaration as grouping.
 
