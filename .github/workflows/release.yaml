@@ -23,6 +23,7 @@ jobs:
       with:
         package-path: VContainer.${{ env.GIT_TAG }}.unitypackage
         include-files: VContainer/metaList
+        project-folder: ./VContainer
     - uses: actions/upload-artifact@v2
       with:
         path: VContainer.${{ env.GIT_TAG }}.unitypackage
@@ -31,27 +32,27 @@ jobs:
     needs: [build-unity]
     runs-on: ubuntu-latest
     steps:
-      - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
+    - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
 
-      # Create Releases
-      - uses: actions/create-release@v1
-        id: create_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Ver.${{ github.ref }}
-          draft: true
+    # Create Releases
+    - uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Ver.${{ github.ref }}
+        draft: true
 
-      # Download(All) Artifacts to current directory
-      - uses: actions/download-artifact@v2-preview
+    # Download(All) Artifacts to current directory
+    - uses: actions/download-artifact@v2-preview
 
-      # Upload to Releases(unitypackage)
-      - uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./VContainer.${{ env.GIT_TAG }}.unitypackage
-          asset_name: VContainer.${{ env.GIT_TAG }}.unitypackage
-          asset_content_type: application/octet-stream
+    # Upload to Releases(unitypackage)
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./VContainer.${{ env.GIT_TAG }}.unitypackage
+        asset_name: VContainer.${{ env.GIT_TAG }}.unitypackage
+        asset_content_type: application/octet-stream
