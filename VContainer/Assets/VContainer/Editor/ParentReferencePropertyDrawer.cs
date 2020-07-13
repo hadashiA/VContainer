@@ -6,7 +6,7 @@ using VContainer.Unity;
 
 namespace VContainer.Editor
 {
-    [CustomPropertyDrawer(typeof(LifetimeScope.ParentReference))]
+    [CustomPropertyDrawer(typeof(ParentReference))]
     public sealed class ParentReferencePropertyDrawer : PropertyDrawer
     {
         static string[] GetAllTypeNames()
