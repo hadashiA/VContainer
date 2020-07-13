@@ -152,7 +152,7 @@ Note:
 
 Right Click inside the Hierarchy tab and select **Create Empty**. And name `GameLifetimeScope` it.
 
-Then attach your LifetimeScope.
+Then attach the Component created above.
 
 ![](docs/screenshot_gamelifetimescope.png)
 
@@ -707,7 +707,7 @@ builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name")
 
 ### ScriptableObject Integration
 
-It is useful to register the setting information saved as Asset as follows.
+It is useful to register the setting information saved as ScriptableObject Asset as follows.
 
 ```csharp
 [Serializable]
@@ -740,7 +740,7 @@ public class GameSettings : ScriptableObject
 
 And
 - Create `GameSettings` assets from menu.
-- Attach any `LifetimeScope` it.
+- Register the created asset with LifetimeScope.
 
 ```csharp
 public class SomeLifetimeScope : LifetimeScope
@@ -805,9 +805,9 @@ using (LifetimeScope.PushParent(parent))
 }
 ```
 
-#### How to pre-set the parent of a scene using a key
+#### How to pre-set the parent of a scene to scene
 
-`LifetimeScope` can be serialized with the parent type in any other scene specified.
+`LifetimeScope` can be serialized by specifying the type of parent in other scenes.
 
 In base scene.
 
