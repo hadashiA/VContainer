@@ -1,6 +1,10 @@
 using System;
 using UnityEngine;
 
+#if VCONTAINER_ECS_INTEGRATION
+using Unity.Entities;
+#endif
+
 namespace VContainer.Unity
 {
     public readonly struct EntryPointsBuilder
@@ -132,5 +136,15 @@ namespace VContainer.Unity
             return registrationBuilder;
         }
 
+#if VCONTAINER_ECS_INTEGRATION
+        public static RegistrationBuilder RegisterSystemFromDefaultWorld<T>(this IContainerBuilder builder)
+            where T : ComponentSystemBase
+        {
+            var system = World.DefaultGameObjectInjectionWorld.GetExistingSystem<T>();
+            return builder.RegisterInstance(system)
+                .As(typeof(ComponentSystemBase))
+                .AsSelf();
+        }
+#endif
     }
 }

@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Internal;
 
+#if VCONTAINER_ECS_INTEGRATION
+using Unity.Entities;
+#endif
+
 namespace VContainer.Unity
 {
     public class LifetimeScope : MonoBehaviour
@@ -363,6 +367,16 @@ namespace VContainer.Unity
             catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<MonoBehaviour>))
             {
             }
+
+#if VCONTAINER_ECS_INTEGRATION
+            try
+            {
+                var _ = Container.Resolve<ComponentSystemBase>();
+            }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(ComponentSystemBase))
+            {
+            }
+#endif
         }
     }
 }
