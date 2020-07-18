@@ -371,9 +371,25 @@ namespace VContainer.Unity
 #if VCONTAINER_ECS_INTEGRATION
             try
             {
-                var _ = Container.Resolve<ComponentSystemBase>();
+                var _ = Container.Resolve<IEnumerable<ComponentSystemBase>>();
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(ComponentSystemBase))
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ComponentSystemBase>))
+            {
+            }
+
+            try
+            {
+                var worlds = Container.Resolve<IEnumerable<World>>();
+                foreach (var world in worlds)
+                {
+                    if (!ScriptBehaviourUpdateOrder.IsWorldInPlayerLoop(world))
+                    {
+                        ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world);
+                    }
+                }
+
+            }
+            catch (VContainerException ex) when (ex.InvalidType == typeof(IEnumerable<World>))
             {
             }
 #endif

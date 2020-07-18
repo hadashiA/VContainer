@@ -78,13 +78,13 @@ namespace VContainer
 
         public void Add(IRegistration registration)
         {
-            foreach (var x in registrations)
-            {
-                if (x.ImplementationType == registration.ImplementationType)
-                {
-                    throw new VContainerException(registration.ImplementationType, $"Conflict implementation type : {registration}");
-                }
-            }
+            // foreach (var x in registrations)
+            // {
+            //     if (x.ImplementationType == registration.ImplementationType)
+            //     {
+            //         throw new VContainerException(registration.ImplementationType, $"Conflict implementation type : {registration}");
+            //     }
+            // }
             registrations.Add(registration);
         }
 

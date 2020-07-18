@@ -137,13 +137,43 @@ namespace VContainer.Unity
         }
 
 #if VCONTAINER_ECS_INTEGRATION
+
+        // Use exisiting world
+
         public static RegistrationBuilder RegisterSystemFromDefaultWorld<T>(this IContainerBuilder builder)
             where T : ComponentSystemBase
+            => RegisterSystemFromWorld<T>(builder, World.DefaultGameObjectInjectionWorld);
+
+        public static RegistrationBuilder RegisterSystemFromWorld<T>(this IContainerBuilder builder, World world)
+            where T : ComponentSystemBase
         {
-            var system = World.DefaultGameObjectInjectionWorld.GetExistingSystem<T>();
+            var system = world.GetExistingSystem<T>();
+            if (system is null)
+                throw new ArgumentException($"{typeof(T).FullName} is not in the world {world}");
+
             return builder.RegisterInstance(system)
                 .As(typeof(ComponentSystemBase))
                 .AsSelf();
+        }
+
+        // Use custom world
+
+        public static RegistrationBuilder RegisterNewWorld(
+            this IContainerBuilder builder,
+            string name,
+            Lifetime lifetime)
+        {
+            return builder.Register(new WorldRegistrationBuilder(name, lifetime));
+        }
+
+        public static SystemRegistrationBuilder RegisterSystemIntoWorld<T>(
+            this IContainerBuilder builder,
+            string worldName)
+            where T : ComponentSystemBase
+        {
+            var registrationBuilder = new SystemRegistrationBuilder(typeof(T), worldName);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
         }
 #endif
     }
