@@ -180,6 +180,16 @@ namespace VContainer.Unity
             builder.Register(registrationBuilder);
             return registrationBuilder;
         }
+
+        public static SystemRegistrationBuilder RegisterSystemIntoDefaultWorld<T>(this IContainerBuilder builder)
+            where T : ComponentSystemBase
+        {
+            var registrationBuilder = new SystemRegistrationBuilder(typeof(T), null)
+                .IntoGroup<SimulationSystemGroup>();
+
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
 #endif
     }
 }

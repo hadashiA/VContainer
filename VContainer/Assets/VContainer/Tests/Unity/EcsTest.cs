@@ -47,6 +47,18 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void RegisterSystemIntoDefaultWorld()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+            builder.RegisterSystemIntoDefaultWorld<SystemB>();
+
+            var container = builder.Build();
+            var system = container.Resolve<SystemB>();
+            Assert.That(system.World, Is.EqualTo(World.DefaultGameObjectInjectionWorld));
+        }
+
+        [Test]
         public void RegisterNewWorld()
         {
             var builder = new ContainerBuilder();

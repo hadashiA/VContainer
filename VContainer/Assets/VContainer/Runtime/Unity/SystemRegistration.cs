@@ -62,6 +62,9 @@ namespace VContainer.Unity
 
         World GetWorld(IObjectResolver resolver)
         {
+            if (worldName is null && World.DefaultGameObjectInjectionWorld != null)
+                return World.DefaultGameObjectInjectionWorld;
+
             var worlds = resolver.Resolve<IEnumerable<World>>();
             foreach (var world in worlds)
             {
