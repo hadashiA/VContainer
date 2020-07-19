@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Internal;
@@ -27,11 +26,6 @@ namespace VContainer.Unity
         [SerializeField]
         bool autoRun = true;
 
-        public const string ProjectRootResourcePath = "ProjectLifetimeScope";
-
-        public static LifetimeScope ProjectRoot => ProjectRootLazy.Value;
-
-        static readonly Lazy<LifetimeScope> ProjectRootLazy = new Lazy<LifetimeScope>(LoadProjectRoot);
         static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
 
         static LifetimeScope overrideParent;
@@ -93,30 +87,6 @@ namespace VContainer.Unity
         static void RemoveExtra()
         {
             lock (SyncRoot) extraInstaller = null;
-        }
-
-        static LifetimeScope LoadProjectRoot()
-        {
-            UnityEngine.Debug.Log($"VContainer try to load {ProjectRootResourcePath}");
-            var prefabs = Resources.LoadAll(ProjectRootResourcePath, typeof(GameObject));
-            if (prefabs.Length > 1)
-            {
-                throw new VContainerException(null, $"{ProjectRootResourcePath} resource is duplicated!");
-            }
-
-            var prefab = (GameObject)prefabs.FirstOrDefault();
-            if (prefab == null)
-            {
-                return null;
-            }
-
-            if (prefab.activeSelf)
-            {
-                prefab.SetActive(false);
-            }
-            var gameObject = Instantiate(prefab);
-            DontDestroyOnLoad(gameObject);
-            return gameObject.GetComponent<LifetimeScope>();
         }
 
         public IObjectResolver Container { get; private set; }
@@ -255,13 +225,13 @@ namespace VContainer.Unity
                 throw new VContainerException(null, $"LifetimeScope parent `{parentReference.Type.FullName}` is not found in any scene");
             }
 
-            if (ProjectRoot != null && ProjectRoot != this)
+            if (LifetimeScopeSettings.Instance is LifetimeScopeSettings settings)
             {
-                if (!ProjectRoot.gameObject.activeSelf)
+                if (settings.rootLifetimeScope.Container is null)
                 {
-                    ProjectRoot.gameObject.SetActive(true);
+                    settings.rootLifetimeScope.Build();
                 }
-                return ProjectRoot;
+                return settings.rootLifetimeScope;
             }
             return null;
         }
