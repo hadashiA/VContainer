@@ -1,3 +1,4 @@
+#if VCONTAINER_ECS_INTEGRATION
 using System;
 using System.Collections.Generic;
 using Unity.Entities;
@@ -71,3 +72,4 @@ namespace VContainer.Unity
         }
     }
 }
+#endif
