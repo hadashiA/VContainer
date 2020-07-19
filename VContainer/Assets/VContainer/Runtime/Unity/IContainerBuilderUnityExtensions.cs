@@ -138,22 +138,45 @@ namespace VContainer.Unity
 
 #if VCONTAINER_ECS_INTEGRATION
 
-        public readonly struct SystemsBuilder
+        public readonly struct NewWorldBuilder
         {
             readonly IContainerBuilder containerBuilder;
-            readonly Lifetime lifetime;
+            readonly string worldName;
+            readonly Lifetime worldLifetime;
 
-            public SystemsBuilder(IContainerBuilder containerBuilder, Lifetime lifetime)
+            public NewWorldBuilder(IContainerBuilder containerBuilder, string worldName, Lifetime worldLifetime)
             {
                 this.containerBuilder = containerBuilder;
-                this.lifetime = lifetime;
+                this.worldName = worldName;
+                this.worldLifetime = worldLifetime;
+
+                containerBuilder.RegisterNewWorld(worldName, worldLifetime);
             }
 
-            public RegistrationBuilder Add<T>()
-                => containerBuilder.Register<T>(lifetime).AsImplementedInterfaces();
+            public SystemRegistrationBuilder Add<T>() where T : ComponentSystemBase
+                => containerBuilder.RegisterSystemIntoWorld<T>(worldName);
+        }
+
+        public readonly struct DefaultWorldBuilder
+        {
+            readonly IContainerBuilder containerBuilder;
+
+            public DefaultWorldBuilder(IContainerBuilder containerBuilder)
+            {
+                this.containerBuilder = containerBuilder;
+            }
+
+            public RegistrationBuilder Add<T>() where T : ComponentSystemBase
+                => containerBuilder.RegisterSystemFromDefaultWorld<T>();
         }
 
         // Use exisiting world
+
+        public static void UseDefaultWorld(this IContainerBuilder builder, Action<DefaultWorldBuilder> configuration)
+        {
+            var systems = new DefaultWorldBuilder(builder);
+            configuration(systems);
+        }
 
         public static RegistrationBuilder RegisterSystemFromDefaultWorld<T>(this IContainerBuilder builder)
             where T : ComponentSystemBase
@@ -172,6 +195,16 @@ namespace VContainer.Unity
         }
 
         // Use custom world
+
+        public static void UseNewWorld(
+            this IContainerBuilder builder,
+            string worldName,
+            Lifetime lifetime,
+            Action<NewWorldBuilder> configuration)
+        {
+            var systems = new NewWorldBuilder(builder, worldName, lifetime);
+            configuration(systems);
+        }
 
         public static RegistrationBuilder RegisterNewWorld(
             this IContainerBuilder builder,

@@ -1015,6 +1015,21 @@ builder.RegisterInstance(settings);
 // ...
 ```
 
+You can use grouping alias:
+
+```
+// Grouping registrations
+builder.UseDefaultWorld(systems =>
+{
+    systems.Add<SystemA>();
+    
+    // systems.Add<SystemB>();
+    // systems.Add<SystemC>();
+    // ...
+});
+```
+
+
 Internaly, this is an automation of the following processes:
 
 ```csharp
@@ -1070,6 +1085,21 @@ builder.RegisterSystemIntoWorld<SystemA>("My World 1");
 builder.Register<ServiceA>(Lifetime.Singleton);
 // ...
 ```
+
+You can also use grouping alias:
+
+```
+// Grouping registrations
+builder.UseNewWorld("My World 1", Lifetime.Scoped, systems =>
+{
+    systems.Add<SystemA>();
+    
+    // systems.Add<SystemB>();
+    // systems.Add<SystemC>();
+    // ...
+});
+```
+
 
 Internaly, If you register World using the above method, the following setup will be performed automatically:
 
