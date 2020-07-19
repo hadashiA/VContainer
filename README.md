@@ -11,6 +11,7 @@
 - Extra small code size. Few internal types.
 - Application can freely create nested Lifetime Scope
 - Dispatch your custom types to Unity's PlayerLoopSystem. (It is greatly influenced by Zenject)
+- ECS Integration
 - Immutable Container.
 
 ![](docs/unity_performance_test_result.png)
@@ -44,6 +45,7 @@ Following is a deep profiler Unity result sample.
 - [Registering](#registering)
 - [Controlling Scope and Lifetime](#controlling-scope-and-lifetime)
 - [Dispatching Unity Lifecycle](#dispatching-unity-lifecycle)
+- [Integrating with ECS](#integrating-with-ecs)
 - [Optimization](#optimization)
 - [Best Practices and Recommendations](#best-practices-and-recommendations)
 
@@ -957,6 +959,185 @@ And
 
 Note:
 - [Unity - Manual: Order of Execution for Event Functions](https://docs.unity3d.com/Manual/ExecutionOrder.html)
+
+## Integrating with ECS
+
+VContainer supports integration between Unity's ECS (Entity Component System) and regular C# World.
+
+:warning: Currently, this feature requires Unity 2019.3 or later versions.
+
+As you know, ECS manages data as tightly controlled, unmanaged chunks.
+On the other hand, the `System` that describes the data functions is designed as a regular C# class.
+
+VContainer focuses on providing DI pattern initialization/setup feature for this `System`.
+
+### Setup
+
+ECS support for VContainer is enabled if the project has the `com.unity.entities` package installed.
+
+- Currently, ECS is a preview version. You may need the settings: `[Windows] -> [Package Manager]` and `[Advanced] -> [Show preview packages]`.
+- Select package of `Entities` and Press `Install`.
+
+If the `com.unity.entities` package exists, the `VCONTAINER_ECS_INTEGRATION` symbol is defined and the following features are enabled.
+
+
+### When using Unity's default World
+
+By default, ECS will automatically add and run classes that inherits the `ComponentSystemBase` defined on your project into the default World.
+
+In this mode you can use method injection to System.
+( The constructor is automatically used by Unity, so it cannot be used.)
+
+```csharp
+class SystemA : SystemBase
+{
+    [Inject]
+    public void Construct(Settings settings)
+    {
+        // ...
+    }
+    
+    protected override void OnUpdate()
+    {
+        // ...
+    }
+    
+}
+```
+
+```csharp
+// Inject the `System`
+builder.RegisterSystemFromDefaultWorld<SystemA>();
+
+// Other Register declarations can be injected into the System.
+// ...
+builder.RegisterInstance(settings);
+// ...
+```
+
+Internaly, this is an automation of the following processes:
+
+```csharp
+var system = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SystemA>();
+system.Construct(settings);
+```
+
+Note:
+- In default (If `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP is **not** used), the group to which System belongs can be controlled by Attribute.
+
+
+## When to use your custom world
+
+ECS also allows you to create and register your own system.
+
+There are two ways to disable Unity's automatic system generation.
+
+- By setting the define symbol `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` will disable all World, System auto-generation.
+- By adding the `[DisableAutoCreation]` attribute to the class definition, the automatic generation of that System will be disabled.
+
+For Systems that have auto-generation disabled, constructor injection can be used. 
+
+```csharp
+public class SystemA : SystemBase
+{
+    readonly ServiceA serviceA;
+
+    public SampleSystem(ServiceA serviceA)
+    {
+        this.serviceA = serviceA;
+    }
+
+    protected override void OnUpdate()
+    {
+        // ...
+    }
+}
+```
+
+World is required to run this System, but if `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` is set, you need to set up World yourself.
+
+VContainer supports World management.
+
+```
+// Register of new World under the control of VContainer.
+builder.RegisterNewWorld("My World 1", Lifetime.Scoped);
+
+// Register the System to be added to the specified World.
+builder.RegisterSystemIntoWorld<SystemA>("My World 1");
+
+// Other Register declarations can be injected into the System.
+// ...
+builder.Register<ServiceA>(Lifetime.Singleton);
+// ...
+```
+
+Internaly, If you register World using the above method, the following setup will be performed automatically:
+
+```csharp
+var world = new World("My World 1");
+
+world.CreateSystem<InitializationSystemGroup>();
+world.CreateSystem<SimulationSystemGroup>();
+world.CreateSystem<PresentationSystemGroup>();
+
+ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world, PlayerLoop.GetCurrentPlayerLoop());
+
+// ...
+
+var systemA = new SystemA(new ServiceA());
+world.AddSystem(systemA);
+
+var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystem<SimulationSystemGroup>();
+systemGroup.AddSystemToUpdateList(systemA);
+
+// ...
+
+foreach (var system in world.Systems)
+{
+    if (system is ComponentSystemGroup group)
+        group.SortSystems();
+}
+```
+
+Note:
+- Currently, VContainer is registering the World using `ScriptBehaviourUpdateOrder.UpdatePlayerLoop`.
+- This is an alias that registers 3 SystemGroups to PlayerLoop, so VContainer also creates these SystemGroups.
+
+
+By default, VContainer will register System to `SimulationSystemGroup`.
+
+If you want to change this, you can use:
+
+```
+builder.RegisterSystemIntoWorld<SystemA>("My World 1")
+    .IntoGroup<PresentationSystemGroup>();
+```
+
+`RegisterNewWorld(...)` can accept Lifetime as an argument.  
+If `Lifetime.Scoped` is specified, when the scope is destroyed, Dispose of all the systems belonging to that World will be called.
+
+```csharp
+public class SystemA : SystemBase, IDisposable
+{
+    protected override void OnUpdate()
+    {
+        // ...
+    }
+    
+    // Called when scope is disposed.
+    public void Dispose()
+    {
+        // ...
+    }
+}
+```
+
+```
+builder.RegisterNewWorld("My World 1", Lifetime.Scoped);
+builder.RegisterSystemIntoWorld("My World 1");
+```
+
+
 
 ## Comparing VContainer to Zenject
 

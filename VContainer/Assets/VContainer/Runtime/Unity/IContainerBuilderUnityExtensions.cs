@@ -138,6 +138,21 @@ namespace VContainer.Unity
 
 #if VCONTAINER_ECS_INTEGRATION
 
+        public readonly struct SystemsBuilder
+        {
+            readonly IContainerBuilder containerBuilder;
+            readonly Lifetime lifetime;
+
+            public SystemsBuilder(IContainerBuilder containerBuilder, Lifetime lifetime)
+            {
+                this.containerBuilder = containerBuilder;
+                this.lifetime = lifetime;
+            }
+
+            public RegistrationBuilder Add<T>()
+                => containerBuilder.Register<T>(lifetime).AsImplementedInterfaces();
+        }
+
         // Use exisiting world
 
         public static RegistrationBuilder RegisterSystemFromDefaultWorld<T>(this IContainerBuilder builder)

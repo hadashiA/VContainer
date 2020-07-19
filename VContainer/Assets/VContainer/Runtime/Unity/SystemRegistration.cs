@@ -51,7 +51,6 @@ namespace VContainer.Unity
                 if (systemGroupType != null)
                 {
                     var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystem(systemGroupType);
-                    systemGroup.SortSystems();
                     systemGroup.AddSystemToUpdateList(instance);
                 }
 
