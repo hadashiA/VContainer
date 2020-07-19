@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using VContainer.Internal;
-#if VCONTAINER_ECS_INTEGRATION
-using Unity.Entities;
-using VContainer.Unity;
-#endif
 
 namespace VContainer
 {
@@ -78,12 +74,7 @@ namespace VContainer
                     var lazy = sharedInstances.GetOrAdd(registration, createInstance);
                     if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable)
                     {
-#if VCONTAINER_ECS_INTEGRATION
-                        if (lazy.Value is World world)
-                            disposables.Add(new WorldDisposable(world));
-                        else
-#endif
-                            disposables.Add(disposable);
+                        disposables.Add(disposable);
                     }
                     return lazy.Value;
                 default:

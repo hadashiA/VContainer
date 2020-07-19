@@ -78,7 +78,8 @@ namespace VContainer.Tests.Unity
 
             var container = builder.Build();
             var system = container.Resolve<SystemB>();
-            var world = container.Resolve<World>();
+            var worldHelper = container.Resolve<WorldConfigurationHelper>();
+            var world = worldHelper.World;
 
             Assert.That(world.IsCreated, Is.True);
             Assert.That(system.World, Is.EqualTo(world));

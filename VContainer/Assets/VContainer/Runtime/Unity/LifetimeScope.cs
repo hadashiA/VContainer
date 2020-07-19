@@ -381,17 +381,13 @@ namespace VContainer.Unity
 
             try
             {
-                var worlds = Container.Resolve<IEnumerable<World>>();
-                foreach (var world in worlds)
+                var worldHelpers = Container.Resolve<IEnumerable<WorldConfigurationHelper>>();
+                foreach (var x in worldHelpers)
                 {
-                    foreach (var system in world.Systems)
-                    {
-                        if (system is ComponentSystemGroup group)
-                            group.SortSystems();
-                    }
+                    x.SortSystems();
                 }
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<World>))
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<WorldConfigurationHelper>))
             {
             }
 #endif

@@ -160,11 +160,13 @@ namespace VContainer.Unity
 
         public static RegistrationBuilder RegisterNewWorld(
             this IContainerBuilder builder,
-            string name,
+            string worldName,
             Lifetime lifetime,
             Action<World> configuration = null)
         {
-            return builder.Register(new WorldRegistrationBuilder(name, lifetime, configuration));
+            builder.Register<WorldConfigurationHelper>(lifetime)
+                .WithParameter(typeof(string), worldName);
+            return builder.Register(new WorldRegistrationBuilder(worldName, lifetime, configuration));
         }
 
         public static SystemRegistrationBuilder RegisterSystemIntoWorld<T>(
