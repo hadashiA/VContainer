@@ -161,9 +161,10 @@ namespace VContainer.Unity
         public static RegistrationBuilder RegisterNewWorld(
             this IContainerBuilder builder,
             string name,
-            Lifetime lifetime)
+            Lifetime lifetime,
+            Action<World> configuration = null)
         {
-            return builder.Register(new WorldRegistrationBuilder(name, lifetime));
+            return builder.Register(new WorldRegistrationBuilder(name, lifetime, configuration));
         }
 
         public static SystemRegistrationBuilder RegisterSystemIntoWorld<T>(
@@ -171,7 +172,9 @@ namespace VContainer.Unity
             string worldName)
             where T : ComponentSystemBase
         {
-            var registrationBuilder = new SystemRegistrationBuilder(typeof(T), worldName);
+            var registrationBuilder = new SystemRegistrationBuilder(typeof(T), worldName)
+                .IntoGroup<SimulationSystemGroup>();
+
             builder.Register(registrationBuilder);
             return registrationBuilder;
         }

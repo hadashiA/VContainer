@@ -36,7 +36,7 @@ namespace VContainer.Unity
                 systemGroupType);
         }
 
-        public SystemRegistrationBuilder IntoSystemGroup<T>() where T : ComponentSystemGroup
+        public SystemRegistrationBuilder IntoGroup<T>() where T : ComponentSystemGroup
         {
             systemGroupType = typeof(T);
             return this;

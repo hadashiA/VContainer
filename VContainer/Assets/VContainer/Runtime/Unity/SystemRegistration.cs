@@ -46,6 +46,14 @@ namespace VContainer.Unity
             {
                 instance = (ComponentSystemBase)injector.CreateInstance(resolver, parameters);
                 world.AddSystem(instance);
+
+                if (systemGroupType != null)
+                {
+                    var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystem(systemGroupType);
+                    systemGroup.SortSystems();
+                    systemGroup.AddSystemToUpdateList(instance);
+                }
+
                 return instance;
             }
             return world.GetExistingSystem(ImplementationType);

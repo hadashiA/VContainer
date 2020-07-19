@@ -1,8 +1,9 @@
+#if VCONTAINER_ECS_INTEGRATION
 using System;
 using System.Collections.Generic;
 using Unity.Entities;
+using UnityEngine.LowLevel;
 
-#if VCONTAINER_ECS_INTEGRATION
 namespace VContainer.Unity
 {
     public sealed class WorldRegistration : IRegistration
@@ -12,27 +13,30 @@ namespace VContainer.Unity
         public Lifetime Lifetime { get; }
 
         readonly string name;
-        readonly Action<World> configuration;
+        readonly Action<World> initialization;
 
-        public WorldRegistration(string name, Lifetime lifetime, Action<World> configuration = null)
+        public WorldRegistration(string name, Lifetime lifetime, Action<World> initialization = null)
         {
             ImplementationType = typeof(World);
             Lifetime = lifetime;
 
             this.name = name;
-            this.configuration = configuration;
+            this.initialization = initialization;
         }
 
         public object SpawnInstance(IObjectResolver resolver)
         {
             var world = new World(name);
-            if (configuration != null)
+            if (initialization != null)
             {
-                configuration(world);
+                initialization(world);
             }
             else
             {
-                ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world);
+                world.CreateSystem<InitializationSystemGroup>();
+                world.CreateSystem<SimulationSystemGroup>();
+                world.CreateSystem<PresentationSystemGroup>();
+                ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world, PlayerLoop.GetCurrentPlayerLoop());
             }
             return world;
         }

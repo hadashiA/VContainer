@@ -90,6 +90,7 @@
      <Compile Include="Assets\VContainer\Runtime\Unity\PlayerLoopRunner.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\SystemRegistration.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\SystemRegistrationBuilder.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Unity\WorldDisposable.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\WorldRegistration.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\WorldRegistrationBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\VContainerException.cs" />

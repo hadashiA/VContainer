@@ -272,6 +272,8 @@ namespace VContainer.Unity
 
         void DispatchPlayerLoopItems()
         {
+            PlayerLoopHelper.Initialize();
+
             try
             {
                 var markers = Container.Resolve<IEnumerable<IInitializable>>();
@@ -382,14 +384,14 @@ namespace VContainer.Unity
                 var worlds = Container.Resolve<IEnumerable<World>>();
                 foreach (var world in worlds)
                 {
-                    if (!ScriptBehaviourUpdateOrder.IsWorldInPlayerLoop(world))
+                    foreach (var system in world.Systems)
                     {
-                        ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world);
+                        if (system is ComponentSystemGroup group)
+                            group.SortSystems();
                     }
                 }
-
             }
-            catch (VContainerException ex) when (ex.InvalidType == typeof(IEnumerable<World>))
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<World>))
             {
             }
 #endif

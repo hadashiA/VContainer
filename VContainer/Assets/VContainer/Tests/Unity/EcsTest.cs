@@ -1,10 +1,8 @@
 #if VCONTAINER_ECS_INTEGRATION
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
 using NUnit.Framework;
-using UnityEngine.TestTools;
 using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
@@ -12,6 +10,10 @@ namespace VContainer.Tests.Unity
     class SystemA : ComponentSystemBase
     {
         public bool UpdateCalled;
+        public I2 Service;
+
+        [Inject]
+        public void Construct(I2 service) => Service = service;
 
         public override void Update() => UpdateCalled = true;
     }
@@ -19,8 +21,11 @@ namespace VContainer.Tests.Unity
     [DisableAutoCreation]
     class SystemB : ComponentSystemBase, IDisposable
     {
+        public I2 Service;
         public bool UpdateCalled;
         public bool Disposed;
+
+        public SystemB(I2 service) => Service = service;
 
         public override void Update() => UpdateCalled = true;
         public void Dispose() => Disposed = true;
@@ -32,48 +37,55 @@ namespace VContainer.Tests.Unity
         public void RegisterSystemFromDefaultWorld()
         {
             var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
             builder.RegisterSystemFromDefaultWorld<SystemA>();
 
             var container = builder.Build();
             var system = container.Resolve<SystemA>();
             Assert.That(system, Is.InstanceOf<SystemA>());
+            Assert.That(system.Service, Is.InstanceOf<I2>());
         }
 
         [Test]
         public void RegisterNewWorld()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterNewWorld("My World", Lifetime.Scoped);
+            builder.RegisterNewWorld("My World 1", Lifetime.Scoped);
+            builder.RegisterNewWorld("My World 2", Lifetime.Scoped);
 
             var container = builder.Build();
-            var world = container.Resolve<World>();
+            var worlds = container.Resolve<IReadOnlyList<World>>();
 
-            Assert.That(world.Name, Is.EqualTo("My World"));
-            Assert.That(ScriptBehaviourUpdateOrder.IsWorldInPlayerLoop(world), Is.True);
+            Assert.That(worlds[0].Name, Is.EqualTo("My World 1"));
+            Assert.That(worlds[1].Name, Is.EqualTo("My World 2"));
+            Assert.That(ScriptBehaviourUpdateOrder.IsWorldInPlayerLoop(worlds[0]), Is.True);
+            Assert.That(ScriptBehaviourUpdateOrder.IsWorldInPlayerLoop(worlds[1]), Is.True);
 
             container.Dispose();
 
-            Assert.That(world.IsCreated, Is.False);
+            Assert.That(worlds[0].IsCreated, Is.False);
+            Assert.That(worlds[1].IsCreated, Is.False);
         }
 
-        [UnityTest]
-        public IEnumerator RegisterSystemIntoWorld()
+        [Test]
+        public void RegisterSystemIntoWorld()
         {
             var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
             builder.RegisterNewWorld("My World 1", Lifetime.Scoped);
-            builder.RegisterSystemIntoWorld<SystemB>("My World 1");
+            builder.RegisterSystemIntoWorld<SystemB>("My World 1")
+                .IntoGroup<InitializationSystemGroup>();
 
             var container = builder.Build();
-            var world = container.Resolve<World>();
             var system = container.Resolve<SystemB>();
+            var world = container.Resolve<World>();
 
+            Assert.That(world.IsCreated, Is.True);
             Assert.That(system.World, Is.EqualTo(world));
-
-            yield return null;
-
-            Assert.That(system.UpdateCalled, Is.True);
+            Assert.That(world.GetExistingSystem<SystemB>(), Is.EqualTo(system));
 
             container.Dispose();
+            Assert.That(world.IsCreated, Is.False);
             Assert.That(system.Disposed, Is.True);
         }
     }
