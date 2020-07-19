@@ -137,7 +137,7 @@ using VContainer.Unity;
 
 namespace MyGame
 {
-    public sealed class GameLifetimeScope : LifetimeScope
+    public class GameLifetimeScope : LifetimeScope
     {
         protected override void Configure(IContainerBuilder builder)
         {
@@ -962,30 +962,26 @@ Note:
 
 ## Integrating with ECS
 
-VContainer supports integration between Unity's ECS (Entity Component System) and regular C# World.
+VContainer supports integration between Unity's ECS (Entity Component System) and regular C# World.  
+( This is an experimental feature. Any feedback is wellcome! :0 )
+
 
 :warning: Currently, this feature requires Unity 2019.3 or later versions.
 
-As you know, ECS manages data as tightly controlled, unmanaged chunks.
-On the other hand, the `System` that describes the data functions is designed as a regular C# class.
-
-VContainer focuses on providing DI pattern initialization/setup feature for this `System`.
-
 ### Setup
 
-ECS support for VContainer is enabled if the project has the `com.unity.entities` package installed.
+ECS features for VContainer is enabled if the project has the `com.unity.entities` package installed.  
 
 - Currently, ECS is a preview version. You may need the settings: `[Windows] -> [Package Manager]` and `[Advanced] -> [Show preview packages]`.
-- Select package of `Entities` and Press `Install`.
+- Select package of `Entities` and Press `[Install]`.
 
 If the `com.unity.entities` package exists, the `VCONTAINER_ECS_INTEGRATION` symbol is defined and the following features are enabled.
 
-
 ### When using Unity's default World
 
-By default, ECS will automatically add and run classes that inherits the `ComponentSystemBase` defined on your project into the default World.
+By default, ECS will automatically instantiate classes that inherits the `ComponentSystemBase` defined in your project, add it to the default world, and running on it.
 
-In this mode you can use method injection to System.
+In this mode, you can use method injection to ECS `System`.
 ( The constructor is automatically used by Unity, so it cannot be used.)
 
 ```csharp
@@ -1006,19 +1002,22 @@ class SystemA : SystemBase
 ```
 
 ```csharp
-// Inject the `System`
+// Inject the `System` to Unity's default World
 builder.RegisterSystemFromDefaultWorld<SystemA>();
 
-// Other Register declarations can be injected into the System.
+// builder.RegisterSystemFromDefaultWorld<SystemB>();
+// builder.RegisterSystemFromDefaultWorld<SystemC>();
+
+// ...
+// Other dependencies can be injected into the System.
 // ...
 builder.RegisterInstance(settings);
 // ...
 ```
 
-You can use grouping alias:
+(Optional) The above can also be declared by grouping as below:
 
-```
-// Grouping registrations
+```csharp
 builder.UseDefaultWorld(systems =>
 {
     systems.Add<SystemA>();
@@ -1029,7 +1028,6 @@ builder.UseDefaultWorld(systems =>
 });
 ```
 
-
 Internaly, this is an automation of the following processes:
 
 ```csharp
@@ -1038,25 +1036,62 @@ system.Construct(settings);
 ```
 
 Note:
-- In default (If `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP is **not** used), the group to which System belongs can be controlled by Attribute.
+- In default (`UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP is **not** used), The SystemGroup to which the System belongs can be controlled by Attribute ( e.g: `[UpdateInGroup(typeof(SystemGroupType))]` .
 
 
-## When to use your custom world
+#### Example of setup entities (with Default World)
+
+```csharp
+public class GameLifetimeScope : LifetimeScope
+{
+    protected override void Configure(IContainerBuilder builder)
+    {
+        builder.UseDefaultWorld(systems =>
+        {
+            systems.Add<SystemA>();
+        })
+    }
+}
+```
+
+```csharp
+public class SystemA : SystemBase
+{
+    [Inject]
+    public void Construct(Foo foo)
+    {
+        // Setup entities...
+        var archtype = World.EntityManager.CreateArchetype(typeof(ComponentDataA));
+        World.EntityManager.CreateEntity(archtype);
+    }
+    protected override void OnUpdate()
+    {
+        Entities.ForEach((ref ComponentDataA data) =>
+            {
+                // Do something...
+            })
+            .Schedule();
+    }
+}
+```
+
+### When to use your custom world
 
 ECS also allows you to create and register your own system.
 
-There are two ways to disable Unity's automatic system generation.
+There are two ways to disable Unity's automatic system bootstrap.
 
-- By setting the define symbol `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` will disable all World, System auto-generation.
-- By adding the `[DisableAutoCreation]` attribute to the class definition, the automatic generation of that System will be disabled.
+- By setting the define symbol `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` will disable all World and System auto-bootstrap.
+- Or, By adding the `[DisableAutoCreation]` attribute to the class definition to disable auto bootstrap per system.
 
-For Systems that have auto-generation disabled, constructor injection can be used. 
+For System that have auto bootstrap disabled, constructor injection can be used. 
 
 ```csharp
 public class SystemA : SystemBase
 {
     readonly ServiceA serviceA;
 
+    // Constructor injection
     public SampleSystem(ServiceA serviceA)
     {
         this.serviceA = serviceA;
@@ -1069,27 +1104,28 @@ public class SystemA : SystemBase
 }
 ```
 
-World is required to run this System, but if `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` is set, you need to set up World yourself.
+To use this System, you need to set up World yourself.
 
-VContainer supports World management.
+VContainer supports to instantiate of World and configuration.
 
-```
+```csharp
 // Register of new World under the control of VContainer.
 builder.RegisterNewWorld("My World 1", Lifetime.Scoped);
 
-// Register the System to be added to the specified World.
+// Register System by specifying the name of World to be added.
 builder.RegisterSystemIntoWorld<SystemA>("My World 1");
+// builder.RegisterSystemIntoWorld<SystemB>("My World 1");
+// builder.RegisterSystemIntoWorld<SystemC>("My World 1");
 
-// Other Register declarations can be injected into the System.
+// Other dependencies can be injected into the System.
 // ...
 builder.Register<ServiceA>(Lifetime.Singleton);
 // ...
 ```
 
-You can also use grouping alias:
+(Optional) The above can also be declared by grouping as below:
 
-```
-// Grouping registrations
+```csharp
 builder.UseNewWorld("My World 1", Lifetime.Scoped, systems =>
 {
     systems.Add<SystemA>();
@@ -1100,10 +1136,11 @@ builder.UseNewWorld("My World 1", Lifetime.Scoped, systems =>
 });
 ```
 
-
-Internaly, If you register World using the above method, the following setup will be performed automatically:
+Internaly, If you use above methods, the following setup will be performed automatically:
 
 ```csharp
+// When resolving world ...
+
 var world = new World("My World 1");
 
 world.CreateSystem<InitializationSystemGroup>();
@@ -1112,15 +1149,15 @@ world.CreateSystem<PresentationSystemGroup>();
 
 ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world, PlayerLoop.GetCurrentPlayerLoop());
 
-// ...
-
+// Resolving dependencies ...
 var systemA = new SystemA(new ServiceA());
 world.AddSystem(systemA);
 
 var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystem<SimulationSystemGroup>();
 systemGroup.AddSystemToUpdateList(systemA);
 
-// ...
+
+// After container build ...
 
 foreach (var system in world.Systems)
 {
@@ -1131,20 +1168,30 @@ foreach (var system in world.Systems)
 
 Note:
 - Currently, VContainer is registering the World using `ScriptBehaviourUpdateOrder.UpdatePlayerLoop`.
-- This is an alias that registers 3 SystemGroups to PlayerLoop, so VContainer also creates these SystemGroups.
+- This is an alias that registers 3 SystemGroups to PlayerLoop, so VContainer also creates these SystemGroups internally.
 
 
-By default, VContainer will register System to `SimulationSystemGroup`.
+By default, VContainer will register System to `SimulationSystemGroup`. If you want to change this, you can use `.IntoGroup<T>()`:
 
-If you want to change this, you can use:
-
-```
+```csharp
+// Example
 builder.RegisterSystemIntoWorld<SystemA>("My World 1")
     .IntoGroup<PresentationSystemGroup>();
 ```
 
-`RegisterNewWorld(...)` can accept Lifetime as an argument.  
-If `Lifetime.Scoped` is specified, when the scope is destroyed, Dispose of all the systems belonging to that World will be called.
+#### Lifeime of World and Systems
+
+`RegisterNewWorld(...)` or `UseNewWorld(...)` can accept Lifetime as an argument.  
+
+- This new World  is placed under the control of VContainer.
+- World holds System. Therefore, the lifetime of System is the same as World. 
+- If `Lifetime.Scoped` is specified, when the scope is destroyed, Dispose of all the systems belonging to that World will be called.
+
+
+```csharp
+builder.RegisterNewWorld("My World 1", Lifetime.Scoped);
+builder.RegisterSystemIntoWorld("My World 1");
+```
 
 ```csharp
 public class SystemA : SystemBase, IDisposable
@@ -1162,11 +1209,66 @@ public class SystemA : SystemBase, IDisposable
 }
 ```
 
-```
-builder.RegisterNewWorld("My World 1", Lifetime.Scoped);
-builder.RegisterSystemIntoWorld("My World 1");
+#### Example of setup entities (with Custom World)
+
+```csharp
+public class GameLifetimeScope : LifetimeScope
+{
+    protected override void Configure(IContainerBuilder builder)
+    {
+        builder.UseNewWorld("My World 1", Lifetime.Scoped, systems =>
+        {
+            systems.Add<SystemA>();
+        })
+    }
+}
 ```
 
+```csharp
+public class SystemA : SystemBase
+{
+    public void SystemA(Foo foo)
+    {
+        // Injected dependencies...
+    }
+
+    protected override void OnCreate()
+    {
+        // Setup entities...
+        var archtype = World.EntityManager.CreateArchetype(typeof(ComponentDataA));
+        World.EntityManager.CreateEntity(archtype);
+    }
+
+    protected override void OnUpdate()
+    {
+        Entities.ForEach((ref ComponentDataA data) =>
+            {
+                // Do something...
+            })
+            .Schedule();
+    }
+}
+```
+
+### Resolving `World`
+
+```csharp
+// When only one world is registered:
+class ClassA
+{
+    public ClassA(World world) { /* ... */ }
+}
+
+// When multiple worlds is registered
+class ClassA
+{
+    public ClassA(IEnumerable<World> worlds)
+    {
+        var world = worlds.First(x => x.Name == "My new world");
+        // ...
+    }
+}
+```
 
 
 ## Comparing VContainer to Zenject

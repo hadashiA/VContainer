@@ -10,7 +10,7 @@ namespace VContainer.Editor
             "using VContainer;\n" +
             "using VContainer.Unity;\n" +
             "\n" +
-            "public sealed class #SCRIPTNAME# : LifetimeScope\n" +
+            "public class #SCRIPTNAME# : LifetimeScope\n" +
             "{\n" +
             "    protected override void Configure(IContainerBuilder builder)\n" +
             "    {\n" +
