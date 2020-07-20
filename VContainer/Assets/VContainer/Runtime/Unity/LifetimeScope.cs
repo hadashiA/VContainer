@@ -91,6 +91,7 @@ namespace VContainer.Unity
 
         public IObjectResolver Container { get; private set; }
         public LifetimeScope Parent { get; private set; }
+        public bool IsRoot { get; set; }
 
         readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<IInstaller> extraInstallers = new List<IInstaller>();
@@ -208,6 +209,8 @@ namespace VContainer.Unity
 
         LifetimeScope GetRuntimeParent()
         {
+            if (IsRoot) return null;
+
             var nextParent = overrideParent;
             if (nextParent != null)
                 return nextParent;
@@ -238,6 +241,8 @@ namespace VContainer.Unity
 
         void DispatchPlayerLoopItems()
         {
+            PlayerLoopHelper.Initialize();
+
             try
             {
                 var markers = Container.Resolve<IEnumerable<IInitializable>>();

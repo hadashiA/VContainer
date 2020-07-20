@@ -5,6 +5,15 @@ namespace VContainer.Unity
 {
     public sealed class LifetimeScopeSettings : ScriptableObject
     {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void Initialize()
+        {
+            if (Instance != null && Instance.rootLifetimeScope == null)
+            {
+                Instance.rootLifetimeScope.Build();
+            }
+        }
+
         public static LifetimeScopeSettings Instance;
 
         [SerializeField]
@@ -35,6 +44,8 @@ namespace VContainer.Unity
 
         void OnEnable()
         {
+            if (rootLifetimeScope != null)
+                rootLifetimeScope.IsRoot = true;
             Instance = this;
         }
     }
