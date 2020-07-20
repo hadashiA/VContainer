@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Internal;
 
+#if VCONTAINER_ECS_INTEGRATION
+using Unity.Entities;
+#endif
+
 namespace VContainer.Unity
 {
     public class LifetimeScope : MonoBehaviour
@@ -268,6 +272,8 @@ namespace VContainer.Unity
 
         void DispatchPlayerLoopItems()
         {
+            PlayerLoopHelper.Initialize();
+
             try
             {
                 var markers = Container.Resolve<IEnumerable<IInitializable>>();
@@ -363,6 +369,28 @@ namespace VContainer.Unity
             catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<MonoBehaviour>))
             {
             }
+
+#if VCONTAINER_ECS_INTEGRATION
+            try
+            {
+                var _ = Container.Resolve<IEnumerable<ComponentSystemBase>>();
+            }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ComponentSystemBase>))
+            {
+            }
+
+            try
+            {
+                var worldHelpers = Container.Resolve<IEnumerable<WorldConfigurationHelper>>();
+                foreach (var x in worldHelpers)
+                {
+                    x.SortSystems();
+                }
+            }
+            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<WorldConfigurationHelper>))
+            {
+            }
+#endif
         }
     }
 }

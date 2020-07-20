@@ -41,14 +41,21 @@ namespace VContainer.Unity
         const int UpdateSystemIndex = 4;
         const int PreLateUpdateSystemIndex = 5;
 
-        static PlayerLoopRunner[] runners = new PlayerLoopRunner[8];
+        static readonly PlayerLoopRunner[] Runners = new PlayerLoopRunner[8];
+        static bool initialized;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void Init()
+        // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void Initialize()
         {
-            for (var i = 0; i < runners.Length; i++)
+            lock (Runners)
             {
-                runners[i] = new PlayerLoopRunner();
+                if (initialized) return;
+                initialized = true;
+            }
+
+            for (var i = 0; i < Runners.Length; i++)
+            {
+                Runners[i] = new PlayerLoopRunner();
             }
 
             var playerLoop =
@@ -66,12 +73,12 @@ namespace VContainer.Unity
                 new PlayerLoopSystem
                 {
                     type = typeof(VContainerDelayedStartupFrame),
-                    updateDelegate = runners[(int)PlayerLoopTiming.Initialization].Run
+                    updateDelegate = Runners[(int)PlayerLoopTiming.Initialization].Run
                 },
                 new PlayerLoopSystem
                 {
                     type = typeof(VContainerPostEarlyUpdate),
-                    updateDelegate = runners[(int)PlayerLoopTiming.PostInitialization].Run
+                    updateDelegate = Runners[(int)PlayerLoopTiming.PostInitialization].Run
                 });
 
             InsertSubsystem(
@@ -80,12 +87,12 @@ namespace VContainer.Unity
                 new PlayerLoopSystem
                 {
                     type = typeof(VContainerFixedUpdate),
-                    updateDelegate = runners[(int)PlayerLoopTiming.FixedUpdate].Run
+                    updateDelegate = Runners[(int)PlayerLoopTiming.FixedUpdate].Run
                 },
                 new PlayerLoopSystem
                 {
                     type = typeof(VContainerPostFixedUpdate),
-                    updateDelegate = runners[(int)PlayerLoopTiming.PostFixedUpdate].Run
+                    updateDelegate = Runners[(int)PlayerLoopTiming.PostFixedUpdate].Run
                 });
 
             InsertSubsystem(
@@ -94,12 +101,12 @@ namespace VContainer.Unity
                 new PlayerLoopSystem
                 {
                     type = typeof(VContainerUpdate),
-                    updateDelegate = runners[(int)PlayerLoopTiming.Update].Run
+                    updateDelegate = Runners[(int)PlayerLoopTiming.Update].Run
                 },
                 new PlayerLoopSystem
                 {
                     type = typeof(VContainerPostUpdate),
-                    updateDelegate = runners[(int)PlayerLoopTiming.PostUpdate].Run
+                    updateDelegate = Runners[(int)PlayerLoopTiming.PostUpdate].Run
                 });
 
             InsertSubsystem(
@@ -108,12 +115,12 @@ namespace VContainer.Unity
                 new PlayerLoopSystem
                 {
                     type = typeof(VContainerLateUpdate),
-                    updateDelegate = runners[(int)PlayerLoopTiming.LateUpdate].Run
+                    updateDelegate = Runners[(int)PlayerLoopTiming.LateUpdate].Run
                 },
                 new PlayerLoopSystem
                 {
                     type = typeof(VContainerPostLateUpdate),
-                    updateDelegate = runners[(int)PlayerLoopTiming.PostLateUpdate].Run
+                    updateDelegate = Runners[(int)PlayerLoopTiming.PostLateUpdate].Run
                 });
 
             playerLoop.subSystemList = copyList;
@@ -122,7 +129,7 @@ namespace VContainer.Unity
 
         public static void Dispatch(PlayerLoopTiming timing, IPlayerLoopItem item)
         {
-            runners[(int)timing].Dispatch(item);
+            Runners[(int)timing].Dispatch(item);
         }
 
         static void InsertSubsystem(
