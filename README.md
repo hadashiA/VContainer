@@ -11,7 +11,7 @@
 - Extra small code size. Few internal types.
 - Application can freely create nested Lifetime Scope
 - Dispatch your custom types to Unity's PlayerLoopSystem. (It is greatly influenced by Zenject)
-- ECS Integration
+- ECS Support
 - Immutable Container.
 
 ![](docs/unity_performance_test_result.png)
@@ -30,7 +30,7 @@ Following is a deep profiler Unity result sample.
 
 ![](docs/screenshot_profiler_zenject.png)
 
-## Breaking Changes to v0.1.x
+## Breaking Changes from v0.0.x
 
 - From 0.0.x, the API of LifetimeScope has changed.
   - [Obsolete MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
