@@ -15,6 +15,7 @@ jobs:
     - name: Create meta list
       working-directory: VContainer
       run: |
+        echo Assets/VContainer.meta >> metaList
         echo Assets/VContainer/Runtime.meta >> metaList
         find Assets/VContainer/Runtime -name \*.meta >> metaList
         echo Assets/VContainer/Editor.meta >> metaList
