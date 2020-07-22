@@ -1,9 +1,9 @@
 # VContainer
 
+![](https://github.com/hadashiA/VContainer/workflows/Test/badge.svg)
+![](https://img.shields.io/badge/unity-2018.4%20or%20later-green.svg)
 [![Releases](https://img.shields.io/github/release/hadashiA/VContainer.svg)](https://github.com/hadashiA/VContainer/releases)
 [![openupm](https://img.shields.io/npm/v/jp.hadashikick.vcontainer?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/jp.hadashikick.vcontainer/)
-![](https://img.shields.io/badge/unity-2018.4%20or%20later-green.svg)
-![](https://github.com/hadashiA/VContainer/workflows/Test/badge.svg)
 
 **VContainer** is an DI (Dependency Injection) library running on Unity (Game Engine).
 
