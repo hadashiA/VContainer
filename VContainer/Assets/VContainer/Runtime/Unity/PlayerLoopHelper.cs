@@ -1,10 +1,12 @@
 using System;
 using UnityEngine;
+#if UNITY_2019_3_OR_NEWER
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
-// #if UNITY_EDITOR
-// using UnityEditor;
-// #endif
+#else
+using UnityEngine.Experimental.LowLevel;
+using UnityEngine.Experimental.PlayerLoop;
+#endif
 
 namespace VContainer.Unity
 {
