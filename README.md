@@ -1,7 +1,7 @@
 # VContainer
 
 ![](https://github.com/hadashiA/VContainer/workflows/Test/badge.svg)
-![](https://img.shields.io/badge/unity-&gt;=%202018.4-green.svg)
+![](https://img.shields.io/badge/unity-&gt;=%202018.4-000.svg)
 [![Releases](https://img.shields.io/github/release/hadashiA/VContainer.svg)](https://github.com/hadashiA/VContainer/releases)
 [![openupm](https://img.shields.io/npm/v/jp.hadashikick.vcontainer?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/jp.hadashikick.vcontainer/)
 
@@ -1010,9 +1010,7 @@ builder.RegisterSystemFromDefaultWorld<SystemA>();
 // builder.RegisterSystemFromDefaultWorld<SystemB>();
 // builder.RegisterSystemFromDefaultWorld<SystemC>();
 
-// ...
 // Other dependencies can be injected into the System.
-// ...
 builder.RegisterInstance(settings);
 // ...
 ```
@@ -1120,9 +1118,7 @@ builder.RegisterSystemIntoWorld<SystemA>("My World 1");
 // builder.RegisterSystemIntoWorld<SystemC>("My World 1");
 
 // Other dependencies can be injected into the System.
-// ...
 builder.Register<ServiceA>(Lifetime.Singleton);
-// ...
 ```
 
 (Optional) The above can also be declared by grouping as below:
