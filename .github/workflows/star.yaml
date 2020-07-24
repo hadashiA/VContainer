@@ -1,0 +1,16 @@
+name: Star
+
+on:
+  watch:
+    types: [started]
+
+jobs:
+ star:
+   runs-on: ubuntu-latest
+   steps:
+   - uses: 8398a7/action-slack@v1
+     with:
+       payload: |
+         { "text": "☆${{ github.event.repository.stargazers_count }} ${{ github.event.repository.html_url }}" }
+     env:
+       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
