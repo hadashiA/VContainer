@@ -13,7 +13,7 @@
 - Extra small code size. Few internal types.
 - Application can freely create nested Lifetime Scope
 - Dispatch your custom types to Unity's PlayerLoopSystem. (It is greatly influenced by Zenject)
-- ECS Support
+- ECS integration
 - Immutable Container.
 
 ![](docs/unity_performance_test_result.png)
