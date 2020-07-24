@@ -7,30 +7,30 @@ namespace VContainer.Internal
 {
     sealed class InjectConstructorInfo
     {
-        public readonly Func<object[], object> Factory;
+        public readonly ConstructorInfo ConstructorInfo;
         public readonly ParameterInfo[] ParameterInfos;
 
         public InjectConstructorInfo(ConstructorInfo constructorInfo)
         {
+            ConstructorInfo = constructorInfo;
             ParameterInfos = constructorInfo.GetParameters();
-            Factory = constructorInfo.Invoke;
         }
 
         public InjectConstructorInfo(ConstructorInfo constructorInfo, ParameterInfo[] parameterInfos)
         {
+            ConstructorInfo = constructorInfo;
             ParameterInfos = parameterInfos;
-            Factory = constructorInfo.Invoke;
         }
     }
 
     sealed class InjectMethodInfo
     {
-        public readonly Func<object, object[], object> Invoke;
+        public readonly MethodInfo MethodInfo;
         public readonly ParameterInfo[] ParameterInfos;
 
-        public InjectMethodInfo(MethodBase methodInfo)
+        public InjectMethodInfo(MethodInfo methodInfo)
         {
-            Invoke = methodInfo.Invoke;
+            MethodInfo = methodInfo;
             ParameterInfos = methodInfo.GetParameters();
         }
     }

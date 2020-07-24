@@ -5,6 +5,12 @@ namespace VContainer.Internal
 {
     sealed class ReflectionInjector : IInjector
     {
+        public static ReflectionInjector Build(Type type)
+        {
+            var injectTypeInfo = TypeAnalyzer.AnalyzeWithCache(type);
+            return new ReflectionInjector(injectTypeInfo);
+        }
+
         readonly InjectTypeInfo injectTypeInfo;
 
         public ReflectionInjector(InjectTypeInfo injectTypeInfo)
@@ -51,7 +57,7 @@ namespace VContainer.Internal
                         throw new VContainerException(injectTypeInfo.Type, $"Failed to resolve {injectTypeInfo.Type.FullName} : {ex.Message}");
                     }
                 }
-                var instance = injectTypeInfo.InjectConstructor.Factory(parameterValues);
+                var instance = injectTypeInfo.InjectConstructor.ConstructorInfo.Invoke(parameterValues);
                 Inject(instance, resolver, parameters);
                 return instance;
             }
@@ -125,7 +131,7 @@ namespace VContainer.Internal
                             throw new VContainerException(parameterType, $"Failed to resolve {injectTypeInfo.Type.FullName} : {ex.Message}");
                         }
                     }
-                    method.Invoke(obj, parameterValues);
+                    method.MethodInfo.Invoke(obj, parameterValues);
                 }
                 finally
                 {
@@ -133,16 +139,5 @@ namespace VContainer.Internal
                 }
             }
         }
-    }
-
-    sealed class ReflectionInjectorBuilder : IInjectorBuilder
-    {
-        public static readonly ReflectionInjectorBuilder Default = new ReflectionInjectorBuilder();
-
-        public IInjector Build(Type type)
-        {
-            var injectTypeInfo = TypeAnalyzer.AnalyzeWithCache(type);
-            return new ReflectionInjector(injectTypeInfo);
-       }
     }
 }
