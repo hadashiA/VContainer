@@ -31,24 +31,5 @@ namespace VContainer.Editor.CodeGen
 
             return assemblyDefinition;
         }
-
-        public static System.Type GetType(this TypeReference type)
-        {
-            return System.Type.GetType(GetReflectionName(type), true);
-        }
-
-        public static string GetReflectionName(TypeReference typeRef)
-        {
-            if (typeRef.IsGenericInstance)
-            {
-                var genericInstance = (GenericInstanceType)typeRef;
-                var genericArgsName = string.Join(",",
-                    genericInstance.GenericArguments
-                        .Select(GetReflectionName)
-                        .ToArray());
-                return $"{genericInstance.Namespace}.{typeRef.Name}[{genericArgsName}]";
-            }
-            return typeRef.FullName;
-        }
    }
 }
