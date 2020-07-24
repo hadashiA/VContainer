@@ -6,6 +6,8 @@
   "description": "Lightweight DI (Dependency Injection) Container for Unity.",
   "keywords": ["DI", "Dependency Injection", "DI Container"],
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "nuget.mono-cecil": "0.1.6-preview"
+  }
 }
 
