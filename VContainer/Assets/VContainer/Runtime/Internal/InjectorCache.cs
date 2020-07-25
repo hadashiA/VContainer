@@ -15,7 +15,6 @@ namespace VContainer.Internal
                 var getter = type.GetMethod("__GetGeneratedInjector", BindingFlags.Static | BindingFlags.Public);
                 if (getter != null)
                 {
-                    UnityEngine.Debug.Log($"!!!!!!!! {type.FullName}");
                     return (IInjector)getter.Invoke(null, null);
                 }
 
