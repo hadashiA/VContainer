@@ -32,5 +32,42 @@ namespace VContainer.Editor.CodeGen
 
             return assemblyDefinition;
         }
-  }
+
+        public static TypeReference CreateParameterTypeReference(
+            ModuleDefinition module,
+            Type parameterType,
+            TypeReference typeRef)
+        {
+            if (!parameterType.ContainsGenericParameters)
+            {
+                return module.ImportReference(parameterType);
+            }
+
+            if (parameterType.IsGenericParameter)
+            {
+                return typeRef.GenericParameters[parameterType.GenericParameterPosition];
+            }
+
+            if (parameterType.IsArray)
+            {
+                return new ArrayType(
+                    CreateParameterTypeReference(
+                        module,
+                        parameterType.GetElementType(),
+                        typeRef),
+                    parameterType.GetArrayRank());
+            }
+
+            var openGenericType = parameterType.GetGenericTypeDefinition();
+            var genericInstance = new GenericInstanceType(module.ImportReference(openGenericType));
+
+            foreach (var arg in parameterType.GenericTypeArguments)
+            {
+                genericInstance.GenericArguments.Add(
+                    CreateParameterTypeReference(module, arg, typeRef));
+            }
+
+            return genericInstance;
+        }
+    }
 }

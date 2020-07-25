@@ -13,7 +13,7 @@ namespace VContainer.Internal
 
         readonly InjectTypeInfo injectTypeInfo;
 
-        public ReflectionInjector(InjectTypeInfo injectTypeInfo)
+        ReflectionInjector(InjectTypeInfo injectTypeInfo)
         {
             this.injectTypeInfo = injectTypeInfo;
         }

@@ -74,6 +74,7 @@
      <Compile Include="Assets\VContainer\Runtime\Internal\HashTableRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\IRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\InjectParameter.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Internal\InjectorCache.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\ReflectionInjector.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\TypeAnalyzer.cs" />
      <Compile Include="Assets\VContainer\Runtime\Registration.cs" />

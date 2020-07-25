@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unity.CompilationPipeline.Common.Diagnostics;
@@ -20,29 +19,63 @@ namespace VContainer.Editor.CodeGen
             objectResolverTypeRef ?? (objectResolverTypeRef = module.ImportReference(typeof(IObjectResolver)));
 
         TypeReference InjectorTypeRef =>
-            injectorTypeRef ?? (injectorTypeRef = module.ImportReference(typeof(IInjector)));
+            injectorTypeRef ??
+            (injectorTypeRef = module.ImportReference(typeof(IInjector)));
 
         TypeReference InjectParameterListTypeRef =>
-            injectParameterListTypeRef ?? (injectParameterListTypeRef = module.ImportReference(typeof(IReadOnlyList<IInjectParameter>)));
+            injectParameterListTypeRef ??
+            (injectParameterListTypeRef = module.ImportReference(typeof(IReadOnlyList<IInjectParameter>)));
 
-        MethodInfo ResolveMethodInfo => resolveMethodInfo ?? (
-            resolveMethodInfo = typeof(IObjectResolverExtensions).GetMethod("Resolve"));
+        MethodReference GetTypeFromHandleRef =>
+            getTypeFromHandleRef ??
+            (getTypeFromHandleRef = module.ImportReference(typeof(Type).GetMethod("GetTypeFromHandle")));
 
-        MethodInfo ResolveOrParameterMethodInfo =>
-            resolveOrParameterMethodInfo ?? (
-                resolveOrParameterMethodInfo = typeof(IObjectResolverExtensions)
-                    .GetMethod("ResolveOrParameter", new []
+        MethodReference BaseEmptyConstructorRef =>
+            baseEmptyConstructorRef ??
+            (baseEmptyConstructorRef = module.ImportReference(typeof(object).GetConstructor(Array.Empty<Type>())));
+
+        MethodReference ResolveMethodRef
+        {
+            get
+            {
+                if (resolveMethodRef == null)
+                {
+                    var methodInfo = typeof(IObjectResolver).GetMethod("Resolve", new []
+                    {
+                        typeof(Type)
+                    });
+                    resolveMethodRef = module.ImportReference(methodInfo);
+                }
+                return resolveMethodRef;
+            }
+        }
+
+        MethodReference ResolveOrParameterMethodRef
+        {
+            get
+            {
+                if (resolveOrParameterMethodRef == null)
+                {
+                    var methodInfo = typeof(IObjectResolverExtensions).GetMethod("ResolveOrParameter", new []
                     {
                         typeof(IObjectResolver),
+                        typeof(Type),
                         typeof(string),
                         typeof(IReadOnlyList<IInjectParameter>)
-                    }));
+                    });
+                    resolveOrParameterMethodRef = module.ImportReference(methodInfo);
+                }
+                return resolveOrParameterMethodRef;
+            }
+        }
 
         TypeReference objectResolverTypeRef;
         TypeReference injectorTypeRef;
         TypeReference injectParameterListTypeRef;
-        MethodInfo resolveMethodInfo;
-        MethodInfo resolveOrParameterMethodInfo;
+        MethodReference baseEmptyConstructorRef;
+        MethodReference getTypeFromHandleRef;
+        MethodReference resolveMethodRef;
+        MethodReference resolveOrParameterMethodRef;
 
         public InjectionILGenerator(
             ModuleDefinition module,
@@ -83,7 +116,7 @@ namespace VContainer.Editor.CodeGen
             sw.Stop();
             if (count > 0)
             {
-                UnityEngine.Debug.Log($"VContainer code generation optimization for {count} types ({sw.Elapsed.TotalMilliseconds}ms)");
+                UnityEngine.Debug.Log($"VContainer code generation optimization for {module.Assembly.Name} {count} types ({sw.Elapsed.TotalMilliseconds}ms)");
                 return true;
             }
             return false;
@@ -111,20 +144,7 @@ namespace VContainer.Editor.CodeGen
                 return false;
             }
 
-            var injectorTypeDef = new TypeDefinition(
-                "",
-                "__GeneratedInjector",
-                TypeAttributes.NestedPrivate | TypeAttributes.Sealed,
-                module.TypeSystem.Object);
-
-            var injectorImpl = new InterfaceImplementation(InjectorTypeRef);
-            injectorTypeDef.Interfaces.Add(injectorImpl);
-
-            GenerateCreateInstanceMethod(typeDef, injectorTypeDef, injectTypeInfo);
-            GenerateInjectMethod(typeDef, injectorTypeDef, injectTypeInfo);
-
-            typeDef.NestedTypes.Add(injectorTypeDef);
-
+            GenerateInnerInjectorType(typeDef, injectTypeInfo);
             return true;
         }
 
@@ -134,9 +154,53 @@ namespace VContainer.Editor.CodeGen
                !type.IsInterface &&
                !(type.IsAbstract && type.IsSealed) &&
                !typeof(Delegate).IsAssignableFrom(type) &&
-               !typeof(Attribute).IsAssignableFrom(type);
+               !typeof(Attribute).IsAssignableFrom(type) &&
+               (targetNamespaces == null ||
+                targetNamespaces.Count <= 0 ||
+                targetNamespaces.Contains(type.Namespace));
 
-        void GenerateCreateInstanceMethod(
+        TypeDefinition GenerateInnerInjectorType(TypeDefinition typeDef, InjectTypeInfo injectTypeInfo)
+        {
+            var injectorTypeDef = new TypeDefinition(
+                "",
+                "__GeneratedInjector",
+                TypeAttributes.NestedPrivate | TypeAttributes.Sealed,
+                module.TypeSystem.Object);
+
+            var injectorImpl = new InterfaceImplementation(InjectorTypeRef);
+            injectorTypeDef.Interfaces.Add(injectorImpl);
+
+            var injectorConstructorDef = GenerateDefaultConstructor(injectorTypeDef);
+            GenerateCreateInstanceMethod(typeDef, injectorTypeDef, injectTypeInfo);
+            GenerateInjectMethod(typeDef, injectorTypeDef, injectTypeInfo);
+            GenerateInjectorGetterMethod(typeDef, injectorConstructorDef);
+
+            typeDef.NestedTypes.Add(injectorTypeDef);
+
+            return injectorTypeDef;
+        }
+
+        MethodDefinition GenerateDefaultConstructor(TypeDefinition typeDef)
+        {
+            var constructorDef = new MethodDefinition(
+                ".ctor",
+                MethodAttributes.Public |
+                MethodAttributes.HideBySig |
+                MethodAttributes.SpecialName |
+                MethodAttributes.RTSpecialName,
+                module.TypeSystem.Void);
+
+            var processor = constructorDef.Body.GetILProcessor();
+            processor.Emit(OpCodes.Nop);
+            processor.Emit(OpCodes.Ldarg_0);
+            processor.Emit(OpCodes.Call, BaseEmptyConstructorRef);
+            processor.Emit(OpCodes.Ret);
+
+            typeDef.Methods.Add(constructorDef);
+            return constructorDef;
+        }
+
+        MethodDefinition GenerateCreateInstanceMethod(
             TypeDefinition typeDef,
             TypeDefinition injectorTypeDef,
             InjectTypeInfo injectTypeInfo)
@@ -168,39 +232,39 @@ namespace VContainer.Editor.CodeGen
             {
                 processor.Emit(OpCodes.Ldnull);
                 processor.Emit(OpCodes.Ret);
-                return;
+                return methodDef;
             }
-
-            var resultVariableDef = new VariableDefinition(module.TypeSystem.Object);
-            body.Variables.Add(resultVariableDef);
 
             var constructorRef = module.ImportReference(injectTypeInfo.InjectConstructor.ConstructorInfo);
             for (var i = 0; i < constructorRef.Parameters.Count; i++)
             {
                 var paramDef = constructorRef.Parameters[i];
                 var paramInfo = injectTypeInfo.InjectConstructor.ParameterInfos[i];
-                var resolveMethodRef = module.ImportReference(ResolveOrParameterMethodInfo.MakeGenericMethod(paramInfo.ParameterType));
+                var paramTypeRef = Utils.CreateParameterTypeReference(module, paramInfo.ParameterType, typeDef);
 
-                var paramVariableDef = new VariableDefinition(paramDef.ParameterType);
+                var paramVariableDef = new VariableDefinition(paramTypeRef);
                 body.Variables.Add(paramVariableDef);
 
                 // TODO: Add ExceptionHandler
                 // Call ResolveOrParameter(IObjectResolver, Type, string, IReadOnlyList<IInjectParameter>)
                 processor.Emit(OpCodes.Ldarg_1);
+                processor.Emit(OpCodes.Ldtoken, paramTypeRef);
+                processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
                 processor.Emit(OpCodes.Ldstr, paramInfo.Name);
                 processor.Emit(OpCodes.Ldarg_2);
-                processor.Emit(OpCodes.Callvirt, resolveMethodRef);
+                processor.Emit(OpCodes.Callvirt, ResolveOrParameterMethodRef);
+                processor.Emit(OpCodes.Unbox_Any, paramTypeRef);
                 processor.Emit(OpCodes.Stloc_S, paramVariableDef);
                 processor.Emit(OpCodes.Ldloc_S, paramVariableDef);
             }
 
             processor.Emit(OpCodes.Newobj, constructorRef);
-            processor.Emit(OpCodes.Stloc, resultVariableDef);
-            processor.Emit(OpCodes.Ldloc, resultVariableDef);
             processor.Emit(OpCodes.Ret);
+
+            return methodDef;
         }
 
-        void GenerateInjectMethod(TypeDefinition typeDef, TypeDefinition injectorTypeDef, InjectTypeInfo injectTypeInfo)
+        MethodDefinition GenerateInjectMethod(TypeDefinition typeDef, TypeDefinition injectorTypeDef, InjectTypeInfo injectTypeInfo)
         {
             var methodDef = new MethodDefinition("Inject", MethodAttributes.Public, module.TypeSystem.Void);
             injectorTypeDef.Methods.Add(methodDef);
@@ -247,17 +311,19 @@ namespace VContainer.Editor.CodeGen
                     {
                         var paramDef = injectMethodRef.Parameters[i];
                         var paramInfo = injectMethod.ParameterInfos[i];
-
-                        var resolveMethodRef = module.ImportReference(ResolveOrParameterMethodInfo.MakeGenericMethod(paramInfo.ParameterType));
+                        var paramTypeRef = Utils.CreateParameterTypeReference(module, paramInfo.ParameterType, typeDef);
 
                         var paramVariableDef = new VariableDefinition(paramDef.ParameterType);
                         body.Variables.Add(paramVariableDef);
 
                         // TODO: Add ExceptionHandler
                         processor.Emit(OpCodes.Ldarg_2);
+                        processor.Emit(OpCodes.Ldtoken, paramTypeRef);
+                        processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
                         processor.Emit(OpCodes.Ldstr, paramInfo.Name);
                         processor.Emit(OpCodes.Ldarg_3);
-                        processor.Emit(OpCodes.Callvirt, resolveMethodRef);
+                        processor.Emit(OpCodes.Callvirt, ResolveOrParameterMethodRef);
+                        processor.Emit(OpCodes.Unbox_Any, paramTypeRef);
                         processor.Emit(OpCodes.Stloc_S, paramVariableDef);
                         processor.Emit(OpCodes.Ldloc_S, paramVariableDef);
                     }
@@ -270,14 +336,16 @@ namespace VContainer.Editor.CodeGen
                 foreach (var injectProperty in injectTypeInfo.InjectProperties)
                 {
                     var propertySetterRef = module.ImportReference(injectProperty.SetMethod);
-                    var resolveMethodRef = module.ImportReference(ResolveMethodInfo.MakeGenericMethod(injectProperty.PropertyType));
+                    var propertyTypeRef = Utils.CreateParameterTypeReference(module, injectProperty.PropertyType, typeDef);
 
                     processor.Emit(OpCodes.Ldloc_S, instanceVariableDef);
 
                     // TODO: Add ExceptionHandler
-                    var resolveStart = processor.Create(OpCodes.Ldarg_2);
-                    processor.Append(resolveStart);
-                    processor.Emit(OpCodes.Callvirt, resolveMethodRef);
+                    // instance.Property = resolver.Resolve(Type)
+                    processor.Emit(OpCodes.Ldarg_2);
+                    processor.Emit(OpCodes.Ldtoken, propertyTypeRef);
+                    processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
+                    processor.Emit(OpCodes.Callvirt, ResolveMethodRef);
                     processor.Emit(OpCodes.Callvirt, propertySetterRef);
                 }
             }
@@ -286,20 +354,36 @@ namespace VContainer.Editor.CodeGen
             {
                 foreach (var injectField in injectTypeInfo.InjectFields)
                 {
-                    var injectFieldRef = module.ImportReference(injectField);
-                    var resolveMethodRef = module.ImportReference(ResolveMethodInfo.MakeGenericMethod(injectField.FieldType));
-
-                    processor.Emit(OpCodes.Ldloc_S, instanceVariableDef);
+                    var fieldRef = module.ImportReference(injectField);
+                    var fieldTypeRef = Utils.CreateParameterTypeReference(module, injectField.FieldType, typeDef);
 
                     // TODO: Add ExceptionHandler
-                    var resolveStart = processor.Create(OpCodes.Ldarg_2);
-                    processor.Append(resolveStart);
-                    processor.Emit(OpCodes.Callvirt, resolveMethodRef);
-                    processor.Emit(OpCodes.Stfld, injectFieldRef);
+                    // instance.Field = resolver.Resolve(Type)
+                    processor.Emit(OpCodes.Ldarg_2);
+                    processor.Emit(OpCodes.Ldtoken, fieldTypeRef);
+                    processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
+                    processor.Emit(OpCodes.Callvirt, ResolveMethodRef);
+                    processor.Emit(OpCodes.Stfld, fieldRef);
                 }
             }
 
             processor.Emit(OpCodes.Ret);
+            return methodDef;
         }
-  }
+
+        void GenerateInjectorGetterMethod(TypeDefinition typeDef, MethodDefinition injectorConstructorDef)
+        {
+            var injectorGetterDef = new MethodDefinition(
+                "__GetGeneratedInjector",
+                MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
+                InjectorTypeRef);
+
+            var processor = injectorGetterDef.Body.GetILProcessor();
+            processor.Emit(OpCodes.Nop);
+            processor.Emit(OpCodes.Newobj, injectorConstructorDef);
+            processor.Emit(OpCodes.Castclass, InjectorTypeRef);
+            processor.Emit(OpCodes.Ret);
+            typeDef.Methods.Add(injectorGetterDef);
+        }
+    }
 }

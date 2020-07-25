@@ -25,7 +25,7 @@ namespace VContainer.Unity
 
         public override IRegistration Build()
         {
-            var injector = ReflectionInjector.Build(ImplementationType);
+            var injector = InjectorCache.GetOrBuild(ImplementationType);
 
             return new SystemRegistration(
                 ImplementationType,
