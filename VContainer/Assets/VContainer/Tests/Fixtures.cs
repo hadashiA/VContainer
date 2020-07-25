@@ -79,7 +79,6 @@ namespace VContainer.Tests
         public void MethodInjectable1(I3 service3, I4 service4)
         {
             Method1Called = true;
-
         }
 
         [Inject]

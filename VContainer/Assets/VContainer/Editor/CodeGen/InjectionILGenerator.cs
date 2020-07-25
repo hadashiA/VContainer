@@ -173,8 +173,8 @@ namespace VContainer.Editor.CodeGen
             injectorTypeDef.Interfaces.Add(injectorImpl);
 
             GenerateDefaultConstructor(injectorTypeDef);
-            GenerateCreateInstanceMethod(typeDef, injectorTypeDef, injectTypeInfo);
             GenerateInjectMethod(typeDef, injectorTypeDef, injectTypeInfo);
+            GenerateCreateInstanceMethod(typeDef, injectorTypeDef, injectTypeInfo);
             GenerateInjectorGetterMethod(typeDef, injectorTypeDef);
 
             typeDef.NestedTypes.Add(injectorTypeDef);
@@ -210,12 +210,10 @@ namespace VContainer.Editor.CodeGen
                 MethodAttributes.Public | MethodAttributes.Virtual,
                 module.TypeSystem.Object);
 
+            var injectMethodDef = injectorTypeDef.Methods.Single(x => x.Name == "Inject");
+
             injectorTypeDef.Methods.Add(methodDef);
 
-            var baseMethodDef = InjectorTypeRef.Resolve().Methods
-                .Single(x => x.Name == "CreateInstance");
-            var baseMethodRef = module.ImportReference(baseMethodDef);
-            methodDef.Overrides.Add(baseMethodRef);
 
             methodDef.Parameters.Add(new ParameterDefinition(ObjectResolverTypeRef)
             {
@@ -239,6 +237,9 @@ namespace VContainer.Editor.CodeGen
                 processor.Emit(OpCodes.Ret);
                 return;
             }
+
+            var resultVariableDef = new VariableDefinition(module.TypeSystem.Object);
+            body.Variables.Add(resultVariableDef);
 
             var constructorRef = module.ImportReference(injectTypeInfo.InjectConstructor.ConstructorInfo);
             for (var i = 0; i < constructorRef.Parameters.Count; i++)
@@ -264,6 +265,15 @@ namespace VContainer.Editor.CodeGen
             }
 
             processor.Emit(OpCodes.Newobj, constructorRef);
+            processor.Emit(OpCodes.Stloc_0);
+
+            processor.Emit(OpCodes.Ldarg_0);
+            processor.Emit(OpCodes.Ldloc_0);
+            processor.Emit(OpCodes.Ldarg_1);
+            processor.Emit(OpCodes.Ldarg_2);
+            processor.Emit(OpCodes.Callvirt, injectMethodDef);
+
+            processor.Emit(OpCodes.Ldloc_0);
             processor.Emit(OpCodes.Ret);
         }
 
@@ -273,11 +283,6 @@ namespace VContainer.Editor.CodeGen
                 MethodAttributes.Public | MethodAttributes.Virtual,
                 module.TypeSystem.Void);
             injectorTypeDef.Methods.Add(methodDef);
-
-            var baseMethodDef = InjectorTypeRef.Resolve().Methods
-                .Single(x => x.Name == "Inject");
-            var baseMethodRef = module.ImportReference(baseMethodDef);
-            methodDef.Overrides.Add(baseMethodRef);
 
             methodDef.Parameters.Add(new ParameterDefinition(module.TypeSystem.Object)
             {
@@ -366,6 +371,8 @@ namespace VContainer.Editor.CodeGen
                 {
                     var fieldRef = module.ImportReference(injectField);
                     var fieldTypeRef = Utils.CreateParameterTypeReference(module, injectField.FieldType, typeDef);
+
+                    processor.Emit(OpCodes.Ldloc_S, instanceVariableDef);
 
                     // TODO: Add ExceptionHandler
                     // instance.Field = resolver.Resolve(Type)
