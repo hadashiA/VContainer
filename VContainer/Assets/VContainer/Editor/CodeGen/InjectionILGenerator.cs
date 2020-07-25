@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 using Unity.CompilationPipeline.Common.Diagnostics;
-using VContainer.Internal;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
+using VContainer.Internal;
 
 namespace VContainer.Editor.CodeGen
 {
@@ -170,17 +172,17 @@ namespace VContainer.Editor.CodeGen
             var injectorImpl = new InterfaceImplementation(InjectorTypeRef);
             injectorTypeDef.Interfaces.Add(injectorImpl);
 
-            var injectorConstructorDef = GenerateDefaultConstructor(injectorTypeDef);
+            GenerateDefaultConstructor(injectorTypeDef);
             GenerateCreateInstanceMethod(typeDef, injectorTypeDef, injectTypeInfo);
             GenerateInjectMethod(typeDef, injectorTypeDef, injectTypeInfo);
-            GenerateInjectorGetterMethod(typeDef, injectorConstructorDef);
+            GenerateInjectorGetterMethod(typeDef, injectorTypeDef);
 
             typeDef.NestedTypes.Add(injectorTypeDef);
 
             return injectorTypeDef;
         }
 
-        MethodDefinition GenerateDefaultConstructor(TypeDefinition typeDef)
+        void GenerateDefaultConstructor(TypeDefinition typeDef)
         {
             var constructorDef = new MethodDefinition(
                 ".ctor",
@@ -197,10 +199,9 @@ namespace VContainer.Editor.CodeGen
             processor.Emit(OpCodes.Ret);
 
             typeDef.Methods.Add(constructorDef);
-            return constructorDef;
         }
 
-        MethodDefinition GenerateCreateInstanceMethod(
+        void GenerateCreateInstanceMethod(
             TypeDefinition typeDef,
             TypeDefinition injectorTypeDef,
             InjectTypeInfo injectTypeInfo)
@@ -232,7 +233,7 @@ namespace VContainer.Editor.CodeGen
             {
                 processor.Emit(OpCodes.Ldnull);
                 processor.Emit(OpCodes.Ret);
-                return methodDef;
+                return;
             }
 
             var constructorRef = module.ImportReference(injectTypeInfo.InjectConstructor.ConstructorInfo);
@@ -260,11 +261,9 @@ namespace VContainer.Editor.CodeGen
 
             processor.Emit(OpCodes.Newobj, constructorRef);
             processor.Emit(OpCodes.Ret);
-
-            return methodDef;
         }
 
-        MethodDefinition GenerateInjectMethod(TypeDefinition typeDef, TypeDefinition injectorTypeDef, InjectTypeInfo injectTypeInfo)
+        void GenerateInjectMethod(TypeDefinition typeDef, TypeDefinition injectorTypeDef, InjectTypeInfo injectTypeInfo)
         {
             var methodDef = new MethodDefinition("Inject", MethodAttributes.Public, module.TypeSystem.Void);
             injectorTypeDef.Methods.Add(methodDef);
@@ -368,11 +367,11 @@ namespace VContainer.Editor.CodeGen
             }
 
             processor.Emit(OpCodes.Ret);
-            return methodDef;
         }
 
-        void GenerateInjectorGetterMethod(TypeDefinition typeDef, MethodDefinition injectorConstructorDef)
+        void GenerateInjectorGetterMethod(TypeDefinition typeDef, TypeDefinition injectorTypeDef)
         {
+            var constructorDef = injectorTypeDef.GetConstructors().First();
             var injectorGetterDef = new MethodDefinition(
                 "__GetGeneratedInjector",
                 MethodAttributes.Static | MethodAttributes.Public | MethodAttributes.HideBySig,
@@ -380,8 +379,7 @@ namespace VContainer.Editor.CodeGen
 
             var processor = injectorGetterDef.Body.GetILProcessor();
             processor.Emit(OpCodes.Nop);
-            processor.Emit(OpCodes.Newobj, injectorConstructorDef);
-            processor.Emit(OpCodes.Castclass, InjectorTypeRef);
+            processor.Emit(OpCodes.Newobj, constructorDef);
             processor.Emit(OpCodes.Ret);
             typeDef.Methods.Add(injectorGetterDef);
         }
