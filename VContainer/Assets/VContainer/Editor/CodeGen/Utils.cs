@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using Mono.Cecil;
@@ -31,5 +32,5 @@ namespace VContainer.Editor.CodeGen
 
             return assemblyDefinition;
         }
-   }
+  }
 }

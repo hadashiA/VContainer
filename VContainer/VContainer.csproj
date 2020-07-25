@@ -62,6 +62,9 @@
      <Compile Include="Assets\VContainer\Runtime\Container.cs" />
      <Compile Include="Assets\VContainer\Runtime\ContainerBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\ContainerBuilderExtensions.cs" />
+     <Compile Include="Assets\VContainer\Runtime\IInjectParameter.cs" />
+     <Compile Include="Assets\VContainer\Runtime\IInjector.cs" />
+     <Compile Include="Assets\VContainer\Runtime\IObjectResolverExtensions.cs" />
      <Compile Include="Assets\VContainer\Runtime\InjectAttribute.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\CappedArrayPool.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\CompositeDisposable.cs" />
@@ -69,7 +72,6 @@
      <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTableRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\GCCollectScope.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\HashTableRegistry.cs" />
-     <Compile Include="Assets\VContainer\Runtime\Internal\IInjector.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\IRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\InjectParameter.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\ReflectionInjector.cs" />

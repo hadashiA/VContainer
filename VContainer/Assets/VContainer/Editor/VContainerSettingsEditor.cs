@@ -76,10 +76,13 @@ namespace VContainer.Editor
             codeGenAssemblyNameList.onAddDropdownCallback = (buttonRect, list) =>
             {
                 var menu = new GenericMenu();
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                var assemblies = AppDomain.CurrentDomain
+                    .GetAssemblies()
+                    .OrderBy(assembly => assembly.GetName().Name);
+                foreach (var assembly in assemblies)
                 {
-                    var name = assembly.GetName().Name.Replace(".", "/");
-                    menu.AddItem(new GUIContent(name), false, HandleAddAssemblyName, assembly);
+                    var label = assembly.GetName().Name.Replace(".", "/");
+                    menu.AddItem(new GUIContent(label), false, HandleAddAssemblyName, assembly);
                 }
                 menu.ShowAsContext();
             };
@@ -131,10 +134,15 @@ namespace VContainer.Editor
                 var menu = new GenericMenu();
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    var namespaces = assembly.GetTypes().Select(t => t.Namespace).Distinct();
+                    var namespaces = assembly.GetTypes()
+                        .Select(t => t.Namespace)
+                        .Where(x => !string.IsNullOrEmpty(x))
+                        .Distinct()
+                        .OrderBy(x => x);
                     foreach (var ns in namespaces)
                     {
-                        menu.AddItem(new GUIContent($"{assembly.FullName}/{ns}"), false, OnAddNamespace, ns);
+                        var label = ns.Replace(".", "/");
+                        menu.AddItem(new GUIContent(label), false, OnAddNamespace, ns);
                     }
                 }
                 menu.ShowAsContext();

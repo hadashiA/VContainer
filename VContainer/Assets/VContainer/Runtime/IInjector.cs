@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace VContainer.Internal
+namespace VContainer
 {
     public interface IInjector
     {

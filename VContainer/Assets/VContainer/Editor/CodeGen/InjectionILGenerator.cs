@@ -25,14 +25,24 @@ namespace VContainer.Editor.CodeGen
         TypeReference InjectParameterListTypeRef =>
             injectParameterListTypeRef ?? (injectParameterListTypeRef = module.ImportReference(typeof(IReadOnlyList<IInjectParameter>)));
 
-        MethodInfo ResolveMethodInfo =>
-            resolveMethodInfo ?? (resolveMethodInfo = typeof(ObjectResolverExtensions).GetMethod("Resolve"));
+        MethodInfo ResolveMethodInfo => resolveMethodInfo ?? (
+            resolveMethodInfo = typeof(IObjectResolverExtensions).GetMethod("Resolve"));
 
+        MethodInfo ResolveOrParameterMethodInfo =>
+            resolveOrParameterMethodInfo ?? (
+                resolveOrParameterMethodInfo = typeof(IObjectResolverExtensions)
+                    .GetMethod("ResolveOrParameter", new []
+                    {
+                        typeof(IObjectResolver),
+                        typeof(string),
+                        typeof(IReadOnlyList<IInjectParameter>)
+                    }));
 
         TypeReference objectResolverTypeRef;
         TypeReference injectorTypeRef;
         TypeReference injectParameterListTypeRef;
         MethodInfo resolveMethodInfo;
+        MethodInfo resolveOrParameterMethodInfo;
 
         public InjectionILGenerator(
             ModuleDefinition module,
@@ -50,29 +60,27 @@ namespace VContainer.Editor.CodeGen
 
             diagnosticMessages = new List<DiagnosticMessage>();
 
-            try
+            foreach (var typeDef in module.Types)
             {
-                foreach (var typeDefinition in module.Types)
+                try
                 {
-                    var changed = TryGenerate(typeDefinition, diagnosticMessages);
-                    if (changed)
+                    if (TryGenerate(typeDef, diagnosticMessages))
                     {
-                        UnityEngine.Debug.Log($"Type={typeDefinition.Name}");
                         count += 1;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                diagnosticMessages.Add(new DiagnosticMessage
+                catch (Exception ex)
                 {
-                    DiagnosticType = DiagnosticType.Error,
-                    MessageData = $"{ex.Message}\n{ex.StackTrace}"
-                });
+                    diagnosticMessages.Add(new DiagnosticMessage
+                    {
+                        DiagnosticType = DiagnosticType.Error,
+                        MessageData = $"VContainer failed pre code gen for {typeDef.FullName} : {ex.Message}\n{ex.StackTrace}"
+                    });
+                    return false;
+                }
             }
 
             sw.Stop();
-
             if (count > 0)
             {
                 UnityEngine.Debug.Log($"VContainer code generation optimization for {count} types ({sw.Elapsed.TotalMilliseconds}ms)");
@@ -85,7 +93,7 @@ namespace VContainer.Editor.CodeGen
         {
             var type = Type.GetType($"{typeDef.FullName}, {module.Assembly.FullName}");
 
-            if (!NeedsInjectType(type))
+            if (type == null || !NeedsInjectType(type))
                 return false;
 
             InjectTypeInfo injectTypeInfo;
@@ -171,14 +179,16 @@ namespace VContainer.Editor.CodeGen
             {
                 var paramDef = constructorRef.Parameters[i];
                 var paramInfo = injectTypeInfo.InjectConstructor.ParameterInfos[i];
-                var resolveMethodRef = module.ImportReference(ResolveMethodInfo.MakeGenericMethod(paramInfo.ParameterType));
+                var resolveMethodRef = module.ImportReference(ResolveOrParameterMethodInfo.MakeGenericMethod(paramInfo.ParameterType));
 
                 var paramVariableDef = new VariableDefinition(paramDef.ParameterType);
                 body.Variables.Add(paramVariableDef);
 
                 // TODO: Add ExceptionHandler
-                var resolveStart = processor.Create(OpCodes.Ldarg_1);
-                processor.Append(resolveStart);
+                // Call ResolveOrParameter(IObjectResolver, Type, string, IReadOnlyList<IInjectParameter>)
+                processor.Emit(OpCodes.Ldarg_1);
+                processor.Emit(OpCodes.Ldstr, paramInfo.Name);
+                processor.Emit(OpCodes.Ldarg_2);
                 processor.Emit(OpCodes.Callvirt, resolveMethodRef);
                 processor.Emit(OpCodes.Stloc_S, paramVariableDef);
                 processor.Emit(OpCodes.Ldloc_S, paramVariableDef);
@@ -190,16 +200,9 @@ namespace VContainer.Editor.CodeGen
             processor.Emit(OpCodes.Ret);
         }
 
-        void GenerateInjectMethod(
-            TypeDefinition typeDef,
-            TypeDefinition injectorTypeDef,
-            InjectTypeInfo injectTypeInfo)
+        void GenerateInjectMethod(TypeDefinition typeDef, TypeDefinition injectorTypeDef, InjectTypeInfo injectTypeInfo)
         {
-            var methodDef = new MethodDefinition(
-                "Inject",
-                MethodAttributes.Public,
-                module.TypeSystem.Void);
-
+            var methodDef = new MethodDefinition("Inject", MethodAttributes.Public, module.TypeSystem.Void);
             injectorTypeDef.Methods.Add(methodDef);
 
             methodDef.Parameters.Add(new ParameterDefinition(module.TypeSystem.Object)
@@ -245,14 +248,15 @@ namespace VContainer.Editor.CodeGen
                         var paramDef = injectMethodRef.Parameters[i];
                         var paramInfo = injectMethod.ParameterInfos[i];
 
-                        var resolveMethodRef = module.ImportReference(ResolveMethodInfo.MakeGenericMethod(paramInfo.ParameterType));
+                        var resolveMethodRef = module.ImportReference(ResolveOrParameterMethodInfo.MakeGenericMethod(paramInfo.ParameterType));
 
                         var paramVariableDef = new VariableDefinition(paramDef.ParameterType);
                         body.Variables.Add(paramVariableDef);
 
                         // TODO: Add ExceptionHandler
-                        var resolveStart = processor.Create(OpCodes.Ldarg_2);
-                        processor.Append(resolveStart);
+                        processor.Emit(OpCodes.Ldarg_2);
+                        processor.Emit(OpCodes.Ldstr, paramInfo.Name);
+                        processor.Emit(OpCodes.Ldarg_3);
                         processor.Emit(OpCodes.Callvirt, resolveMethodRef);
                         processor.Emit(OpCodes.Stloc_S, paramVariableDef);
                         processor.Emit(OpCodes.Ldloc_S, paramVariableDef);
