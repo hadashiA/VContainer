@@ -157,6 +157,7 @@ namespace VContainer.Editor.CodeGen
                !(type.IsAbstract && type.IsSealed) &&
                !typeof(Delegate).IsAssignableFrom(type) &&
                !typeof(Attribute).IsAssignableFrom(type) &&
+               !type.IsGenericType &&
                (targetNamespaces == null ||
                 targetNamespaces.Count <= 0 ||
                 targetNamespaces.Contains(type.Namespace));
