@@ -12,10 +12,11 @@ namespace VContainer.Internal
         {
             return Injectors.GetOrAdd(type, type1 =>
             {
-                var field = type.GetField("__GetGeneratedInjector", BindingFlags.Static | BindingFlags.Public);
-                if (field != null)
+                var getter = type.GetMethod("__GetGeneratedInjector", BindingFlags.Static | BindingFlags.Public);
+                if (getter != null)
                 {
-                    return (IInjector)field.GetValue(null);
+                    UnityEngine.Debug.Log($"!!!!!!!! {type.FullName}");
+                    return (IInjector)getter.Invoke(null, null);
                 }
 
                 return ReflectionInjector.Build(type);

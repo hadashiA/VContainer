@@ -34,7 +34,7 @@ namespace VContainer.Editor.CodeGen
 
         MethodReference BaseEmptyConstructorRef =>
             baseEmptyConstructorRef ??
-            (baseEmptyConstructorRef = module.ImportReference(typeof(object).GetConstructor(Array.Empty<Type>())));
+            (baseEmptyConstructorRef = module.ImportReference(typeof(object).GetConstructor(Type.EmptyTypes)));
 
         MethodReference ResolveMethodRef
         {
@@ -161,7 +161,7 @@ namespace VContainer.Editor.CodeGen
                 targetNamespaces.Count <= 0 ||
                 targetNamespaces.Contains(type.Namespace));
 
-        TypeDefinition GenerateInnerInjectorType(TypeDefinition typeDef, InjectTypeInfo injectTypeInfo)
+        void GenerateInnerInjectorType(TypeDefinition typeDef, InjectTypeInfo injectTypeInfo)
         {
             var injectorTypeDef = new TypeDefinition(
                 "",
@@ -178,8 +178,6 @@ namespace VContainer.Editor.CodeGen
             GenerateInjectorGetterMethod(typeDef, injectorTypeDef);
 
             typeDef.NestedTypes.Add(injectorTypeDef);
-
-            return injectorTypeDef;
         }
 
         void GenerateDefaultConstructor(TypeDefinition typeDef)
@@ -193,10 +191,12 @@ namespace VContainer.Editor.CodeGen
                 module.TypeSystem.Void);
 
             var processor = constructorDef.Body.GetILProcessor();
-            processor.Emit(OpCodes.Nop);
+            // processor.Emit(OpCodes.Nop);
             processor.Emit(OpCodes.Ldarg_0);
             processor.Emit(OpCodes.Call, BaseEmptyConstructorRef);
             processor.Emit(OpCodes.Ret);
+
+            constructorDef.DeclaringType = typeDef;
 
             typeDef.Methods.Add(constructorDef);
         }
@@ -206,12 +206,16 @@ namespace VContainer.Editor.CodeGen
             TypeDefinition injectorTypeDef,
             InjectTypeInfo injectTypeInfo)
         {
-            var methodDef = new MethodDefinition(
-                "CreateInstance",
-                MethodAttributes.Public,
+            var methodDef = new MethodDefinition("CreateInstance",
+                MethodAttributes.Public | MethodAttributes.Virtual,
                 module.TypeSystem.Object);
 
             injectorTypeDef.Methods.Add(methodDef);
+
+            var baseMethodDef = InjectorTypeRef.Resolve().Methods
+                .Single(x => x.Name == "CreateInstance");
+            var baseMethodRef = module.ImportReference(baseMethodDef);
+            methodDef.Overrides.Add(baseMethodRef);
 
             methodDef.Parameters.Add(new ParameterDefinition(ObjectResolverTypeRef)
             {
@@ -265,8 +269,15 @@ namespace VContainer.Editor.CodeGen
 
         void GenerateInjectMethod(TypeDefinition typeDef, TypeDefinition injectorTypeDef, InjectTypeInfo injectTypeInfo)
         {
-            var methodDef = new MethodDefinition("Inject", MethodAttributes.Public, module.TypeSystem.Void);
+            var methodDef = new MethodDefinition("Inject",
+                MethodAttributes.Public | MethodAttributes.Virtual,
+                module.TypeSystem.Void);
             injectorTypeDef.Methods.Add(methodDef);
+
+            var baseMethodDef = InjectorTypeRef.Resolve().Methods
+                .Single(x => x.Name == "Inject");
+            var baseMethodRef = module.ImportReference(baseMethodDef);
+            methodDef.Overrides.Add(baseMethodRef);
 
             methodDef.Parameters.Add(new ParameterDefinition(module.TypeSystem.Object)
             {

@@ -2,6 +2,7 @@
 
 namespace VContainer.Tests
 {
+
     interface I1
     {
     }
