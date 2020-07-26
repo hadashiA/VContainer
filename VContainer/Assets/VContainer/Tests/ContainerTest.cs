@@ -214,6 +214,20 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void ResolveGenerics()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+            builder.Register<GenericsService<I2>>(Lifetime.Singleton);
+            builder.Register<GenericsArgumentService>(Lifetime.Singleton);
+
+            var container = builder.Build();
+
+            var resolved = container.Resolve<GenericsArgumentService>();
+            Assert.That(resolved.GenericsService, Is.InstanceOf<GenericsService<I2>>());
+        }
+
+        [Test]
         public void RegisterInstance()
         {
             var builder = new ContainerBuilder();

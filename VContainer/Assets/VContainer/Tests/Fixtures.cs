@@ -224,4 +224,24 @@ namespace VContainer.Tests
             Service2 = service2;
         }
     }
+
+    class GenericsService<T>
+    {
+        public readonly I2 Service2;
+
+        public GenericsService(I2 service2)
+        {
+            service2 = service2;
+        }
+    }
+
+    class GenericsArgumentService
+    {
+        public readonly GenericsService<I2> GenericsService;
+
+        public GenericsArgumentService(GenericsService<I2> genericsService)
+        {
+            GenericsService = genericsService;
+        }
+    }
 }
