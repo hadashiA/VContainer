@@ -932,16 +932,16 @@ using (LifetimeScope.Push(fooInstaller)
 
 You can specify a root LifetimeScope that will be the parent of all LifetimeScopes.  
 
-![](docs/screenshot_vcontainersettings_collapse.png)
 
 - 1. Create your root LifetimeScope prefab
 - 2. Create `VContainerSettings`
     - Choose `Assets -> Create -> VContaienr -> VContainer Settings`
 - 3. From your VContainerSettings inspector, set your prefab to the **Root Lifetime Scope** section.
 
-- Note:
+![](docs/screenshot_vcontainersettings_collapse.png)
+
+Note:
   - If you create VContainerSettings from this menu, it will be automatically registered in preload assets.
-  - ![](docs/screenshot_preloadassets.png)
 
 
 ## Dispatching Unity Lifecycle
