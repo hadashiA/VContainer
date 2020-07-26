@@ -16,13 +16,11 @@
 - ECS Support
 - Immutable Container.
 
-![](docs/unity_performance_test_result.png)
+![](docs/benchmark_result.png)
 
-- This benchmark was run by [Performance Testing Extension for Unity Test Runner](https://docs.unity3d.com/Packages/com.unity.test-framework.performance@1.0/manual/index.html).  Test cases is [here](VContainer.Benchmark).
-- :warning: This benchmark does not use Zenject's Reflection baking.
-  - Currently, VContainer does not support pre-build IL weaving or C# code generation optimizations, but it is planned for a future version.
-  - VContainer does all type-analyze in Container Build phase. To reduce main thread blokcing time, you can consider [Async Contaienr Build](#async-contaienr-build).
-
+- This cases is [here](VContainer.Benchmark).
+- "CodeGen" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. see [Optimization](#optimization) section.
+  - Zenject also has a pre-code generation feature called "Reflection Baking", but it was excluded in this benchmark because it didn't succeed in working in the same environment.
 
 And in resolve, We have zero allocation (without resolved instances).
 
@@ -34,7 +32,7 @@ Following is a deep profiler Unity result sample.
 
 ## Breaking Changes from v0.0.x
 
-- From 0.0.x, the API of LifetimeScope has changed.
+- From 0.0.x, API has changed.
   - [Obsolete MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
   - If you are using an earlier version, please check [Getting Started](#getting-started) again.
 
@@ -1301,6 +1299,39 @@ Zenject is awesome. but VContainer is:
 wip
 
 ## Optimization
+
+### Pre IL Code Generation
+
+:warning: this feature requires Unity 2019.3 or later.
+
+VContainer has the ability to perform the meta programming part faster by generating IL code at compile time.  
+As a result, there is no reflection at runtime, and it is expected to be 3-6x faster.  
+It works in the IL2CPP environment.
+
+#### How to enable code generation mode
+
+##### 1. Add VContainerSettings in your project
+
+Choose `Assets -> Create -> VContainer -> VContainer Settings`.  
+And select directory.
+
+Note:
+- This menu will automatically add VContainerSettings to preload-assets.
+
+![](docs/screenshot_preloadassets.png)
+
+##### 2. Specify target assemblies
+
+Set the following from the inspector of VContainerSettings.asset.
+
+- Prepare Code Generation section
+  - **Enabled** : enable/disable code generation feature at build time.
+  - **Target Assemblies** : Specify the assembly you want to pre-IL generate.
+      - "+" button shows valid choices
+      - The Assembly specified here must reference VContainer.dll. 
+      - If not specified, no pre-code generation will be done
+  - **Namespace Filter** : You can filter the target by specifying namespace.
+      - "+" button shows valid choices.
 
 ### Async Contaienr Build
 
