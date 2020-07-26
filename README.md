@@ -18,13 +18,13 @@
 
 ![](docs/benchmark_result.png)
 
-- Test cases is [here](VContainer.Benchmark).
-- "VContainer (CodeGen)" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. see [Optimization](#optimization) section.
-  - Zenject also has a pre-code generation feature called "Reflection Baking", but it was excluded in this benchmark. (Because it didn't succeed in working in the same environment..)
+This image is the execution speed benchmark result.
+- By default, both VContainer and Zenject use reflection at runtime.
+- "VContainer (CodeGen)" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. 
+    - See [Optimization](#optimization) section  more information.
+- Zenject also has a pre-code generation feature called "Reflection Baking", but it was excluded in this benchmark. (Because it didn't succeed in working in the same environment..)
 
-And in resolve, We have zero allocation (without resolved instances).
-
-Following is a deep profiler Unity result sample.
+And in resolve, We have zero allocation (without resolved instances):
 
 ![](docs/screenshot_profiler_vcontainer.png)
 
@@ -932,12 +932,16 @@ using (LifetimeScope.Push(fooInstaller)
 
 You can specify a root LifetimeScope that will be the parent of all LifetimeScopes.  
 
+![](docs/screenshot_vcontainersettings_collapse.png)
+
 - 1. Create your root LifetimeScope prefab
 - 2. Create `VContainerSettings`
     - Choose `Assets -> Create -> VContaienr -> VContainer Settings`
-    - Note:
-        - If you create VContainerSettings from this menu, it will be automatically registered in preload assets.
 - 3. From your VContainerSettings inspector, set your prefab to the **Root Lifetime Scope** section.
+
+- Note:
+  - If you create VContainerSettings from this menu, it will be automatically registered in preload assets.
+  - ![](docs/screenshot_preloadassets.png)
 
 
 ## Dispatching Unity Lifecycle
@@ -1327,11 +1331,11 @@ And select directory.
 Note:
 - This menu will automatically add VContainerSettings to preload-assets.
 
-![](docs/screenshot_preloadassets.png)
-
 ##### 2. Specify target assemblies
 
 Set the following from the inspector of VContainerSettings.asset.
+
+![](docs/screenshot_vcontainersettings.png)
 
 - Prepare Code Generation section
   - **Enabled** : enable/disable code generation feature at build time.
@@ -1392,7 +1396,7 @@ class GameLifetimeScope : LifetimeScope
 ### Parallel Container Build
 
 If you enable `VCONTAINER_PARALLEL_CONTAINER_BUILD` compilation flag,
-VCOntainer will perform container builds in Parallel.
+VContainer will perform container builds in Parallel.
 
 This is the solution when you have a lot of objects to register.
 
