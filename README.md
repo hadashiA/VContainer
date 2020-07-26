@@ -1321,7 +1321,7 @@ VContainer has the ability to perform the meta programming part faster by genera
 As a result, there is no reflection at runtime, and it is expected to be 3-6x faster.  
 It works in the IL2CPP environment.
 
-With VContainer, for example, the following IL is automatically generated (C# example) :
+With VContainer, for example, the following code (as IL) is automatically generated:
 
 ```csharp
 class ClassA
@@ -1337,17 +1337,17 @@ class ClassA
 
         public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
-            AllInjectionFeatureService allInjectionFeatureService = (AllInjectionFeatureService)instance;
+            ClassA clasA = (ClassA)instance;
             I3 service = resolver.ResolveOrParameter<I3>("service3", parameters);
             I4 service2 = resolver.ResolveOrParameter<I4>("service4", parameters);
             allInjectionFeatureService.MethodInjectable1(service, service2);
             I5 service3 = resolver.ResolveOrParameter<I5>("service5", parameters);
             I6 service4 = resolver.ResolveOrParameter<I6>("service6", parameters);
-            allInjectionFeatureService.MethodInjectable2(service3, service4);
-            allInjectionFeatureService.PrivatePropertyInjectable = resolver.Resolve<I2>();
-            allInjectionFeatureService.PublicPropertyInjectable = resolver.Resolve<I3>();
-            allInjectionFeatureService.privateFieldInjectable = resolver.Resolve<I4>();
-            allInjectionFeatureService.PublicFieldInjectable = resolver.Resolve<I5>();
+            classA.MethodInjectable2(service3, service4);
+            classA.PrivatePropertyInjectable = resolver.Resolve<I2>();
+            classA.PublicPropertyInjectable = resolver.Resolve<I3>();
+            classA.privateFieldInjectable = resolver.Resolve<I4>();
+            classA.PublicFieldInjectable = resolver.Resolve<I5>();
         }
    }
 ```
