@@ -11,11 +11,6 @@ namespace VContainer
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
     }
 
-    public static class ObjectResolverExtensions
-    {
-        public static T Resolve<T>(this IObjectResolver resolver) => (T)resolver.Resolve(typeof(T));
-    }
-
     public interface IScopedObjectResolver : IObjectResolver
     {
         IObjectResolver Root { get; }

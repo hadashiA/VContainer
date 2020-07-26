@@ -53,7 +53,6 @@ namespace VContainer.Tests
             set => publicProperty = value;
         }
 
-
         [Inject]
         I4 privateFieldInjectable;
 
@@ -76,13 +75,13 @@ namespace VContainer.Tests
         }
 
         [Inject]
-        public void MethodInjectable1()
+        public void MethodInjectable1(I3 service3, I4 service4)
         {
             Method1Called = true;
         }
 
         [Inject]
-        public void MethodInjectable2()
+        public void MethodInjectable2(I5 service5, I6 service6)
         {
             Method2Called = true;
         }
@@ -223,6 +222,26 @@ namespace VContainer.Tests
         public void MethodInjectable1(I2 service2)
         {
             Service2 = service2;
+        }
+    }
+
+    class GenericsService<T>
+    {
+        public readonly I2 Service2;
+
+        public GenericsService(I2 service2)
+        {
+            service2 = service2;
+        }
+    }
+
+    class GenericsArgumentService
+    {
+        public readonly GenericsService<I2> GenericsService;
+
+        public GenericsArgumentService(GenericsService<I2> genericsService)
+        {
+            GenericsService = genericsService;
         }
     }
 }
