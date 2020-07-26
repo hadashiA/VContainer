@@ -118,7 +118,8 @@ namespace VContainer.Editor.CodeGen
             sw.Stop();
             if (count > 0)
             {
-                UnityEngine.Debug.Log($"VContainer code generation optimization for {module.Assembly.Name} {count} types ({sw.Elapsed.TotalMilliseconds}ms)");
+                var assemblyName = module.Assembly.Name.Name;
+                UnityEngine.Debug.Log($"VContainer code generation optimization for {assemblyName} {count} types ({sw.Elapsed.TotalMilliseconds}ms)");
                 return true;
             }
             return false;
