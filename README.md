@@ -1345,6 +1345,18 @@ Set the following from the inspector of VContainerSettings.asset.
       - If not specified, no pre-code generation will be done
   - **Namespace Filter** : You can filter the target by specifying namespace.
       - "+" button shows valid choices.
+      
+#### 3. Build your assembly      
+
+The next time the specified assembly is compiled, VContainer will make changes to the compiled dll.
+
+If it succeeds, it will be logged. For example:
+
+> VContainer code generation optimization for MyGame.dll 24 types (40.0355ms)
+
+
+VContainer code generation optimization for VContainer.Benchmark.Fixtures 24 types (40.0355ms)
+
 
 ### Async Contaienr Build
 
