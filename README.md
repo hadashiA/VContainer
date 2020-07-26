@@ -30,11 +30,14 @@ Following is a deep profiler Unity result sample.
 
 ![](docs/screenshot_profiler_zenject.png)
 
-## Breaking Changes from v0.0.x
+## Breaking Changes
 
-- From 0.0.x, API has changed.
-  - [Obsolete MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
+- From 0.0.x
+  - [Remove MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
   - If you are using an earlier version, please check [Getting Started](#getting-started) again.
+- From 0.2.x
+  - [Use `VContainerSettings` instead of automatically loading Resources](https://github.com/hadashiA/VContainer/pull/25
+  - If you were using "ProjectLifetimeScope" in Resources, please check [How to create project root LifetimeScope](#how-to-create-project-root-lifetimescope)
 
 ## Index
 
@@ -925,11 +928,17 @@ using (LifetimeScope.Push(fooInstaller)
 }
 ```
 
-### Project Root
+### How to create project root LifetimeScope
 
-You can create a parent for all LifetimeScopes in your scene.
+You can specify a root LifetimeScope that will be the parent of all LifetimeScopes.  
 
-To do so, create a `LifetimeScope` subclass prefab in a folder named `Resources` in Assets and name it "ProjectLifetimeScope".
+- 1. Create your root LifetimeScope prefab
+- 2. Create `VContainerSettings`
+    - Choose `Assets -> Create -> VContaienr -> VContainer Settings`
+    - Note:
+        - If you create VContainerSettings from this menu, it will be automatically registered in preload assets.
+- 3. From your VContainerSettings inspector, set your prefab to the **Root Lifetime Scope** section.
+
 
 ## Dispatching Unity Lifecycle
 

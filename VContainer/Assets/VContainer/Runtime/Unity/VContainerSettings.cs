@@ -1,8 +1,9 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using VContainer.Unity;
 
-namespace VContainer.Editor
+namespace VContainer.Unity
 {
     [Serializable]
     public sealed class CodeGenSettings
@@ -15,10 +16,12 @@ namespace VContainer.Editor
     public sealed class VContainerSettings : ScriptableObject
     {
         [SerializeField]
+        public LifetimeScope RootLifetimeScope;
+
+        [SerializeField]
         public CodeGenSettings CodeGen;
 
         public static VContainerSettings Instance { get; private set; }
-
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Create/VContainer/VContainer Settings")]
@@ -56,6 +59,8 @@ namespace VContainer.Editor
 
         void OnEnable()
         {
+            if (RootLifetimeScope != null)
+                RootLifetimeScope.IsRoot = true;
             Instance = this;
         }
     }

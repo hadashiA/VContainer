@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Internal;
@@ -11,7 +10,7 @@ using Unity.Entities;
 
 namespace VContainer.Unity
 {
-    
+
     public class LifetimeScope : MonoBehaviour
     {
         public readonly struct ParentOverrideScope : IDisposable
@@ -32,11 +31,6 @@ namespace VContainer.Unity
         [SerializeField]
         bool autoRun = true;
 
-        public const string ProjectRootResourcePath = "ProjectLifetimeScope";
-
-        public static LifetimeScope ProjectRoot => ProjectRootLazy.Value;
-
-        static readonly Lazy<LifetimeScope> ProjectRootLazy = new Lazy<LifetimeScope>(LoadProjectRoot);
         static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
 
         static LifetimeScope overrideParent;
@@ -100,32 +94,9 @@ namespace VContainer.Unity
             lock (SyncRoot) extraInstaller = null;
         }
 
-        static LifetimeScope LoadProjectRoot()
-        {
-            UnityEngine.Debug.Log($"VContainer try to load {ProjectRootResourcePath}");
-            var prefabs = Resources.LoadAll(ProjectRootResourcePath, typeof(GameObject));
-            if (prefabs.Length > 1)
-            {
-                throw new VContainerException(null, $"{ProjectRootResourcePath} resource is duplicated!");
-            }
-
-            var prefab = (GameObject)prefabs.FirstOrDefault();
-            if (prefab == null)
-            {
-                return null;
-            }
-
-            if (prefab.activeSelf)
-            {
-                prefab.SetActive(false);
-            }
-            var gameObject = Instantiate(prefab);
-            DontDestroyOnLoad(gameObject);
-            return gameObject.GetComponent<LifetimeScope>();
-        }
-
         public IObjectResolver Container { get; private set; }
         public LifetimeScope Parent { get; private set; }
+        public bool IsRoot { get; set; }
 
         readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<IInstaller> extraInstallers = new List<IInstaller>();
@@ -243,6 +214,8 @@ namespace VContainer.Unity
 
         LifetimeScope GetRuntimeParent()
         {
+            if (IsRoot) return null;
+
             var nextParent = overrideParent;
             if (nextParent != null)
                 return nextParent;
@@ -260,13 +233,16 @@ namespace VContainer.Unity
                 throw new VContainerException(null, $"LifetimeScope parent `{parentReference.Type.FullName}` is not found in any scene");
             }
 
-            if (ProjectRoot != null && ProjectRoot != this)
+            if (VContainerSettings.Instance is VContainerSettings settings)
             {
-                if (!ProjectRoot.gameObject.activeSelf)
+                if (settings.RootLifetimeScope != null)
                 {
-                    ProjectRoot.gameObject.SetActive(true);
+                    if (settings.RootLifetimeScope.Container == null)
+                    {
+                        settings.RootLifetimeScope.Build();
+                    }
+                    return settings.RootLifetimeScope;
                 }
-                return ProjectRoot;
             }
             return null;
         }
