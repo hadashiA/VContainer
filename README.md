@@ -18,9 +18,9 @@
 
 ![](docs/benchmark_result.png)
 
-- This cases is [here](VContainer.Benchmark).
-- "CodeGen" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. see [Optimization](#optimization) section.
-  - Zenject also has a pre-code generation feature called "Reflection Baking", but it was excluded in this benchmark because it didn't succeed in working in the same environment.
+- Test cases is [here](VContainer.Benchmark).
+- "VContainer (CodeGen)" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. see [Optimization](#optimization) section.
+  - Zenject also has a pre-code generation feature called "Reflection Baking", but it was excluded in this benchmark. (Because it didn't succeed in working in the same environment..)
 
 And in resolve, We have zero allocation (without resolved instances).
 
