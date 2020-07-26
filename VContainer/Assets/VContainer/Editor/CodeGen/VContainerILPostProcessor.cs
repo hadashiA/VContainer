@@ -13,9 +13,10 @@ namespace VContainer.Editor.CodeGen
 
         public override bool WillProcess(ICompiledAssembly compiledAssembly)
         {
-            return VContainerSettings.Instance != null &&
-                   VContainerSettings.Instance.CodeGen.Enabled &&
-                   VContainerSettings.Instance.CodeGen.AssemblyNames.Contains(compiledAssembly.Name) &&
+            var settings = VContainerSettings.Instance;
+            return settings != null &&
+                   settings.CodeGen.Enabled &&
+                   settings.CodeGen.AssemblyNames.Contains(compiledAssembly.Name) &&
                    compiledAssembly.References.Any(x => x.EndsWith("VContainer.dll"));
         }
 

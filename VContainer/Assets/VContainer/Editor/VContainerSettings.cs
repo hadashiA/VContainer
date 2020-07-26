@@ -19,6 +19,7 @@ namespace VContainer.Editor
 
         public static VContainerSettings Instance { get; private set; }
 
+
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Create/VContainer/VContainer Settings")]
         public static void CreateAsset()
@@ -39,6 +40,17 @@ namespace VContainer.Editor
             var preloadedAssets = UnityEditor.PlayerSettings.GetPreloadedAssets().ToList();
             preloadedAssets.Add(configObject);
             UnityEditor.PlayerSettings.SetPreloadedAssets(preloadedAssets.ToArray());
+        }
+
+        [UnityEditor.InitializeOnLoadMethod]
+        public static void LoadInstanceFromAssetDatabase()
+        {
+            var guids = UnityEditor.AssetDatabase.FindAssets("t:VContainerSettings");
+            if (guids.Length > 0)
+            {
+                var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                Instance = UnityEditor.AssetDatabase.LoadAssetAtPath<VContainerSettings>(path);
+            }
         }
 #endif
 
