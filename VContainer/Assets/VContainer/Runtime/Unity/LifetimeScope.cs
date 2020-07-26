@@ -184,13 +184,13 @@ namespace VContainer.Unity
             return child;
         }
 
-        public LifetimeScope CreateChild(Action<IContainerBuilder> installation = null)
+        public LifetimeScope CreateChild(Action<IContainerBuilder> installation)
         {
             if (installation != null)
             {
                 return CreateChild(new ActionInstaller(installation));
             }
-            return CreateChild((IInstaller)null);
+            return CreateChild();
         }
 
         public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
@@ -213,13 +213,13 @@ namespace VContainer.Unity
             return child;
         }
 
-        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation = null)
+        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
         {
             if (installation != null)
             {
                 return CreateChildFromPrefab(prefab, new ActionInstaller(installation));
             }
-            return CreateChildFromPrefab(prefab, (IInstaller)null);
+            return CreateChildFromPrefab(prefab);
         }
 
         void InstallTo(IContainerBuilder builder)
