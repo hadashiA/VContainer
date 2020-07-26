@@ -36,7 +36,7 @@ Following is a deep profiler Unity result sample.
   - [Remove MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
   - If you are using an earlier version, please check [Getting Started](#getting-started) again.
 - From 0.2.x
-  - [Use `VContainerSettings` instead of automatically loading Resources](https://github.com/hadashiA/VContainer/pull/25
+  - [Use `VContainerSettings` instead of automatically loading Resources](https://github.com/hadashiA/VContainer/pull/25)
   - If you were using "ProjectLifetimeScope" in Resources, please check [How to create project root LifetimeScope](#how-to-create-project-root-lifetimescope)
 
 ## Index
