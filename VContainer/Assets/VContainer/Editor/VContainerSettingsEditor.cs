@@ -4,6 +4,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using VContainer.Unity;
 
 namespace VContainer.Editor
 {
@@ -26,6 +27,9 @@ namespace VContainer.Editor
 
             using (var scope = new EditorGUI.ChangeCheckScope())
             {
+                var rootLifetimeScopeProp = serializedObject.FindProperty("RootLifetimeScope");
+                EditorGUILayout.PropertyField(rootLifetimeScopeProp);
+
                 expandCodeGen = EditorGUILayout.Foldout(expandCodeGen, "Prepare Code Generation", true);
                 if (expandCodeGen)
                 {

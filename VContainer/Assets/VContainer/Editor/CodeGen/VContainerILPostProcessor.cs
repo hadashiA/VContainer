@@ -4,6 +4,7 @@ using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using VContainer.Unity;
 
 namespace VContainer.Editor.CodeGen
 {
