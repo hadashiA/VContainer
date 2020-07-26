@@ -36,40 +36,15 @@ namespace VContainer.Editor.CodeGen
             baseEmptyConstructorRef ??
             (baseEmptyConstructorRef = module.ImportReference(typeof(object).GetConstructor(Type.EmptyTypes)));
 
-        MethodReference ResolveMethodRef
-        {
-            get
-            {
-                if (resolveMethodRef == null)
-                {
-                    var methodInfo = typeof(IObjectResolver).GetMethod("Resolve", new []
-                    {
-                        typeof(Type)
-                    });
-                    resolveMethodRef = module.ImportReference(methodInfo);
-                }
-                return resolveMethodRef;
-            }
-        }
+        MethodReference ResolveMethodRef =>
+            resolveMethodRef ??
+            (resolveMethodRef =
+                module.ImportReference(typeof(IObjectResolverExtensions).GetMethod("ResolveNonGeneric")));
 
-        MethodReference ResolveOrParameterMethodRef
-        {
-            get
-            {
-                if (resolveOrParameterMethodRef == null)
-                {
-                    var methodInfo = typeof(IObjectResolverExtensions).GetMethod("ResolveOrParameter", new []
-                    {
-                        typeof(IObjectResolver),
-                        typeof(Type),
-                        typeof(string),
-                        typeof(IReadOnlyList<IInjectParameter>)
-                    });
-                    resolveOrParameterMethodRef = module.ImportReference(methodInfo);
-                }
-                return resolveOrParameterMethodRef;
-            }
-        }
+        MethodReference ResolveOrParameterMethodRef =>
+            resolveOrParameterMethodRef ??
+            (resolveOrParameterMethodRef =
+                module.ImportReference(typeof(IObjectResolverExtensions).GetMethod("ResolveOrParameter")));
 
         TypeReference objectResolverTypeRef;
         TypeReference injectorTypeRef;
@@ -260,7 +235,7 @@ namespace VContainer.Editor.CodeGen
                 processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
                 processor.Emit(OpCodes.Ldstr, paramInfo.Name);
                 processor.Emit(OpCodes.Ldarg_2);
-                processor.Emit(OpCodes.Callvirt, ResolveOrParameterMethodRef);
+                processor.Emit(OpCodes.Call, ResolveOrParameterMethodRef);
                 processor.Emit(OpCodes.Unbox_Any, paramTypeRef);
                 processor.Emit(OpCodes.Stloc_S, paramVariableDef);
                 processor.Emit(OpCodes.Ldloc_S, paramVariableDef);
@@ -339,7 +314,7 @@ namespace VContainer.Editor.CodeGen
                         processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
                         processor.Emit(OpCodes.Ldstr, paramInfo.Name);
                         processor.Emit(OpCodes.Ldarg_3);
-                        processor.Emit(OpCodes.Callvirt, ResolveOrParameterMethodRef);
+                        processor.Emit(OpCodes.Call, ResolveOrParameterMethodRef);
                         processor.Emit(OpCodes.Unbox_Any, paramTypeRef);
                         processor.Emit(OpCodes.Stloc_S, paramVariableDef);
                         processor.Emit(OpCodes.Ldloc_S, paramVariableDef);
@@ -362,7 +337,7 @@ namespace VContainer.Editor.CodeGen
                     processor.Emit(OpCodes.Ldarg_2);
                     processor.Emit(OpCodes.Ldtoken, propertyTypeRef);
                     processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
-                    processor.Emit(OpCodes.Callvirt, ResolveMethodRef);
+                    processor.Emit(OpCodes.Call, ResolveMethodRef);
                     processor.Emit(OpCodes.Callvirt, propertySetterRef);
                 }
             }
@@ -381,7 +356,7 @@ namespace VContainer.Editor.CodeGen
                     processor.Emit(OpCodes.Ldarg_2);
                     processor.Emit(OpCodes.Ldtoken, fieldTypeRef);
                     processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
-                    processor.Emit(OpCodes.Callvirt, ResolveMethodRef);
+                    processor.Emit(OpCodes.Call, ResolveMethodRef);
                     processor.Emit(OpCodes.Stfld, fieldRef);
                 }
             }

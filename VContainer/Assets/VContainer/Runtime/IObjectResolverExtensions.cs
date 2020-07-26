@@ -7,6 +7,10 @@ namespace VContainer
     {
         public static T Resolve<T>(this IObjectResolver resolver) => (T)resolver.Resolve(typeof(T));
 
+        // Using from CodeGen
+        [Preserve]
+        public static object ResolveNonGeneric(this IObjectResolver resolve, Type type) => resolve.Resolve(type);
+
         public static object ResolveOrParameter(
             this IObjectResolver resolver,
             Type parameterType,
