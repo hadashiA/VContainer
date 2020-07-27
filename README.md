@@ -9,11 +9,11 @@
 
 "V" means making Unity's initial "U" more thinner and solid ... !
 
-- Fast resolve. Minimum GC allocation. (For using reflection. Because it targets Unity IL2CPP.)
+- Fast resolve. Minimum GC allocation.
 - Extra small code size. Few internal types.
-- Application can freely create nested Lifetime Scope
+- Application can freely create nested Lifetime Scope.
 - Dispatch your custom types to Unity's PlayerLoopSystem. (It is greatly influenced by Zenject)
-- ECS integration
+- ECS integration.
 - Immutable Container.
 
 ![](docs/benchmark_result.png)
