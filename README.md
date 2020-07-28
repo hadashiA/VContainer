@@ -18,7 +18,8 @@
 
 ![](docs/benchmark_result.png)
 
-This image is the execution speed benchmark result.
+Basically, VContainer is 5-10x faster than Zenject.
+
 - By default, both VContainer and Zenject use reflection at runtime.
 - "VContainer (CodeGen)" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. 
     - See [Optimization](#optimization) section  more information.
@@ -797,7 +798,7 @@ var parent = LifetimeScope.Find<BaseLifetimeScope>();
 // The LifetimeScope generated inside this block will have the specified parent
 using (LifetimeScope.PushParent(parent))
 {
-    // If this scene has a LifetimeScope, its parent will be `current`.
+    // If this scene has a LifetimeScope, its parent will be `parent`.
     var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
     while (!loading.isDone)
     {
