@@ -94,6 +94,8 @@ Further reading:
     - `"jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer"`
 - unitypackage
   - The [releases](https://github.com/hadashiA/VContainer/releases) page provides downloadable .unitypackage files.
+  - The following entry is required in your `Package/manifest.json` to use the unitypackage.
+    - `"nuget.mono-cecil": "0.1.6-preview"`
 
 ## Getting Started
 
