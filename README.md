@@ -12,7 +12,7 @@
 - Fast resolve. Minimum GC allocation.
 - Extra small code size. Few internal types.
 - Application can freely create nested Lifetime Scope.
-- Dispatch your custom types to Unity's PlayerLoopSystem. (It is greatly influenced by Zenject)
+- IoC : Create script entry point without MonoBehaviour. (Using own Unity's PlayerLoopSystem)
 - ECS integration.
 - Immutable Container.
 
