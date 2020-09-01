@@ -242,7 +242,7 @@ We should register this as running on Unity's life cycle events.
 ```
 
 Note:
-- `RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)` is an alias to register interfaces related to Unity's PlayerLoop event. ( Simular to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
+- `RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)` is an alias to register interfaces related to Unity's PlayerLoop event. ( Similar to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
 - Registering lifecycle events without relying on MonoBehaviour facilitates decupling of domain logic and presentation !
 
 If you have multiple EntryPoints, you can also use the following declaration as grouping.
@@ -642,7 +642,7 @@ builder.RegisterComponent(yourBehaviour);
 ```
 
 Note:
-- `RegisterComponent` simular to `RegisterInstance`. The only difference is that MonoBehaviour registered with `RegisterComponent` will be injected even if not Resolved.
+- `RegisterComponent` similar to `RegisterInstance`. The only difference is that MonoBehaviour registered with `RegisterComponent` will be injected even if not Resolved.
 
 **Register from scene with `LifetimeScope`**
 
