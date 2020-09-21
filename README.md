@@ -667,7 +667,7 @@ builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
 **Register component that with new GameObject when resolving**
 
 ```csharp
-builder.RegisterComponentOnNewGameObject<YourBehaciour>(Lifetime.Scoped, "NewGameObjectName");
+builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "NewGameObjectName");
 ```
 
 **Register component as interface**
