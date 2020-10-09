@@ -63,11 +63,15 @@ namespace VContainer
                     return registration.SpawnInstance(this);
 
                 case Lifetime.Singleton:
+                    if (Parent is null)
+                    {
+                        return Root.Resolve(registration);
+                    }
                     if (registry.Exists(registration))
                     {
                         return sharedInstances.GetOrAdd(registration, createInstance).Value;
                     }
-                    return (Parent.Parent is null ? Parent.Root : Parent).Resolve(registration);
+                    return Parent.Resolve(registration);
 
                 case Lifetime.Scoped:
                     var lazy = sharedInstances.GetOrAdd(registration, createInstance);
