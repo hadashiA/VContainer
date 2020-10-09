@@ -98,10 +98,10 @@ namespace VContainer.Tests
 
             var parentContainer = builder.Build();
 
-            var childContainer = parentContainer.CreateScope(builder =>
+            var childContainer = parentContainer.CreateScope(childBuilder =>
             {
-                builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
-                builder.Register<ServiceA>(Lifetime.Singleton);
+                childBuilder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+                childBuilder.Register<ServiceA>(Lifetime.Singleton);
             });
             {
                 var parentSingleton = childContainer.Resolve<NoDependencyServiceA>();
@@ -112,10 +112,10 @@ namespace VContainer.Tests
                 Assert.That(childSingleton.Service2, Is.InstanceOf<I2>());
             }
 
-            var grandChildContainer = childContainer.CreateScope(builder =>
+            var grandChildContainer = childContainer.CreateScope(grandChildBuilder =>
             {
-                builder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton);
-                builder.Register<ServiceB>(Lifetime.Singleton);
+                grandChildBuilder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton);
+                grandChildBuilder.Register<ServiceB>(Lifetime.Singleton);
             });
             {
                 var parentSingleton = grandChildContainer.Resolve<NoDependencyServiceA>();
