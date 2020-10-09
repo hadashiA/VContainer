@@ -75,5 +75,60 @@ namespace VContainer.Tests
                 Assert.Throws<VContainerException>(() => container.Resolve<DisposableServiceB>());
             }
         }
+
+        [Test]
+        public void CreateScopeWithResolveSingleton()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<NoDependencyServiceA>(Lifetime.Singleton);
+
+            var container = builder.Build();
+
+            var scopedContainer = container.CreateScope();
+
+            var singleton = scopedContainer.Resolve<NoDependencyServiceA>();
+            Assert.That(singleton, Is.InstanceOf<NoDependencyServiceA>());
+        }
+
+        [Test]
+        public void CreateScopeWithRegisterSingleton()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<NoDependencyServiceA>(Lifetime.Singleton);
+
+            var parentContainer = builder.Build();
+
+            var childContainer = parentContainer.CreateScope(builder =>
+            {
+                builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+                builder.Register<ServiceA>(Lifetime.Singleton);
+            });
+            {
+                var parentSingleton = childContainer.Resolve<NoDependencyServiceA>();
+                Assert.That(parentSingleton, Is.InstanceOf<NoDependencyServiceA>());
+
+                var childSingleton = childContainer.Resolve<ServiceA>();
+                Assert.That(childSingleton, Is.InstanceOf<ServiceA>());
+                Assert.That(childSingleton.Service2, Is.InstanceOf<I2>());
+            }
+
+            var grandChildContainer = childContainer.CreateScope(builder =>
+            {
+                builder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton);
+                builder.Register<ServiceB>(Lifetime.Singleton);
+            });
+            {
+                var parentSingleton = grandChildContainer.Resolve<NoDependencyServiceA>();
+                Assert.That(parentSingleton, Is.InstanceOf<NoDependencyServiceA>());
+
+                var childSingleton = grandChildContainer.Resolve<ServiceA>();
+                Assert.That(childSingleton, Is.InstanceOf<ServiceA>());
+                Assert.That(childSingleton.Service2, Is.InstanceOf<I2>());
+
+                var grandChildSingleton = grandChildContainer.Resolve<ServiceB>();
+                Assert.That(grandChildSingleton, Is.InstanceOf<ServiceB>());
+                Assert.That(grandChildSingleton.Service3, Is.InstanceOf<I3>());
+            }
+        }
     }
 }

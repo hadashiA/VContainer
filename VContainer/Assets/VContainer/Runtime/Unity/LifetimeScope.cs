@@ -10,7 +10,6 @@ using Unity.Entities;
 
 namespace VContainer.Unity
 {
-
     public class LifetimeScope : MonoBehaviour
     {
         public readonly struct ParentOverrideScope : IDisposable

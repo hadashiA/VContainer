@@ -6,5 +6,6 @@ namespace VContainer.Internal
     {
         // void Add(Registration registration);
         bool TryGet(Type interfaceType, out IRegistration registration);
+        bool Exists(IRegistration registration);
     }
 }
