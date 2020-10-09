@@ -120,10 +120,12 @@ namespace VContainer.Tests
             {
                 var parentSingleton = grandChildContainer.Resolve<NoDependencyServiceA>();
                 Assert.That(parentSingleton, Is.InstanceOf<NoDependencyServiceA>());
+                Assert.That(parentSingleton, Is.EqualTo(parentContainer.Resolve<NoDependencyServiceA>()));
 
                 var childSingleton = grandChildContainer.Resolve<ServiceA>();
                 Assert.That(childSingleton, Is.InstanceOf<ServiceA>());
                 Assert.That(childSingleton.Service2, Is.InstanceOf<I2>());
+                Assert.That(childSingleton, Is.EqualTo(childContainer.Resolve<ServiceA>()));
 
                 var grandChildSingleton = grandChildContainer.Resolve<ServiceB>();
                 Assert.That(grandChildSingleton, Is.InstanceOf<ServiceB>());
