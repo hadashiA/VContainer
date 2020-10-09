@@ -67,7 +67,7 @@ namespace VContainer
                     {
                         return sharedInstances.GetOrAdd(registration, createInstance).Value;
                     }
-                    return Parent.Resolve(registration);
+                    return (Parent.Parent is null ? Parent.Root : Parent).Resolve(registration);
 
                 case Lifetime.Scoped:
                     var lazy = sharedInstances.GetOrAdd(registration, createInstance);
