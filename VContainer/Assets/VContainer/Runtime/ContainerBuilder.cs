@@ -9,11 +9,12 @@ namespace VContainer
     public interface IContainerBuilder
     {
         object ApplicationOrigin { get; set; }
+        bool ContainerExposed { get; set; }
 
         RegistrationBuilder Register<T>(Lifetime lifetime);
         RegistrationBuilder RegisterInstance(object instance);
+
         RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
-        void RegisterContainer();
 
         IObjectResolver Build();
     }
@@ -45,10 +46,9 @@ namespace VContainer
     public class ContainerBuilder : IContainerBuilder
     {
         public object ApplicationOrigin { get; set; }
+        public bool ContainerExposed { get; set; }
 
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
-
-        bool containerRegistered;
 
         public RegistrationBuilder Register<T>(Lifetime lifetime)
             => Register(new RegistrationBuilder(typeof(T), lifetime));
@@ -61,8 +61,6 @@ namespace VContainer
             registrationBuilders.Add(registrationBuilder);
             return registrationBuilder;
         }
-
-        public void RegisterContainer() => containerRegistered = true;
 
         public virtual IObjectResolver Build()
         {
@@ -101,7 +99,7 @@ namespace VContainer
                 TypeAnalyzer.CheckCircularDependency(x.ImplementationType);
             }
 #endif
-            if (containerRegistered)
+            if (ContainerExposed)
             {
                 registrations.Add(ContainerRegistration.Default);
             }

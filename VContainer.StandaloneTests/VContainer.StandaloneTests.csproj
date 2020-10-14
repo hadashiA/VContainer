@@ -7,10 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="..\VContainer\Assets\VContainer\Tests\**\*.cs"
-                 Exclude="
-..\VContainer\Assets\VContainer\Tests\Unity\**\*.cs;
-" />
+        <Compile Include="..\VContainer\Assets\VContainer\Tests\**\*.cs" Exclude="&#xA;..\VContainer\Assets\VContainer\Tests\Unity\**\*.cs;&#xA;" />
     </ItemGroup>
 
     <ItemGroup>
