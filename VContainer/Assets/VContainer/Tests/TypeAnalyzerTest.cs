@@ -22,6 +22,16 @@ namespace VContainer.Tests
             }
         }
 
+        class HasStaticConstructor
+        {
+            static int Foo = 400;
+
+            [Inject]
+            public HasStaticConstructor()
+            {
+            }
+        }
+
         class HasInjectConstructor
         {
             [Inject]
@@ -56,7 +66,11 @@ namespace VContainer.Tests
             }
             {
                 var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasInjectConstructor));
-                // Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
+                Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
+            }
+            {
+                var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasStaticConstructor));
+                Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.IsStatic, Is.False);
             }
         }
     }
