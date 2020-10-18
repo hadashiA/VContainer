@@ -64,12 +64,12 @@
      <Compile Include="Assets\VContainer\Runtime\ContainerBuilderExtensions.cs" />
      <Compile Include="Assets\VContainer\Runtime\IInjectParameter.cs" />
      <Compile Include="Assets\VContainer\Runtime\IInjector.cs" />
-     <Compile Include="Assets\VContainer\Runtime\Internal\FactoryRegistration.cs" />
-     <Compile Include="Assets\VContainer\Runtime\Internal\Registration.cs" />
      <Compile Include="Assets\VContainer\Runtime\IObjectResolverExtensions.cs" />
+     <Compile Include="Assets\VContainer\Runtime\IRegistration.cs" />
      <Compile Include="Assets\VContainer\Runtime\InjectAttribute.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\CappedArrayPool.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\CompositeDisposable.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Internal\FactoryRegistration.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTable.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTableRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\GCCollectScope.cs" />
@@ -78,8 +78,8 @@
      <Compile Include="Assets\VContainer\Runtime\Internal\InjectParameter.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\InjectorCache.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\ReflectionInjector.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Internal\Registration.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\TypeAnalyzer.cs" />
-     <Compile Include="Assets\VContainer\Runtime\IRegistration.cs" />
      <Compile Include="Assets\VContainer\Runtime\RegistrationBuilder.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ActionInstaller.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ComponentRegistration.cs" />
