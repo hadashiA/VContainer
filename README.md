@@ -9,36 +9,27 @@
 
 "V" means making Unity's initial "U" more thinner and solid ... !
 
-- Fast resolve. Minimum GC allocation.
-- Extra small code size. Few internal types.
-- Application can freely create nested Lifetime Scope.
-- IoC : Create script entry point without MonoBehaviour. (Using own Unity's PlayerLoopSystem)
-- ECS integration.
-- Immutable Container.
+- **Fast resolve:** Basically, 5-10x faster than Zenject.
+- **Minimum GC allocation**: In Resolve, We have zero allocation without spawned instances.
+- **Extra small code size**: Few internal types and few .callvirt.
+- **Flexible scoping**: Application can freely create nested Lifetime Scope.
+- **IoC**: Create script entry point without MonoBehaviour. (Using own Unity's PlayerLoopSystem)
+- **ECS integration**
+- **Immutable Container:** Thread safety and robustness.
 
 ![](docs/benchmark_result.png)
-
-Basically, VContainer is 5-10x faster than Zenject.
 
 - By default, both VContainer and Zenject use reflection at runtime.
 - "VContainer (CodeGen)" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. 
     - See [Optimization](#optimization) section  more information.
-- Zenject also has a pre-code generation feature called "Reflection Baking", but it was excluded in this benchmark. (Because it didn't succeed in working in the same environment..)
 
-And in resolve, We have zero allocation (without resolved instances):
+Here is an example of profile results for GC Alloc:
 
 ![](docs/screenshot_profiler_vcontainer.png)
 
 ![](docs/screenshot_profiler_zenject.png)
 
-## Breaking Changes
-
-- From 0.0.x
-  - [Remove MonoInstaller/ScriptableObjectInstaller and instead inherit LifetimeScope](https://github.com/hadashiA/VContainer/pull/15)
-  - If you are using an earlier version, please check [Getting Started](#getting-started) again.
-- From 0.2.x
-  - [Use `VContainerSettings` instead of automatically loading Resources](https://github.com/hadashiA/VContainer/pull/25)
-  - If you were using "ProjectLifetimeScope" in Resources, please check [How to create project root LifetimeScope](#how-to-create-project-root-lifetimescope)
+(VContainer has achieved zero allocation during Resolve.)
 
 ## Index
 
@@ -50,6 +41,7 @@ And in resolve, We have zero allocation (without resolved instances):
 - [Controlling Scope and Lifetime](#controlling-scope-and-lifetime)
 - [Dispatching Unity Lifecycle](#dispatching-unity-lifecycle)
 - [Integrating with ECS](#integrating-with-ecs)
+- [Comparing VContainer to Zenject](#comparing-vcontainer-to-zenject)
 - [Optimization](#optimization)
 - [Best Practices and Recommendations](#best-practices-and-recommendations)
 
@@ -628,9 +620,77 @@ class OtherClass
 }
 ```
 
+#### Register Factory
+
+VContainer allows to register a `Func<>` delegate for the creation of an instance. This is especially useful in scenarios where instance is created at any time during execution, or multiple instances are created at any time.
+
+By registering Factory instead of instance, you can keep the dependency static and simple.
+
+##### Register `Func<>` Factory that requires only runtime parameters
+
+```csharp
+builder.RegisterFactory<int, Foo>(x => new Foo(x));
+```
+
+We can resolve like below:
+
+```csharp
+class ClassA
+{
+    readonly Func<int, Foo> factory;
+
+    public ClassA(Func<int, Foo> factory)
+    {
+        this.factory = factory;
+    }
+
+    public void DoSomething()
+    {
+        var foo = factory.Invoke(100);
+        // ...
+    }
+}
+```
+
+##### Register `Func<>` Factory that requires container dependencies and runtime parameters
+
+```csharp
+builder.RegisterFactory<int, Foo>(container =>
+{
+    var dependency = container.Resolve<Dependency>(); // Resolve per scope
+    return x => new Foo(x, dependency); // Execute per factory invocation
+}, Lifetime.Scoped);
+```
+
+This method required 2 params
+
+- Func<>: Receives Container and returns Factory.
+
+- Lifetime : Determines how often the Factory is generated. (that is, how often the outer Func is executed.)
+
+We can resolve like below:
+
+```csharp
+class ClassA
+{
+    readonly Func<int, Foo> factory;
+
+    public ClassA(Func<int, Foo> factory)
+    {
+        this.factory = factory;
+    }
+
+    public void DoSomething()
+    {
+        var foo = factory.Invoke(100);
+        // ...
+    }
+}
+```
+
 #### Register `MonoBehaviour`
 
-**Register from LifetimeScope's `[SerializeField]`**
+##### Register from LifetimeScope's `[SerializeField]`
 
 ```csharp
 [SerializeField]
@@ -644,7 +704,7 @@ builder.RegisterComponent(yourBehaviour);
 Note:
 - `RegisterComponent` similar to `RegisterInstance`. The only difference is that MonoBehaviour registered with `RegisterComponent` will be injected even if not Resolved.
 
-**Register from scene with `LifetimeScope`**
+##### Register from scene with `LifetimeScope`
 
 ```csharp
 builder.RegisterComponentInHierarchy<YourBehaviour>();
@@ -653,7 +713,7 @@ builder.RegisterComponentInHierarchy<YourBehaviour>();
 Note:
 - `RegisterComponentInHierarchy` always `.Scoped` lifetime. Because lifetime is equal to the scene.
 
-**Register component that Instantiate from prefab when resolving**
+##### Register component that Instantiate from prefab when resolving
 
 ```csharp
 [SerializeField]
@@ -664,20 +724,20 @@ YourBehaviour prefab;
 builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
 ```
 
-**Register component that with new GameObject when resolving**
+##### Register component that with new GameObject when resolving
 
 ```csharp
 builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "NewGameObjectName");
 ```
 
-**Register component as interface**
+##### Register component as interface
 
 ```csharp
 builder.RegisterComponentInHierarchy<YourBehaviour>()
     .AsImplementedInterfaces();
 ```
 
-**Register component to specific parent Transform**
+##### Register component to specific parent Transform
 
 ```csharp
 builder.RegisterComponentFromInNewPrefab<YourBehaviour>(Lifetime.Scoped)
@@ -775,12 +835,12 @@ it has following behaviours:
 
 - If registered object is not found, `LifetimeScope` will look for a parent `LifetimeScope`.
 - For `Lifetime.Singleton`
-  - Always returns the same instance.
-  - Parent and child cannot register the same type.
+  - Basically, always returns the same instance.
+  - If parent and child have the same type, it returns the instance with the closest scope.
 - For `LifeTime.Transient`
   - Instance creating for each resolving.
   - If parent and child have the same type, child will prioritize itself.
-- For `Lifetime.Scoped`:
+- For `Lifetime.Scoped`
   - Instance will be different for each child.
       - If same child, returns same instance.
       - If parent and child have the same type, child will prioritize itself.
@@ -1311,10 +1371,158 @@ Zenject is awesome. but VContainer is:
  | Container.Bind\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromNewComponentOnNewGameObject()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached()<br>&nbsp;&nbsp;&nbsp;&nbsp;.WithGameObjectName("Foo1") | builder.RegisterComponentOnNewGameObject\<Foo\>(Lifetime.Scoped, "Foo1") |
  | .UnderTransform(parentTransform) | .UnderTransform(parentTransform) |
  | .UnderTransform(() => parentTransform) | .UnderTransform(() => parentTransform) |
- | Container.Bind\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromComponentInNewPrefabResource("Some/Path/Foo") | **Not supported**<br>We should load Resources using  `LoadAsync` family.<br>You can use `RegisterInstance()` etc after loading the Resource. |
- | Container.Bind\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.WithId("foo").AsCached() | **Not supported**<br>Duplicate type Resolve is not recommended.<br>You can instead use type-specific Register<br>builder.Register\<Service\>(Lifetime.Scoped)<br>&nbsp;&nbsp;&nbsp;&nbsp;.WithParameter("foo", foo) |
 
-wip
+<table style="height: 0 auto;">
+<tr>
+  <th>Zenject</th>
+  <th>VContainer</th>
+</tr>
+<tr>
+<td>
+
+```csharp
+Container.Bind<Foo>()
+    .FromComponentInNewPrefabResource("Some/Path/Foo")
+```
+
+</td>
+<td>
+
+#### Not supported</b>
+
+We should load Resources using LoadAsync family.
+You can use RegisterInstance() etc after loading the Resource.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+```csharp
+Container.Bind<Foo>()
+    .WithId("foo").AsCached()
+```
+
+</td>
+<td>
+
+#### Not supported
+
+Duplicate type Resolve is not recommended.
+You can instead use type-specific Register
+builder.Register<Service>(Lifetime.Scoped)
+    .WithParameter("foo", foo)
+
+</td>
+</tr>
+
+<table style="height: 0 auto;">
+<tr>
+  <th>Zenject</th>
+  <th>VContainer</th>
+</tr>
+<tr>
+<td>
+
+```csharp
+public class Enemy
+{
+    readonly Player player;
+    readonly float speed;
+
+    public Enemy(float speed, Player player)
+    {
+        this.player = player;
+        this.speed = speed;
+    }
+
+    public class Factory : PlaceholderFactory<float, Enemy>;
+    {
+    }
+}
+
+Container.BindFactory<float, Enemy, Enemy.Factory>();
+```
+
+</td>
+<td>
+
+```csharp
+public class Enemy
+{
+    readonly Player player;
+    readonly float speed;
+
+    public Enemy(float speed, Player player)
+    {
+        this.player = player;
+        this.speed = speed;
+    }
+}
+
+builder.RegisterFactory<float, Enemy>(container =>
+{
+    var player = container.Resolve<Player>();
+    return speed => new Enemy(speed, player);
+}, Lifetime.Scoped);
+```
+
+</td>
+</tr>
+<tr>
+<td>
+
+```csharp
+public class Enemy : MonoBehaviour
+{
+    Player player;
+
+    [Inject]
+    public void Construct(Player player)
+    {
+        this.player = player;
+    }
+
+    public class Factory : PlaceholderFactory<Enemy>
+    {
+    }
+}
+
+Container.BindFactory<Enemy, Enemy.Factory>()
+    .FromComponentInNewPrefab(enemyPrefab);
+```
+
+</td>
+<td>
+
+```csharp
+public class Enemy : MonoBehaviour
+{
+    Player player;
+
+    public void Construct(Player player)
+    {
+        this.player = player;
+    }
+}
+
+builder.RegisterFactory<Enemy>(container =>
+{
+    var player = container.Resolve<Player>();
+    return () =>
+    {
+        var enemy = Instantiate(enemyPrefab);
+        enemy.Construct(player);
+        return enemy;
+    };
+}, Lifetime.Scoped);
+```
+
+</td>
+</tr>
+</table>
+
 
 ## Optimization
 
