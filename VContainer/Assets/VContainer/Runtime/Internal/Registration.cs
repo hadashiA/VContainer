@@ -1,19 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using VContainer.Internal;
 
-namespace VContainer
+namespace VContainer.Internal
 {
-    public interface IRegistration
-    {
-        Type ImplementationType { get; }
-        IReadOnlyList<Type> InterfaceTypes { get; }
-        Lifetime Lifetime { get; }
-        object SpawnInstance(IObjectResolver resolver);
-    }
-
-    public sealed class Registration : IRegistration
+    sealed class Registration : IRegistration
     {
         public Type ImplementationType { get; }
         public IReadOnlyList<Type> InterfaceTypes { get; }
@@ -54,7 +45,7 @@ namespace VContainer
         }
     }
 
-    public sealed class CollectionRegistration : IRegistration, IEnumerable<IRegistration>
+    sealed class CollectionRegistration : IRegistration, IEnumerable<IRegistration>
     {
         public Type ImplementationType { get; }
         public IReadOnlyList<Type> InterfaceTypes => interfaceTypes;
@@ -112,7 +103,7 @@ namespace VContainer
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public sealed class ContainerRegistration : IRegistration
+    sealed class ContainerRegistration : IRegistration
     {
         public static readonly ContainerRegistration Default = new ContainerRegistration();
 

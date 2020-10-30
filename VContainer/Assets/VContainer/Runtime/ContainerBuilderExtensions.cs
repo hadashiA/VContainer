@@ -37,6 +37,85 @@ namespace VContainer
             this IContainerBuilder builder, object instance)
             => builder.RegisterInstance(instance).As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
 
+        public static RegistrationBuilder RegisterFactory<T>(
+            this IContainerBuilder builder,
+            Func<T> factory)
+            => builder.RegisterInstance(factory);
+
+        public static RegistrationBuilder RegisterFactory<TParam1, T>(
+            this IContainerBuilder builder,
+            Func<TParam1, T> factory)
+            => builder.RegisterInstance(factory);
+
+        public static RegistrationBuilder RegisterFactory<TParam1, TParam2, T>(
+            this IContainerBuilder builder,
+            Func<TParam1, TParam2, T> factory)
+            => builder.RegisterInstance(factory);
+
+        public static RegistrationBuilder RegisterFactory<TParam1, TParam2, TParam3, T>(
+            this IContainerBuilder builder,
+            Func<TParam1, TParam2, TParam3, T> factory)
+            => builder.RegisterInstance(factory);
+
+        public static RegistrationBuilder RegisterFactory<TParam1, TParam2, TParam3, TParam4, T>(
+            this IContainerBuilder builder,
+            Func<TParam1, TParam2, TParam3, TParam4, T> factory)
+            => builder.RegisterInstance(factory);
+        
+        public static RegistrationBuilder RegisterFactory<T>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, Func<T>> factoryFactory,
+            Lifetime lifetime)
+        {
+            var registrationBuilder = new FactoryRegistration<T>(factoryFactory, lifetime);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
+
+        public static RegistrationBuilder RegisterFactory<TParam1, T>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, Func<TParam1, T>> factoryFactory,
+            Lifetime lifetime)
+        {
+            var registrationBuilder = new FactoryRegistration<TParam1, T>(factoryFactory, lifetime);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
+
+        public static RegistrationBuilder RegisterFactory<TParam1, TParam2, T>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, Func<TParam1, TParam2, T>> factoryFactory,
+            Lifetime lifetime)
+        {
+            var registrationBuilder = new FactoryRegistration<TParam1, TParam2, T>(factoryFactory, lifetime);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
+
+        public static RegistrationBuilder RegisterFactory<TParam1, TParam2, TParam3, T>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, Func<TParam1, TParam2, TParam3, T>> factoryFactory,
+            Lifetime lifetime)
+        {
+            var registrationBuilder = new FactoryRegistration<TParam1, TParam2, TParam3, T>(factoryFactory, lifetime);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
+
+        public static RegistrationBuilder RegisterFactory<TParam1, TParam2, TParam3, TParam4, T>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, Func<TParam1, TParam2, TParam3, TParam4, T>> factoryFactory,
+            Lifetime lifetime)
+        {
+            var registrationBuilder = new FactoryRegistration<TParam1, TParam2, TParam3, TParam4, T>(factoryFactory, lifetime);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
+
+
+        public static void RegisterContainer(this IContainerBuilder builder)
+            => builder.ContainerExposed = true;
+
         public static RegistrationBuilder RegisterGCCollect(this IContainerBuilder builder)
             => builder.RegisterInstance<IDisposable>(new GCCollectScope());
     }
