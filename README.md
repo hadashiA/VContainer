@@ -17,13 +17,15 @@
 - **ECS integration**
 - **Immutable Container:** Thread safety and robustness.
 
+Benchmarking:
+
 ![](docs/benchmark_result.png)
 
 - By default, both VContainer and Zenject use reflection at runtime.
 - "VContainer (CodeGen)" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. 
     - See [Optimization](#optimization) section  more information.
 
-Here is an example of profile results for GC Alloc:
+An example of profile results for GC Alloc:
 
 ![](docs/screenshot_profiler_vcontainer.png)
 
