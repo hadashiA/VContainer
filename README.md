@@ -1430,6 +1430,45 @@ builder.Register<Service>(Lifetime.Scoped)
 ```csharp
 public class Enemy
 {
+    readonly float speed;
+
+    public Enemy(float speed)
+    {
+        this.speed = speed;
+    }
+
+    public class Factory : PlaceholderFactory<float, Enemy>;
+    {
+    }
+}
+
+Container.BindFactory<float, Enemy, Enemy.Factory>();
+```
+
+</td>   
+<td>
+
+```csharp
+public class Enemy
+{
+    readonly float speed;
+
+    public Enemy(float speed)
+    {
+        this.speed = speed;
+    }
+}
+
+builder.RegisterFactory<float, Enemy>(speed => new Enemy(speed));
+```
+
+</td>
+<tr>
+<td>
+
+```csharp
+public class Enemy
+{
     readonly Player player;
     readonly float speed;
 
