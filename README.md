@@ -906,6 +906,9 @@ And below is an example of creating a child.
 // Create no extra registered child
 var childLifetimeScope = lifetimeScope.CreateChild();
 
+// Instantiate with child scope
+childLifetimeScope.Container.Resolve<ScopedService>();
+
 // Create a extra registered child
 var childLifetimeScope = lifetimeScope.CreateChild(builder =>
 {
