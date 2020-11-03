@@ -4,11 +4,15 @@ using VContainer.Internal;
 
 namespace VContainer
 {
-    public interface IObjectResolver : IDisposable
+    public interface IScopeFactory
+    {
+        IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
+    }
+
+    public interface IObjectResolver : IScopeFactory, IDisposable
     {
         object Resolve(Type type);
         object Resolve(IRegistration registration);
-        IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
     }
 
     public interface IScopedObjectResolver : IObjectResolver

@@ -103,6 +103,7 @@ namespace VContainer
             {
                 registrations.Add(ContainerRegistration.Default);
             }
+            registrations.Add(ScopeFactoryRegistration.Default);
             return registrations;
         }
     }
