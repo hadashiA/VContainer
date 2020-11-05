@@ -10,7 +10,13 @@ using Unity.Entities;
 
 namespace VContainer.Unity
 {
-    public class LifetimeScope : MonoBehaviour, IApplicationOrigin
+    public interface IScopeFactory
+    {
+        IObjectResolver CreateScope(IInstaller installer = null);
+        IObjectResolver CreateScope(Action<IContainerBuilder> installation);
+    }
+
+    public class LifetimeScope : MonoBehaviour, IScopeFactory
     {
         public readonly struct ParentOverrideScope : IDisposable
         {
@@ -139,6 +145,8 @@ namespace VContainer.Unity
                 InstallTo(builder);
                 Container = builder.Build();
             }
+
+            ActivateEntryPoints();
         }
 
         public LifetimeScope CreateChild(IInstaller installer = null)
@@ -194,6 +202,13 @@ namespace VContainer.Unity
             return CreateChildFromPrefab(prefab);
         }
 
+        IObjectResolver IScopeFactory.CreateScope(IInstaller installer = null)
+            => CreateChild(installer).Container;
+
+        IObjectResolver IScopeFactory.CreateScope(Action<IContainerBuilder> installation)
+            => CreateChild(installation).Container;
+
+
         void InstallTo(IContainerBuilder builder)
         {
             Configure(builder);
@@ -209,6 +224,8 @@ namespace VContainer.Unity
                 extraInstaller = LifetimeScope.extraInstaller;
             }
             extraInstaller?.Install(builder);
+
+            builder.RegisterInstance<IScopeFactory>(this);
         }
 
         LifetimeScope GetRuntimeParent()
@@ -246,13 +263,13 @@ namespace VContainer.Unity
             return null;
         }
 
-        void IApplicationOrigin.OnContainerBuilt(IObjectResolver container)
+        void ActivateEntryPoints()
         {
             PlayerLoopHelper.Initialize();
 
             try
             {
-                var markers = container.Resolve<IEnumerable<IInitializable>>();
+                var markers = Container.Resolve<IEnumerable<IInitializable>>();
                 var loopItem = new InitializationLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Initialization, loopItem);
@@ -263,7 +280,7 @@ namespace VContainer.Unity
 
             try
             {
-                var markers = container.Resolve<IEnumerable<IPostInitializable>>();
+                var markers = Container.Resolve<IEnumerable<IPostInitializable>>();
                 var loopItem = new PostInitializationLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
@@ -274,7 +291,7 @@ namespace VContainer.Unity
 
             try
             {
-                var markers = container.Resolve<IEnumerable<IFixedTickable>>();
+                var markers = Container.Resolve<IEnumerable<IFixedTickable>>();
                 var loopItem = new FixedTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.FixedUpdate, loopItem);
@@ -285,7 +302,7 @@ namespace VContainer.Unity
 
             try
             {
-                var markers = container.Resolve<IEnumerable<IPostFixedTickable>>();
+                var markers = Container.Resolve<IEnumerable<IPostFixedTickable>>();
                 var loopItem = new PostFixedTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
@@ -296,7 +313,7 @@ namespace VContainer.Unity
 
             try
             {
-                var markers = container.Resolve<IEnumerable<ITickable>>();
+                var markers = Container.Resolve<IEnumerable<ITickable>>();
                 var loopItem = new TickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Update, loopItem);
@@ -307,7 +324,7 @@ namespace VContainer.Unity
 
             try
             {
-                var markers = container.Resolve<IEnumerable<IPostTickable>>();
+                var markers = Container.Resolve<IEnumerable<IPostTickable>>();
                 var loopItem = new PostTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostUpdate, loopItem);
@@ -318,7 +335,7 @@ namespace VContainer.Unity
 
             try
             {
-                var markers = container.Resolve<IEnumerable<ILateTickable>>();
+                var markers = Container.Resolve<IEnumerable<ILateTickable>>();
                 var loopItem = new LateTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, loopItem);
@@ -329,7 +346,7 @@ namespace VContainer.Unity
 
             try
             {
-                var markers = container.Resolve<IEnumerable<IPostLateTickable>>();
+                var markers = Container.Resolve<IEnumerable<IPostLateTickable>>();
                 var loopItem = new PostLateTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
@@ -340,7 +357,7 @@ namespace VContainer.Unity
 
             try
             {
-                var _ = container.Resolve<IEnumerable<MonoBehaviour>>();
+                var _ = Container.Resolve<IEnumerable<MonoBehaviour>>();
             }
             catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<MonoBehaviour>))
             {
@@ -349,7 +366,7 @@ namespace VContainer.Unity
 #if VCONTAINER_ECS_INTEGRATION
             try
             {
-                var _ = container.Resolve<IEnumerable<ComponentSystemBase>>();
+                var _ = Container.Resolve<IEnumerable<ComponentSystemBase>>();
             }
             catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ComponentSystemBase>))
             {
@@ -357,7 +374,7 @@ namespace VContainer.Unity
 
             try
             {
-                var worldHelpers = container.Resolve<IEnumerable<WorldConfigurationHelper>>();
+                var worldHelpers = Container.Resolve<IEnumerable<WorldConfigurationHelper>>();
                 foreach (var x in worldHelpers)
                 {
                     x.SortSystems();

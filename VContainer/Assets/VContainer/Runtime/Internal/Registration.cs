@@ -112,14 +112,4 @@ namespace VContainer.Internal
         public Lifetime Lifetime => Lifetime.Transient;
         public object SpawnInstance(IObjectResolver resolver) => resolver;
     }
-
-    sealed class ScopeFactoryRegistration : IRegistration
-    {
-        public static readonly ScopeFactoryRegistration Default = new ScopeFactoryRegistration();
-
-        public Type ImplementationType => typeof(IScopeFactory);
-        public IReadOnlyList<Type> InterfaceTypes => null;
-        public Lifetime Lifetime => Lifetime.Transient;
-        public object SpawnInstance(IObjectResolver resolver) => resolver;
-    }
 }

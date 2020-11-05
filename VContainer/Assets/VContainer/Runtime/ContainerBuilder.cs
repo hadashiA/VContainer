@@ -8,7 +8,7 @@ namespace VContainer
 {
     public interface IContainerBuilder
     {
-        IApplicationOrigin ApplicationOrigin { get; set; }
+        object ApplicationOrigin { get; set; }
         bool ContainerExposed { get; set; }
 
         RegistrationBuilder Register<T>(Lifetime lifetime);
@@ -17,11 +17,6 @@ namespace VContainer
         RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
 
         IObjectResolver Build();
-    }
-
-    public interface IApplicationOrigin
-    {
-        void OnContainerBuilt(IObjectResolver container);
     }
 
     public sealed class ScopedContainerBuilder : ContainerBuilder
@@ -39,9 +34,7 @@ namespace VContainer
         {
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
-            var container = new ScopedContainer(registry, root, parent);
-            ApplicationOrigin?.OnContainerBuilt(container);
-            return container;
+            return new ScopedContainer(registry, root, parent);
         }
 
         public override IObjectResolver Build() => BuildScope();
@@ -49,7 +42,7 @@ namespace VContainer
 
     public class ContainerBuilder : IContainerBuilder
     {
-        public IApplicationOrigin ApplicationOrigin { get; set; }
+        public object ApplicationOrigin { get; set; }
         public bool ContainerExposed { get; set; }
 
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
@@ -70,9 +63,7 @@ namespace VContainer
         {
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
-            var container = new Container(registry);
-            ApplicationOrigin?.OnContainerBuilt(container);
-            return container;
+            return new Container(registry);
         }
 
         protected IReadOnlyList<IRegistration> BuildRegistrations()
@@ -108,7 +99,6 @@ namespace VContainer
             {
                 registrations.Add(ContainerRegistration.Default);
             }
-            registrations.Add(ScopeFactoryRegistration.Default);
             return registrations;
         }
     }
