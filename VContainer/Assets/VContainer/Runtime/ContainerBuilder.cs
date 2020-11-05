@@ -8,7 +8,7 @@ namespace VContainer
 {
     public interface IContainerBuilder
     {
-        object ApplicationOrigin { get; set; }
+        IApplicationOrigin ApplicationOrigin { get; set; }
         bool ContainerExposed { get; set; }
 
         RegistrationBuilder Register<T>(Lifetime lifetime);
@@ -19,14 +19,17 @@ namespace VContainer
         IObjectResolver Build();
     }
 
+    public interface IApplicationOrigin
+    {
+        void OnContainerBuilt(IObjectResolver container);
+    }
+
     public sealed class ScopedContainerBuilder : ContainerBuilder
     {
         readonly IObjectResolver root;
         readonly IScopedObjectResolver parent;
 
-        internal ScopedContainerBuilder(
-            IObjectResolver root,
-            IScopedObjectResolver parent)
+        internal ScopedContainerBuilder(IObjectResolver root, IScopedObjectResolver parent)
         {
             this.root = root;
             this.parent = parent;
@@ -37,6 +40,7 @@ namespace VContainer
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             var container = new ScopedContainer(registry, root, parent);
+            ApplicationOrigin?.OnContainerBuilt(container);
             return container;
         }
 
@@ -45,7 +49,7 @@ namespace VContainer
 
     public class ContainerBuilder : IContainerBuilder
     {
-        public object ApplicationOrigin { get; set; }
+        public IApplicationOrigin ApplicationOrigin { get; set; }
         public bool ContainerExposed { get; set; }
 
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
@@ -67,6 +71,7 @@ namespace VContainer
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             var container = new Container(registry);
+            ApplicationOrigin?.OnContainerBuilt(container);
             return container;
         }
 
