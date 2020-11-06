@@ -1,7 +1,5 @@
-using System.Collections;
 using UnityEngine;
 using NUnit.Framework;
-using UnityEngine.TestTools;
 using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
@@ -23,35 +21,63 @@ namespace VContainer.Tests.Unity
             Assert.That(child2.Parent, Is.Null);
         }
 
-        [UnityTest]
-        public IEnumerator ActivateEntryPoints()
+        [Test]
+        public void CreateChild()
         {
+            LifetimeScope parentLifetimeScope;
+
             using (LifetimeScope.Push(builder =>
             {
                 builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
             }))
             {
-                var parentLifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
-                yield return null;
-
-                var parentEntryPoint = parentLifetimeScope.Container.Resolve<SampleEntryPoint>();
-                Assert.That(parentEntryPoint.InitializeCalled, Is.True);
-
-                var childLifetimeScope = parentLifetimeScope.CreateChild();
-                var childEntryPoint = childLifetimeScope.Container.Resolve<SampleEntryPoint>();
-                yield return null;
-
-                Assert.That(childEntryPoint.InitializeCalled, Is.True);
-                Assert.That(childEntryPoint, Is.Not.EqualTo(parentEntryPoint));
-
-                var scopeFactory = childLifetimeScope.Container.Resolve<IScopeFactory>();
-                var instantScope = scopeFactory.CreateScope();
-                yield return null;
-
-                var instantEntryPoint = instantScope.Resolve<SampleEntryPoint>();
-                Assert.That(instantEntryPoint.InitializeCalled, Is.True);
-                Assert.That(instantEntryPoint, Is.Not.EqualTo(childEntryPoint));
+                parentLifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
             }
+
+            var parentEntryPoint = parentLifetimeScope.Container.Resolve<SampleEntryPoint>();
+            Assert.That(parentEntryPoint, Is.Not.Null);
+
+            var childLifetimeScope = parentLifetimeScope.CreateChild();
+            var childEntryPoint = childLifetimeScope.Container.Resolve<SampleEntryPoint>();
+
+            Assert.That(childEntryPoint, Is.Not.Null);
+            Assert.That(childEntryPoint, Is.Not.EqualTo(parentEntryPoint));
+
+            var scopeFactory = childLifetimeScope.Container.Resolve<IScopeFactory>();
+            var instantScope = scopeFactory.CreateScope();
+            var instantEntryPoint = instantScope.Container.Resolve<SampleEntryPoint>();
+
+            Assert.That(instantEntryPoint, Is.Not.Null);
+            Assert.That(instantEntryPoint, Is.Not.EqualTo(childEntryPoint));
+        }
+
+        [Test]
+        public void CreateScopeWithSingleton()
+        {
+            LifetimeScope parentLifetimeScope;
+
+            using (LifetimeScope.Push(builder =>
+            {
+                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Singleton).AsSelf();
+            }))
+            {
+                parentLifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
+            }
+
+            var parentEntryPoint = parentLifetimeScope.Container.Resolve<SampleEntryPoint>();
+            Assert.That(parentEntryPoint, Is.InstanceOf<SampleEntryPoint>());
+
+            var childLifetimeScope = parentLifetimeScope.CreateChild();
+            var childEntryPoint = childLifetimeScope.Container.Resolve<SampleEntryPoint>();
+
+            Assert.That(childEntryPoint, Is.InstanceOf<SampleEntryPoint>());
+            Assert.That(childEntryPoint, Is.EqualTo(parentEntryPoint));
+
+            var scopeFactory = childLifetimeScope.Container.Resolve<IScopeFactory>();
+            var instantScope = scopeFactory.CreateScope();
+            var instantEntryPoint = instantScope.Container.Resolve<SampleEntryPoint>();
+            Assert.That(instantEntryPoint, Is.InstanceOf<SampleEntryPoint>());
+            Assert.That(instantEntryPoint, Is.EqualTo(childEntryPoint));
         }
     }
 }
