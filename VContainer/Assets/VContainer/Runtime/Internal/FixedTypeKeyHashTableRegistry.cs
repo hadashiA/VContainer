@@ -97,9 +97,9 @@ namespace VContainer.Internal
                     if (hashTable.TryGet(elementType, out var elementRegistration))
                     {
                         collectionRegistration.Add(elementRegistration);
+                        registration = collectionRegistration;
+                        return true;
                     }
-                    registration = collectionRegistration;
-                    return true;
                 }
             }
             return false;

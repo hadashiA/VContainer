@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace VContainer.Tests
@@ -133,5 +135,53 @@ namespace VContainer.Tests
                 Assert.That(grandChildSingleton.Service3, Is.InstanceOf<I3>());
             }
         }
+
+        [Test]
+        public void ResolveCollectionFromParent()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Singleton);
+            builder.Register<I1, MultipleInterfaceServiceB>(Lifetime.Transient);
+
+            var container = builder.Build();
+            var childContainer = container.CreateScope();
+
+            var enumerable = childContainer.Resolve<IEnumerable<I1>>();
+            var e0 = enumerable.ElementAt(0);
+            var e1 = enumerable.ElementAt(1);
+            Assert.That(e0, Is.TypeOf<MultipleInterfaceServiceA>());
+            Assert.That(e1, Is.TypeOf<MultipleInterfaceServiceB>());
+
+            var list = childContainer.Resolve<IReadOnlyList<I1>>();
+            Assert.That(list[0], Is.TypeOf<MultipleInterfaceServiceA>());
+            Assert.That(list[1], Is.TypeOf<MultipleInterfaceServiceB>());
+
+            // Singleton
+            Assert.That(list[0], Is.EqualTo(e0));
+
+            // Empty
+            var empty = childContainer.Resolve<IEnumerable<I7>>();
+            Assert.That(empty, Is.Empty);
+        }
+
+        [Test]
+        public void ResolveOneAsCollectionFromParent()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Singleton);
+
+            var container = builder.Build();
+            var childContainer = container.CreateScope();
+
+            var enumerable = childContainer.Resolve<IEnumerable<I1>>();
+            var e0 = enumerable.ElementAt(0);
+            Assert.That(e0, Is.TypeOf<MultipleInterfaceServiceA>());
+            Assert.That(enumerable.Count(), Is.EqualTo(1));
+
+            var list = childContainer.Resolve<IReadOnlyList<I1>>();
+            Assert.That(list[0], Is.TypeOf<MultipleInterfaceServiceA>());
+            Assert.That(list.Count, Is.EqualTo(1));
+        }
+
     }
 }
