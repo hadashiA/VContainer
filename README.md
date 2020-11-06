@@ -913,6 +913,9 @@ class LevelLoader : IDisposable
         // Create a child scope for the container that contains this LevelLoader instance.
         instantScope = scopeFactory.Create();
       
+        // Create from LifetimeScope prefab
+        instantScope = scopeFactory.CreateChildFromPrefab(prefab);
+      
         // Create a child scope with extra registrations
         instantScope = scopeFactory.CreateScope(builder =>
         {
@@ -924,9 +927,6 @@ class LevelLoader : IDisposable
       
         // Create a child scope with extra registrations via `IInstaller`
         instantScope = scopeFacotry.CreateScope(extraInstaller);
-
-        // Create from LifetimeScope prefab
-        instantScope = scopeFactory.CreateChildFromPrefab(prefab);
 
         // Create from LifetimeScope prefab and extra registrations
         instantScope = lifetimeScope.CreateChildFromPrefab(prefab, builder =>
@@ -943,7 +943,7 @@ class LevelLoader : IDisposable
     public void Dispose()
     {
         // Note that the return value is `LifetimeScope`. 
-        // Use Destroy to safely destroy the scope.
+        // Use `Destroy` GameObject to safely disposing the scope.
         UnityEngine.Object.Destroy(instantScope.gameObject);
     }
 }
