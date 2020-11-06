@@ -12,8 +12,10 @@ namespace VContainer.Unity
 {
     public interface IScopeFactory
     {
-        IObjectResolver CreateScope(IInstaller installer = null);
-        IObjectResolver CreateScope(Action<IContainerBuilder> installation);
+        LifetimeScope CreateScope(IInstaller installer = null);
+        LifetimeScope CreateScope(Action<IContainerBuilder> installation);
+        LifetimeScope CreateScopeFromPrefab(LifetimeScope prefab, IInstaller installer = null);
+        LifetimeScope CreateScopeFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation);
     }
 
     public class LifetimeScope : MonoBehaviour, IScopeFactory
@@ -202,12 +204,14 @@ namespace VContainer.Unity
             return CreateChildFromPrefab(prefab);
         }
 
-        IObjectResolver IScopeFactory.CreateScope(IInstaller installer = null)
-            => CreateChild(installer).Container;
+        LifetimeScope IScopeFactory.CreateScope(IInstaller installer = null) => CreateChild(installer);
+        LifetimeScope IScopeFactory.CreateScope(Action<IContainerBuilder> installation) => CreateChild(installation);
 
-        IObjectResolver IScopeFactory.CreateScope(Action<IContainerBuilder> installation)
-            => CreateChild(installation).Container;
+        LifetimeScope IScopeFactory.CreateScopeFromPrefab(LifetimeScope prefab, IInstaller installer = null)
+            => CreateChildFromPrefab(prefab, installer);
 
+        LifetimeScope IScopeFactory.CreateScopeFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
+            => CreateChildFromPrefab(prefab, installation);
 
         void InstallTo(IContainerBuilder builder)
         {
