@@ -901,7 +901,8 @@ You can use this by injecting `IScopeFactory`
 class LevelLoader
 {
     readonly IScopeFactory scopeFactory;
-    readonly IObjectResolver instantScope;
+    
+    IObjectResolver instantScope;
   
     public LevelLoader(IScopeFactory scopeFactory)
     {
