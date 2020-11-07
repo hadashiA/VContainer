@@ -898,53 +898,57 @@ Child can also be generated from your C# code.
 You can use this by injecting `IScopeFactory`
 
 ```csharp
-class LevelLoader : IDisposable
+class LevelLoader
 {
     readonly IScopeFactory scopeFactory;
-    readonly LifetimeScope instantScope;
+    readonly IObjectResolver instantScope;
   
     public LevelLoader(IScopeFactory scopeFactory)
     {
         this.scopeFactory = scopeFactory;
     }
   
-    public void DoSomething()
+    public void Load()
     {
+        // ... Loading some assets
+      
         // Create a child scope for the container that contains this LevelLoader instance.
         instantScope = scopeFactory.Create();
       
-        // Create from LifetimeScope prefab
+        // Create with LifetimeScope prefab
         instantScope = scopeFactory.CreateChildFromPrefab(prefab);
+            
+        // Create with LifetimeScope prefab and extra registrations
+        instantScope = lifetimeScope.CreateChildFromPrefab(prefab, builder =>
+        {
+            builder.RegisterInstance(someExtraAsset);
+            builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
+            // ...
+        });     
       
         // Create a child scope with extra registrations
         instantScope = scopeFactory.CreateScope(builder =>
         {
-            builder.Register<ExtraService>(Lifetime.Scoped);
-            builder.RegisterInstance(someExtraAsset);       
-            builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
-            // ...
+            // ...          
         });
       
         // Create a child scope with extra registrations via `IInstaller`
         instantScope = scopeFacotry.CreateScope(extraInstaller);
-
-        // Create from LifetimeScope prefab and extra registrations
-        instantScope = lifetimeScope.CreateChildFromPrefab(prefab, builder =>
-        {
-            // ...
-        });        
+   
       
         // The additionally registered entry point runs immediately after the scope is created...
       
         // Or you can use scoped instance directly.
-        var foo = instantScope.Container.Resolve<Foo>();
+        var foo = instantScope.Resolve<Foo>();
     }
   
-    public void Dispose()
+    public void Unload()
     {
-        // Note that the return value is `LifetimeScope`. 
-        // Use `Destroy` GameObject to safely disposing the scope.
-        UnityEngine.Object.Destroy(instantScope.gameObject);
+        // ... Unloading some assets
+      
+        // Note that the scope implicitly create `LifetimeScope`. 
+        // Use `Dispose` to safely destroying the scope.
+        instantScope.Dispose();
     }
 }
 ```
@@ -994,7 +998,6 @@ using (LifetimeScope.Push(builder =>
 {
     // Register for the next scene not yet loaded
     builder.RegisterInstance(extraInstance);
-    builder.Register<ExtraType>(Lifetime.Scoped);
 }))
 {
     // Load the scene here.
@@ -1033,7 +1036,7 @@ class FooInstaller : IInstaller
 
 using (LifetimeScope.Push(fooInstaller)
 {
-    // ...
+    // ... loading scene
 }
 ```
 

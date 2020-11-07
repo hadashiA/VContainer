@@ -12,10 +12,31 @@ namespace VContainer.Unity
 {
     public interface IScopeFactory
     {
-        LifetimeScope CreateScope(IInstaller installer = null);
-        LifetimeScope CreateScope(Action<IContainerBuilder> installation);
-        LifetimeScope CreateScopeFromPrefab(LifetimeScope prefab, IInstaller installer = null);
-        LifetimeScope CreateScopeFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation);
+        IObjectResolver CreateScope(IInstaller installer = null);
+        IObjectResolver CreateScope(Action<IContainerBuilder> installation);
+        IObjectResolver CreateScopeFromPrefab(LifetimeScope prefab, IInstaller installer = null);
+        IObjectResolver CreateScopeFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation);
+    }
+
+    public class LifetimeScopeProxy : IObjectResolver
+    {
+        readonly LifetimeScope lifetimeScope;
+
+        public LifetimeScopeProxy(LifetimeScope lifetimeScope)
+        {
+            this.lifetimeScope = lifetimeScope;
+        }
+
+        public void Dispose() => UnityEngine.Object.Destroy(lifetimeScope.gameObject);
+
+        public object Resolve(Type type) => lifetimeScope.Container.Resolve(type);
+        public object Resolve(IRegistration registration) => lifetimeScope.Container.Resolve(registration);
+
+        public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
+        {
+            var child = lifetimeScope.CreateChild(installation);
+            return (IScopedObjectResolver)child.Container;
+        }
     }
 
     public class LifetimeScope : MonoBehaviour, IScopeFactory
@@ -204,14 +225,29 @@ namespace VContainer.Unity
             return CreateChildFromPrefab(prefab);
         }
 
-        LifetimeScope IScopeFactory.CreateScope(IInstaller installer = null) => CreateChild(installer);
-        LifetimeScope IScopeFactory.CreateScope(Action<IContainerBuilder> installation) => CreateChild(installation);
+        IObjectResolver IScopeFactory.CreateScope(IInstaller installer = null)
+        {
+            var child = CreateChild(installer);
+            return new LifetimeScopeProxy(child);
+        }
 
-        LifetimeScope IScopeFactory.CreateScopeFromPrefab(LifetimeScope prefab, IInstaller installer = null)
-            => CreateChildFromPrefab(prefab, installer);
+        IObjectResolver IScopeFactory.CreateScope(Action<IContainerBuilder> installation)
+        {
+            var child = CreateChild(installation);
+            return new LifetimeScopeProxy(child);
+        }
 
-        LifetimeScope IScopeFactory.CreateScopeFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
-            => CreateChildFromPrefab(prefab, installation);
+        IObjectResolver IScopeFactory.CreateScopeFromPrefab(LifetimeScope prefab, IInstaller installer = null)
+        {
+            var child = CreateChildFromPrefab(prefab, installer);
+            return new LifetimeScopeProxy(child);
+        }
+
+        IObjectResolver IScopeFactory.CreateScopeFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
+        {
+            var child = CreateChildFromPrefab(prefab, installation);
+            return new LifetimeScopeProxy(child);
+        }
 
         void InstallTo(IContainerBuilder builder)
         {
@@ -271,121 +307,77 @@ namespace VContainer.Unity
         {
             PlayerLoopHelper.Initialize();
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IInitializable>>();
                 var loopItem = new InitializationLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Initialization, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IInitializable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IPostInitializable>>();
                 var loopItem = new PostInitializationLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostInitializable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IFixedTickable>>();
                 var loopItem = new FixedTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.FixedUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IFixedTickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IPostFixedTickable>>();
                 var loopItem = new PostFixedTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostFixedTickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<ITickable>>();
                 var loopItem = new TickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Update, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ITickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IPostTickable>>();
                 var loopItem = new PostTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostTickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<ILateTickable>>();
                 var loopItem = new LateTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ILateTickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IPostLateTickable>>();
                 var loopItem = new PostLateTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostLateTickable>))
-            {
-            }
 
-            try
             {
                 var _ = Container.Resolve<IEnumerable<MonoBehaviour>>();
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<MonoBehaviour>))
-            {
-            }
 
 #if VCONTAINER_ECS_INTEGRATION
-            try
             {
                 var _ = Container.Resolve<IEnumerable<ComponentSystemBase>>();
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ComponentSystemBase>))
-            {
-            }
 
-            try
             {
                 var worldHelpers = Container.Resolve<IEnumerable<WorldConfigurationHelper>>();
                 foreach (var x in worldHelpers)
                 {
                     x.SortSystems();
                 }
-            }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<WorldConfigurationHelper>))
-            {
             }
 #endif
         }

@@ -1,5 +1,8 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using NUnit.Framework;
+using UnityEngine.TestTools;
 using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
@@ -21,8 +24,8 @@ namespace VContainer.Tests.Unity
             Assert.That(child2.Parent, Is.Null);
         }
 
-        [Test]
-        public void CreateChild()
+        [UnityTest]
+        public IEnumerator CreateChild()
         {
             LifetimeScope parentLifetimeScope;
 
@@ -34,21 +37,58 @@ namespace VContainer.Tests.Unity
                 parentLifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
             }
 
+            yield return null;
+            yield return null;
+
             var parentEntryPoint = parentLifetimeScope.Container.Resolve<SampleEntryPoint>();
-            Assert.That(parentEntryPoint, Is.Not.Null);
+            Assert.That(parentEntryPoint, Is.InstanceOf<SampleEntryPoint>());
+            Assert.That(parentEntryPoint.InitializeCalled, Is.True);
+            Assert.That(parentEntryPoint.TickCalls, Is.EqualTo(2));
 
-            var childLifetimeScope = parentLifetimeScope.CreateChild();
+            var childLifetimeScope = parentLifetimeScope.CreateChild(builder =>
+            {
+                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
+                builder.Register<DisposableServiceA>(Lifetime.Scoped);
+            });
+
+            yield return null;
+            yield return null;
+
             var childEntryPoint = childLifetimeScope.Container.Resolve<SampleEntryPoint>();
+            var childDisposable = childLifetimeScope.Container.Resolve<DisposableServiceA>();
 
-            Assert.That(childEntryPoint, Is.Not.Null);
+            Assert.That(childEntryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(childEntryPoint, Is.Not.EqualTo(parentEntryPoint));
+            Assert.That(childEntryPoint.InitializeCalled, Is.True);
+            Assert.That(childEntryPoint.TickCalls, Is.EqualTo(2));
 
             var scopeFactory = childLifetimeScope.Container.Resolve<IScopeFactory>();
-            var instantScope = scopeFactory.CreateScope();
-            var instantEntryPoint = instantScope.Container.Resolve<SampleEntryPoint>();
+            var instantScope = scopeFactory.CreateScope(builder =>
+            {
+                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
+                builder.Register<DisposableServiceA>(Lifetime.Scoped);
+            });
 
-            Assert.That(instantEntryPoint, Is.Not.Null);
+            yield return null;
+            yield return null;
+
+            var instantEntryPoint = instantScope.Resolve<SampleEntryPoint>();
+            var instantDisposable = instantScope.Resolve<DisposableServiceA>();
+
+            Assert.That(childLifetimeScope.transform.childCount, Is.EqualTo(1));
+            Assert.That(instantEntryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(instantEntryPoint, Is.Not.EqualTo(childEntryPoint));
+            Assert.That(instantEntryPoint.InitializeCalled, Is.True);
+            Assert.That(instantEntryPoint.TickCalls, Is.EqualTo(2));
+
+            instantScope.Dispose();
+            yield return null;
+            Assert.That(instantDisposable.Disposed, Is.True);
+            Assert.That(childLifetimeScope.transform.childCount, Is.Zero);
+
+            UnityEngine.Object.Destroy(childLifetimeScope.gameObject);
+            yield return null;
+            Assert.That(childDisposable.Disposed, Is.True);
         }
 
         [Test]
@@ -75,7 +115,7 @@ namespace VContainer.Tests.Unity
 
             var scopeFactory = childLifetimeScope.Container.Resolve<IScopeFactory>();
             var instantScope = scopeFactory.CreateScope();
-            var instantEntryPoint = instantScope.Container.Resolve<SampleEntryPoint>();
+            var instantEntryPoint = instantScope.Resolve<SampleEntryPoint>();
             Assert.That(instantEntryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(instantEntryPoint, Is.EqualTo(childEntryPoint));
         }
