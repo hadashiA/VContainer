@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using NUnit.Framework;
@@ -41,6 +40,10 @@ namespace VContainer.Tests.Unity
             yield return null;
 
             var parentEntryPoint = parentLifetimeScope.Container.Resolve<SampleEntryPoint>();
+            var parentLifetimeScopeFromContainer = parentLifetimeScope.Container.Resolve<LifetimeScope>();
+
+            Assert.That(parentLifetimeScopeFromContainer, Is.EqualTo(parentLifetimeScope));
+            Assert.That(parentLifetimeScopeFromContainer.transform.childCount, Is.Zero);
             Assert.That(parentEntryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(parentEntryPoint.InitializeCalled, Is.True);
             Assert.That(parentEntryPoint.TickCalls, Is.EqualTo(2));
@@ -56,39 +59,19 @@ namespace VContainer.Tests.Unity
 
             var childEntryPoint = childLifetimeScope.Container.Resolve<SampleEntryPoint>();
             var childDisposable = childLifetimeScope.Container.Resolve<DisposableServiceA>();
+            var childLifetimeScopeFromContainer = childLifetimeScope.Container.Resolve<LifetimeScope>();
 
+            Assert.That(childLifetimeScopeFromContainer, Is.EqualTo(childLifetimeScope));
             Assert.That(childEntryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(childEntryPoint, Is.Not.EqualTo(parentEntryPoint));
             Assert.That(childEntryPoint.InitializeCalled, Is.True);
             Assert.That(childEntryPoint.TickCalls, Is.EqualTo(2));
 
-            var scopeFactory = childLifetimeScope.Container.Resolve<IScopeFactory>();
-            var instantScope = scopeFactory.CreateScope(builder =>
-            {
-                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
-                builder.Register<DisposableServiceA>(Lifetime.Scoped);
-            });
-
-            yield return null;
-            yield return null;
-
-            var instantEntryPoint = instantScope.Resolve<SampleEntryPoint>();
-            var instantDisposable = instantScope.Resolve<DisposableServiceA>();
-
-            Assert.That(childLifetimeScope.transform.childCount, Is.EqualTo(1));
-            Assert.That(instantEntryPoint, Is.InstanceOf<SampleEntryPoint>());
-            Assert.That(instantEntryPoint, Is.Not.EqualTo(childEntryPoint));
-            Assert.That(instantEntryPoint.InitializeCalled, Is.True);
-            Assert.That(instantEntryPoint.TickCalls, Is.EqualTo(2));
-
-            instantScope.Dispose();
-            yield return null;
-            Assert.That(instantDisposable.Disposed, Is.True);
-            Assert.That(childLifetimeScope.transform.childCount, Is.Zero);
-
-            UnityEngine.Object.Destroy(childLifetimeScope.gameObject);
+            childLifetimeScope.Dispose();
             yield return null;
             Assert.That(childDisposable.Disposed, Is.True);
+            Assert.That(childLifetimeScope == null, Is.True);
+            Assert.That(parentLifetimeScope.transform.childCount, Is.Zero);
         }
 
         [Test]
@@ -112,12 +95,6 @@ namespace VContainer.Tests.Unity
 
             Assert.That(childEntryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(childEntryPoint, Is.EqualTo(parentEntryPoint));
-
-            var scopeFactory = childLifetimeScope.Container.Resolve<IScopeFactory>();
-            var instantScope = scopeFactory.CreateScope();
-            var instantEntryPoint = instantScope.Resolve<SampleEntryPoint>();
-            Assert.That(instantEntryPoint, Is.InstanceOf<SampleEntryPoint>());
-            Assert.That(instantEntryPoint, Is.EqualTo(childEntryPoint));
         }
     }
 }

@@ -5,14 +5,13 @@ namespace VContainer.Internal
 {
     sealed class CompositeDisposable : IDisposable
     {
-        readonly object syncRoot = new object();
         readonly Stack<IDisposable> disposables = new Stack<IDisposable>();
 
         bool disposed;
 
         public void Dispose()
         {
-            lock (syncRoot)
+            lock (disposables)
             {
                 if (!disposed)
                 {
@@ -27,7 +26,7 @@ namespace VContainer.Internal
 
         public void Add(IDisposable disposable)
         {
-            lock (syncRoot)
+            lock (disposables)
             {
                 disposables.Push(disposable);
             }

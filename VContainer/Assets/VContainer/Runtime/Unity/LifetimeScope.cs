@@ -10,36 +10,7 @@ using Unity.Entities;
 
 namespace VContainer.Unity
 {
-    public interface IScopeFactory
-    {
-        IObjectResolver CreateScope(IInstaller installer = null);
-        IObjectResolver CreateScope(Action<IContainerBuilder> installation);
-        IObjectResolver CreateScopeFromPrefab(LifetimeScope prefab, IInstaller installer = null);
-        IObjectResolver CreateScopeFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation);
-    }
-
-    public class LifetimeScopeProxy : IObjectResolver
-    {
-        readonly LifetimeScope lifetimeScope;
-
-        public LifetimeScopeProxy(LifetimeScope lifetimeScope)
-        {
-            this.lifetimeScope = lifetimeScope;
-        }
-
-        public void Dispose() => UnityEngine.Object.Destroy(lifetimeScope.gameObject);
-
-        public object Resolve(Type type) => lifetimeScope.Container.Resolve(type);
-        public object Resolve(IRegistration registration) => lifetimeScope.Container.Resolve(registration);
-
-        public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
-        {
-            var child = lifetimeScope.CreateChild(installation);
-            return (IScopedObjectResolver)child.Container;
-        }
-    }
-
-    public class LifetimeScope : MonoBehaviour, IScopeFactory
+    public class LifetimeScope : MonoBehaviour, IDisposable
     {
         public readonly struct ParentOverrideScope : IDisposable
         {
@@ -144,8 +115,12 @@ namespace VContainer.Unity
             Container?.Dispose();
         }
 
-        protected virtual void Configure(IContainerBuilder builder)
+        protected virtual void Configure(IContainerBuilder builder) { }
+
+        public void Dispose()
         {
+            if (this != null)
+                Destroy(gameObject);
         }
 
         public void Build()
@@ -225,30 +200,6 @@ namespace VContainer.Unity
             return CreateChildFromPrefab(prefab);
         }
 
-        IObjectResolver IScopeFactory.CreateScope(IInstaller installer = null)
-        {
-            var child = CreateChild(installer);
-            return new LifetimeScopeProxy(child);
-        }
-
-        IObjectResolver IScopeFactory.CreateScope(Action<IContainerBuilder> installation)
-        {
-            var child = CreateChild(installation);
-            return new LifetimeScopeProxy(child);
-        }
-
-        IObjectResolver IScopeFactory.CreateScopeFromPrefab(LifetimeScope prefab, IInstaller installer = null)
-        {
-            var child = CreateChildFromPrefab(prefab, installer);
-            return new LifetimeScopeProxy(child);
-        }
-
-        IObjectResolver IScopeFactory.CreateScopeFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
-        {
-            var child = CreateChildFromPrefab(prefab, installation);
-            return new LifetimeScopeProxy(child);
-        }
-
         void InstallTo(IContainerBuilder builder)
         {
             Configure(builder);
@@ -265,7 +216,7 @@ namespace VContainer.Unity
             }
             extraInstaller?.Install(builder);
 
-            builder.RegisterInstance<IScopeFactory>(this);
+            builder.RegisterInstance(this);
         }
 
         LifetimeScope GetRuntimeParent()

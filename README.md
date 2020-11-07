@@ -856,24 +856,88 @@ If you want to destroy with `LifetimeScope`, make it a child transform of `Lifet
 You can parent it by specifying a `LifetimeScope` object before loading the scene.
 
 ```csharp
-// Find LifetimeScope by type in all loaded scenes
-var parent = LifetimeScope.Find<BaseLifetimeScope>();
-
-// The LifetimeScope generated inside this block will have the specified parent
-using (LifetimeScope.PushParent(parent))
+class SceneLoader
 {
-    // If this scene has a LifetimeScope, its parent will be `parent`.
-    var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
-    while (!loading.isDone)
+    readonly LifetimeScope parent;
+  
+    public SceneLoader(LifetimeScope lifetimeScope)
     {
-        yield return null;
+        parent = lifetimeScope; // Inject the LifetimeScope to which this class belongs
+    }
+  
+    IEnumerator LoadSceneAsync()
+    {
+        // LifetimeScope generated in this block will be parented by `this.lifetimeScope`
+        using (LifetimeScope.PushParent(parent))
+        {
+            // If this scene has a LifetimeScope, its parent will be `parent`.
+            var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+            while (!loading.isDone)
+            {
+                yield return null;
+            }            
+        }
+    }
+
+    // UniTask example
+    async UniTask LoadSceneAsync()
+    {
+        using (LifetimeScope.PushParent(parent))
+        {
+            await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+        }        
+    }
+}
+```
+
+LifetimeScope is a GameObject, so you can also search from the scene.
+
+```csharp
+var parent = LifetimeScope.Find<BaseLifetimeScope>();
+```
+
+#### How to add additional registers to the next scene
+
+Often, you may want to add additional Registers to the loaded scenes.
+
+For example, when context is finalized after assets are loaded asynchronously.
+
+In that case you could use:
+
+```csharp
+// LifetimeScopes generated during this block will be additionally Registered.
+using (LifetimeScope.Push(builder =>
+{
+    // Register for the next scene not yet loaded
+    builder.RegisterInstance(extraInstance);
+}))
+{
+    // Loading the scene..
+}
+```
+
+```csharp
+// Use registration as type
+class FooInstaller : IInstaller
+{
+    public void Install(IContainerBuilder builder)
+    {
+        builder.Register<ExtraType>(Lifetime.Scoped);
     }
 }
 
-using (LifetimeScope.PushParent(parent))
+using (LifetimeScope.Push(fooInstaller)
 {
-    // UniTask example
-    await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+    // ... loading scene
+}
+```
+
+```csharp
+// PushParent() and Push() can be used together.
+using (LifetimeScope.PushParent(parent))
+using (LifetimeScope.Push(builder => ...)
+{
+    // ... loading scene
 }
 ```
 
@@ -893,19 +957,16 @@ In additional scene.
 
 Child can also be generated from your C# code.
 
-#### Use `IScopeFactory`
-
-You can use this by injecting `IScopeFactory`
-
 ```csharp
 class LevelLoader
 {
-    readonly IScopeFactory scopeFactory;
-    readonly IObjectResolver instantScope;
+    readonly LifetimeScope currentScope;
+    
+    LifetimeScope instantScope;
   
-    public LevelLoader(IScopeFactory scopeFactory)
+    public LevelLoader(LifetimeScope lifetimeScope)
     {
-        this.scopeFactory = scopeFactory;
+        currentScope = lifetimeScope;
     }
   
     public void Load()
@@ -913,13 +974,13 @@ class LevelLoader
         // ... Loading some assets
       
         // Create a child scope for the container that contains this LevelLoader instance.
-        instantScope = scopeFactory.Create();
+        instantScope = currentScopey.CreateChild();
       
         // Create with LifetimeScope prefab
-        instantScope = scopeFactory.CreateChildFromPrefab(prefab);
+        instantScope = currentScope.CreateChildFromPrefab(prefab);
             
         // Create with LifetimeScope prefab and extra registrations
-        instantScope = lifetimeScope.CreateChildFromPrefab(prefab, builder =>
+        instantScope = currentScopee.CreateChildFromPrefab(prefab, builder =>
         {
             builder.RegisterInstance(someExtraAsset);
             builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
@@ -927,13 +988,13 @@ class LevelLoader
         });     
       
         // Create a child scope with extra registrations
-        instantScope = scopeFactory.CreateScope(builder =>
+        instantScope = currentScope.CreateChild(builder =>
         {
             // ...          
         });
       
         // Create a child scope with extra registrations via `IInstaller`
-        instantScope = scopeFacotry.CreateScope(extraInstaller);
+        instantScope = currentScope.CreateChild(extraInstaller);
    
       
         // The additionally registered entry point runs immediately after the scope is created...
@@ -950,93 +1011,6 @@ class LevelLoader
         // Use `Dispose` to safely destroying the scope.
         instantScope.Dispose();
     }
-}
-```
-
-#### Use `LifetimeScope` reference directly
-
-`LifetimeScope` component can be creating child. 
-
-Can be used to get a reference to the `LifetimeScope` if the key is set.
-
-```csharp
-var lifetimeScope = LifetimeScope.Find<BaseLifetimeScope>();
-```
-
-And below is an example of creating a child.
-
-```csharp
-
-var childLifetimeScope = lifetimeScope.CreateChild();
-var childLifetimeScope = lifetimeScope.CreateChild(builder =>
-{
-    builder.Register<ExtraClass>(Lifetime.Scoped);
-    builder.RegisterInstance(extraInstance);
-    // ...
-});
-var childLifetimeScope = lifetimeScope.CreateChild(childInstaller);
-var childLifetimeScope = lifetimeScope.CreateChildFromPrefab(prefab);
-var childLifetimeScope = lifetimeScope.CreateChildFromPrefab(prefab, builder =>
-{
-    // ...
-});
-
-// Dispose child scope
-UnityEngine.Object.Destroy(childLifetimeScope.gameObject);
-```
-
-## How to add additional registers to the next scene
-
-Often, you may want to add additional Registers to the loaded scenes.
-
-For example, when context is finalized after assets are loaded asynchronously.
-
-In that case you could use:
-
-```csharp
-using (LifetimeScope.Push(builder =>
-{
-    // Register for the next scene not yet loaded
-    builder.RegisterInstance(extraInstance);
-}))
-{
-    // Load the scene here.
-    var loading = SceneManager.LoadSceneAsync("NextScene");
-    while (!loading.isDone)
-    {
-        yield return null;
-    }
-}
-```
-
-```csharp
-// Example with UniTask
-using (LifetimeScope.Push(builder =>
-{
-    // Register for the next scene not yet loaded
-    builder.RegisterInstance(extraInstance);
-    builder.Register<ExtraType>(Lifetime.Scoped);
-}))
-{
-    // Load the scene here
-    await SceneManager.LoadSceneAsync("NextScene");
-}
-
-```
-
-```csharp
-// Use registration as type
-class FooInstaller : IInstaller
-{
-    public void Install(IContainerBuilder builder)
-    {
-        builder.Register<ExtraType>(Lifetime.Scoped);
-    }
-}
-
-using (LifetimeScope.Push(fooInstaller)
-{
-    // ... loading scene
 }
 ```
 
