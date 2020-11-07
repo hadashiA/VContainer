@@ -17,13 +17,15 @@
 - **ECS integration**
 - **Immutable Container:** Thread safety and robustness.
 
+Benchmarking:
+
 ![](docs/benchmark_result.png)
 
 - By default, both VContainer and Zenject use reflection at runtime.
 - "VContainer (CodeGen)" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor. 
     - See [Optimization](#optimization) section  more information.
 
-Here is an example of profile results for GC Alloc:
+An example of profile results for GC Alloc:
 
 ![](docs/screenshot_profiler_vcontainer.png)
 
@@ -1004,12 +1006,12 @@ class LevelLoader
     }
   
     public void Unload()
-    {
-        // ... Unloading some assets
-      
+    {      
         // Note that the scope implicitly create `LifetimeScope`. 
         // Use `Dispose` to safely destroying the scope.
         instantScope.Dispose();
+        
+        // ... Unloading some assets
     }
 }
 ```
@@ -1443,6 +1445,45 @@ builder.Register<Service>(Lifetime.Scoped)
   <th>Zenject</th>
   <th>VContainer</th>
 </tr>
+<tr>
+<td>
+
+```csharp
+public class Enemy
+{
+    readonly float speed;
+
+    public Enemy(float speed)
+    {
+        this.speed = speed;
+    }
+
+    public class Factory : PlaceholderFactory<float, Enemy>;
+    {
+    }
+}
+
+Container.BindFactory<float, Enemy, Enemy.Factory>();
+```
+
+</td>   
+<td>
+
+```csharp
+public class Enemy
+{
+    readonly float speed;
+
+    public Enemy(float speed)
+    {
+        this.speed = speed;
+    }
+}
+
+builder.RegisterFactory<float, Enemy>(speed => new Enemy(speed));
+```
+
+</td>
 <tr>
 <td>
 
