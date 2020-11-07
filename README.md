@@ -982,7 +982,7 @@ class LevelLoader
         instantScope = currentScope.CreateChildFromPrefab(prefab);
             
         // Create with LifetimeScope prefab and extra registrations
-        instantScope = currentScopee.CreateChildFromPrefab(prefab, builder =>
+        instantScope = currentScope.CreateChildFromPrefab(prefab, builder =>
         {
             builder.RegisterInstance(someExtraAsset);
             builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
@@ -1002,7 +1002,7 @@ class LevelLoader
         // The additionally registered entry point runs immediately after the scope is created...
       
         // Or you can use scoped instance directly.
-        var foo = instantScope.Resolve<Foo>();
+        var foo = instantScope.Container.Resolve<Foo>();
     }
   
     public void Unload()
