@@ -913,13 +913,13 @@ class LevelLoader
         // ... Loading some assets
       
         // Create a child scope for the container that contains this LevelLoader instance.
-        instantScope = scopeFactory.Create();
+        instantScope = scopeFactory.CreateScope();
       
         // Create with LifetimeScope prefab
-        instantScope = scopeFactory.CreateChildFromPrefab(prefab);
+        instantScope = scopeFactory.CreateScopeFromPrefab(prefab);
             
         // Create with LifetimeScope prefab and extra registrations
-        instantScope = lifetimeScope.CreateChildFromPrefab(prefab, builder =>
+        instantScope = lifetimeScope.CreateScopeFromPrefab(prefab, builder =>
         {
             builder.RegisterInstance(someExtraAsset);
             builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
