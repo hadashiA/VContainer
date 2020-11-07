@@ -919,7 +919,7 @@ class LevelLoader
         instantScope = scopeFactory.CreateScopeFromPrefab(prefab);
             
         // Create with LifetimeScope prefab and extra registrations
-        instantScope = lifetimeScope.CreateScopeFromPrefab(prefab, builder =>
+        instantScope = scopeFactory.CreateScopeFromPrefab(prefab, builder =>
         {
             builder.RegisterInstance(someExtraAsset);
             builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
@@ -943,12 +943,12 @@ class LevelLoader
     }
   
     public void Unload()
-    {
-        // ... Unloading some assets
-      
+    {      
         // Note that the scope implicitly create `LifetimeScope`. 
         // Use `Dispose` to safely destroying the scope.
         instantScope.Dispose();
+        
+        // ... Unloading some assets
     }
 }
 ```
