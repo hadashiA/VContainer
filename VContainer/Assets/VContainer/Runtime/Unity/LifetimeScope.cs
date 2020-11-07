@@ -10,7 +10,7 @@ using Unity.Entities;
 
 namespace VContainer.Unity
 {
-    public class LifetimeScope : MonoBehaviour
+    public class LifetimeScope : MonoBehaviour, IDisposable
     {
         public readonly struct ParentOverrideScope : IDisposable
         {
@@ -115,8 +115,12 @@ namespace VContainer.Unity
             Container?.Dispose();
         }
 
-        protected virtual void Configure(IContainerBuilder builder)
+        protected virtual void Configure(IContainerBuilder builder) { }
+
+        public void Dispose()
         {
+            if (this != null)
+                Destroy(gameObject);
         }
 
         public void Build()
@@ -130,14 +134,17 @@ namespace VContainer.Unity
                 {
                     builder.ApplicationOrigin = this;
                     InstallTo(builder);
+                    Container = builder.Build();
                 });
             }
             else
             {
-                InstallTo(new ContainerBuilder { ApplicationOrigin = this });
+                var builder = new ContainerBuilder { ApplicationOrigin = this };
+                InstallTo(builder);
+                Container = builder.Build();
             }
 
-            DispatchPlayerLoopItems();
+            ActivateEntryPoints();
         }
 
         public LifetimeScope CreateChild(IInstaller installer = null)
@@ -208,7 +215,8 @@ namespace VContainer.Unity
                 extraInstaller = LifetimeScope.extraInstaller;
             }
             extraInstaller?.Install(builder);
-            Container = builder.Build();
+
+            builder.RegisterInstance(this);
         }
 
         LifetimeScope GetRuntimeParent()
@@ -246,125 +254,81 @@ namespace VContainer.Unity
             return null;
         }
 
-        void DispatchPlayerLoopItems()
+        void ActivateEntryPoints()
         {
             PlayerLoopHelper.Initialize();
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IInitializable>>();
                 var loopItem = new InitializationLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Initialization, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IInitializable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IPostInitializable>>();
                 var loopItem = new PostInitializationLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostInitializable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IFixedTickable>>();
                 var loopItem = new FixedTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.FixedUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IFixedTickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IPostFixedTickable>>();
                 var loopItem = new PostFixedTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostFixedTickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<ITickable>>();
                 var loopItem = new TickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Update, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ITickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IPostTickable>>();
                 var loopItem = new PostTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostTickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<ILateTickable>>();
                 var loopItem = new LateTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ILateTickable>))
-            {
-            }
 
-            try
             {
                 var markers = Container.Resolve<IEnumerable<IPostLateTickable>>();
                 var loopItem = new PostLateTickableLoopItem(markers);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<IPostLateTickable>))
-            {
-            }
 
-            try
             {
                 var _ = Container.Resolve<IEnumerable<MonoBehaviour>>();
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<MonoBehaviour>))
-            {
-            }
 
 #if VCONTAINER_ECS_INTEGRATION
-            try
             {
                 var _ = Container.Resolve<IEnumerable<ComponentSystemBase>>();
             }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<ComponentSystemBase>))
-            {
-            }
 
-            try
             {
                 var worldHelpers = Container.Resolve<IEnumerable<WorldConfigurationHelper>>();
                 foreach (var x in worldHelpers)
                 {
                     x.SortSystems();
                 }
-            }
-            catch (VContainerException ex) when(ex.InvalidType == typeof(IEnumerable<WorldConfigurationHelper>))
-            {
             }
 #endif
         }

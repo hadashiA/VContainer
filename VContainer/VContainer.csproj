@@ -73,7 +73,6 @@
      <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTable.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\FixedTypeKeyHashTableRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\GCCollectScope.cs" />
-     <Compile Include="Assets\VContainer\Runtime\Internal\HashTableRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\IRegistry.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\InjectParameter.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\InjectorCache.cs" />

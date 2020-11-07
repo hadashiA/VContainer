@@ -24,9 +24,7 @@ namespace VContainer
         readonly IObjectResolver root;
         readonly IScopedObjectResolver parent;
 
-        internal ScopedContainerBuilder(
-            IObjectResolver root,
-            IScopedObjectResolver parent)
+        internal ScopedContainerBuilder(IObjectResolver root, IScopedObjectResolver parent)
         {
             this.root = root;
             this.parent = parent;
@@ -36,8 +34,7 @@ namespace VContainer
         {
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
-            var container = new ScopedContainer(registry, root, parent);
-            return container;
+            return new ScopedContainer(registry, root, parent);
         }
 
         public override IObjectResolver Build() => BuildScope();
@@ -66,8 +63,7 @@ namespace VContainer
         {
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
-            var container = new Container(registry);
-            return container;
+            return new Container(registry);
         }
 
         protected IReadOnlyList<IRegistration> BuildRegistrations()

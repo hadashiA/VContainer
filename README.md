@@ -858,24 +858,88 @@ If you want to destroy with `LifetimeScope`, make it a child transform of `Lifet
 You can parent it by specifying a `LifetimeScope` object before loading the scene.
 
 ```csharp
-// Find LifetimeScope by type in all loaded scenes
-var parent = LifetimeScope.Find<BaseLifetimeScope>();
-
-// The LifetimeScope generated inside this block will have the specified parent
-using (LifetimeScope.PushParent(parent))
+class SceneLoader
 {
-    // If this scene has a LifetimeScope, its parent will be `parent`.
-    var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
-    while (!loading.isDone)
+    readonly LifetimeScope parent;
+  
+    public SceneLoader(LifetimeScope lifetimeScope)
     {
-        yield return null;
+        parent = lifetimeScope; // Inject the LifetimeScope to which this class belongs
+    }
+  
+    IEnumerator LoadSceneAsync()
+    {
+        // LifetimeScope generated in this block will be parented by `this.lifetimeScope`
+        using (LifetimeScope.PushParent(parent))
+        {
+            // If this scene has a LifetimeScope, its parent will be `parent`.
+            var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+            while (!loading.isDone)
+            {
+                yield return null;
+            }            
+        }
+    }
+
+    // UniTask example
+    async UniTask LoadSceneAsync()
+    {
+        using (LifetimeScope.PushParent(parent))
+        {
+            await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+        }        
+    }
+}
+```
+
+LifetimeScope is a GameObject, so you can also search from the scene.
+
+```csharp
+var parent = LifetimeScope.Find<BaseLifetimeScope>();
+```
+
+#### How to add additional registers to the next scene
+
+Often, you may want to add additional Registers to the loaded scenes.
+
+For example, when context is finalized after assets are loaded asynchronously.
+
+In that case you could use:
+
+```csharp
+// LifetimeScopes generated during this block will be additionally Registered.
+using (LifetimeScope.Push(builder =>
+{
+    // Register for the next scene not yet loaded
+    builder.RegisterInstance(extraInstance);
+}))
+{
+    // Loading the scene..
+}
+```
+
+```csharp
+// Use registration as type
+class FooInstaller : IInstaller
+{
+    public void Install(IContainerBuilder builder)
+    {
+        builder.Register<ExtraType>(Lifetime.Scoped);
     }
 }
 
-using (LifetimeScope.PushParent(parent))
+using (LifetimeScope.Push(fooInstaller)
 {
-    // UniTask example
-    await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+    // ... loading scene
+}
+```
+
+```csharp
+// PushParent() and Push() can be used together.
+using (LifetimeScope.PushParent(parent))
+using (LifetimeScope.Push(builder => ...)
+{
+    // ... loading scene
 }
 ```
 
@@ -893,108 +957,62 @@ In additional scene.
 
 ### How to generate child with code first
 
-Child can also be generated from code.
-Can be used to get a reference to the `LifetimeScope` if the key is set.
+Child can also be generated from your C# code.
 
 ```csharp
-var lifetimeScope = LifetimeScope.Find<BaseLifetimeScope>();
-```
-
-And below is an example of creating a child.
-
-```csharp
-// Create no extra registered child
-var childLifetimeScope = lifetimeScope.CreateChild();
-
-// Instantiate with child scope
-childLifetimeScope.Container.Resolve<ScopedService>();
-
-// Create a extra registered child
-var childLifetimeScope = lifetimeScope.CreateChild(builder =>
+class LevelLoader
 {
-    builder.Register<ExtraClass>(Lifetime.Scoped);
-    builder.RegisterInstance(extraInstance);
-    // ...
-});
-
-// Create a extra registered child with IInstaller.
-class ChildInstaller : IInstaller
-{
-    public void Install(IContainerBuilder builder)
+    readonly LifetimeScope currentScope;
+    
+    LifetimeScope instantScope;
+  
+    public LevelLoader(LifetimeScope lifetimeScope)
     {
-        // ...
+        currentScope = lifetimeScope;
     }
-}
-
-var childLifetimeScope = lifetimeScope.CreateChild(childInstaller);
-
-// Create from LifetimeScope prefab
-var childLifetimeScope = lifetimeScope.CreateChildFromPrefab(prefab);
-
-// Allow extra registrations
-var childLifetimeScope = lifetimeScope.CreateChildFromPrefab(prefab, builder =>
-{
-    // Extra Registration
-});
-
-
-// Dispose child scope
-UnityEngine.Object.Destroy(childLifetimeScope.gameObject);
-```
-
-## How to add additional registers to the next scene
-
-Often, you may want to add additional Registers to the loaded scenes.
-
-For example, when context is finalized after assets are loaded asynchronously.
-
-In that case you could use:
-
-```csharp
-using (LifetimeScope.Push(builder =>
-{
-    // Register for the next scene not yet loaded
-    builder.RegisterInstance(extraInstance);
-    builder.Register<ExtraType>(Lifetime.Scoped);
-}))
-{
-    // Load the scene here.
-    var loading = SceneManager.LoadSceneAsync("NextScene");
-    while (!loading.isDone)
+  
+    public void Load()
     {
-        yield return null;
+        // ... Loading some assets
+      
+        // Create a child scope for the container that contains this LevelLoader instance.
+        instantScope = currentScopey.CreateChild();
+      
+        // Create with LifetimeScope prefab
+        instantScope = currentScope.CreateChildFromPrefab(prefab);
+            
+        // Create with LifetimeScope prefab and extra registrations
+        instantScope = currentScope.CreateChildFromPrefab(prefab, builder =>
+        {
+            builder.RegisterInstance(someExtraAsset);
+            builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
+            // ...
+        });     
+      
+        // Create a child scope with extra registrations
+        instantScope = currentScope.CreateChild(builder =>
+        {
+            // ...          
+        });
+      
+        // Create a child scope with extra registrations via `IInstaller`
+        instantScope = currentScope.CreateChild(extraInstaller);
+   
+      
+        // The additionally registered entry point runs immediately after the scope is created...
+      
+        // Or you can use scoped instance directly.
+        var foo = instantScope.Container.Resolve<Foo>();
     }
-}
-```
-
-```csharp
-// Example with UniTask
-using (LifetimeScope.Push(builder =>
-{
-    // Register for the next scene not yet loaded
-    builder.RegisterInstance(extraInstance);
-    builder.Register<ExtraType>(Lifetime.Scoped);
-}))
-{
-    // Load the scene here
-    await SceneManager.LoadSceneAsync("NextScene");
-}
-
-```
-
-```csharp
-// Use registration as type
-class FooInstaller : IInstaller
-{
-    public void Install(IContainerBuilder builder)
-    {
-        builder.Register<ExtraType>(Lifetime.Scoped);
+  
+    public void Unload()
+    {      
+        // Note that the scope implicitly create `LifetimeScope`. 
+        // Use `Dispose` to safely destroying the scope.
+        instantScope.Dispose();
+        
+        // ... Unloading some assets
     }
-}
-
-using (LifetimeScope.Push(fooInstaller)
-{
-    // ...
 }
 ```
 
@@ -1357,21 +1375,21 @@ Zenject is awesome. but VContainer is:
 - Easy to read implementation.
 - Code first, transparent API.
 
- | Zenject                               | VContainer                                |
- |:--------------------------------------|:------------------------------------------|
- | Container.Bind\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsTransient() | builder.Register\<Service\>(Lifetime.Transient) |
- | Container.Bind\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached() | builder.Register\<Service\>(Lifetime.Scoped) |
- | Container.Bind\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsSingle() | builder.Register\<Service\>(Lifetime.Singleton) |
- | Container.Bind\<IService\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.To\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCache() | builder.Register\<IService, Service\>(Lifetime.Scoped) |
- | Container.Bind(typeof(IInitializable), typeof(IDisposable))<br>&nbsp;&nbsp;&nbsp;&nbsp;.To\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached(); | builder.Register\<Service\>(Lifetime.Scoped)<br>&nbsp;&nbsp;&nbsp;&nbsp;.As\<IInitializable, IDisposable\>() |
- | Container.BindInterfacesTo\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached() | builder.Register\<Service\>(Lifetime.Scoped)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsImplementedInterfaces() |
- | Container.BindInterfacesAndSelfTo\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached()| builder.Register\<Service\>(Lifetime.Scoped)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsImplementedInterfaces()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsSelf() |
- | Container.BindInstance(obj) | builder.RegisterInstance(obj) |
- | Container.Bind\<IService\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromInstance(obj) | builder.RegisterInstance\<IService\>(obj) |
- | Container.Bind(typeof(IService1), typeof(IService2))<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromInstance(obj) | builder.RegisterInstance(obj)<br>&nbsp;&nbsp;&nbsp;&nbsp;.As\<IService1, IService2\>() |
- | Container.BindInterfacesTo\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromInstance(obj) | builder.RegisterInstance(obj)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsImplementedInterfaces() |
- | Container.BindInterfacesAndSelfTo\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromInstance(obj) | builder.RegisterInstance(obj)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsImplementedInterfaces()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsSelf() |
- | Container.Bind\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromComponentInHierarchy()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached(); | builder.RegisterComponentInHierarchy\<Foo\>() |
+| Zenject                               | VContainer                                |
+|:--------------------------------------|:------------------------------------------|
+| Container.Bind\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsTransient() | builder.Register\<Service\>(Lifetime.Transient) |
+| Container.Bind\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached() | builder.Register\<Service\>(Lifetime.Scoped) |
+| Container.Bind\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsSingle() | builder.Register\<Service\>(Lifetime.Singleton) |
+| Container.Bind\<IService\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.To\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCache() | builder.Register\<IService, Service\>(Lifetime.Scoped) |
+| Container.Bind(typeof(IInitializable), typeof(IDisposable))<br>&nbsp;&nbsp;&nbsp;&nbsp;.To\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached(); | builder.Register\<Service\>(Lifetime.Scoped)<br>&nbsp;&nbsp;&nbsp;&nbsp;.As\<IInitializable, IDisposable\>() |
+| Container.BindInterfacesTo\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached() | builder.Register\<Service\>(Lifetime.Scoped)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsImplementedInterfaces() |
+| Container.BindInterfacesAndSelfTo\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached()| builder.Register\<Service\>(Lifetime.Scoped)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsImplementedInterfaces()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsSelf() |
+| Container.BindInstance(obj) | builder.RegisterInstance(obj) |
+| Container.Bind\<IService\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromInstance(obj) | builder.RegisterInstance\<IService\>(obj) |
+| Container.Bind(typeof(IService1), typeof(IService2))<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromInstance(obj) | builder.RegisterInstance(obj)<br>&nbsp;&nbsp;&nbsp;&nbsp;.As\<IService1, IService2\>() |
+| Container.BindInterfacesTo\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromInstance(obj) | builder.RegisterInstance(obj)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsImplementedInterfaces() |
+| Container.BindInterfacesAndSelfTo\<Service\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromInstance(obj) | builder.RegisterInstance(obj)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsImplementedInterfaces()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsSelf() |
+| Container.Bind\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromComponentInHierarchy()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached(); | builder.RegisterComponentInHierarchy\<Foo\>() |
  | Container.Bind\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromComponentInNewPrefab(prefab)<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached()<br>&nbsp;&nbsp;&nbsp;&nbsp; | builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped)
  | Container.Bind\<Foo\>()<br>&nbsp;&nbsp;&nbsp;&nbsp;.FromNewComponentOnNewGameObject()<br>&nbsp;&nbsp;&nbsp;&nbsp;.AsCached()<br>&nbsp;&nbsp;&nbsp;&nbsp;.WithGameObjectName("Foo1") | builder.RegisterComponentOnNewGameObject\<Foo\>(Lifetime.Scoped, "Foo1") |
  | .UnderTransform(parentTransform) | .UnderTransform(parentTransform) |
