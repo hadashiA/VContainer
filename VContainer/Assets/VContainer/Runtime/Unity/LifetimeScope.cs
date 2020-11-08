@@ -216,7 +216,7 @@ namespace VContainer.Unity
             }
             extraInstaller?.Install(builder);
 
-            builder.RegisterInstance(this);
+            builder.RegisterInstance<LifetimeScope>(this).AsSelf();
         }
 
         LifetimeScope GetRuntimeParent()
