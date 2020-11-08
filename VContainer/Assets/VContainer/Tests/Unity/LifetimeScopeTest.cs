@@ -6,6 +6,8 @@ using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
 {
+    class SampleLifetimeScope : LifetimeScope {}
+
     public class LifetimeScopeTest
     {
         [Test]
@@ -33,7 +35,8 @@ namespace VContainer.Tests.Unity
                 builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
             }))
             {
-                parentLifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
+                parentLifetimeScope = new GameObject("SampleLifetimeScope")
+                    .AddComponent<SampleLifetimeScope>();
             }
 
             yield return null;
