@@ -36,7 +36,18 @@ namespace VContainer.Unity
         static ExtraInstaller extraInstaller;
         static readonly object SyncRoot = new object();
 
-        public static ParentOverrideScope PushParent(LifetimeScope parent) => new ParentOverrideScope(parent);
+        public static LifetimeScope Create(Action<IContainerBuilder> installation)
+        {
+            using (Push(installation)) return Create();
+        }
+
+        public static LifetimeScope Create(IInstaller installer = null)
+        {
+            using (Push(installer)) return Create();
+        }
+
+        public static ParentOverrideScope PushParent(LifetimeScope parent)
+            => new ParentOverrideScope(parent);
 
         public static ExtraInstallationScope Push(Action<IContainerBuilder> installing)
             => new ExtraInstallationScope(new ActionInstaller(installing));
@@ -44,11 +55,17 @@ namespace VContainer.Unity
         public static ExtraInstallationScope Push(IInstaller installer)
             => new ExtraInstallationScope(installer);
 
-        public static LifetimeScope Find<T>(Scene scene) where T : LifetimeScope
-            => Find(typeof(T), scene);
+        public static LifetimeScope Find<T>(Scene scene) where T : LifetimeScope => Find(typeof(T), scene);
+        public static LifetimeScope Find<T>() where T : LifetimeScope => Find(typeof(T));
 
-        public static LifetimeScope Find<T>() where T : LifetimeScope
-            => Find(typeof(T));
+        static LifetimeScope Create()
+        {
+            var gameObject = new GameObject("LifeTimeScope");
+            gameObject.SetActive(false);
+            var newScope = gameObject.AddComponent<LifetimeScope>();
+            gameObject.SetActive(true);
+            return newScope;
+        }
 
         static LifetimeScope Find(Type type, Scene scene)
         {
