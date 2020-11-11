@@ -258,77 +258,79 @@ namespace VContainer.Unity
         {
             PlayerLoopHelper.Initialize();
 
+            var initializables = Container.Resolve<IReadOnlyList<IInitializable>>();
+            if (initializables.Count > 0)
             {
-                var markers = Container.Resolve<IEnumerable<IInitializable>>();
-                var loopItem = new InitializationLoopItem(markers);
+                var loopItem = new InitializationLoopItem(initializables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Initialization, loopItem);
             }
 
+            var postInitializables = Container.Resolve<IReadOnlyList<IPostInitializable>>();
+            if (postInitializables.Count > 0)
             {
-                var markers = Container.Resolve<IEnumerable<IPostInitializable>>();
-                var loopItem = new PostInitializationLoopItem(markers);
+                var loopItem = new PostInitializationLoopItem(postInitializables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
             }
 
+            var fixedTickables = Container.Resolve<IReadOnlyList<IFixedTickable>>();
+            if (fixedTickables.Count > 0)
             {
-                var markers = Container.Resolve<IEnumerable<IFixedTickable>>();
-                var loopItem = new FixedTickableLoopItem(markers);
+                var loopItem = new FixedTickableLoopItem(fixedTickables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.FixedUpdate, loopItem);
             }
 
+            var postFixedTickables = Container.Resolve<IReadOnlyList<IPostFixedTickable>>();
+            if (postFixedTickables.Count > 0)
             {
-                var markers = Container.Resolve<IEnumerable<IPostFixedTickable>>();
-                var loopItem = new PostFixedTickableLoopItem(markers);
+                var loopItem = new PostFixedTickableLoopItem(postFixedTickables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
             }
 
+            var tickables = Container.Resolve<IReadOnlyList<ITickable>>();
+            if (tickables.Count > 0)
             {
-                var markers = Container.Resolve<IEnumerable<ITickable>>();
-                var loopItem = new TickableLoopItem(markers);
+                var loopItem = new TickableLoopItem(tickables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Update, loopItem);
             }
 
+            var postTickables = Container.Resolve<IReadOnlyList<IPostTickable>>();
+            if (postTickables.Count > 0)
             {
-                var markers = Container.Resolve<IEnumerable<IPostTickable>>();
-                var loopItem = new PostTickableLoopItem(markers);
+                var loopItem = new PostTickableLoopItem(postTickables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostUpdate, loopItem);
             }
 
+            var lateTickables = Container.Resolve<IReadOnlyList<ILateTickable>>();
+            if (lateTickables.Count > 0)
             {
-                var markers = Container.Resolve<IEnumerable<ILateTickable>>();
-                var loopItem = new LateTickableLoopItem(markers);
+                var loopItem = new LateTickableLoopItem(lateTickables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, loopItem);
             }
 
+            var postLateTickables = Container.Resolve<IReadOnlyList<IPostLateTickable>>();
+            if (postLateTickables.Count > 0)
             {
-                var markers = Container.Resolve<IEnumerable<IPostLateTickable>>();
-                var loopItem = new PostLateTickableLoopItem(markers);
+                var loopItem = new PostLateTickableLoopItem(postLateTickables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
 
-            {
-                var _ = Container.Resolve<IEnumerable<MonoBehaviour>>();
-            }
+            Container.Resolve<IEnumerable<MonoBehaviour>>();
 
 #if VCONTAINER_ECS_INTEGRATION
-            {
-                var _ = Container.Resolve<IEnumerable<ComponentSystemBase>>();
-            }
+            Container.Resolve<IEnumerable<ComponentSystemBase>>();
 
+            var worldHelpers = Container.Resolve<IEnumerable<WorldConfigurationHelper>>();
+            foreach (var x in worldHelpers)
             {
-                var worldHelpers = Container.Resolve<IEnumerable<WorldConfigurationHelper>>();
-                foreach (var x in worldHelpers)
-                {
-                    x.SortSystems();
-                }
+                x.SortSystems();
             }
 #endif
         }
