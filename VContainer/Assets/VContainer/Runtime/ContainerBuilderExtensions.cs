@@ -112,7 +112,6 @@ namespace VContainer
             return registrationBuilder;
         }
 
-
         public static void RegisterContainer(this IContainerBuilder builder)
             => builder.ContainerExposed = true;
 

@@ -7,21 +7,19 @@ namespace VContainer.Internal
     {
         readonly Stack<IDisposable> disposables = new Stack<IDisposable>();
 
-        bool disposed;
-
         public void Dispose()
         {
-            lock (disposables)
+            IDisposable disposable;
+            do
             {
-                if (!disposed)
+                lock (disposables)
                 {
-                    while (disposables.Count > 0)
-                    {
-                        disposables.Pop().Dispose();
-                    }
-                    disposed = true;
+                    disposable = disposables.Count > 0
+                        ? disposables.Pop()
+                        : null;
                 }
-            }
+                disposable?.Dispose();
+            } while (disposable != null);
         }
 
         public void Add(IDisposable disposable)
