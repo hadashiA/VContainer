@@ -1142,7 +1142,7 @@ system.Construct(settings);
 ```
 
 Note:
-- In default (`UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP is **not** used), The SystemGroup to which the System belongs can be controlled by Attribute ( e.g: `[UpdateInGroup(typeof(SystemGroupType))]` .
+- In default (`UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` is **not** used), The SystemGroup to which the System belongs can be controlled by Attribute ( e.g: `[UpdateInGroup(typeof(SystemGroupType))]` .
 
 
 #### Example of setup entities (with Default World)
