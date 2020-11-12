@@ -26,6 +26,29 @@ namespace VContainer.Tests.Unity
         }
 
         [UnityTest]
+        public IEnumerator Create()
+        {
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
+                builder.Register<DisposableServiceA>(Lifetime.Scoped);
+            });
+
+            yield return null;
+            yield return null;
+
+            var entryPoint = lifetimeScope.Container.Resolve<SampleEntryPoint>();
+            Assert.That(entryPoint, Is.InstanceOf<SampleEntryPoint>());
+            Assert.That(entryPoint.InitializeCalled, Is.True);
+            Assert.That(entryPoint.TickCalls, Is.EqualTo(2));
+
+            var disposable = lifetimeScope.Container.Resolve<DisposableServiceA>();
+            lifetimeScope.Dispose();
+            yield return null;
+            Assert.That(disposable.Disposed, Is.True);
+        }
+
+        [UnityTest]
         public IEnumerator CreateChild()
         {
             LifetimeScope parentLifetimeScope;

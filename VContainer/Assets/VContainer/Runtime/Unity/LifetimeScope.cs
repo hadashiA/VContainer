@@ -36,7 +36,24 @@ namespace VContainer.Unity
         static ExtraInstaller extraInstaller;
         static readonly object SyncRoot = new object();
 
-        public static ParentOverrideScope PushParent(LifetimeScope parent) => new ParentOverrideScope(parent);
+        static LifetimeScope Create(IInstaller installer = null)
+        {
+            var gameObject = new GameObject("LifeTimeScope");
+            gameObject.SetActive(false);
+            var newScope = gameObject.AddComponent<LifetimeScope>();
+            if (installer != null)
+            {
+                newScope.extraInstallers.Add(installer);
+            }
+            gameObject.SetActive(true);
+            return newScope;
+        }
+
+        public static LifetimeScope Create(Action<IContainerBuilder> installation)
+            => Create(new ActionInstaller(installation));
+
+        public static ParentOverrideScope PushParent(LifetimeScope parent)
+            => new ParentOverrideScope(parent);
 
         public static ExtraInstallationScope Push(Action<IContainerBuilder> installing)
             => new ExtraInstallationScope(new ActionInstaller(installing));
@@ -44,11 +61,8 @@ namespace VContainer.Unity
         public static ExtraInstallationScope Push(IInstaller installer)
             => new ExtraInstallationScope(installer);
 
-        public static LifetimeScope Find<T>(Scene scene) where T : LifetimeScope
-            => Find(typeof(T), scene);
-
-        public static LifetimeScope Find<T>() where T : LifetimeScope
-            => Find(typeof(T));
+        public static LifetimeScope Find<T>(Scene scene) where T : LifetimeScope => Find(typeof(T), scene);
+        public static LifetimeScope Find<T>() where T : LifetimeScope => Find(typeof(T));
 
         static LifetimeScope Find(Type type, Scene scene)
         {
@@ -113,6 +127,7 @@ namespace VContainer.Unity
         {
             disposable.Dispose();
             Container?.Dispose();
+            Container = null;
         }
 
         protected virtual void Configure(IContainerBuilder builder) { }
@@ -144,6 +159,7 @@ namespace VContainer.Unity
                 Container = builder.Build();
             }
 
+            extraInstallers.Clear();
             ActivateEntryPoints();
         }
 
@@ -163,13 +179,7 @@ namespace VContainer.Unity
         }
 
         public LifetimeScope CreateChild(Action<IContainerBuilder> installation)
-        {
-            if (installation != null)
-            {
-                return CreateChild(new ActionInstaller(installation));
-            }
-            return CreateChild();
-        }
+            => CreateChild(new ActionInstaller(installation));
 
         public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
         {
@@ -192,13 +202,7 @@ namespace VContainer.Unity
         }
 
         public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
-        {
-            if (installation != null)
-            {
-                return CreateChildFromPrefab(prefab, new ActionInstaller(installation));
-            }
-            return CreateChildFromPrefab(prefab);
-        }
+            => CreateChildFromPrefab(prefab, new ActionInstaller(installation));
 
         void InstallTo(IContainerBuilder builder)
         {
@@ -209,12 +213,12 @@ namespace VContainer.Unity
                 installer.Install(builder);
             }
 
-            ExtraInstaller extraInstaller;
+            ExtraInstaller extraInstallerStatic;
             lock (SyncRoot)
             {
-                extraInstaller = LifetimeScope.extraInstaller;
+                extraInstallerStatic = LifetimeScope.extraInstaller;
             }
-            extraInstaller?.Install(builder);
+            extraInstallerStatic?.Install(builder);
 
             builder.RegisterInstance<LifetimeScope>(this).AsSelf();
         }
