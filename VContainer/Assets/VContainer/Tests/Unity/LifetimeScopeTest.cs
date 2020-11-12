@@ -44,8 +44,10 @@ namespace VContainer.Tests.Unity
 
             var disposable = lifetimeScope.Container.Resolve<DisposableServiceA>();
             lifetimeScope.Dispose();
+
             yield return null;
             Assert.That(disposable.Disposed, Is.True);
+            Assert.That(entryPoint.TickCalls, Is.EqualTo(2));
         }
 
         [UnityTest]
