@@ -114,8 +114,5 @@ namespace VContainer
 
         public static void RegisterContainer(this IContainerBuilder builder)
             => builder.ContainerExposed = true;
-
-        public static RegistrationBuilder RegisterGCCollect(this IContainerBuilder builder)
-            => builder.RegisterInstance<IDisposable>(new GCCollectScope());
     }
 }

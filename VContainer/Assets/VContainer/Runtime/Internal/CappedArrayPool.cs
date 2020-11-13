@@ -2,7 +2,7 @@ using System;
 
 namespace VContainer.Internal
 {
-    public sealed class CappedArrayPool<T>
+    sealed class CappedArrayPool<T>
     {
         const int InitialBucketSize = 4;
 
