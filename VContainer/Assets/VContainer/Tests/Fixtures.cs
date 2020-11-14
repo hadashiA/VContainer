@@ -30,6 +30,16 @@ namespace VContainer.Tests
     {
     }
 
+    struct StructA
+    {
+        public int X;
+
+        public StructA(int x)
+        {
+            X = x;
+        }
+    }
+
     class AllInjectionFeatureService : I1
     {
         public bool ConstructorCalled;
@@ -223,6 +233,15 @@ namespace VContainer.Tests
         {
             Service2 = service2;
         }
+    }
+
+    class HasFieldInjection
+    {
+        [Inject]
+        public StructA StructA;
+
+        [Inject]
+        public I2 Service2;
     }
 
     class GenericsService<T>

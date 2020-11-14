@@ -228,6 +228,21 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void ResolveAsField()
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterInstance(new StructA(100));
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+            builder.Register<HasFieldInjection>(Lifetime.Singleton);
+
+            var container = builder.Build();
+            var resolved = container.Resolve<HasFieldInjection>();
+            Assert.That(resolved, Is.InstanceOf<HasFieldInjection>());
+            Assert.That(resolved.Service2, Is.InstanceOf<I2>());
+            Assert.That(resolved.StructA.X , Is.EqualTo(100));
+        }
+
+        [Test]
         public void RegisterInstance()
         {
             var builder = new ContainerBuilder();

@@ -2,6 +2,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
+#if UNITY_2018_4_OR_NEWER
+using Unity.Collections.LowLevel.Unsafe;
+#endif
 
 namespace VContainer.Internal
 {
@@ -35,18 +38,20 @@ namespace VContainer.Internal
         }
     }
 
-    // sealed class InjectFieldInfo
-    // {
-    //     public readonly Type FieldType;
-    //     public readonly Action<object, object> Setter;
-    //
-    //     public InjectFieldInfo(FieldInfo fieldInfo)
-    //     {
-    //         FieldType = fieldInfo.FieldType;
-    //         Setter = fieldInfo.SetValue;
-    //     }
-    // }
-    //
+    sealed class InjectFieldInfo
+    {
+        public readonly FieldInfo FieldInfo;
+        public readonly int Offset;
+
+        public InjectFieldInfo(FieldInfo fieldInfo)
+        {
+            FieldInfo = fieldInfo;
+#if UNITY_2018_4_OR_NEWER
+            Offset = UnsafeUtility.GetFieldOffset(fieldInfo);
+#endif
+        }
+    }
+
     // sealed class InjectPropertyInfo
     // {
     //     public readonly Type PropertyType;
@@ -64,14 +69,14 @@ namespace VContainer.Internal
         public readonly Type Type;
         public readonly InjectConstructorInfo InjectConstructor;
         public readonly IReadOnlyList<InjectMethodInfo> InjectMethods;
-        public readonly IReadOnlyList<FieldInfo> InjectFields;
+        public readonly IReadOnlyList<InjectFieldInfo> InjectFields;
         public readonly IReadOnlyList<PropertyInfo> InjectProperties;
 
         public InjectTypeInfo(
             Type type,
             InjectConstructorInfo injectConstructor,
             IReadOnlyList<InjectMethodInfo> injectMethods,
-            IReadOnlyList<FieldInfo> injectFields,
+            IReadOnlyList<InjectFieldInfo> injectFields,
             IReadOnlyList<PropertyInfo> injectProperties)
         {
             Type = type;
@@ -138,14 +143,14 @@ namespace VContainer.Internal
             }
 
             // Fields, [Inject] Only
-            var injectFields = default(List<FieldInfo>);
+            var injectFields = default(List<InjectFieldInfo>);
             foreach (var fieldInfo in type.GetRuntimeFields())
             {
                 if (fieldInfo.IsDefined(typeof(InjectAttribute), true))
                 {
                     if (injectFields == null)
-                        injectFields = new List<FieldInfo>();
-                    injectFields.Add(fieldInfo);
+                        injectFields = new List<InjectFieldInfo>();
+                    injectFields.Add(new InjectFieldInfo(fieldInfo));
                 }
             }
 
@@ -207,7 +212,7 @@ namespace VContainer.Internal
                 {
                     foreach (var x in injectTypeInfo.InjectFields)
                     {
-                        CheckCircularDependencyRecursive(x.FieldType, stack);
+                        CheckCircularDependencyRecursive(x.FieldInfo.FieldType, stack);
                     }
                 }
 
