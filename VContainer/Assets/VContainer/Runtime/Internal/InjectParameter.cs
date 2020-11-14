@@ -2,7 +2,7 @@ using System;
 
 namespace VContainer.Internal
 {
-    public sealed class TypedParameter : IInjectParameter
+    sealed class TypedParameter : IInjectParameter
     {
         public readonly Type Type;
         public object Value { get; }
@@ -16,7 +16,7 @@ namespace VContainer.Internal
         public bool Match(Type parameterType, string _) => parameterType == Type;
     }
 
-    public sealed class NamedParameter : IInjectParameter
+    sealed class NamedParameter : IInjectParameter
     {
         public readonly string Name;
         public object Value { get; }

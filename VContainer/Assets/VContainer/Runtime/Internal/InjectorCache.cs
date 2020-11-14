@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace VContainer.Internal
 {
-    public static class InjectorCache
+    static class InjectorCache
     {
         static readonly ConcurrentDictionary<Type, IInjector> Injectors = new ConcurrentDictionary<Type, IInjector>();
 
