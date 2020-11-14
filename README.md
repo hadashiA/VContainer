@@ -436,7 +436,7 @@ It can resolve like this:
 ```csharp
 class ClassA
 {
-    public ClassA(IServiceA serviceA) { /* ... */ }
+    public ClassA(ServiceA serviceA) { /* ... */ }
 }
 ```
 
