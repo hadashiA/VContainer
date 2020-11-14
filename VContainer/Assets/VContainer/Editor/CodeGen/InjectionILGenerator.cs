@@ -344,10 +344,10 @@ namespace VContainer.Editor.CodeGen
 
             if (injectTypeInfo.InjectFields != null)
             {
-                foreach (var injectField in injectTypeInfo.InjectFields)
+                foreach (var x in injectTypeInfo.InjectFields)
                 {
-                    var fieldRef = module.ImportReference(injectField);
-                    var fieldTypeRef = Utils.CreateParameterTypeReference(module, injectField.FieldType, typeDef);
+                    var fieldRef = module.ImportReference(x.FieldInfo);
+                    var fieldTypeRef = Utils.CreateParameterTypeReference(module, x.FieldInfo.FieldType, typeDef);
 
                     processor.Emit(OpCodes.Ldloc_S, instanceVariableDef);
 

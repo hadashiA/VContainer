@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+#if UNITY_2018_4_OR_NEWER
+using Unity.Collections.LowLevel.Unsafe;
+#endif
 
 namespace VContainer.Internal
 {
@@ -63,8 +66,24 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectFields)
             {
-                var fieldValue = resolver.Resolve(x.FieldType);
-                x.SetValue(obj, fieldValue);
+                var fieldValue = resolver.Resolve(x.FieldInfo.FieldType);
+#if UNITY_2018_4_OR_NEWER
+                if (!x.FieldInfo.FieldType.IsValueType)
+                {
+                    unsafe
+                    {
+                        var objPtr = UnsafeUtility.PinGCObjectAndGetAddress(obj, out var targetHandle);
+                        UnsafeUtility.CopyObjectAddressToPtr(fieldValue, (byte*)objPtr + x.Offset);
+                        UnsafeUtility.ReleaseGCObject(targetHandle);
+                    }
+                }
+                else
+                {
+                    x.FieldInfo.SetValue(obj, fieldValue);
+                }
+#else
+                x.FieldInfo.SetValue(obj, fieldValue);
+#endif
             }
         }
 
