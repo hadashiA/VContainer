@@ -149,7 +149,6 @@ namespace VContainer.Unity
                 {
                     builder.ApplicationOrigin = this;
                     InstallTo(builder);
-                    Container = builder.Build();
                 });
             }
             else
