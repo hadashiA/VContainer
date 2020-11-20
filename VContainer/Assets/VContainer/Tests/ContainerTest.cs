@@ -255,7 +255,7 @@ namespace VContainer.Tests
         public void RegisterMultipleDisposables()
         {
             var builder = new ContainerBuilder();
-            builder.Register<IDisposable, DisposableServiceA>(Lifetime.Scoped);
+            builder.Register<IDisposable, DisposableServiceA>(Lifetime.Singleton);
             builder.Register<IDisposable, DisposableServiceB>(Lifetime.Scoped);
 
             var container = builder.Build();

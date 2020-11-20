@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using VContainer.Internal;
 
 namespace VContainer
@@ -64,22 +65,16 @@ namespace VContainer
 
                 case Lifetime.Singleton:
                     if (Parent is null)
-                    {
                         return Root.Resolve(registration);
-                    }
-                    if (registry.Exists(registration))
-                    {
-                        return sharedInstances.GetOrAdd(registration, createInstance).Value;
-                    }
-                    return Parent.Resolve(registration);
+
+                    if (!registry.Exists(registration))
+                        return Parent.Resolve(registration);
+
+                    return CreateTrackedInstance(registration);
 
                 case Lifetime.Scoped:
-                    var lazy = sharedInstances.GetOrAdd(registration, createInstance);
-                    if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable)
-                    {
-                        disposables.Add(disposable);
-                    }
-                    return lazy.Value;
+                    return CreateTrackedInstance(registration);
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -99,6 +94,17 @@ namespace VContainer
         {
             disposables.Dispose();
             sharedInstances.Clear();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        object CreateTrackedInstance(IRegistration registration)
+        {
+            var lazy = sharedInstances.GetOrAdd(registration, createInstance);
+            if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable)
+            {
+                disposables.Add(disposable);
+            }
+            return lazy.Value;
         }
 
         IRegistration FindRegistration(Type type)
@@ -121,6 +127,7 @@ namespace VContainer
         readonly IRegistry registry;
         readonly IScopedObjectResolver rootScope;
         readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
+        readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<IRegistration, Lazy<object>> createInstance;
 
         internal Container(IRegistry registry)
@@ -148,10 +155,18 @@ namespace VContainer
             {
                 case Lifetime.Transient:
                     return registration.SpawnInstance(this);
+
                 case Lifetime.Singleton:
-                    return sharedInstances.GetOrAdd(registration, createInstance).Value;
+                    var singleton = sharedInstances.GetOrAdd(registration, createInstance);
+                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable)
+                    {
+                        disposables.Add(disposable);
+                    }
+                    return singleton.Value;
+
                 case Lifetime.Scoped:
                     return rootScope.Resolve(registration);
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -160,6 +175,12 @@ namespace VContainer
         public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
             => rootScope.CreateScope(installation);
 
-        public void Dispose() => rootScope.Dispose();
+        public void Dispose()
+        {
+            rootScope.Dispose();
+            disposables.Dispose();
+            sharedInstances.Clear();
+        }
     }
 }
+

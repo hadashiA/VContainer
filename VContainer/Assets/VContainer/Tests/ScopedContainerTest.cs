@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 namespace VContainer.Tests
@@ -42,9 +43,8 @@ namespace VContainer.Tests
                 Assert.That(localScope1Obj.Disposed, Is.True);
             }
             Assert.That(rootScopeObj.Disposed, Is.True);
-
-            Assert.That(singleton1.Disposed, Is.False);
-            Assert.That(singleton2.Disposed, Is.False);
+            Assert.That(singleton1.Disposed, Is.True);
+            Assert.That(singleton2.Disposed, Is.True);
             Assert.That(singleton1, Is.EqualTo(singleton2));
         }
 
@@ -83,7 +83,6 @@ namespace VContainer.Tests
             builder.Register<NoDependencyServiceA>(Lifetime.Singleton);
 
             var container = builder.Build();
-
             var scopedContainer = container.CreateScope();
 
             var singleton = scopedContainer.Resolve<NoDependencyServiceA>();
@@ -98,10 +97,14 @@ namespace VContainer.Tests
 
             var parentContainer = builder.Build();
 
+            DisposableServiceB childSingletonDisposable;
+            DisposableServiceB grandChildSingletonDisposable;
+
             var childContainer = parentContainer.CreateScope(childBuilder =>
             {
                 childBuilder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
                 childBuilder.Register<ServiceA>(Lifetime.Singleton);
+                childBuilder.Register<DisposableServiceB>(Lifetime.Singleton);
             });
             {
                 var parentSingleton = childContainer.Resolve<DisposableServiceA>();
@@ -117,6 +120,7 @@ namespace VContainer.Tests
             {
                 grandChildBuilder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton);
                 grandChildBuilder.Register<ServiceB>(Lifetime.Singleton);
+                grandChildBuilder.Register<DisposableServiceB>(Lifetime.Singleton);
             });
             {
                 var parentSingleton = grandChildContainer.Resolve<DisposableServiceA>();
@@ -132,6 +136,35 @@ namespace VContainer.Tests
                 Assert.That(grandChildSingleton, Is.InstanceOf<ServiceB>());
                 Assert.That(grandChildSingleton.Service3, Is.InstanceOf<I3>());
             }
+
+            childSingletonDisposable = childContainer.Resolve<DisposableServiceB>();
+            childContainer.Dispose();
+            Assert.That(childSingletonDisposable.Disposed, Is.True);
+
+            grandChildSingletonDisposable = grandChildContainer.Resolve<DisposableServiceB>();
+            grandChildContainer.Dispose();
+            Assert.That(grandChildSingletonDisposable.Disposed, Is.True);
+
+        }
+
+        [Test]
+        public void ResolveFromParent()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+            builder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton);
+            var parentContainer = builder.Build();
+
+            var childContainer = parentContainer.CreateScope(childBuilder =>
+            {
+                // childBuilder.Register<ServiceA>(Lifetime.Singleton);
+                childBuilder.Register<ServiceB>(Lifetime.Scoped);
+            });
+
+            //var singletonService = childContainer.Resolve<ServiceA>();
+            var scopedService = childContainer.Resolve<ServiceB>();
+            //Assert.That(singletonService, Is.InstanceOf<ServiceA>());
+            Assert.That(scopedService, Is.InstanceOf<ServiceB>());
         }
     }
 }
