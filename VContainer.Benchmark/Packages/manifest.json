@@ -1,0 +1,32 @@
+{
+  "scopedRegistries": [
+    {
+      "name": "Unofficial Unity Package Manager Registry",
+      "url": "https://upm-packages.dev",
+      "scopes": [
+        "com.stevevermeulen",
+        "jp.cysharp",
+        "dev.upm-packages"
+      ]
+    }
+  ],
+  "dependencies": {
+    "com.unity.entities": "0.11.1-preview.4",
+    "com.unity.test-framework": "1.1.18",
+    "com.unity.ugui": "1.0.0",
+    "com.unity.modules.animation": "1.0.0",
+    "com.unity.modules.audio": "1.0.0",
+    "com.unity.modules.imageconversion": "1.0.0",
+    "com.unity.modules.imgui": "1.0.0",
+    "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.modules.ui": "1.0.0",
+    "com.unity.modules.uielements": "1.0.0",
+    "com.unity.modules.assetbundle": "1.0.0",
+    "nuget.mono-cecil": "0.1.6-preview",
+    "com.stevevermeulen.extenject": "9.1.2",
+    "jp.hadashikick.vcontainer": "file:../../VContainer/Assets/VContainer"
+  },
+  "testables": [
+    "com.unity.test-framework.performance"
+  ]
+}

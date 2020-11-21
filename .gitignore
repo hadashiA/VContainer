@@ -189,7 +189,7 @@ PublishScripts/
 # NuGet Packages
 *.nupkg
 # The packages folder can be ignored because of Package Restore
-**/[pP]ackages/*
+/packages
 # except build/, which is used as an MSBuild target.
 #!**/[Pp]ackages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
@@ -378,7 +378,6 @@ VContainer/*.userprefs
 VContainer/*.pidb
 VContainer/*.booproj
 VContainer/*.svd
-
 VContainer/bin/*
 VContainer/obj/*
 
@@ -394,7 +393,5 @@ VContainer.Benchmark/*.userprefs
 VContainer.Benchmark/*.pidb
 VContainer.Benchmark/*.booproj
 VContainer.Benchmark/*.svd
-
 VContainer.Benchmark/bin/*
 VContainer.Benchmark/obj/*
-
