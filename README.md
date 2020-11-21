@@ -86,9 +86,9 @@ Further reading:
 ### Unity Package Manager (upm)
 
 - `Window -> Package Manager -> +▼ -> Add package from git url`
-  - `https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.1.1`
+  - `https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.2.0`
 - Or add this to your `Package/manifest.json`
-  - `"jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.1.1"`
+  - `"jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.2.0"`
 
 ### .unitypackage
 
