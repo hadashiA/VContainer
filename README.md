@@ -846,13 +846,14 @@ it has following behaviours:
 - For `Lifetime.Singleton`
   - Basically, always returns the same instance.
   - If parent and child have the same type, it returns the instance with the closest scope.
+  - When a `LifetimeScope` is destroyed, objects with `IDisposable` implemented are called `Dispose()`.
 - For `LifeTime.Transient`
   - Instance creating for each resolving.
-  - If parent and child have the same type, child will prioritize itself.
+  - If parent and child have the same registration, the child will create its own instance.
 - For `Lifetime.Scoped`
   - Instance will be different for each child.
       - If same child, returns same instance.
-      - If parent and child have the same type, child will prioritize itself.
+  - If parent and child have the same registration, the child will create its own instance.
   - When a `LifetimeScope` is destroyed, objects with `IDisposable` implemented are called `Dispose()`.
 
 :warning: If scene is alive and only `LifetimeScope` is destroyed, MonoBehaviour registered as `Lifetime.Scoped` is not automatically destroyed.
