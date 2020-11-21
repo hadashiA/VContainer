@@ -68,21 +68,24 @@ namespace VContainer
 
         protected IReadOnlyList<IRegistration> BuildRegistrations()
         {
+            var registrations = new IRegistration[registrationBuilders.Count + (ContainerExposed ? 1 : 0)];
+
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
-            var a = new IRegistration[registrationBuilders.Count];
             Parallel.For(0, registrationBuilders.Count, i =>
             {
-                a[i] = registrationBuilders[i].Build();
+                registrations[i] = registrationBuilders[i].Build();
             });
 
-            var registrations = new List<IRegistration>(a);
 #else
-            var registrations = new List<IRegistration>(registrationBuilders.Count);
-            foreach (var registrationBuilder in registrationBuilders)
+            for (var i = 0; i < registrationBuilders.Count; i++)
             {
-                registrations.Add(registrationBuilder.Build());
+                registrations[i] = registrationBuilders[i].Build();
             }
 #endif
+            if (ContainerExposed)
+            {
+                registrations[registrations.Length - 1] = ContainerRegistration.Default;
+            }
 
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
             Parallel.For(0, registrations.Count, i =>
@@ -95,10 +98,6 @@ namespace VContainer
                 TypeAnalyzer.CheckCircularDependency(x.ImplementationType);
             }
 #endif
-            if (ContainerExposed)
-            {
-                registrations.Add(ContainerRegistration.Default);
-            }
             return registrations;
         }
     }
