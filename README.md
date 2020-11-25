@@ -64,12 +64,29 @@ The only way to exclude a unconcerned dependency from a class is to pass from ou
 Then, if your class receives dependencies externally, need help from outside.
 DI is a technique that facilitates a place to resolve dependencies completely outside.
 
-Terminology:
+### Why DI for Unity ?
+
+In Unity, MonoBehaviour is the entry point for our C # code.  On the other hand, MonoBehaviour is also a "View component". 
+
+In modern application design, "separation of domain logic and presentation layer (View component)" is important.
+
+It is against this that MonoBehaviour has many roles (event handling, control flow, domain logic calls, etc.) in addition to its behavior as a View.
+
+One of the purposes of DI is IoC (Inversion of Control).  DI containers we can make pure C # classes the entry point (not MonoBehaviour).
+This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
+
+View components are dynamically created / destroyed at run time, while all "features" such as control flow and domain logic have a more stable lifespan.
+
+Generally speaking, it's a good idea to make the View layer stateless and separate it from control flow and data management.
+
+This is the main reason I like DI.
+
+### Terminology
+
 - **DI Container:** Have dependent references all at once and execute auto-wiring.
 - **Composition Root:** The place where you make settings to resolve dependencies.
 - **Auto-wiring:** It is a function that allows you to manage services in the container with minimal configuration. DI library usually does this.
-- **IoC (Inversion of Control):** Make the object with control flow responsibility an entry point. In simple and traditional programming, the entry point is where the responsibility for interrupting user input is. In Unity, the entry point is `MonoBehaviour`, but in order to separate presentation and domain logic, it is effective to create an entry point that does not depend on `MonoBehaviour`.
-VContainer supports this with its own PlayerLoop. See [Dispatching Unity Lifecycle](#dispatching-unity-lifecycle) section.
+- **IoC (Inversion of Control):** Make the object with control flow responsibility an entry point. In simple and traditional programming, the entry point is where the responsibility for interrupting user input is.
 
 
 Note:
@@ -259,6 +276,71 @@ builder.UseEntryPoints(Lifetime.Singleton, entryPoints =>
 ```
 
 This makes it clearer that EntryPoints are given special treatment by design.
+
+**6. Inversion of Control (IoC)**
+
+It typically calls logic in response to events such as user input. 
+
+Consider the following View Component.
+
+```csharp
+public class HelloScreen : MonoBehaviour
+{
+    public Button HelloButton;
+}
+```
+
+In normal Unity programming, you embed logic calls in HelloScreen, but if you're using DI, you can separate HelloScreen and   any control flow.
+
+```diff
+public class GamePresenter
+{
+-    public class GamePresenter : ITickable
++    public class GamePresenter : IInitializable
+     {
+         readonly HelloWorldService helloWorldService;
++        readonly HelloScreen helloScreen;  
+
+         public GamePresenter(
+             HelloWorldService helloWorldService,
++            HelloScreen helloScreen)
+         {
+             this.helloWorldService = helloWorldService;
++            this.helloScreen = helloScreen;
+         }
+
++        void IInitializable.Initialize()
++        {
++            helloScreen.HelloButton.onClick.AddListener(() => helloWorldService.Hello());
++        }
+     }    
+}
+```
+
+By doing this, we succeeded in separating the domain logic / control flow / view component.
+
+- **GamePresenter:** Responsible only for Control Flow.
+- **HelloWorldService:** Responsible only for the functionality that can be called anytime, anywhere
+- **HelloScreen**: Responsible only for View.
+
+In VContainer, you need to register the dependent MonoBehaviour. Don't forget to register HelloScreen.
+
+```diff
+    public class GameLifetimeScope : LifetimeScope
+    {
++       [SerializeField]
++       HelloScreen helloScreen;
+
+        protected override void Configure(IContainerBuilder builder)
+        {
+            builder.RegisterEntryPoint<HelloWorldService>(Lifetime.Singleton);
+            builder.Register<HelloWorldService>(Lifetime.Singleton);
++           builder.RegisterComponent(helloScreen);
+        }
+    }
+```
+
+
 
 ## Resolving
 
