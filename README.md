@@ -277,7 +277,7 @@ builder.UseEntryPoints(Lifetime.Singleton, entryPoints =>
 
 This makes it clearer that EntryPoints are given special treatment by design.
 
-**6. Inversion of Control (IoC)**
+**6. Inversion of Control (IoC)**
 
 It typically calls logic in response to events such as user input. 
 
