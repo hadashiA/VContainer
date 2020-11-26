@@ -4,7 +4,7 @@ namespace VContainer.Internal
 {
     sealed class CappedArrayPool<T>
     {
-        const int InitialBucketSize = 4;
+        internal const int InitialBucketSize = 4;
 
         public static readonly T[] EmptyArray = new T[0];
         public static readonly CappedArrayPool<T> Shared8Limit = new CappedArrayPool<T>(8);
@@ -13,7 +13,7 @@ namespace VContainer.Internal
         readonly object syncRoot = new object();
         readonly int[] tails;
 
-        CappedArrayPool(int maxLength)
+        internal CappedArrayPool(int maxLength)
         {
             buckets = new T[maxLength][][];
             tails = new int[maxLength];
@@ -46,6 +46,7 @@ namespace VContainer.Internal
                 if (tail >= bucket.Length)
                 {
                     Array.Resize(ref bucket, bucket.Length * 2);
+                    buckets[i] = bucket;
                 }
 
                 var result = bucket[tail] ?? new T[length];
