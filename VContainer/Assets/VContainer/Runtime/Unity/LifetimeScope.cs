@@ -30,6 +30,9 @@ namespace VContainer.Unity
         [SerializeField]
         bool autoRun = true;
 
+        [SerializeField]
+        List<MonoBehaviour> autoInjectTargets;
+
         static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
 
         static LifetimeScope overrideParent;
@@ -159,6 +162,7 @@ namespace VContainer.Unity
             }
 
             extraInstallers.Clear();
+            AutoInjectAll();
             ActivateEntryPoints();
         }
 
@@ -255,6 +259,20 @@ namespace VContainer.Unity
                 }
             }
             return null;
+        }
+
+        void AutoInjectAll()
+        {
+            if (autoInjectTargets == null || autoInjectTargets.Count <= 0)
+                return;
+
+            foreach (var target in autoInjectTargets)
+            {
+                if (target != null) // Check missing reference
+                {
+                    Container.Inject(target);
+                }
+            }
         }
 
         void ActivateEntryPoints()

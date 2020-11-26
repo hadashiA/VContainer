@@ -369,5 +369,26 @@ namespace VContainer.Tests
             Assert.Throws<VContainerException>(() => builder.Build(),
                 "Circular dependency detected! type: VContainer.Tests.HasCircularDependency1");
         }
+
+        [Test]
+        public void Inject()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+
+            var container = builder.Build();
+
+            var methodInjectable = new HasMethodInjection();
+            Assert.That(methodInjectable.Service2, Is.Null);
+
+            container.Inject(methodInjectable);
+            Assert.That(methodInjectable.Service2, Is.InstanceOf<I2>());
+
+            var noInjectable = new NoDependencyServiceA();
+            Assert.DoesNotThrow(() => container.Inject(noInjectable));
+
+            var ctorInjectable = new ServiceA(new NoDependencyServiceA());
+            Assert.DoesNotThrow(() => container.Inject(ctorInjectable));
+        }
     }
 }
