@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace VContainer.Unity
 {
-    public static class IObjectResolverUnityExtensions
+    public static class ObjectResolverUnityExtensions
     {
         public static void InjectGameObject(this IObjectResolver resolver, GameObject gameObject)
         {

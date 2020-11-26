@@ -46,7 +46,7 @@ namespace VContainer.Unity
             => containerBuilder.RegisterComponentInNewPrefab(prefab, lifetime);
     }
 
-    public static class IContainerBuilderUnityExtensions
+    public static class ContainerBuilderUnityExtensions
     {
         public static void UseEntryPoints(
             this IContainerBuilder builder,
