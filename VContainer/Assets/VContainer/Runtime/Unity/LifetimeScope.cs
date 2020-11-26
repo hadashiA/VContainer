@@ -31,7 +31,7 @@ namespace VContainer.Unity
         bool autoRun = true;
 
         [SerializeField]
-        List<MonoBehaviour> autoInjectTargets;
+        List<GameObject> autoInjectTargets;
 
         static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
 
@@ -263,14 +263,14 @@ namespace VContainer.Unity
 
         void AutoInjectAll()
         {
-            if (autoInjectTargets == null || autoInjectTargets.Count <= 0)
+            if (autoInjectTargets == null)
                 return;
 
             foreach (var target in autoInjectTargets)
             {
                 if (target != null) // Check missing reference
                 {
-                    Container.Inject(target);
+                    Container.InjectGameObject(target);
                 }
             }
         }
