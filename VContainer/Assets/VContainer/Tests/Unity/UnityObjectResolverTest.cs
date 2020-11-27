@@ -67,5 +67,71 @@ namespace VContainer.Tests.Unity
             Assert.That(component2.ServiceB, Is.InstanceOf<ServiceB>());
             Assert.That(child2Component.ServiceA, Is.InstanceOf<ServiceA>());
         }
+
+        [Test]
+        public void InstantiateMonoBehaviour()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Singleton);
+            var container = builder.Build();
+
+            var parent = new GameObject("Parent");
+            var original = new GameObject("Original").AddComponent<SampleMonoBehaviour>();
+
+            var instance1 = container.Instantiate(original);
+            Assert.That(instance1, Is.Not.EqualTo(original));
+            Assert.That(instance1.ServiceA, Is.InstanceOf<ServiceA>());
+
+            var instance2 = container.Instantiate(original, parent.transform);
+            Assert.That(parent.GetComponentInChildren<SampleMonoBehaviour>(), Is.EqualTo(instance2));
+            Assert.That(instance2, Is.Not.EqualTo(original));
+            Assert.That(instance2.ServiceA, Is.InstanceOf<ServiceA>());
+
+            var instance3 = container.Instantiate(
+                original,
+                new Vector3(1f, 2f, 3f),
+                Quaternion.Euler(1f, 2f, 3f));
+
+            Assert.That(instance3, Is.Not.EqualTo(original));
+            Assert.That(instance3.ServiceA, Is.InstanceOf<ServiceA>());
+            Assert.That(instance3.transform.position, Is.EqualTo(new Vector3(1f, 2f, 3f)));
+            Assert.That(instance3.transform.rotation, Is.EqualTo(Quaternion.Euler(1f, 2f, 3f)));
+        }
+
+
+        [Test]
+        public void InstantiateGameObject()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Singleton);
+            var container = builder.Build();
+
+            var parent = new GameObject("Parent");
+            var original = new GameObject("Original");
+
+            original.AddComponent<SampleMonoBehaviour>();
+
+            var instance1 = container.Instantiate(original);
+            Assert.That(instance1, Is.Not.EqualTo(original));
+            Assert.That(instance1.GetComponent<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(instance1.GetComponent<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
+
+            var instance2 = container.Instantiate(original, parent.transform);
+            Assert.That(parent.transform.GetChild(0), Is.EqualTo(instance2.transform));
+            Assert.That(instance2, Is.Not.EqualTo(original));
+            Assert.That(instance2.GetComponent<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(instance2.GetComponent<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
+
+            var instance3 = container.Instantiate(
+                original,
+                new Vector3(1f, 2f, 3f),
+                Quaternion.Euler(1f, 2f, 3f));
+
+            Assert.That(instance3, Is.Not.EqualTo(original));
+            Assert.That(instance3.GetComponent<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(instance3.GetComponent<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
+            Assert.That(instance3.transform.position, Is.EqualTo(new Vector3(1f, 2f, 3f)));
+            Assert.That(instance3.transform.rotation, Is.EqualTo(Quaternion.Euler(1f, 2f, 3f)));
+        }
     }
 }
