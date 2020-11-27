@@ -72,8 +72,7 @@ In modern application design, "separation of domain logic and presentation layer
 
 It is against this that MonoBehaviour has many roles (event handling, control flow, domain logic calls, etc.) in addition to its behavior as a View.
 
-One of the purposes of DI is IoC (Inversion of Control).  DI containers we can make pure C # classes the entry point (not MonoBehaviour).
-This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
+One of the purposes of DI is IoC (Inversion of Control).  DI containers we can make pure C # classes the entry point (not MonoBehaviour). This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
 
 View components are dynamically created / destroyed at run time, while all "features" such as control flow and domain logic have a more stable lifespan.
 
@@ -452,6 +451,12 @@ You can also use field.
     [Inject]
     IServiceA serviceA;
 ```
+
+### Auto inject GameObject in the scene
+
+In VContainer, objects that are not explicitly registered will not be injected. Therefore, execute Register for the object you want to inject. Therefore, execute Register for the object you want to inject. 
+
+If you want to run **"Inject Only"** into MonoBehaviour, you can do so by inserting GameObject in the `autoInjectGameObject` field of LifetimeScope.
 
 ### Implicit Relationship Types
 
@@ -919,6 +924,36 @@ public class SomeLifetimeScope : LifetimeScope
 }
 ```
 
+## Use Container Directory
+
+You can also use Container's API directly, if needed.
+
+For example:
+
+```csharp
+class ClassA
+{
+    public ClassA(LifetimeScope currentScope)
+    {      
+        // Resolve
+        var serviceA = currentScope.Container.Resolve<ServiceA>();
+      
+        // Execute Inject on the generated instance
+        currentScope.Container.Inject(foo);
+      
+        // Execute Inject for all MonoBehaviour contained in GameObject
+        currentScope.Container.InjectGameObject(gameObject);
+      
+        // Instantiate with Inject
+        currentScope.Container.Instantiate(prefab);
+        currentScope.Container.Instantiate(prefab, parent);
+        currentScope.Container.Instantiate(prefab, position, rotation parent);
+    }
+}
+```
+
+
+
 ## Controlling Scope and Lifetime
 
 `LifetimeScope` can build parent-child relationship.
@@ -1120,7 +1155,6 @@ You can specify a root LifetimeScope that will be the parent of all LifetimeScop
 
 Note:
   - If you create VContainerSettings from this menu, it will be automatically registered in preload assets.
-
 
 ## Dispatching Unity Lifecycle
 
