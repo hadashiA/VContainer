@@ -454,7 +454,7 @@ You can also use field.
 
 ### Auto inject GameObject in the scene
 
-In VContainer, objects that are not explicitly registered will not be injected. Therefore, execute Register for the object you want to inject. Therefore, execute Register for the object you want to inject. 
+In VContainer, objects that are not explicitly registered will not be injected. Therefore, execute Register for the object you want to inject. 
 
 If you want to run **"Inject Only"** into MonoBehaviour, you can do so by inserting GameObject in the `autoInjectGameObject` field of LifetimeScope.
 
@@ -928,6 +928,7 @@ public class SomeLifetimeScope : LifetimeScope
 
 You can also use Container's API directly, if needed.
 
+
 For example:
 
 ```csharp
@@ -952,6 +953,7 @@ class ClassA
 }
 ```
 
+:warning: These methods are poor performance (especially if CodeGen is not enabled). Use only if normal DI patterns are not applicable.
 LifetimeScope also has a Container reference.
 
 ```csharp
