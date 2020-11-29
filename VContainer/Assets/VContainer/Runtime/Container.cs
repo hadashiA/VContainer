@@ -10,6 +10,8 @@ namespace VContainer
         object Resolve(Type type);
         object Resolve(IRegistration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
+        void Inject(object instance);
+        void Inject(object instance, params IInjectParameter[] parameters);
     }
 
     public interface IScopedObjectResolver : IObjectResolver
@@ -85,6 +87,18 @@ namespace VContainer
             var containerBuilder = new ScopedContainerBuilder(Root, this);
             installation?.Invoke(containerBuilder);
             return containerBuilder.BuildScope();
+        }
+
+        public void Inject(object instance)
+        {
+            var injector = InjectorCache.GetOrBuild(instance.GetType());
+            injector.Inject(instance, this, null);
+        }
+
+        public void Inject(object instance, params IInjectParameter[] parameters)
+        {
+            var injector = InjectorCache.GetOrBuild(instance.GetType());
+            injector.Inject(instance, this, parameters);
         }
 
         public bool TryGetRegistration(Type type, out IRegistration registration)
@@ -174,6 +188,18 @@ namespace VContainer
 
         public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
             => rootScope.CreateScope(installation);
+
+        public void Inject(object instance)
+        {
+            var injector = InjectorCache.GetOrBuild(instance.GetType());
+            injector.Inject(instance, this, null);
+        }
+
+        public void Inject(object instance, params IInjectParameter[] parameters)
+        {
+            var injector = InjectorCache.GetOrBuild(instance.GetType());
+            injector.Inject(instance, this, parameters);
+        }
 
         public void Dispose()
         {

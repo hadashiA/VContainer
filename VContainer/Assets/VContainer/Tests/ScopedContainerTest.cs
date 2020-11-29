@@ -166,5 +166,28 @@ namespace VContainer.Tests
             //Assert.That(singletonService, Is.InstanceOf<ServiceA>());
             Assert.That(scopedService, Is.InstanceOf<ServiceB>());
         }
+
+        [Test]
+        public void Inject()
+        {
+            var builder = new ContainerBuilder();
+            var container = builder.Build();
+            var childContainer = container.CreateScope(childBuilder =>
+            {
+                childBuilder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+            });
+
+            var methodInjectable = new HasMethodInjection();
+            Assert.That(methodInjectable.Service2, Is.Null);
+
+            childContainer.Inject(methodInjectable);
+            Assert.That(methodInjectable.Service2, Is.InstanceOf<I2>());
+
+            var noInjectable = new NoDependencyServiceA();
+            Assert.DoesNotThrow(() => childContainer.Inject(noInjectable));
+
+            var ctorInjectable = new ServiceA(new NoDependencyServiceA());
+            Assert.DoesNotThrow(() => childContainer.Inject(ctorInjectable));
+        }
     }
 }
