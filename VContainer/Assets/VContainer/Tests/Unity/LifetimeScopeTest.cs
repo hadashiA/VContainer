@@ -11,11 +11,11 @@ namespace VContainer.Tests.Unity
     public class LifetimeScopeTest
     {
         [Test]
-        public void PushParent()
+        public void EnqueueParent()
         {
             var parent = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
 
-            using (LifetimeScope.PushParent(parent))
+            using (LifetimeScope.EnqueueParent(parent))
             {
                 var child = new GameObject("LifetimeScope Child 1").AddComponent<LifetimeScope>();
                 Assert.That(child.Parent, Is.EqualTo(parent));
@@ -53,16 +53,10 @@ namespace VContainer.Tests.Unity
         [UnityTest]
         public IEnumerator CreateChild()
         {
-            LifetimeScope parentLifetimeScope;
-
-            using (LifetimeScope.Push(builder =>
+            var parentLifetimeScope = LifetimeScope.Create(builder =>
             {
                 builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
-            }))
-            {
-                parentLifetimeScope = new GameObject("SampleLifetimeScope")
-                    .AddComponent<SampleLifetimeScope>();
-            }
+            });
 
             yield return null;
             yield return null;
@@ -105,15 +99,10 @@ namespace VContainer.Tests.Unity
         [Test]
         public void CreateScopeWithSingleton()
         {
-            LifetimeScope parentLifetimeScope;
-
-            using (LifetimeScope.Push(builder =>
+            var parentLifetimeScope = LifetimeScope.Create(builder =>
             {
                 builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Singleton).AsSelf();
-            }))
-            {
-                parentLifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
-            }
+            });
 
             var parentEntryPoint = parentLifetimeScope.Container.Resolve<SampleEntryPoint>();
             Assert.That(parentEntryPoint, Is.InstanceOf<SampleEntryPoint>());

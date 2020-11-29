@@ -960,7 +960,7 @@ class SceneLoader
     IEnumerator LoadSceneAsync()
     {
         // LifetimeScope generated in this block will be parented by `this.lifetimeScope`
-        using (LifetimeScope.PushParent(parent))
+        using (LifetimeScope.EnqueueParent(parent))
         {
             // If this scene has a LifetimeScope, its parent will be `parent`.
             var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
@@ -974,7 +974,7 @@ class SceneLoader
     // UniTask example
     async UniTask LoadSceneAsync()
     {
-        using (LifetimeScope.PushParent(parent))
+        using (LifetimeScope.EnqueueParent(parent))
         {
             await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
         }        
@@ -998,7 +998,7 @@ In that case you could use:
 
 ```csharp
 // LifetimeScopes generated during this block will be additionally Registered.
-using (LifetimeScope.Push(builder =>
+using (LifetimeScope.Enqueue(builder =>
 {
     // Register for the next scene not yet loaded
     builder.RegisterInstance(extraInstance);
@@ -1018,16 +1018,16 @@ class FooInstaller : IInstaller
     }
 }
 
-using (LifetimeScope.Push(fooInstaller)
+using (LifetimeScope.Enqueue(fooInstaller)
 {
     // ... loading scene
 }
 ```
 
 ```csharp
-// PushParent() and Push() can be used together.
-using (LifetimeScope.PushParent(parent))
-using (LifetimeScope.Push(builder => ...)
+// EnqueueParent() and Enqueue() can be used together.
+using (LifetimeScope.EnqueueParent(parent))
+using (LifetimeScope.Enqueue(builder => ...)
 {
     // ... loading scene
 }
