@@ -933,21 +933,33 @@ For example:
 ```csharp
 class ClassA
 {
-    public ClassA(LifetimeScope currentScope)
+    public ClassA(IObjectResolver container)
     {      
         // Resolve
-        var serviceA = currentScope.Container.Resolve<ServiceA>();
+        var serviceA = container.Resolve<ServiceA>();
       
         // Execute Inject on the generated instance
-        currentScope.Container.Inject(foo);
+        container.Inject(foo);
       
         // Execute Inject for all MonoBehaviour contained in GameObject
-        currentScope.Container.InjectGameObject(gameObject);
+        container.InjectGameObject(gameObject);
       
         // Instantiate with Inject
-        currentScope.Container.Instantiate(prefab);
-        currentScope.Container.Instantiate(prefab, parent);
-        currentScope.Container.Instantiate(prefab, position, rotation parent);
+        container.Instantiate(prefab);
+        container.Instantiate(prefab, parent);
+        container.Instantiate(prefab, position, rotation parent);
+    }
+}
+```
+
+LifetimeScope also has a Container reference.
+
+```csharp
+class ClassA
+{
+    public ClassA(LifetimeScope currentScope)
+    {
+        currentScope.Container...
     }
 }
 ```
