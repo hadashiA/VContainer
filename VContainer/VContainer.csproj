@@ -85,6 +85,7 @@
      <Compile Include="Assets\VContainer\Runtime\Unity\ExtraInstaller.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ContainerBuilderUnityExtensions.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\IInstaller.cs" />
+     <Compile Include="Assets\VContainer\Runtime\Unity\UnityEngineObjectListBuffer.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ObjectResolverUnityExtensions.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\LifetimeScope.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\ParentReference.cs" />

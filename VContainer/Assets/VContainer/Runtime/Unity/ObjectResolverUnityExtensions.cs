@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
@@ -6,14 +7,17 @@ namespace VContainer.Unity
     {
         public static void InjectGameObject(this IObjectResolver resolver, GameObject gameObject)
         {
+            var buffer = UnityEngineObjectListBuffer<MonoBehaviour>.Get();
+
             void InjectGameObjectRecursive(GameObject current)
             {
                 if (current == null) return;
 
-                var monoBehaviours = current.GetComponents<MonoBehaviour>();
-                foreach (var x in monoBehaviours)
+                buffer.Clear();
+                current.GetComponents(buffer);
+                foreach (var monoBehaviour in buffer)
                 {
-                    resolver.Inject(x);
+                    resolver.Inject(monoBehaviour);
                 }
 
                 var transform = current.transform;

@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-
+using VContainer.Internal;
 #if VCONTAINER_ECS_INTEGRATION
 using Unity.Entities;
 #endif
@@ -94,9 +94,12 @@ namespace VContainer.Unity
             var lifetimeScope = (LifetimeScope)builder.ApplicationOrigin;
             var scene = lifetimeScope.gameObject.scene;
             var component = default(T);
-            foreach (var x in scene.GetRootGameObjects())
+
+            var gameObjectBuffer = UnityEngineObjectListBuffer<GameObject>.Get();
+            scene.GetRootGameObjects(gameObjectBuffer);
+            foreach (var gameObject in gameObjectBuffer)
             {
-                component = x.GetComponentInChildren<T>(true);
+                component = gameObject.GetComponentInChildren<T>(true);
                 if (component != null) break;
             }
 
