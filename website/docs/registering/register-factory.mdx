@@ -1,0 +1,69 @@
+---
+title: Register Factory
+---
+
+VContainer allows to register a `Func<>` delegate for the creation of an instance. This is especially useful in scenarios where instance is created at any time during execution, or multiple instances are created at any time.
+
+By registering Factory instead of instance, you can keep the dependency static and simple.
+
+## Register `Func<>` Factory that requires only runtime parameters
+
+```csharp
+builder.RegisterFactory<int, Foo>(x => new Foo(x));
+```
+
+We can resolve like below:
+
+```csharp
+class ClassA
+{
+    readonly Func<int, Foo> factory;
+
+    public ClassA(Func<int, Foo> factory)
+    {
+        this.factory = factory;
+    }
+
+    public void DoSomething()
+    {
+        var foo = factory.Invoke(100);
+        // ...
+    }
+}
+```
+
+## Register `Func<>` Factory that requires container dependencies and runtime parameters
+
+```csharp
+builder.RegisterFactory<int, Foo>(container =>
+{
+    var dependency = container.Resolve<Dependency>(); // Resolve per scope
+    return x => new Foo(x, dependency); // Execute per factory invocation
+}, Lifetime.Scoped);
+```
+
+This method required 2 params
+
+- `Func<>` : Receives Container and returns Factory.
+- `Lifetime` : Determines how often the Factory is generated. (that is, how often the outer Func is executed.)
+
+We can resolve like below:
+
+```csharp
+class ClassA
+{
+    readonly Func<int, Foo> factory;
+
+    public ClassA(Func<int, Foo> factory)
+    {
+        this.factory = factory;
+    }
+
+    public void DoSomething()
+    {
+        var foo = factory.Invoke(100);
+        // ...
+    }
+}
+```
+

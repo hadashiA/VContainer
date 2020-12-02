@@ -1,0 +1,62 @@
+---
+title: Generate child with code first
+---
+
+Child can also be generated from your C# code.
+
+```csharp
+class LevelLoader
+{
+    readonly LifetimeScope currentScope;
+
+    LifetimeScope instantScope;
+
+    public LevelLoader(LifetimeScope lifetimeScope)
+    {
+        currentScope = lifetimeScope;
+    }
+
+    public void Load()
+    {
+        // ... Loading some assets
+
+        // Create a child scope for the container that contains this LevelLoader instance.
+        instantScope = currentScopey.CreateChild();
+
+        // Create with LifetimeScope prefab
+        instantScope = currentScope.CreateChildFromPrefab(prefab);
+
+        // Create with LifetimeScope prefab and extra registrations
+        instantScope = currentScope.CreateChildFromPrefab(prefab, builder =>
+        {
+            builder.RegisterInstance(someExtraAsset);
+            builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
+            // ...
+        });
+
+        // Create a child scope with extra registrations
+        instantScope = currentScope.CreateChild(builder =>
+        {
+            // ...
+        });
+
+        // Create a child scope with extra registrations via `IInstaller`
+        instantScope = currentScope.CreateChild(extraInstaller);
+
+
+        // The additionally registered entry point runs immediately after the scope is created...
+
+        // Or you can use scoped instance directly.
+        var foo = instantScope.Container.Resolve<Foo>();
+    }
+
+    public void Unload()
+    {
+        // Note that the scope implicitly create `LifetimeScope`.
+        // Use `Dispose` to safely destroying the scope.
+        instantScope.Dispose();
+
+        // ... Unloading some assets
+    }
+}
+```
