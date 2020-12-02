@@ -76,12 +76,8 @@ html[data-theme='dark'] {
 
 /* DocSidebar */
 
-.menu .menu__list {
-  margin: 0;
-  list-style-type: none;
-  padding-left: 0;
-  transition: height .2s cubic-bezier(.08,.52,.52,1);
-  transition: height var(--ifm-transition-fast) cubic-bezier(.08,.52,.52,1);
+.menu__list {
+  padding-left: var(--ifm-menu-link-padding-horizontal);
 }
 
 .menu__link.menu__link--sublist,
@@ -91,6 +87,12 @@ html[data-theme='dark'] {
 
 .menu__link.menu__link--sublist.menu__link--active {
   color: var(--ifm-font-color-base);
+}
+
+.menu>ul.menu__list li>a {
+  padding-left: 0;
+  /*padding-right: 0;*/
+  /*margin: 0;*/
 }
 
 .menu>ul.menu__list ul.menu__list {
