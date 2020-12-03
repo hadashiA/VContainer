@@ -9,8 +9,6 @@
 :root {
   /* override */
   --ifm-color-primary: #33e;
-  /*--ifm-font-color-base: #fff;*/
-  /*--ifm-font-color-base-dark: #fff;*/
   /*--ifm-color-primary-dark: rgb(33, 175, 144);*/
   /*--ifm-color-primary-darker: rgb(31, 165, 136);*/
   /*--ifm-color-primary-darkest: rgb(26, 136, 112);*/
@@ -19,18 +17,9 @@
   /*--ifm-color-primary-lightest: rgb(146, 224, 208);*/
   --ifm-code-font-size: 95%;
   --ifm-font-weight-semibold: 700;
-  /*--ifm-font-color-base: #000;*/
   --ifm-menu-color-background-active: none;
   --ifm-menu-color-background-hover: none;
 
-  /*--ifm-menu-color: var(--ifm-font-color-base);*/
-
-  /*--ifm-h1-font-size: 1.5rem;*/
-  /*--ifm-h2-font-size: 1.25rem;*/
-  /*--ifm-h3-font-size: 1rem;*/
-  /*--ifm-h4-font-size: 0.875rem;*/
-  /*--ifm-h5-font-size: 0.85rem;*/
-  /*--ifm-h6-font-size: 0.75rem;*/
   --ifm-h1-font-size: 2rem;
   --ifm-h2-font-size: 1.5rem;
   --ifm-h3-font-size: 1.25rem;
@@ -65,6 +54,12 @@ html[data-theme='dark'] {
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
+}
+
+/* DocItem */
+
+.table-of-contents__link {
+  color: var(--ifm-toc-link-color);
 }
 
 /* DocPaginator */
@@ -105,4 +100,24 @@ html[data-theme='dark'] {
 .menu__link--sublist:after {
   width: 0.65em;
   height: 0.65em;
+}
+
+a.menu__link:hover {
+  color: var(--ifm-color-primary);
+  cursor: pointer;
+}
+
+/* Edit URL */
+
+article + div .row > .col > a {
+  color: var(--ifm-color-secondary-darkest);
+}
+
+/* Footer */
+
+.footer--dark {
+  --ifm-footer-background-color: #fafafa;
+  --ifm-footer-link-color: rgb(34, 34, 34);
+  --ifm-footer-color: var(--ifm-footer-link-color);
+  --ifm-footer-title-color: rgb(34, 34, 34);
 }
