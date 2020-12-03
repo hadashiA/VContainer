@@ -1,44 +1,6 @@
 ---
-id: what-is-vcontainer
-title: VContainer
-sidebar_label: What is VContainer
-slug: /
+title: What is DI ?
 ---
-
-![](https://github.com/hadashiA/VContainer/workflows/Test/badge.svg)
-![](https://img.shields.io/badge/unity-2018.4+-000.svg)
-[![Releases](https://img.shields.io/github/release/hadashiA/VContainer.svg)](https://github.com/hadashiA/VContainer/releases)
-[![openupm](https://img.shields.io/npm/v/jp.hadashikick.vcontainer?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/jp.hadashikick.vcontainer/)
-
-**VContainer** is an DI (Dependency Injection) library running on Unity (Game Engine).
-
-"V" means making Unity's initial "U" more thinner and solid ... !
-
-- **Fast resolve:** Basically, 5-10x faster than Zenject.
-- **Minimum GC allocation**: In Resolve, We have zero allocation without spawned instances.
-- **Extra small code size**: Few internal types and few .callvirt.
-- **Flexible scoping**: Application can freely create nested Lifetime Scope.
-- **IoC**: Create script entry point without MonoBehaviour. (Using own Unity's PlayerLoopSystem)
-- **ECS integration**
-- **Immutable Container:** Thread safety and robustness.
-
-Benchmarking:
-
-![](assets/benchmark_result.png)
-
-- By default, both VContainer and Zenject use reflection at runtime.
-- "VContainer (CodeGen)" means optimization feature by pre-generation IL code of Inject methods by ILPostProcessor.
-    - See [Optimization](#optimization) section  more information.
-
-An example of profile results for GC Alloc:
-
-![](assets/screenshot_profiler_vcontainer.png)
-
-![](assets/screenshot_profiler_zenject.png)
-
-(VContainer has achieved zero allocation during Resolve.)
-
-## What is DI ?
 
 DI (Dependency Injection) is a general technique in OOP that all about removing unconcerned dependencies from your code.
 It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.
@@ -77,12 +39,3 @@ This is the main reason I like DI.
 - **Composition Root:** The place where you make settings to resolve dependencies.
 - **Auto-wiring:** It is a function that allows you to manage services in the container with minimal configuration. DI library usually does this.
 - **IoC (Inversion of Control):** Make the object with control flow responsibility an entry point. In simple and traditional programming, the entry point is where the responsibility for interrupting user input is.
-
-
-Note:
-- Don't try to DI what an object should hide inside. What's hidden is leaking and the design is getting worse.
-- The word DI does not necessarily mean magic or library. Creating your own Composition Root without using the library is called `Poor man's DI` or `DIY DI`.  This is **not** an anti-pattern.
-
-Further reading:
-- [Lightweight IoC Container for Unity - Seba's Lab](https://www.sebaslab.com/ioc-container-unity-part-1/)
-- [Manning | Dependency Injection in .NET](https://www.manning.com/books/dependency-injection-in-dot-net)

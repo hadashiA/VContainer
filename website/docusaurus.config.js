@@ -15,18 +15,18 @@ module.exports = {
       darkTheme: require('prism-react-renderer/themes/dracula'),
     },
     navbar: {
-      title: 'My Site',
-      logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
-      },
+      title: 'VContainer',
+      // logo: {
+      //   alt: 'My Site Logo',
+      //   src: 'img/logo.svg',
+      // },
       items: [
-        {
-          to: 'docs/',
-          activeBasePath: 'docs',
-          label: 'Docs',
-          position: 'left',
-        },
+        // {
+        //   to: 'docs/',
+        //   activeBasePath: 'docs',
+        //   label: 'Docs',
+        //   position: 'left',
+        // },
         {
           href: 'https://github.com/hadashiA/VContainer',
           label: 'GitHub',
@@ -90,6 +90,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.ts'),
+          routeBasePath: '/',
           // Please change this to your repo.
           editUrl:
             'https://github.com/facebook/docusaurus/edit/master/website/',

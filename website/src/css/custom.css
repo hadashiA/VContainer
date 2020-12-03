@@ -102,14 +102,7 @@ html[data-theme='dark'] {
   padding-left: var(--ifm-menu-link-padding-horizontal);
 }
 
-/*@media (min-width: 997px) {*/
-/*  .menu__list {*/
-/*    font-size: 0.9em;*/
-/*    !*font-weight: 700;*!*/
-/*    !*height: 100vh;*!*/
-/*    !*overflow-y: auto;*!*/
-/*    !*position: -webkit-sticky;*!*/
-/*    !*position: sticky;*!*/
-/*    !*top: 0*!*/
-/*  }*/
-/*}*/
+.menu__link--sublist:after {
+  width: 0.65em;
+  height: 0.65em;
+}
