@@ -15,10 +15,13 @@
     "@docusaurus/core": "2.0.0-alpha.69",
     "@docusaurus/preset-classic": "2.0.0-alpha.69",
     "@mdx-js/react": "^1.6.21",
+    "@nivo/bar": "^0.66.0",
+    "@nivo/core": "^0.66.0",
     "clsx": "^1.1.1",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "remark-images": "^2.0.0"
+    "remark-images": "^2.0.0",
+    "victory": "^35.4.2"
   },
   "browserslist": {
     "production": [

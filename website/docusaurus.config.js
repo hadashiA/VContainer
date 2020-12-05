@@ -37,6 +37,7 @@ module.exports = {
         lightIconStyle: {
           marginLeft: '1px',
         },
+      },
     },
     prism: {
       additionalLanguages: ['csharp'],
@@ -136,4 +137,4 @@ module.exports = {
       },
     ],
   ],
-};
+}
