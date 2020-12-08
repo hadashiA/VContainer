@@ -7,7 +7,6 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  /* override */
   --ifm-color-primary: #33e;
   /*--ifm-color-primary-dark: rgb(33, 175, 144);*/
   /*--ifm-color-primary-darker: rgb(31, 165, 136);*/
@@ -26,6 +25,22 @@
   --ifm-h4-font-size: 1rem;
   --ifm-h5-font-size: 0.875rem;
   --ifm-h6-font-size: 0.85rem;
+}
+
+/*.hero--primary {*/
+/*    --ifm-hero-background-color: #fafafa;*/
+/*    --ifm-hero-text-color: #000;*/
+/*}*/
+
+.hero--primary .button.button--secondary.button--outline:not(.button--active):not(:hover) {
+    color: #fff;
+}
+
+.button {
+    /*box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);*/
+    /*background-color: var(--ifm-color-primary);*/
+    /*color: #fff;*/
+    border-radius: 9999px;
 }
 
 h1.docTitle_node_modules-\@docusaurus-theme-classic-lib-theme-DocItem- {

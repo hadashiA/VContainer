@@ -1,6 +1,6 @@
 module.exports = {
   title: 'VContainer',
-  tagline: 'The extra fast, minimum code size, GC-free DI (Dependency Injection) library running on Unity (IL2CPP). ',
+  tagline: 'A fastest DI (Dependency Injection) for Unity',
   url: 'https://vcontainer.hadashikick.jp',
   baseUrl: '/',
   onBrokenLinks: 'throw',
