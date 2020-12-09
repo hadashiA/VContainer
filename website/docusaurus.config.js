@@ -51,12 +51,17 @@ module.exports = {
       //   src: 'img/logo.svg',
       // },
       items: [
-        // {
-        //   to: 'docs/',
-        //   activeBasePath: 'docs',
-        //   label: 'Docs',
-        //   position: 'left',
-        // },
+        {
+          to: 'docs/setup/installation',
+          activeBasePath: 'docs',
+          label: 'Get Started',
+          position: 'right',
+        },
+        {
+          href: 'https://github.com/hadashiA/VContainer/releases',
+          label: 'v1.3.0',
+          position: 'right',
+        },
         {
           href: 'https://github.com/hadashiA/VContainer',
           label: 'GitHub',

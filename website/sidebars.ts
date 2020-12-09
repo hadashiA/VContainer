@@ -1,13 +1,9 @@
 module.exports = {
   docs: {
       'ABOUT': [
-          // 'about/what-is-vcontainer'
-          { type: 'doc', id: 'about/concepts' },
-          { type: 'doc', id: 'about/what-is-di' },
-      ],
-      'SETUP': [
-          'setup/installation',
-          'setup/getting-started'
+          'about/what-is-vcontainer',
+          'about/getting-started',
+          'about/what-is-di',
       ],
       'RESOLVING': [
           'resolving/constructor-injection',

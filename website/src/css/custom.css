@@ -58,6 +58,11 @@
     border-radius: 9999px;
 }
 
+.button-getting-started {
+    /*background-color: var(--ifm-color-primary);*/
+    color: #000;
+}
+
 h1.docTitle_node_modules-\@docusaurus-theme-classic-lib-theme-DocItem- {
   font-size: var(--ifm-h1-font-size);
 }

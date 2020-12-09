@@ -3,7 +3,7 @@ import { ResponsiveBar } from '@nivo/bar'
 
 const data = [
   {
-    "testCase": "Resolve Singleton",
+    "testCase": "Singleton",
     "VContainer (CodeGen)": 4.3884,
     "VContainer (CodeGen)color": "hsl(192, 70%, 50%)",
     "VContainer (Reflection)": 4.918865,
@@ -49,7 +49,7 @@ export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
       layout="vertical"
       keys={['VContainer (CodeGen)', 'VContainer (Reflection)', 'Zenject (Reflection)']}
       indexBy="testCase"
-      margin={{top: 0, right: 150, bottom: 50, left: 60}}
+      margin={{top: 20, right: 60, bottom: 70, left: 60}}
       padding={0.3}
       valueScale={{type: 'linear'}}
       indexScale={{type: 'band', round: true}}
@@ -105,10 +105,10 @@ export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
         legendOffset: 32
       }}
       axisLeft={{
-        tickSize: 5,
+        tickSize: 6,
         tickPadding: 5,
         tickRotation: 0,
-        tickValues: 5,
+        tickValues: 3,
         legend: 'ms',
         legendPosition: 'middle',
         legendOffset: -50
@@ -120,13 +120,13 @@ export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
       legends={[
         {
           dataFrom: 'keys',
-          anchor: 'bottom-right',
-          direction: 'column',
+          anchor: 'bottom-left',
+          direction: 'row',
           justify: false,
-          translateX: 120,
-          translateY: 0,
+          translateX: -15,
+          translateY: 60,
           itemsSpacing: 2,
-          itemWidth: 150,
+          itemWidth: 160,
           itemHeight: 20,
           itemDirection: 'left-to-right',
           itemOpacity: 0.85,
