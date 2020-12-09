@@ -7,7 +7,7 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #33e;
+  --ifm-color-primary: #3333ee;
   /*--ifm-color-primary-dark: rgb(33, 175, 144);*/
   /*--ifm-color-primary-darker: rgb(31, 165, 136);*/
   /*--ifm-color-primary-darkest: rgb(26, 136, 112);*/
@@ -31,6 +31,21 @@
 /*    --ifm-hero-background-color: #fafafa;*/
 /*    --ifm-hero-text-color: #000;*/
 /*}*/
+
+.test {
+    color: rgb(237, 197, 206);
+    color: rgb(237, 197, 197);
+    color: rgb(235, 218, 196);
+    color: rgb(235, 235, 199);
+    color: rgb(217, 234, 199);
+    color: rgb(196, 236, 197);
+    color: rgb(197, 237, 226);
+    color: rgb(197, 225, 237);
+    color: rgb(197, 203, 237);
+    color: rgb(215, 197, 237);
+    color: rgb(238, 197, 237);
+    color: rgb(238, 197, 215);
+}
 
 .hero--primary .button.button--secondary.button--outline:not(.button--active):not(:hover) {
     color: #fff;

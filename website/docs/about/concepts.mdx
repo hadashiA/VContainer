@@ -4,21 +4,40 @@ sidebar_label: Concepts
 slug: /
 ---
 
-**VContainer** is an DI (Dependency Injection) library running on Unity (Game Engine).
+import {BenchmarkGraph} from "./BenchmarkGraph"
+
+A fatest DI (Dependency Injection) for Unity.
+
+"V" means making Unity's initial "U" more thinner and solid.
+
+- **Fast resolve:** Basically 5-10x faster than Zenject. And has a optimization feature by Pre IL Code generation.
+- **Minimum overhead, small code size**: In Resolve, We have **zero allocation** without spawned instances.
+- **Flexible scoping**: Application can freely create nested Lifetime Scope.
+- **Thread safety and robustness:** VContainer has guarantees for immutability.
+
+## Inversion of Control
 
 ![](assets/vcontainer@2x.png)
 
+DI containers we can make pure C # classes the entry point (not MonoBehaviour). This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
+
+## Benchmarking
+
+<BenchmarkGraph height={400} />
+
+10,000 iteration for each test cases.
+Unity 2019.x / IL2CPP Standalone macOS build.
+
+- VContainer (CodeGen) means
 
 
-"V" means making Unity's initial "U" more thinner and solid ... !
+## Simple and transparent API
 
-- **Fast resolve:** Basically, 5-10x faster than Zenject.
-- **Minimum GC allocation**: In Resolve, We have zero allocation without spawned instances.
-- **Extra small code size**: Few internal types and few .callvirt.
-- **Flexible scoping**: Application can freely create nested Lifetime Scope.
-- **IoC**: Create script entry point without MonoBehaviour. (Using own Unity's PlayerLoopSystem)
-- **ECS integration**
-- **Immutable Container:** Thread safety and robustness.
+![](assets/code_lifetimescope_annotated.png)
+
+
+
+## Flexible Scoping
 
 Benchmarking:
 
