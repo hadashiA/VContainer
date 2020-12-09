@@ -2,8 +2,8 @@ module.exports = {
   docs: {
       'ABOUT': [
           'about/what-is-vcontainer',
-          'about/getting-started',
           'about/what-is-di',
+          'about/getting-started',
       ],
       'RESOLVING': [
           'resolving/constructor-injection',
@@ -34,9 +34,8 @@ module.exports = {
           'optimization/async-container-build',
           'optimization/parallel-container-build'
       ],
-      // 'Comparing to Zenject': {
-      //   type: 'doc',
-      //   id: 'zenject',
-      // }
+      'Comparing to other libraries': [
+          'comparing/comparing-to-zenject'
+      ]
   },
 };

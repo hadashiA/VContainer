@@ -1,25 +1,39 @@
 ---
 title: VContainer
 sidebar_label: What is VContainer
+hide_table_of_contents: false
 slug: /
 ---
 
 import Link from '@docusaurus/Link'
-import {BenchmarkGraph} from "./BenchmarkGraph"
+import {BenchmarkGraph} from "../components/BenchmarkGraph"
 
 A fatest DI (Dependency Injection) for Unity. "V" means making Unity's initial "U" more thinner and solid.
 
-- **Fast Resolve:** Basically 5-10x faster than Zenject. Pre IL Code generation optimization mode available.
-- **Minimum overhead:** In Resolve, has **zero allocation** without spawned instances. Pay attention any overhead.
-- **Assisting correct DI way:**: Provides simple and transparent API, and recommends a stable lifetime DI.
-- **Flexible scoping**: Application can freely create nested Lifetime Scope.
+- **Fast Resolve:** Basically [5-10x faster](#performance) than Zenject.
+- **Minimum GC Allocation:** In Resolve, we have **zero allocation** without spawned instances.
+- **Small code size:** Few internal types and few .callvirt.
+- **Assisting correct DI way:**: Provides simple and transparent API, and carefully select features. This prevents the DI declaration from becoming overly complex.
 - **Immutable Container:** Thread safety and robustness.
+
+#### Features
+
+- [Constructor Injection](../resolving/constructor-injection) / [Method Injection](../resolving/method-injection) / [Property & Field Injection](../resolving/property-field-injection)
+- [Dispatch own PlayerLoopSystem](../integration/dispatching-unity-lifecycle-event)
+- [Flexible scoping](../scoping/lifetime-overview)
+  - Application can freely create nested Lifetime Scope with any async way for you like.
+- [Pre IL Code generation optimization mode](../optimization/codegen)
+- [ECS Integration](../integration/ecs) *beta*
 
 ## DI + Inversion of Control for Unity
 
 ![](assets/vcontainer@2x.png)
 
 DI containers we can make pure C # classes the entry point (not MonoBehaviour). This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
+
+Further reading:
+- [Manning | Dependency Injection in .NET](https://www.manning.com/books/dependency-injection-in-dot-net)
+- [Lightweight IoC Container for Unity - Seba's Lab](https://www.sebaslab.com/ioc-container-unity-part-1/)
 
 ## Performance
 

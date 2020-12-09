@@ -1,5 +1,5 @@
 ---
-title: Integrating with ECS
+title: Integrating with ECS (beta)
 ---
 
 VContainer supports integration between Unity's ECS (Entity Component System) and regular C# World.
@@ -175,7 +175,7 @@ builder.UseNewWorld("My World 1", Lifetime.Scoped, systems =>
 
 Internaly, If you use above methods, the following setup will be performed automatically:
 
-```csharp
+```csharp title="YourLifetimeScope.cs"
 // When resolving world ...
 
 var world = new World("My World 1");

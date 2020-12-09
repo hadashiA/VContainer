@@ -4,26 +4,37 @@ title: Getting Started
 
 ## Installation
 
-### Unity Package Manager (upm)
+*Requires Unity 2018.4+*
 
-- `Window -> Package Manager -> +▼ -> Add package from git url`
-  - `https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.3.0`
-- Or add this to your `Package/manifest.json`
-  - `"jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.3.0"`
+### Install via UPM (using Git URL)
 
-### .unitypackage
+1. Navigate to your project's Packages folder and open the manifest.json file.
+2. Add this line below the "dependencies": { line
+    - ```json title="Packages/manifest.json"
+      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.3.0",
+      ```
+3. UPM should now install the package.
 
-The [releases](https://github.com/hadashiA/VContainer/releases) page provides downloadable .unitypackage files.
+### Install via OpenUPM
 
-:::caution
-To use the unitypackage, the following entry is required in your `Package/manifest.json`.
-:::
 
-```json
-"nuget.mono-cecil": "0.1.6-preview"
-```
+1. The package is available on the [openupm registry](https://openupm.com). It's recommended to install it via [openupm-cli](https://github.com/openupm/openupm-cli).
+2. Execute the openum command.
+    - ```
+      openupm add jp.hadashikick.vcontainer
+      ```
 
-## Quick start guide
+### Install manually (using .unitypackage)
+
+1. Navigate to your project's Packages folder and open the manifest.json file.
+2. Add this line below the "dependencies": { line
+    - ```json title="Packages/manifest.json"
+      "nuget.mono-cecil": "0.1.6-preview",
+      ```
+3. Download the .unitypackage from [releases](https://github.com/hadashiA/VContainer/releases) page.
+4. Open VContainer.x.x.x.unitypackage
+
+## Quick start
 
 The basic way for integrating VContainer into your application is:
 
@@ -39,7 +50,7 @@ Normally, "scope" is repeatedly created and destroyed during the game. `Lifetime
 
 Let's say Hello world.
 
-```csharp
+```csharp title="HelloWorldService.cs"
 namespace MyGame
 {
     public class HelloWorldService
@@ -64,7 +75,7 @@ Note:
 
 You instruct `builder` and register the class above.
 
-```diff
+```diff title="GameLifetimeScope.cs"
 using VContainer;
 using VContainer.Unity;
 
@@ -96,7 +107,7 @@ Then attach the Component created above.
 Registered objects will automatically have dependency injection.
 Like below:
 
-```csharp
+```csharp title="GamePresenter.cs"
 using VContainer;
 using VContainer.Unity;
 
@@ -129,7 +140,7 @@ To write an application in Unity, we have to interrupt Unity's lifecycle events.
 Objects registered with VContainer can do this independently of MonoBehaviour.
 This is done automatically by implementing and registering some marker interfaces.
 
-```diff
+```diff title="GamePresenter.cs"
 using VContainer;
 using VContainer.Unity;
 
@@ -161,7 +172,7 @@ As such, it's a good practice to keep any side effect entry points through the m
 
 We should register this as running on Unity's life cycle events.
 
-```diff
+```diff title="GameLifetimeScope.cs"
 - builder.Register<GamePresenter>(Lifetime.Singleton);
 + builder.RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)
 ```
@@ -172,7 +183,7 @@ Note:
 
 If you have multiple EntryPoints, you can also use the following declaration as grouping.
 
-```csharp
+```csharp title="GameLifetimeScope.cs"
 builder.UseEntryPoints(Lifetime.Singleton, entryPoints =>
 {
     entryPoints.Add<GamePresenter>();
@@ -190,7 +201,7 @@ It typically calls logic in response to events such as user input.
 
 Consider the following View Component.
 
-```csharp
+```csharp title="HelloScreen.cs"
 public class HelloScreen : MonoBehaviour
 {
     public Button HelloButton;
@@ -199,7 +210,7 @@ public class HelloScreen : MonoBehaviour
 
 In normal Unity programming, you embed logic calls in HelloScreen, but if you're using DI, you can separate HelloScreen and   any control flow.
 
-```diff
+```diff  title="GamePresenter.cs"
 public class GamePresenter
 {
 -    public class GamePresenter : ITickable
@@ -232,7 +243,7 @@ By doing this, we succeeded in separating the domain logic / control flow / view
 
 In VContainer, you need to register the dependent MonoBehaviour. Don't forget to register HelloScreen.
 
-```diff
+```diff  title="GameLifetimeScope.cs"
     public class GameLifetimeScope : LifetimeScope
     {
 +       [SerializeField]

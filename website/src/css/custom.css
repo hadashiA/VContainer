@@ -104,6 +104,14 @@ html[data-theme='dark'] {
   color: var(--ifm-font-color-base);
 }
 
+.pagination-nav__sublabel {
+  color: #000;
+}
+
+.pagination-nav__link:hover .pagination-nav__sublabel {
+    color: var(--ifm-color-primary);
+}
+
 /* DocSidebar */
 
 .menu__list {

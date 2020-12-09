@@ -47,12 +47,13 @@ To prevent this problem, add the `[Inject]` Attribute explicitly.
 Note:
 - If class has multiple constructors, the one with `[Inject]` has priority.
 
-###tip
+:::tip
 **Recommendation:**
+
 Use Constructor Injection whenever possible.
 The constructor & readonly field idiom is:
 - The instantiated object has a compiler-level guarantee that the dependencies have been resolved.
 - No magic in the class code. Instantiate easily without DI container. (e.g. Unit testing)
 - If you look at the constructor, the dependency is clear.
   - If too many constructor arguments, it can be considered overly responsible.
-###
+:::
