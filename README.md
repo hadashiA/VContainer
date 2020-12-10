@@ -5,11 +5,11 @@
 [![Releases](https://img.shields.io/github/release/hadashiA/VContainer.svg)](https://github.com/hadashiA/VContainer/releases)
 [![openupm](https://img.shields.io/npm/v/jp.hadashikick.vcontainer?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/jp.hadashikick.vcontainer/)
 
-**VContainer** is an DI (Dependency Injection) library running on Unity (Game Engine).  
+**VContainer** is an fatest DI (Dependency Injection) library running on Unity (Game Engine).  
+
+![](website/docs/about/assets/vcontainer@2x.png)
+
 "V" means making Unity's initial "U" more thinner and solid ... !
-
-To get started, follow our getting started guides in the [documentation](https://vcontainer.hadashikick.jp).
-
 
 - **Fast Resolve:** Basically 5-10x faster than Zenject.
 - **Minimum GC Allocation:** In Resolve, we have **zero allocation** without spawned instances.
