@@ -101,6 +101,18 @@ module.exports = {
     //     },
     //   ],
     // },
+    // algolia: {
+    //   apiKey:
+    //   indexName: 'YOUR_INDEX_NAME',
+    //
+    //   // Optional: see doc section bellow
+    //   contextualSearch: true,
+    //
+    //   // Optional: Algolia search parameters
+    //   searchParameters: {},
+    //
+    //   //... other Algolia params
+    // },
   },
   presets: [
     [
