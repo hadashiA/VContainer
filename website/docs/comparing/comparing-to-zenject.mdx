@@ -1,7 +1,7 @@
 ---
 title: Comparing to Zenject
 sidebar_label: Zenject
-hide_table_of_contents: true
+hide_table_of_contents: false
 ---
 
 import {Inline} from '../components/CodeBlockInTable'
@@ -317,9 +317,9 @@ Zenject is awesome. However, VContainer has the following advantages:
 
 ### Factory
 
-#### Zenject
+#### Factory with parameter
 
-```csharp
+```csharp title="Zenject"
 public class Enemy
 {
     readonly float speed;
@@ -337,9 +337,7 @@ public class Enemy
 Container.BindFactory<float, Enemy, Enemy.Factory>();
 ```
 
-#### VContainer
-
-```csharp
+```csharp title="VContainer"
 public class Enemy
 {
     readonly float speed;
@@ -353,9 +351,9 @@ public class Enemy
 builder.RegisterFactory<float, Enemy>(speed => new Enemy(speed));
 ```
 
-#### Zenject
+#### Factory with parameter & resolve dependency at runtime
 
-```csharp
+```csharp title="Zenject"
 public class Enemy
 {
     readonly Player player;
@@ -375,9 +373,7 @@ public class Enemy
 Container.BindFactory<float, Enemy, Enemy.Factory>();
 ```
 
-#### VContainer
-
-```csharp
+```csharp title="VContainer"
 public class Enemy
 {
     readonly Player player;
@@ -397,9 +393,9 @@ builder.RegisterFactory<float, Enemy>(container =>
 }, Lifetime.Scoped);
 ```
 
-#### Zenject
+#### Factory with prefab
 
-```csharp
+```csharp title="Zenject"
 public class Enemy : MonoBehaviour
 {
     Player player;
@@ -419,9 +415,7 @@ Container.BindFactory<Enemy, Enemy.Factory>()
     .FromComponentInNewPrefab(enemyPrefab);
 ```
 
-#### VContainer
-
-```csharp
+```csharp title="VContainer"
 public class Enemy : MonoBehaviour
 {
     Player player;

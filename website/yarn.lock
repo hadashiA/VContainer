@@ -1321,7 +1321,7 @@
     "@docusaurus/utils" "2.0.0-alpha.69"
     react-json-view "^1.19.1"
 
-"@docusaurus/plugin-google-analytics@2.0.0-alpha.69":
+"@docusaurus/plugin-google-analytics@2.0.0-alpha.69", "@docusaurus/plugin-google-analytics@^2.0.0-alpha.69":
   version "2.0.0-alpha.69"
   resolved "https://registry.yarnpkg.com/@docusaurus/plugin-google-analytics/-/plugin-google-analytics-2.0.0-alpha.69.tgz#031e0e4431842b1c9ba99fb6dd6dd258ee91f05e"
   integrity sha512-CrGy8DeJqMZdNmbLNyfgLtjMcapOoqY8jbJiKYCELI8SZ8Ns28i8Yh5W9qe4KxGqSQXvVWHg36xJVG/xAF/6jA==

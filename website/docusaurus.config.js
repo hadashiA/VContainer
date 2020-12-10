@@ -102,17 +102,16 @@ module.exports = {
     //   ],
     // },
     // algolia: {
-    //   apiKey:
-    //   indexName: 'YOUR_INDEX_NAME',
-    //
-    //   // Optional: see doc section bellow
+    //   apiKey: process.env.ALGOLIA_API_KEY,
+    //   indexName: process.env.ALGOLIA_INDEX_NAME,
     //   contextualSearch: true,
-    //
-    //   // Optional: Algolia search parameters
     //   searchParameters: {},
-    //
-    //   //... other Algolia params
     // },
+    googleAnalytics: {
+      trackingID: process.env.GA_TRACKING_ID,
+      // Optional fields.
+      anonymizeIP: true, // Should IPs be anonymized?
+    },
   },
   presets: [
     [
