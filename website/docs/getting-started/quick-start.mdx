@@ -1,40 +1,6 @@
 ---
-title: Getting Started
+title: Quick Start
 ---
-
-## Installation
-
-*Requires Unity 2018.4+*
-
-### Install via UPM (using Git URL)
-
-1. Navigate to your project's Packages folder and open the manifest.json file.
-2. Add this line below the "dependencies": { line
-    - ```json title="Packages/manifest.json"
-      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.3.0",
-      ```
-3. UPM should now install the package.
-
-### Install via OpenUPM
-
-
-1. The package is available on the [openupm registry](https://openupm.com). It's recommended to install it via [openupm-cli](https://github.com/openupm/openupm-cli).
-2. Execute the openum command.
-    - ```
-      openupm add jp.hadashikick.vcontainer
-      ```
-
-### Install manually (using .unitypackage)
-
-1. Navigate to your project's Packages folder and open the manifest.json file.
-2. Add this line below the "dependencies": { line
-    - ```json title="Packages/manifest.json"
-      "nuget.mono-cecil": "0.1.6-preview",
-      ```
-3. Download the .unitypackage from [releases](https://github.com/hadashiA/VContainer/releases) page.
-4. Open VContainer.x.x.x.unitypackage
-
-## Quick start
 
 The basic way for integrating VContainer into your application is:
 
@@ -70,8 +36,9 @@ Next, let's write a setting that can auto-wiring the class.
 - Right click in a folder within the Project Tab and Choose **Create -> C# Script**.
 - Name it `GameLifetimeScope.cs`.
 
-Note:
-- VContainer will automatically template C# scripts ending in `*LifetimeScope`.
+:::note
+VContainer will automatically template C# scripts ending in *LifetimeScope.
+```
 
 You instruct `builder` and register the class above.
 
@@ -91,8 +58,9 @@ namespace MyGame
 }
 ```
 
-Note:
-- VContainer always required a `Lifetime` argument explicitly. This gives us transparency and consistency.
+:::note
+VContainer always required a `Lifetime` argument explicitly. This gives us transparency and consistency.
+:::
 
 **3. Create GameObject attached your LifetimeScope**
 
@@ -177,9 +145,11 @@ We should register this as running on Unity's life cycle events.
 + builder.RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)
 ```
 
-Note:
-- `RegisterEntryPoint<GamePresenter>(Lifetime.Singleton)` is an alias to register interfaces related to Unity's PlayerLoop event. ( Similar to `Register<GamePresenter>(Lifetime.Singleton).As<ITickable>()`)
+:::note
+- RegisterEntryPoint&lt;GamePresenter&gt;(Lifetime.Singleton) is an alias to register interfaces related to Unity's PlayerLoop event.
+    - Similar to Register&lt;GamePresenter&gt;(Lifetime.Singleton).As&lt;ITickable&gt;()
 - Registering lifecycle events without relying on MonoBehaviour facilitates decupling of domain logic and presentation !
+:::
 
 If you have multiple EntryPoints, you can also use the following declaration as grouping.
 

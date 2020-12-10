@@ -1,16 +1,21 @@
 ---
 title: Comparing to Zenject
 sidebar_label: Zenject
-hide_table_of_contents: false
+hide_table_of_contents: true
 ---
 
 import {Inline} from '../components/CodeBlockInTable'
+import {CodeSizeGraph} from "../components/CodeSizeGraph"
 
 Zenject is awesome. However, VContainer has the following advantages:
 
 - Most parts of reflections and assertions are isolated to the Container's build stage.
 - Easy to read implementation.
 - VContainer has carefully selected features and does not register data-oriented objects in the container or actively inject the View component. This prevents the DI declaration from becoming overly complex.
+
+## Code size (v1.3.0)
+
+<CodeSizeGraph height={300} />
 
 ## API difference
 

@@ -52,7 +52,7 @@ module.exports = {
       // },
       items: [
         {
-          to: 'about/getting-started',
+          to: 'getting-started/installation',
           activeBasePath: 'none',
           label: 'Getting Started',
           position: 'right',

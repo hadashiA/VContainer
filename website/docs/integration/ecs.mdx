@@ -74,8 +74,9 @@ var system = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SystemA>();
 system.Construct(settings);
 ```
 
-Note:
-- In default (`UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` is **not** used), The SystemGroup to which the System belongs can be controlled by Attribute ( e.g: `[UpdateInGroup(typeof(SystemGroupType))]` .
+:::note
+In default (`UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` is **not** used), The SystemGroup to which the System belongs can be controlled by Attribute ( e.g: `[UpdateInGroup(typeof(SystemGroupType))]` .
+:::
 
 
 ### Example of setup entities (with Default World)
@@ -203,10 +204,10 @@ foreach (var system in world.Systems)
 }
 ```
 
-Note:
+:::note
 - Currently, VContainer is registering the World using `ScriptBehaviourUpdateOrder.UpdatePlayerLoop`.
 - This is an alias that registers 3 SystemGroups to PlayerLoop, so VContainer also creates these SystemGroups internally.
-
+:::
 
 By default, VContainer will register System to `SimulationSystemGroup`. If you want to change this, you can use `.IntoGroup<T>()`:
 

@@ -118,8 +118,9 @@ class GameController : IInitializable, ITickable, IDisposable { /* ... */ }
 builder.RegisterEntryPoint<GameController>(Lifetime.Singleton);
 ```
 
-Note:
-- this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
+:::note
+this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
+:::
 
 If you have multiple EntryPoints, you have the option to use the following declaration as grouping.
 
@@ -150,8 +151,9 @@ var obj = new ServiceA();
 builder.RegisterInstance(obj);
 ```
 
-Note:
-- `RegisterIntance` always `Scoped` lifetime. So it has no arguments.
+:::note
+`RegisterIntance` always `Scoped` lifetime. So it has no arguments.
+:::
 
 It can resolve like this:
 

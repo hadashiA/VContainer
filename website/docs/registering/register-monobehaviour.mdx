@@ -13,8 +13,9 @@ YourBehaviour yourBehaviour;
 builder.RegisterComponent(yourBehaviour);
 ```
 
-Note:
-- `RegisterComponent` similar to `RegisterInstance`. The only difference is that MonoBehaviour registered with `RegisterComponent` will be injected even if not Resolved.
+:::note
+RegisterComponent similar to RegisterInstance. The only difference is that MonoBehaviour registered with RegisterComponent will be injected even if not Resolved.
+:::
 
 ## Register from scene with `LifetimeScope`
 
@@ -22,8 +23,9 @@ Note:
 builder.RegisterComponentInHierarchy<YourBehaviour>();
 ```
 
-Note:
-- `RegisterComponentInHierarchy` always `.Scoped` lifetime. Because lifetime is equal to the scene.
+:::note
+RegisterComponentInHierarchy always .Scoped lifetime. Because lifetime is equal to the scene.
+:::
 
 ## Register component that Instantiate from prefab when resolving
 
