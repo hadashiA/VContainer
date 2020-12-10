@@ -1,0 +1,130 @@
+/* stylelint-disable docusaurus/copyright-header */
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #3333ee;
+  /*--ifm-color-primary-dark: rgb(33, 175, 144);*/
+  /*--ifm-color-primary-darker: rgb(31, 165, 136);*/
+  /*--ifm-color-primary-darkest: rgb(26, 136, 112);*/
+  /*--ifm-color-primary-light: rgb(70, 203, 174);*/
+  /*--ifm-color-primary-lighter: rgb(102, 212, 189);*/
+  /*--ifm-color-primary-lightest: rgb(146, 224, 208);*/
+  --ifm-code-font-size: 95%;
+  --ifm-font-weight-semibold: 700;
+  --ifm-menu-color-background-active: none;
+  --ifm-menu-color-background-hover: none;
+
+  --ifm-h1-font-size: 2rem;
+  --ifm-h2-font-size: 1.5rem;
+  --ifm-h3-font-size: 1.25rem;
+  --ifm-h4-font-size: 1rem;
+  --ifm-h5-font-size: 0.875rem;
+  --ifm-h6-font-size: 0.85rem;
+}
+
+h1.docTitle_node_modules-\@docusaurus-theme-classic-lib-theme-DocItem- {
+  font-size: var(--ifm-h1-font-size);
+}
+
+.markdown > h2 {
+  --ifm-h2-font-size: 1.5rem;
+}
+
+.markdown > h3 {
+  --ifm-h3-font-size: 1.25rem;
+}
+
+.markdown > h4 {
+  --ifm-h3-font-size: 1rem;
+}
+
+html[data-theme='dark'] {
+  --ifm-background-color: rgb(17, 17, 34);
+  /*--ifm-font-color-base: #fff;*/
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgb(72, 77, 91);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
+
+/* DocItem */
+
+.table-of-contents__link {
+  color: var(--ifm-toc-link-color);
+}
+
+/* DocPaginator */
+
+.pagination-nav__link {
+  border: none;
+  color: var(--ifm-font-color-base);
+}
+
+.pagination-nav__sublabel {
+  color: #000;
+}
+
+.pagination-nav__link:hover .pagination-nav__sublabel {
+    color: var(--ifm-color-primary);
+}
+
+/* DocSidebar */
+
+.menu__list {
+  padding-left: var(--ifm-menu-link-padding-horizontal);
+}
+
+.menu__link.menu__link--sublist,
+.menu__list-item {
+  font-size: 0.85rem;
+}
+
+.menu__link.menu__link--sublist.menu__link--active {
+  color: var(--ifm-font-color-base);
+}
+
+.menu>ul.menu__list li>a {
+  padding-left: 0;
+  /*padding-right: 0;*/
+  /*margin: 0;*/
+}
+
+.menu>ul.menu__list ul.menu__list {
+  border-left: 1px solid rgba(0,27,61,.075);
+  border-left: 1px solid var(--ifm-hr-border-color);
+  margin-left: 0;
+  padding-left: var(--ifm-menu-link-padding-horizontal);
+}
+
+.menu__link--sublist:after {
+  width: 0.65em;
+  height: 0.65em;
+}
+
+a.menu__link:hover {
+  color: var(--ifm-color-primary);
+  cursor: pointer;
+}
+
+/* Edit URL */
+
+article + div .row > .col > a {
+  color: var(--ifm-color-secondary-darkest);
+}
+
+/* Footer */
+
+.footer--dark {
+  --ifm-footer-background-color: #fafafa;
+  --ifm-footer-link-color: rgb(34, 34, 34);
+  --ifm-footer-color: var(--ifm-footer-link-color);
+  --ifm-footer-title-color: rgb(34, 34, 34);
+}

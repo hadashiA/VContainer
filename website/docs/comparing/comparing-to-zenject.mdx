@@ -1,0 +1,480 @@
+---
+title: Comparing to Zenject
+sidebar_label: Zenject
+hide_table_of_contents: false
+---
+
+import {Inline} from '../components/CodeBlockInTable'
+import {CodeSizeGraph} from "../components/CodeSizeGraph"
+
+Zenject is awesome. However, VContainer has the following advantages:
+
+- Most parts of reflections and assertions are isolated to the Container's build stage.
+- Easy to read implementation.
+- VContainer has carefully selected features and does not register data-oriented objects in the container or actively inject the View component. This prevents the DI declaration from becoming overly complex.
+
+## Code size (v1.3.0)
+
+<CodeSizeGraph height={300} />
+
+## API difference
+
+### Basic
+
+<table>
+  <thead>
+  <tr>
+    <th>Zenject</th>
+    <th>VContainer</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;Service&gt;()
+          .AsTransient()
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.Register&lt;Service&gt;(Lifetime.Transient)
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;Service&gt;()
+          .AsCached()
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.Register&lt;Service&gt;(Lifetime.Scoped)
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;Service&gt;()
+          .AsSingle()
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.Register&lt;Service&gt;(Lifetime.Singleton)
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;IService&gt;()
+          .To&lt;Service&gt;
+          .AsCached()
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.Register&lt;IService,Service&gt;(Lifetime.Scoped)
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind(
+          typeof(IInitializable),
+          typeof(IDisposable))
+          .To&lt;Service&gt;()
+          .AsCached()
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.Register&lt;Service&gt;(Lifetime.Scoped)
+          .As&lt;IInitializable,IDisposable&gt;()
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.BindInterfacesTo&lt;Service&gt;()
+          .AsCached()
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.Register&lt;Service&gt;(Lifetime.Scoped)
+        .AsImplementedInterfaces()
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.BindInterfacesAndSelfTo&lt;Foo&gt;()
+          .AsCached()
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.Register&lt;Service&gt;(Lifetime.Scoped)
+          .AsImplementedInterfaces()
+          .AsSelf()
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.BindInstance(obj)
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterInstance(obj)
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;IService&gt;()
+          .FromInstance(obj)
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterInstance&lt;IService&gt;(obj)
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind(
+          typeof(IService1),
+          typeof(IService2))
+          .FromInstance(obj)
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterInstance(obj)
+          .As&lt;IService1,IService2&gt;()
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind(
+          typeof(IService1),
+          typeof(IService2))
+          .FromInstance(obj)
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterInstance(obj)
+          .As&lt;IService1,IService2&gt;()
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.BindInterfacesTo&lt;Service&gt;()
+          .FromInstance(obj)
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterInstance(obj)
+          .AsImplementedInterfaces()
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.BindInterfacesAndSelfTo&lt;Service&gt;()
+          .FromInstance(obj)
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterInstance(obj)
+          .AsImplementedInterfaces()
+          .AsSelf()
+      </Inline>
+    </td>
+  </tr>
+</tbody>
+</table>
+
+### Component
+
+<table>
+<thead>
+  <tr>
+    <th>Zenject</th>
+    <th>VContainer</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;Foo&gt;()
+          .FromComponentInHierarchy()
+          .AsCached();
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterComponentInHierarchy&lt;Foo&gt;()
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;Foo&gt;()
+          .FromComponentInNewPrefab(prefab)
+          .AsCached()
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped)
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;Foo&gt;()
+          .FromNewComponentOnNewGameObject()
+          .AsCached()
+          .WithGameObjectName("Foo1")
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      builder.RegisterComponentOnNewGameObject&lt;Foo&gt;(
+          Lifetime.Scoped,
+          "Foo1")
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      .UnderTransform(parentTransform)
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      .UnderTransform(parentTransform)
+      </Inline>
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      .UnderTransform(() => parentTransform)
+      </Inline>
+    </td>
+    <td>
+      <Inline>
+      .UnderTransform(() => parentTransform)
+      </Inline>
+    </td>
+  </tr>
+</tbody>
+</table>
+
+### Factory
+
+#### Factory with parameter
+
+```csharp title="Zenject"
+public class Enemy
+{
+    readonly float speed;
+
+    public Enemy(float speed)
+    {
+        this.speed = speed;
+    }
+
+    public class Factory : PlaceholderFactory<float, Enemy>;
+    {
+    }
+}
+
+Container.BindFactory<float, Enemy, Enemy.Factory>();
+```
+
+```csharp title="VContainer"
+public class Enemy
+{
+    readonly float speed;
+
+    public Enemy(float speed)
+    {
+        this.speed = speed;
+    }
+}
+
+builder.RegisterFactory<float, Enemy>(speed => new Enemy(speed));
+```
+
+#### Factory with parameter & resolve dependency at runtime
+
+```csharp title="Zenject"
+public class Enemy
+{
+    readonly Player player;
+    readonly float speed;
+
+    public Enemy(float speed, Player player)
+    {
+        this.player = player;
+        this.speed = speed;
+    }
+
+    public class Factory : PlaceholderFactory<float, Enemy>;
+    {
+    }
+}
+
+Container.BindFactory<float, Enemy, Enemy.Factory>();
+```
+
+```csharp title="VContainer"
+public class Enemy
+{
+    readonly Player player;
+    readonly float speed;
+
+    public Enemy(float speed, Player player)
+    {
+        this.player = player;
+        this.speed = speed;
+    }
+}
+
+builder.RegisterFactory<float, Enemy>(container =>
+{
+    var player = container.Resolve<Player>();
+    return speed => new Enemy(speed, player);
+}, Lifetime.Scoped);
+```
+
+#### Factory with prefab
+
+```csharp title="Zenject"
+public class Enemy : MonoBehaviour
+{
+    Player player;
+
+    [Inject]
+    public void Construct(Player player)
+    {
+        this.player = player;
+    }
+
+    public class Factory : PlaceholderFactory<Enemy>
+    {
+    }
+}
+
+Container.BindFactory<Enemy, Enemy.Factory>()
+    .FromComponentInNewPrefab(enemyPrefab);
+```
+
+```csharp title="VContainer"
+public class Enemy : MonoBehaviour
+{
+    Player player;
+
+    public void Construct(Player player)
+    {
+        this.player = player;
+    }
+}
+
+builder.RegisterFactory<Enemy>(container =>
+{
+    var player = container.Resolve<Player>();
+    return () =>
+    {
+        var enemy = Instantiate(enemyPrefab);
+        enemy.Construct(player);
+        return enemy;
+    };
+}, Lifetime.Scoped);
+```
+
+### Misc
+
+<table>
+  <thead>
+  <tr>
+    <th>Zenject</th>
+    <th>VContainer</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;Foo&gt;()
+          .FromComponentInNewPrefabResource("Some/Path/Foo")
+      </Inline>
+    </td>
+    <td>
+      <strong>Not Supported</strong>
+      <br />
+      We should load Resources using LoadAsync family. You can use RegisterInstance() etc after loading the Resource.
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <Inline>
+      Container.Bind&lt;Foo&gt;()
+          .WithId("foo")
+          .AsCached()
+      </Inline>
+    </td>
+    <td>
+      <strong>Not supported</strong>
+      <br />
+      Duplicate type Resolve is not recommended. You can instead use type-specific Register builder.Register(Lifetime.Scoped).WithParameter("foo", foo)
+    </td>
+  </tr>
+  </tbody>
+</table>

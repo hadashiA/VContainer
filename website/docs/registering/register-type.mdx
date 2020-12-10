@@ -1,0 +1,215 @@
+---
+title: Register Type
+---
+
+There are various ways to use Register.
+Let's take the following complex type as an example.
+
+```csharp
+class ServiceA : IServiceA, IInputPort, IDisposable { /* ... */ }
+```
+
+## Register Concrete Type
+
+```cs
+builder.Register<ServiceA>(Lifetime.Singleton);
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(ServiceA serviceA) { /* ... */ }
+}
+```
+
+## Register as Interface
+
+```csharp
+builder.Register<IServiceA, ServiceA>();
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
+```
+
+## Register as multiple Interface
+
+```csharp
+builder.Register<ServiceA>(Lifetime.Singleton)
+    .As<IServiceA, IInputPort>();
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
+
+class ClassB
+{
+    public ClassB(IInputPort handlerA) { /* ... */ }
+}
+```
+
+## Register all implemented interfaces automatically
+
+```csharp
+builder.Register<ServiceA>(Lifetime.Singleton)
+    .AsImplementedInterfaces();
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
+
+class ClassB
+{
+    public ClassB(IHandlerB handlerA) { /* ... */ }
+}
+```
+
+## Register all implemented interfaces and concrete type
+
+```csharp
+builder.Register<ServiceA>(Lifetime.Singleton)
+    .AsImplementedInterfaces()
+    .AsSelf();
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
+
+class ClassB
+{
+    public ClassB(IHandlerB handlerA) { /* ... */ }
+}
+
+class ClassB
+{
+    public ClassB(ServiceA serviceA) { /* ... */ }
+}
+```
+
+## Register lifecycle marker interfaces
+
+```csharp
+class GameController : IInitializable, ITickable, IDisposable { /* ... */ }
+```
+
+```csharp
+builder.RegisterEntryPoint<GameController>(Lifetime.Singleton);
+```
+
+:::note
+this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
+:::
+
+If you have multiple EntryPoints, you have the option to use the following declaration as grouping.
+
+```csharp
+builder.UseEntryPoints(Lifetime.Scoped, entryPoints =>
+{
+   entryPoints.Add<ScopedEntryPointA>();
+   entryPoints.Add<ScopedEntryPointB>();
+   entryPoints.Add<ScopedEntryPointC>().AsSelf();
+});
+```
+
+This is the same as:
+
+```csharp
+builder.RegisterEntryPoint<ScopedEntryPointA>(Lifetime.Scoped);
+builder.RegisterEntryPoint<ScopedEntryPointB>(Lifetime.Scoped);
+builder.RegisterEntryPoint<ScopedEntryPointC>(Lifetime.Scoped).AsSelf();
+```
+
+## Register instance
+
+```csharp
+// ...
+var obj = new ServiceA();
+// ...
+
+builder.RegisterInstance(obj);
+```
+
+:::note
+`RegisterIntance` always `Scoped` lifetime. So it has no arguments.
+:::
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(ServiceA serviceA) { /* ... */ }
+}
+```
+
+##  Register instance as interface
+
+Allow `As*` decrelations.
+
+```csharp
+builder.RegisterInstance<IInputPort>(serviceA);
+
+builder.RegisterInstance(serviceA)
+    .As<IServiceA, IInputPort>();
+
+builder.RegisterInstance()
+    .AsImplementedInterfaces();
+```
+
+## Register type-specific parameters
+
+If the types are not unique, but you have a dependency you want to inject at startup, you can use below:
+
+```csharp
+builder.Register<SomeService>(lifetime.Singleton)
+    .WithParameter<string>("http://example.com");
+```
+
+Or, You can parameter name as a key.
+
+```csharp
+builder.Register<SomeService>(Lifetime.Singleton)
+    .WithParameter("url", "http://example.com");
+```
+
+It can resolve like this:
+
+
+```csharp
+class SomeService
+{
+    public SomeService(string url) { /* ... */ }
+}
+```
+
+This Register is with only `SomeService`.
+
+```csharp
+class OtherClass
+{
+    // ! Error
+    public OtherClass(string hogehoge) { /* ... */ }
+}
+```

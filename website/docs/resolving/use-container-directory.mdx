@@ -1,0 +1,46 @@
+---
+title: Use Container Directory
+---
+
+You can also use Container's API directly, if needed.
+
+For example:
+
+```csharp
+class ClassA
+{
+    public ClassA(IObjectResolver container)
+    {
+        // Resolve
+        var serviceA = container.Resolve<ServiceA>();
+
+        // Execute Inject on the generated instance
+        container.Inject(foo);
+
+        // Execute Inject for all MonoBehaviour contained in GameObject
+        container.InjectGameObject(gameObject);
+
+        // Instantiate with Inject
+        container.Instantiate(prefab);
+        container.Instantiate(prefab, parent);
+        container.Instantiate(prefab, position, rotation parent);
+    }
+}
+```
+
+:::caution
+These methods are poor performance (especially if CodeGen is not enabled). Use only if normal DI patterns are not applicable.
+:::
+
+LifetimeScope also has a Container reference.
+
+```csharp
+class ClassA
+{
+    public ClassA(LifetimeScope currentScope)
+    {
+        currentScope.Container...
+    }
+}
+```
+

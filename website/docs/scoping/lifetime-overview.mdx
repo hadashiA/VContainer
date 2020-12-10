@@ -1,0 +1,34 @@
+---
+title: Lifetime Overview
+---
+
+- Singleton : Single instance per container (includes all parents and children).
+- Transient : Instance per resolving.
+- Scoped    : Instance per `LifetimeScope`.
+  - If LifetimeScope is single, similar to Singleton.
+  - If you create a LifetimeScope child, the instance will be different for each child.
+  - When LifetimeScope is destroyed, release references and calls all the registered `IDisposable`.
+
+## Lifetime with Parent/Child relationship
+
+`LifetimeScope` can build parent-child relationship.
+it has following behaviours:
+
+- If registered object is not found, `LifetimeScope` will look for a parent `LifetimeScope`.
+- For `Lifetime.Singleton`
+  - Basically, always returns the same instance.
+  - If parent and child have the same type, it returns the instance with the closest scope.
+  - When a `LifetimeScope` is destroyed, objects with `IDisposable` implemented are called `Dispose()`.
+- For `LifeTime.Transient`
+  - Instance creating for each resolving.
+  - If parent and child have the same registration, the child will create its own instance.
+- For `Lifetime.Scoped`
+  - Instance will be different for each child.
+      - If same child, returns same instance.
+  - If parent and child have the same registration, the child will create its own instance.
+  - When a `LifetimeScope` is destroyed, objects with `IDisposable` implemented are called `Dispose()`.
+
+:::caution
+If scene is alive and only `LifetimeScope` is destroyed, MonoBehaviour registered as `Lifetime.Scoped` is not automatically destroyed.
+If you want to destroy with `LifetimeScope`, make it a child transform of `LifetimeScope` or consider implement IDisposable.
+:::
