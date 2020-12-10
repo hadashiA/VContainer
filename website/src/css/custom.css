@@ -27,42 +27,6 @@
   --ifm-h6-font-size: 0.85rem;
 }
 
-/*.hero--primary {*/
-/*    --ifm-hero-background-color: #fafafa;*/
-/*    --ifm-hero-text-color: #000;*/
-/*}*/
-
-.test {
-    color: rgb(237, 197, 206);
-    color: rgb(237, 197, 197);
-    color: rgb(235, 218, 196);
-    color: rgb(235, 235, 199);
-    color: rgb(217, 234, 199);
-    color: rgb(196, 236, 197);
-    color: rgb(197, 237, 226);
-    color: rgb(197, 225, 237);
-    color: rgb(197, 203, 237);
-    color: rgb(215, 197, 237);
-    color: rgb(238, 197, 237);
-    color: rgb(238, 197, 215);
-}
-
-.hero--primary .button.button--secondary.button--outline:not(.button--active):not(:hover) {
-    color: #fff;
-}
-
-.button {
-    /*box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);*/
-    /*background-color: var(--ifm-color-primary);*/
-    /*color: #fff;*/
-    border-radius: 9999px;
-}
-
-.button-getting-started {
-    /*background-color: var(--ifm-color-primary);*/
-    color: #000;
-}
-
 h1.docTitle_node_modules-\@docusaurus-theme-classic-lib-theme-DocItem- {
   font-size: var(--ifm-h1-font-size);
 }
