@@ -9,6 +9,9 @@ module.exports = {
   organizationName: 'hadashiA', // Usually your GitHub org/user name.
   projectName: 'VContainer', // Usually your repo name.
   themeConfig: {
+    metadatas: [
+      { name: 'google-site-verification', content: 'NnHSE65iUUxvPzWqwesZPk9W5ctITrhqcNwdDOl_fLg' },
+    ],
     colorMode: {
       // Hides the switch in the navbar
       // Useful if you want to support a single color mode
