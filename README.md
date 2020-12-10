@@ -26,13 +26,13 @@
 - Pre IL Code generation optimization mode
 - ECS Integration *beta*
 
-## Getting Started
-
-Visit [vcontainer.hadashikick.jp/getting-started](https://vcontainer.hadashikick.jp/getting-started/installation) to get started with Next.js.
-
 ## Documentation
 
 Visit [vcontainer.hadashikick.jp](https://vcontainer.hadashikick.jp) to view the full documentation.
+
+## Getting Started
+
+Visit [vcontainer.hadashikick.jp/getting-started](https://vcontainer.hadashikick.jp/getting-started/installation) to get started with Next.js.
 
 ## License
 
