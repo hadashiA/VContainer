@@ -10,7 +10,7 @@ module.exports = {
   projectName: 'VContainer', // Usually your repo name.
   themeConfig: {
     metadatas: [
-      { name: 'google-site-verification', content: 'NnHSE65iUUxvPzWqwesZPk9W5ctITrhqcNwdDOl_fLg' },
+      { name: 'google-site-verification', content: 'ldYnOkZTq5AfzmJzEbsFzWXAYp9tyO5IhmYQv45MMDY' },
     ],
     colorMode: {
       // Hides the switch in the navbar
