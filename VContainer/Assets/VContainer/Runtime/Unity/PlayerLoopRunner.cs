@@ -50,7 +50,7 @@ namespace VContainer.Unity
                 }
             }
 
-            var item = default(IPlayerLoopItem);
+            IPlayerLoopItem item;
             lock (runningGate)
             {
                 item = runningQueue.Count > 0 ? runningQueue.Dequeue() : null;
