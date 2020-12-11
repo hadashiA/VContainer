@@ -7,8 +7,6 @@
 
 **VContainer** is an fatest DI (Dependency Injection) library running on Unity (Game Engine).  
 
-![](website/docs/about/assets/vcontainer@2x.png)
-
 "V" means making Unity's initial "U" more thinner and solid ... !
 
 - **Fast Resolve:** Basically 5-10x faster than Zenject.
