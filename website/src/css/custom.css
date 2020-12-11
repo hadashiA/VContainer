@@ -69,7 +69,7 @@ html[data-theme='dark'] {
 }
 
 .pagination-nav__sublabel {
-  color: #000;
+  color: var(--ifm-font-color-base);
 }
 
 .pagination-nav__link:hover .pagination-nav__sublabel {
