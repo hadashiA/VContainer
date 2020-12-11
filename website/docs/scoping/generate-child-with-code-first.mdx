@@ -21,7 +21,7 @@ class LevelLoader
         // ... Loading some assets
 
         // Create a child scope for the container that contains this LevelLoader instance.
-        instantScope = currentScopey.CreateChild();
+        instantScope = currentScope.CreateChild();
 
         // Create with LifetimeScope prefab
         instantScope = currentScope.CreateChildFromPrefab(prefab);
