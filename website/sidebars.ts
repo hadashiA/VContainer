@@ -6,7 +6,7 @@ module.exports = {
     ],
     'GETTING STARTED': [
       'getting-started/installation',
-      'getting-started/quick-start',
+      'getting-started/hello-world',
     ],
     'RESOLVING': [
       'resolving/constructor-injection',

@@ -128,3 +128,13 @@ article + div .row > .col > a {
   --ifm-footer-color: var(--ifm-footer-link-color);
   --ifm-footer-title-color: rgb(34, 34, 34);
 }
+
+/* Search Bar */
+
+.DocSearch .DocSearch-Button-Key {
+    visibility: hidden;
+}
+
+.DocSearch.DocSearch-Button {
+    height: 30px;
+}
