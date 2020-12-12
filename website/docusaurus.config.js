@@ -25,22 +25,22 @@ module.exports = {
       // Dark/light switch icon options
       switchConfig: {
         // Icon for the switch while in dark mode
-        darkIcon: '🌙',
+        // darkIcon: '\u{263D}',
 
         // CSS to apply to dark icon,
         // React inline style object
         // see https://reactjs.org/docs/dom-elements.html#style
-        darkIconStyle: {
-          marginLeft: '2px',
-        },
+        // darkIconStyle: {
+        //   marginLeft: '2px',
+        // },
 
         // Unicode icons such as '\u2600' will work
         // Unicode with 5 chars require brackets: '\u{1F602}'
-        lightIcon: '\u{1F602}',
+        // lightIcon: '\u{263C}',
 
-        lightIconStyle: {
-          marginLeft: '1px',
-        },
+        // lightIconStyle: {
+        //   marginLeft: '1px',
+        // },
       },
     },
     prism: {
@@ -105,12 +105,12 @@ module.exports = {
     //     },
     //   ],
     // },
-    // algolia: {
-    //   apiKey: process.env.ALGOLIA_API_KEY,
-    //   indexName: process.env.ALGOLIA_INDEX_NAME,
-    //   contextualSearch: true,
-    //   searchParameters: {},
-    // },
+    algolia: {
+      apiKey: process.env.ALGOLIA_API_KEY,
+      indexName: process.env.ALGOLIA_INDEX_NAME,
+      contextualSearch: true,
+      searchParameters: {},
+    },
     googleAnalytics: {
       trackingID: process.env.GA_TRACKING_ID,
       // Optional fields.

@@ -1,0 +1,18 @@
+{
+  "index_name": "vcontainer.hadashikick.jp",
+  "start_urls": [
+    {
+      "url": "https://vcontainer.hadashikick.jp"
+    }
+  ],
+  "selectors": {
+    "default": {
+      "lvl0": ".markdown h1",
+      "lvl1": ".markdown h2",
+      "lvl2": ".markdown h3",
+      "lvl3": ".markdown h4",
+      "lvl4": ".markdown h5",
+      "text": ".markdown p, .markdown li"
+    }
+  }
+}
