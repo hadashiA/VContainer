@@ -106,10 +106,9 @@ module.exports = {
     //   ],
     // },
     algolia: {
+      appId: process.env.ALGOLIA_APP_ID,
       apiKey: process.env.ALGOLIA_API_KEY,
-      indexName: process.env.ALGOLIA_INDEX_NAME,
-      contextualSearch: true,
-      searchParameters: {},
+      indexName: process.env.ALGOLIA_INDEX_NAME
     },
     googleAnalytics: {
       trackingID: process.env.GA_TRACKING_ID,
