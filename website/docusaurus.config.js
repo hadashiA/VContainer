@@ -25,7 +25,7 @@ module.exports = {
       // Dark/light switch icon options
       switchConfig: {
         // Icon for the switch while in dark mode
-        // darkIcon: '\u{263D}',
+        darkIcon: ' ',
 
         // CSS to apply to dark icon,
         // React inline style object
@@ -36,7 +36,7 @@ module.exports = {
 
         // Unicode icons such as '\u2600' will work
         // Unicode with 5 chars require brackets: '\u{1F602}'
-        // lightIcon: '\u{263C}',
+        lightIcon: ' ',
 
         // lightIconStyle: {
         //   marginLeft: '1px',

@@ -138,3 +138,15 @@ article + div .row > .col > a {
 .DocSearch.DocSearch-Button {
     height: 30px;
 }
+
+/* Toggle */
+
+.react-toggle .react-toggle-track {
+    width: 42px;
+    height: 20px;
+}
+
+.react-toggle .react-toggle-thumb {
+    width: 18px;
+    height: 18px;
+}
