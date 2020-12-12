@@ -31,8 +31,10 @@ class ClassA
 }
 ```
 
-:warning: Constructors are often stripped in the IL2CPP environment.
+:::caution
+Constructors are often stripped in the IL2CPP environment.
 To prevent this problem, add the `[Inject]` Attribute explicitly.
+:::
 
 ```csharp
     [Inject]
@@ -49,9 +51,7 @@ To prevent this problem, add the `[Inject]` Attribute explicitly.
 If class has multiple constructors, the one with `[Inject]` has priority.
 :::
 
-:::tip
-**Recommendation:**
-
+:::tip Recommendation
 Use Constructor Injection whenever possible.
 The constructor & readonly field idiom is:
 - The instantiated object has a compiler-level guarantee that the dependencies have been resolved.

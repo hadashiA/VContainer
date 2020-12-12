@@ -12,6 +12,7 @@ module.exports = {
     metadatas: [
       { name: 'google-site-verification', content: 'ldYnOkZTq5AfzmJzEbsFzWXAYp9tyO5IhmYQv45MMDY' },
     ],
+    image: 'img/vcontainer@2x.png',
     colorMode: {
       // Hides the switch in the navbar
       // Useful if you want to support a single color mode
