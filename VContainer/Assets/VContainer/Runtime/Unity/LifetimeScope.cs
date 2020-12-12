@@ -33,8 +33,6 @@ namespace VContainer.Unity
         [SerializeField]
         protected List<GameObject> autoInjectGameObjects;
 
-        static readonly List<GameObject> GameObjectBuffer = new List<GameObject>(32);
-
         static LifetimeScope overrideParent;
         static ExtraInstaller extraInstaller;
         static readonly object SyncRoot = new object();
@@ -78,10 +76,11 @@ namespace VContainer.Unity
 
         static LifetimeScope Find(Type type, Scene scene)
         {
-            scene.GetRootGameObjects(GameObjectBuffer);
-            foreach (var root in GameObjectBuffer)
+            var buffer = ListBuffer<GameObject>.Get();
+            scene.GetRootGameObjects(buffer);
+            foreach (var gameObject in buffer)
             {
-                var found = root.GetComponentInChildren(type) as LifetimeScope;
+                var found = gameObject.GetComponentInChildren(type) as LifetimeScope;
                 if (found != null)
                     return found;
             }
