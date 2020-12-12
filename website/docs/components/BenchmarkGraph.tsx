@@ -5,7 +5,6 @@ const data = [
   {
     "testCase": "Singleton",
     "VContainer (CodeGen)": 4.3884,
-    "VContainer (CodeGen)color": "hsl(192, 70%, 50%)",
     "VContainer (Reflection)": 4.918865,
     "Zenject (Reflection)": 21.209325,
   },
@@ -35,12 +34,6 @@ const data = [
   },
 ]
 
-const renderLabel = (label: string) =>
-  <p>
-    {label.split(' ').map(line => <>{line}<br /></>)}
-  </p>
-
-
 export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
   <div style={{height, width: '100%'}}>
     <ResponsiveBar
@@ -49,7 +42,7 @@ export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
       layout="vertical"
       keys={['VContainer (CodeGen)', 'VContainer (Reflection)', 'Zenject (Reflection)']}
       indexBy="testCase"
-      margin={{top: 20, right: 60, bottom: 70, left: 60}}
+      margin={{top: 20, right: 60, bottom: 40, left: 60}}
       padding={0.3}
       valueScale={{type: 'linear'}}
       indexScale={{type: 'band', round: true}}
@@ -120,11 +113,11 @@ export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
       legends={[
         {
           dataFrom: 'keys',
-          anchor: 'bottom-left',
-          direction: 'row',
+          anchor: 'top-left',
+          direction: 'column',
           justify: false,
-          translateX: -15,
-          translateY: 60,
+          translateX: 10,
+          translateY: 0,
           itemsSpacing: 2,
           itemWidth: 160,
           itemHeight: 20,

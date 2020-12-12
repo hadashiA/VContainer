@@ -1,6 +1,6 @@
 module.exports = {
   title: 'VContainer',
-  tagline: 'A fastest DI (Dependency Injection) for Unity (Game Engine)',
+  tagline: 'The extra fast DI (Dependency Injection) for Unity Game Engine',
   url: 'https://vcontainer.hadashikick.jp',
   baseUrl: '/',
   onBrokenLinks: 'throw',

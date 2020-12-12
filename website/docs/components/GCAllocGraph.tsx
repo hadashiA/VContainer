@@ -18,7 +18,7 @@ export const GCAllocGraph: React.FC<{ height: number }> = ({ height }) =>
       keys={['VContainer', 'Zenject']}
       indexBy="content"
       margin={{top: 20, right: 60, bottom: 70, left: 60}}
-      padding={0.3}
+      padding={0.75}
       valueScale={{type: 'linear'}}
       indexScale={{type: 'band', round: true}}
       colors={[
@@ -81,11 +81,11 @@ export const GCAllocGraph: React.FC<{ height: number }> = ({ height }) =>
       legends={[
         {
           dataFrom: 'keys',
-          anchor: 'bottom-left',
-          direction: 'row',
+          anchor: 'top-left',
+          direction: 'column',
           justify: false,
-          translateX: -15,
-          translateY: 60,
+          translateX: 10,
+          translateY: 0,
           itemsSpacing: 2,
           itemWidth: 160,
           itemHeight: 20,
