@@ -13,6 +13,16 @@ namespace VContainer.Unity
         void PostInitialize();
     }
 
+    public interface IStartable
+    {
+        void Start();
+    }
+
+    public interface IPostStartable
+    {
+        void PostStart();
+    }
+
     public interface IFixedTickable
     {
         void FixedTick();
@@ -82,6 +92,52 @@ namespace VContainer.Unity
             foreach (var x in entries)
             {
                 x.PostInitialize();
+            }
+            return false;
+        }
+
+        public void Dispose() => disposed = true;
+    }
+
+    sealed class StartableLoopItem : IPlayerLoopItem, IDisposable
+    {
+        readonly IEnumerable<IStartable> entries;
+        bool disposed;
+
+        public StartableLoopItem(IEnumerable<IStartable> entries)
+        {
+            this.entries = entries;
+        }
+
+        public bool MoveNext()
+        {
+            if (disposed) return false;
+            foreach (var x in entries)
+            {
+                x.Start();
+            }
+            return false;
+        }
+
+        public void Dispose() => disposed = true;
+    }
+
+    sealed class PostStartableLoopItem : IPlayerLoopItem, IDisposable
+    {
+        readonly IEnumerable<IPostStartable> entries;
+        bool disposed;
+
+        public PostStartableLoopItem(IEnumerable<IPostStartable> entries)
+        {
+            this.entries = entries;
+        }
+
+        public bool MoveNext()
+        {
+            if (disposed) return false;
+            foreach (var x in entries)
+            {
+                x.PostStart();
             }
             return false;
         }

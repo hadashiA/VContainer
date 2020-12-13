@@ -5,6 +5,8 @@ namespace VContainer.Tests.Unity
     public sealed class SampleEntryPoint :
         IInitializable,
         IPostInitializable,
+        IStartable,
+        IPostStartable,
         IFixedTickable,
         IPostFixedTickable,
         ITickable,
@@ -14,6 +16,8 @@ namespace VContainer.Tests.Unity
     {
         public bool InitializeCalled;
         public bool PostInitializeCalled;
+        public bool StartCalled;
+        public bool PostStartCalled;
         public int FixedTickCalls;
         public int PostFixedTickCalls;
         public int TickCalls;
@@ -23,6 +27,8 @@ namespace VContainer.Tests.Unity
 
         void IInitializable.Initialize() => InitializeCalled = true;
         void IPostInitializable.PostInitialize() => PostInitializeCalled = true;
+        void IStartable.Start() => StartCalled = true;
+        void IPostStartable.PostStart() => PostStartCalled = true;
         void IFixedTickable.FixedTick() => FixedTickCalls += 1;
         void IPostFixedTickable.PostFixedTick() => PostFixedTickCalls += 1;
         void ITickable.Tick() => TickCalls += 1;

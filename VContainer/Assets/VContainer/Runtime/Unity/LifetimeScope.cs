@@ -304,6 +304,22 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
             }
 
+            var startables = Container.Resolve<IReadOnlyList<IStartable>>();
+            if (startables.Count > 0)
+            {
+                var loopItem = new StartableLoopItem(startables);
+                disposable.Add(loopItem);
+                PlayerLoopHelper.Dispatch(PlayerLoopTiming.Startup, loopItem);
+            }
+
+            var postStartable = Container.Resolve<IReadOnlyList<IPostStartable>>();
+            if (postInitializables.Count > 0)
+            {
+                var loopItem = new PostStartableLoopItem(postStartable);
+                disposable.Add(loopItem);
+                PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostStartup, loopItem);
+            }
+
             var fixedTickables = Container.Resolve<IReadOnlyList<IFixedTickable>>();
             if (fixedTickables.Count > 0)
             {
