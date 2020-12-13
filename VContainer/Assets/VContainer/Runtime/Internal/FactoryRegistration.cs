@@ -56,7 +56,7 @@ namespace VContainer.Internal
         public override IRegistration Build() => this;
         public object SpawnInstance(IObjectResolver resolver) => factoryFactory(resolver);
     }
-    
+
     sealed class FactoryRegistration<TParam1, TParam2, TParam3, T> : RegistrationBuilder, IRegistration
     {
         readonly Func<IObjectResolver, Func<TParam1, TParam2, TParam3, T>> factoryFactory;
@@ -74,7 +74,7 @@ namespace VContainer.Internal
         public override IRegistration Build() => this;
         public object SpawnInstance(IObjectResolver resolver) => factoryFactory(resolver);
     }
-    
+
     sealed class FactoryRegistration<TParam1, TParam2, TParam3, TParam4, T> : RegistrationBuilder, IRegistration
     {
         readonly Func<IObjectResolver, Func<TParam1, TParam2, TParam3, TParam4, T>> factoryFactory;

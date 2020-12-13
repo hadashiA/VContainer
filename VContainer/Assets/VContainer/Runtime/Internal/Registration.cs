@@ -110,6 +110,7 @@ namespace VContainer.Internal
         public Type ImplementationType => typeof(IObjectResolver);
         public IReadOnlyList<Type> InterfaceTypes => null;
         public Lifetime Lifetime => Lifetime.Transient;
+
         public object SpawnInstance(IObjectResolver resolver) => resolver;
     }
 }

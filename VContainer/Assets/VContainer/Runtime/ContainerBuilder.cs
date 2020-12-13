@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using VContainer.Internal;
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
@@ -13,8 +14,9 @@ namespace VContainer
 
         RegistrationBuilder Register<T>(Lifetime lifetime);
         RegistrationBuilder RegisterInstance(object instance);
-
         RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
+
+        void RegisterBuildCallback(Action<IObjectResolver> container);
 
         IObjectResolver Build();
     }
@@ -34,7 +36,9 @@ namespace VContainer
         {
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
-            return new ScopedContainer(registry, root, parent);
+            var container = new ScopedContainer(registry, root, parent);
+            EmitCallbacks(container);
+            return container;
         }
 
         public override IObjectResolver Build() => BuildScope();
@@ -45,7 +49,9 @@ namespace VContainer
         public object ApplicationOrigin { get; set; }
         public bool ContainerExposed { get; set; }
 
+
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
+        List<Action<IObjectResolver>> buildCallbacks;
 
         public RegistrationBuilder Register<T>(Lifetime lifetime)
             => Register(new RegistrationBuilder(typeof(T), lifetime));
@@ -59,11 +65,20 @@ namespace VContainer
             return registrationBuilder;
         }
 
+        public void RegisterBuildCallback(Action<IObjectResolver> callback)
+        {
+            if (buildCallbacks == null)
+                buildCallbacks = new List<Action<IObjectResolver>>();
+            buildCallbacks.Add(callback);
+        }
+
         public virtual IObjectResolver Build()
         {
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
-            return new Container(registry);
+            var container = new Container(registry);
+            EmitCallbacks(container);
+            return container;
         }
 
         protected IReadOnlyList<IRegistration> BuildRegistrations()
@@ -99,6 +114,16 @@ namespace VContainer
             }
 #endif
             return registrations;
+        }
+
+        protected void EmitCallbacks(IObjectResolver container)
+        {
+            if (buildCallbacks == null) return;
+
+            foreach (var callback in buildCallbacks)
+            {
+                callback.Invoke(container);
+            }
         }
     }
 }

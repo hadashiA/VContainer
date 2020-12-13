@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using Unity.Entities;
-using VContainer.Internal;
 
 namespace VContainer.Unity
 {
