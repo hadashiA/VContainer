@@ -184,7 +184,7 @@ In normal Unity programming, you embed logic calls in HelloScreen, but if you're
 public class GamePresenter
 {
 -    public class GamePresenter : ITickable
-+    public class GamePresenter : IInitializable
++    public class GamePresenter : IStartable
      {
          readonly HelloWorldService helloWorldService;
 +        readonly HelloScreen helloScreen;  
@@ -197,7 +197,7 @@ public class GamePresenter
 +            this.helloScreen = helloScreen;
          }
 
-+        void IInitializable.Initialize()
++        void IStartable.Start()
 +        {
 +            helloScreen.HelloButton.onClick.AddListener(() => helloWorldService.Hello());
 +        }
