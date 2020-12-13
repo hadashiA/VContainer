@@ -76,7 +76,7 @@ namespace VContainer.Unity
 
         static LifetimeScope Find(Type type, Scene scene)
         {
-            var buffer = ListBuffer<GameObject>.Get();
+            var buffer = UnityEngineObjectListBuffer<GameObject>.Get();
             scene.GetRootGameObjects(buffer);
             foreach (var gameObject in buffer)
             {
