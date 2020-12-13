@@ -368,8 +368,6 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
 
-            Container.Resolve<IEnumerable<MonoBehaviour>>();
-
 #if VCONTAINER_ECS_INTEGRATION
             Container.Resolve<IEnumerable<ComponentSystemBase>>();
 

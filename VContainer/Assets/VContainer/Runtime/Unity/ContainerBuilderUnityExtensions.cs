@@ -80,12 +80,20 @@ namespace VContainer.Unity
         public static RegistrationBuilder RegisterComponent(
             this IContainerBuilder builder,
             MonoBehaviour component)
-            => builder.RegisterInstance(component).As(typeof(MonoBehaviour), component.GetType());
+        {
+            var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), component.GetType());
+            builder.RegisterBuildCallback(container => container.Inject(component));
+            return registrationBuilder;
+        }
 
         public static RegistrationBuilder RegisterComponent<TInterface>(
             this IContainerBuilder builder,
             TInterface component)
-            => builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(TInterface));
+        {
+            var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(TInterface));
+            builder.RegisterBuildCallback(container => container.Inject(component));
+            return registrationBuilder;
+        }
 
         public static RegistrationBuilder RegisterComponentInHierarchy<T>(
             this IContainerBuilder builder
@@ -108,7 +116,9 @@ namespace VContainer.Unity
                 throw new VContainerException(typeof(T), $"Component {typeof(T)} is not in this scene {scene.path}");
             }
 
-            return builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(T));
+            var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(T));
+            builder.RegisterBuildCallback(container => container.Inject(component));
+            return registrationBuilder;
         }
 
         public static ComponentRegistrationBuilder RegisterComponentOnNewGameObject<T>(
