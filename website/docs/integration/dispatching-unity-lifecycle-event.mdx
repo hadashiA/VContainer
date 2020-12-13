@@ -6,23 +6,27 @@ VContainer has own PlayerLoop sub systems.
 
 If you register a class that implements the marker interface, it will be scheduled in Unity's PlayerLoop cycle.
 
-Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: `IInitilizable` etc)
+Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: `IStartable` etc)
 
 
 The following interfaces and timings are available.
 
-- `IInitializable`     : Nearly `Start`
-- `IPostInitializable` : After `Start`
-- `IFixedTickable`     : Nearly `FixedUpdate`
-- `IPostFixedTickable` : After `FixedUpdate`
-- `ITickable`          : Nearly `Update`
-- `IPostTickable`      : After `Update`
-- `ILateTickable`      : Nearly `LateUpdate`
-- `IPostLateTickabl`   : After `LateUpdate`
+| VContaienr entry point                | Timing |
+|:--------------------------------------|:----------------------------------|
+| `IInitializable.Initialize()`         | Early `PlayerLoop.Initialization` |
+| `IPostInitializable.PostInitialize()` | Late `PlayerLoop.Initialization`  |
+| `IStartable.Start()`                  | Nearly `MonoBehaviour.Start()`    |
+| `IPostStartable.PostStart()`          | After `MonoBehaviour.Start()`     |
+| `IFixedTickable.FixedTick()`          | Nearly `MonoBehaviour.FixedUpdate()` |
+| `IPostFixedTickable.PostFixedTick()`  | After `MonoBehaviour.FixedUpdate()` |
+| `ITickable.Tick()`                    | Nearly `MonoBehaviour.Update()` |
+| `IPostTickable.PostTick()`            | After `MonoBehaviour.Update()` |
+| `ILateTickable.LateTick()`            | Nearly `MonoBehaviour.LateUpdate()` |
+| `IPostLateTickable.LateTick()`        | After `MonoBehaviour.LateUpdate()` |
 
 And
 
-- `IDisposable` : With container disposes. (For `Lifetime.Scoped`)
+- `IDisposable` : With container disposes. (For `Lifetime.Singleton` / `Lifetime.Scoped`)
 
 ![](./assets/lifecycle_diagram.png)
 

@@ -40,6 +40,9 @@ namespace VContainer.Tests.Unity
             var entryPoint = lifetimeScope.Container.Resolve<SampleEntryPoint>();
             Assert.That(entryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(entryPoint.InitializeCalled, Is.True);
+            Assert.That(entryPoint.PostInitializeCalled, Is.True);
+            Assert.That(entryPoint.StartCalled, Is.True);
+            Assert.That(entryPoint.PostStartCalled, Is.True);
             Assert.That(entryPoint.TickCalls, Is.EqualTo(2));
 
             var disposable = lifetimeScope.Container.Resolve<DisposableServiceA>();
