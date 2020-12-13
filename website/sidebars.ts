@@ -21,6 +21,7 @@ module.exports = {
       'registering/register-factory',
       'registering/register-monobehaviour',
       'registering/register-scriptable-object',
+      'registering/register-callbacks',
     ],
     'SCOPING': [
       'scoping/lifetime-overview',
