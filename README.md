@@ -244,8 +244,9 @@ Visit [vcontainer.hadashikick.jp/getting-started](https://vcontainer.hadashikick
 
 VContainer is inspired by:
 
-- [Zenject](https://github.com/modesttree/Zenject) and [Extenject](https://github.com/svermeulen/Extenject).
+- [Zenject](https://github.com/modesttree/Zenject) / [Extenject](https://github.com/svermeulen/Extenject).
 - [Autofac](http://autofac.org) - [Autofac Project](https://github.com/autofac/Autofac).
+- [MicroResolver](https://github.com/neuecc/MicroResolver)
 
 ## License
 
