@@ -28,6 +28,18 @@ The extra fast DI (Dependency Injection) library running on Unity Game Engine.
 
 ![](./website/static/img/benchmark_result.png)
 
+### GC Alloc Result Example
+
+
+
+![](./website/static/img/gc_alloc_profiler_result.png)
+
+![](./website/static/img/screenshot_profiler_vcontainer.png)
+
+![](./website/static/img/screenshot_profiler_zenject.png)
+
+
+
 ## Installation
 
 *Requires Unity 2018.4+*
