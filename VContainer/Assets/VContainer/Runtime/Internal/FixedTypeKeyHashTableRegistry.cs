@@ -42,15 +42,17 @@ namespace VContainer.Internal
             if (buf.TryGetValue(service, out var exists))
             {
                 var collectionService = typeof(IEnumerable<>).MakeGenericType(service);
-                if (buf.TryGetValue(collectionService, out var collection))
+                CollectionRegistration collection;
+                if (buf.TryGetValue(collectionService, out var found))
                 {
-                    ((CollectionRegistration)collection).Add(registration);
+                    collection = (CollectionRegistration)found;
                 }
                 else
                 {
-                    var newCollection = new CollectionRegistration(service) { exists, registration };
-                    AddCollectionToBuildBuffer(buf, newCollection);
+                    collection = new CollectionRegistration(service) { exists };
+                    AddCollectionToBuildBuffer(buf, collection);
                 }
+                collection.Add(registration);
             }
             else
             {
