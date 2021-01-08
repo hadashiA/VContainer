@@ -49,8 +49,14 @@ namespace VContainer.Editor
                 if (index < 0) index = 0;
 
                 EditorGUI.LabelField(labelRect, "Parent");
-                index = EditorGUI.Popup(popupRect, index, names);
-                typeNameProp.stringValue = names[index];
+                using (var check = new EditorGUI.ChangeCheckScope())
+                {
+                    index = EditorGUI.Popup(popupRect, index, names);
+                    if (check.changed)
+                    {
+                        typeNameProp.stringValue = names[index];
+                    }
+                }
             }
         }
 
