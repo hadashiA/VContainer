@@ -15,11 +15,7 @@ namespace VContainer.Unity
 
     public sealed class VContainerSettings : ScriptableObject
     {
-#if UNITY_2019_3_OR_NEWER
-        [SerializeReference]
-#else
         [SerializeField]
-#endif
         public LifetimeScope RootLifetimeScope;
 
         [SerializeField]
