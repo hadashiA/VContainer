@@ -67,3 +67,22 @@ class ClassA
 }
 ```
 
+In this case, container.Instantiate etc. are also useful.
+
+```csharp
+builder.RegisterFactory<CharacterType, CharacterActor>(container =>
+{
+    return characterType =>
+    {
+        var characterPrefab = ...
+        return container.Instantiate(characterPrefab, parentTransform);
+    }
+}, Lifetime.Scoped);
+```
+
+See [Use Container directory](../resolving/use-container-directory) more information.
+
+:::note
+`Func <>` factory is like a short hand.
+In complex cases, consider defining and registering your own factory class。
+:::
