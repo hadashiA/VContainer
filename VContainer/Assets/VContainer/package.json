@@ -1,9 +1,9 @@
 {
   "name": "jp.hadashikick.vcontainer",
   "displayName": "VContainer",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "unity": "2018.4",
-  "description": "Lightweight DI (Dependency Injection) Container for Unity.",
+  "description": "The extra fast DI (Dependency Injection) for Unity",
   "keywords": ["DI", "Dependency Injection", "DI Container"],
   "license": "MIT",
   "dependencies": {
