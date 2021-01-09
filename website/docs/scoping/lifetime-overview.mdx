@@ -2,7 +2,8 @@
 title: Lifetime Overview
 ---
 
-- Singleton : Single instance per container (includes all parents and children).
+- Singleton : Single instance for all containers.
+  - Same type cannot be registered in the same container.
 - Transient : Instance per resolving.
 - Scoped    : Instance per `LifetimeScope`.
   - If LifetimeScope is single, similar to Singleton.
