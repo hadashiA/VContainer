@@ -1,28 +1,28 @@
 version: '3'
 services:
   alf:
-    image: gableroux/unity3d:2019.4.0f1
+    image: gableroux/unity3d:2020.1.13f1-linux-il2cpp
     volumes:
     - .:/VContainer
     working_dir: /VContainer/tmp
     command: /opt/Unity/Editor/Unity -quit -batchmode -nographics -logFile -createManualActivationFile
   test:
-    image: gableroux/unity3d:2019.4.0f1
+    image: gableroux/unity3d:2020.1.13f1-linux-il2cpp
     volumes:
     - .:/VContainer
     working_dir: /VContainer
     command: >
       /bin/sh -c "
-        /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2019.4.0f1.ulf ||
-        /opt/Unity/Editor/Unity -runTests -batchmode -nographics -logFile -projectPath ./VContainer -testResults ./tmp/TestResults.xml -testPlatform StandaloneLinux64 -buildTarget StandaloneLinux64 -scriptbackend=mono
+        /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2020.1.ulf ||
+        /opt/Unity/Editor/Unity -runTests -batchmode -nographics -logFile ./tmp/log -projectPath ./VContainer -testResults ./tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=mono
       "
   performance-test:
-    image: gableroux/unity3d:2019.4.0f1
+    image: gableroux/unity3d:2020.1.13f1-linux-il2cpp
     volumes:
     - .:/VContainer
     working_dir: /VContainer
     command: >
       /bin/sh -c "
-        /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2019.4.0f1.ulf ||
-        /opt/Unity/Editor/Unity -runTests -batchmode -nographics -projectPath ./VContainer.Benchmark -testResults tmp/PerformanceTestResults-linux.xml -testPlatform StandaloneLinux64 -buildTarget StandaloneLinux64 -scriptbackend=il2cpp
+        /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile ./tmp/Unity_v2020.1.ulf ||
+        /opt/Unity/Editor/Unity -runTests -batchmode -nographics -silent-crashes -logFile ./tmp/log -projectPath ./VContainer.Benchmark -testResults tmp/PerformanceTestResults.xml -buildTarget StandaloneLinux64 -scriptbackend=il2cpp
       "

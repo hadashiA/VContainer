@@ -24,11 +24,11 @@ jobs:
       UNITY_BIN: /opt/Unity/Editor/Unity
     strategy:
       matrix:
-        unityVersion: ['2019.4.14f1']
+        unityVersion: ['2020.1.13f1']
         scriptBackend: ['mono']
         include:
-        - unityVersion: 2019.4.14f1
-          license: UNITY_LICENSE_2019_BASE64
+        - unityVersion: 2020.1.13f1
+          license: UNITY_LICENSE_2020_1_BASE64
         # - unityVersion: 2020.1.12f1
         #   license: UNITY_LICENSE_2020_BASE64
     container:
@@ -38,7 +38,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: VContainer/Library
-        key: Library-VContainer
+        key: Library-VContainer2
         restore-keys: |
           Library-VContainer-
           Library-
@@ -54,7 +54,7 @@ jobs:
       run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
     - name: Run Tests
       shell: bash
-      run: $UNITY_BIN -batchmode -nographics -silent-crashes -logFile /dev/stdout -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=${{ matrix.scriptBackend }}
+      run: $UNITY_BIN -batchmode -logFile /dev/stdout -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=${{ matrix.scriptBackend }} -nographics -silent-crashes
     - uses: actions/upload-artifact@v1
       with:
         name: Test results
