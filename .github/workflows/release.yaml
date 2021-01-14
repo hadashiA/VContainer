@@ -17,7 +17,7 @@ jobs:
     - name: Decode Unity License File
       run: |
         mkdir ./tmp
-        echo -n $UNITY_LICENSE_2019_BASE64 | base64 --decode > $UNITY_LICENSE_FILE
+        echo -n ${{ secrets.UNITY_LICENSE_2020_1_BASE64 }} | base64 --decode > $UNITY_LICENSE_FILE
     - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
 
     # set release tag(*.*.*) to env.GIT_TAG
@@ -47,7 +47,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Ver.${{ github.ref }}
+        release_name: v${{ github.ref }}
 
     # Download(All) Artifacts to current directory
     - uses: actions/download-artifact@v2-preview

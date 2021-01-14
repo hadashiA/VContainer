@@ -24,13 +24,15 @@ jobs:
       UNITY_BIN: /opt/Unity/Editor/Unity
     strategy:
       matrix:
-        unityVersion: ['2020.1.13f1']
+        unityVersion:
+        - 2020.1.13f1
+        # - 2019.4.14f1
         scriptBackend: ['mono']
         include:
         - unityVersion: 2020.1.13f1
           license: UNITY_LICENSE_2020_1_BASE64
-        # - unityVersion: 2020.1.12f1
-        #   license: UNITY_LICENSE_2020_BASE64
+        # - unityVersion: 2019.4.14f1
+        #   license: UNITY_LICENSE_2019_4_BASE64
     container:
       image: gableroux/unity3d:${{ matrix.unityVersion }}-linux-il2cpp
     steps:
@@ -38,10 +40,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: VContainer/Library
-        key: Library-VContainer2
-        restore-keys: |
-          Library-VContainer-
-          Library-
+        key: Library-VContainer-${{ matrix.unityVersion }}
     - name: Dump unity license file
       shell: bash
       run: |
