@@ -80,13 +80,23 @@ namespace VContainer.Tests
         public void CreateScopeWithResolveSingleton()
         {
             var builder = new ContainerBuilder();
-            builder.Register<NoDependencyServiceA>(Lifetime.Singleton);
+            builder.Register<DisposableServiceA>(Lifetime.Singleton)
+                .AsImplementedInterfaces()
+                .AsSelf();
 
             var container = builder.Build();
-            var scopedContainer = container.CreateScope();
+            var scopedContainer = container.CreateScope(childBuilder =>
+            {
+                childBuilder.Register<DisposableServiceB>(Lifetime.Singleton)
+                    .AsImplementedInterfaces()
+                    .AsSelf();
+            });
 
-            var singleton = scopedContainer.Resolve<NoDependencyServiceA>();
-            Assert.That(singleton, Is.InstanceOf<NoDependencyServiceA>());
+            var singleton = container.Resolve<DisposableServiceA>();
+            var singleton2 = scopedContainer.Resolve<DisposableServiceA>();
+            Assert.That(singleton, Is.InstanceOf<DisposableServiceA>());
+            Assert.That(singleton2, Is.InstanceOf<DisposableServiceA>());
+            Assert.That(singleton, Is.EqualTo(singleton2));
         }
 
         [Test]

@@ -69,7 +69,7 @@ namespace VContainer
                     if (Parent is null)
                         return Root.Resolve(registration);
 
-                    if (!registry.Exists(registration))
+                    if (!registry.Exists(registration.ImplementationType))
                         return Parent.Resolve(registration);
 
                     return CreateTrackedInstance(registration);
