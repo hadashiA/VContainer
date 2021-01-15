@@ -2,39 +2,43 @@ name: Release
 
 on:
   push:
-    tags:
-    - "[0-9]+.[0-9]+.[0-9]+*"
-
+    tags: ["[0-9]+.[0-9]+.[0-9]+*"]
+    branches: ['release-test']
 jobs:
   build-unity:
     runs-on: ubuntu-latest
+    env:
+      UNITY_LICENSE_FILE: ./tmp/ulf
+      UNITY_BIN: /opt/Unity/Editor/Unity
+    container:
+      image: gableroux/unity3d:2019.4.14f1-linux-il2cpp
     steps:
     - uses: actions/checkout@v2
-    # set release tag(*.*.*) to env.GIT_TAG
-    - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
-    - name: Create meta list
-      working-directory: VContainer
+    - name: Decode Unity License File
       run: |
-        echo Assets/VContainer.meta >> metaList
-        echo Assets/VContainer/Runtime.meta >> metaList
-        find Assets/VContainer/Runtime -name \*.meta >> metaList
-        echo Assets/VContainer/Editor.meta >> metaList
-        find Assets/VContainer/Editor -name \*.meta >> metaList
-    - uses: pCYSl5EDgo/create-unitypackage@master
-      with:
-        package-path: VContainer.${{ env.GIT_TAG }}.unitypackage
-        include-files: VContainer/metaList
-        project-folder: ./VContainer
+        mkdir ./tmp
+        echo -n ${{ secrets.UNITY_LICENSE_2020_1_BASE64 }} | base64 --decode > $UNITY_LICENSE_FILE
+    - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
+
+    # set release tag(*.*.*) to env.GIT_TAG
+    - run: echo "name=GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+    # Execute scripts: Export Package
+    - name: Export unitypackage
+      run: $UNITY_BIN -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./VContainer
+      working-directory: VContainer
+
+    # Store artifacts.
     - uses: actions/upload-artifact@v2
       with:
-        path: VContainer.${{ env.GIT_TAG }}.unitypackage
         name: VContainer.${{ env.GIT_TAG }}.unitypackage
+        path: ./VContainer/VContainer.${{ env.GIT_TAG }}.unitypackage
 
   create-release:
     needs: [build-unity]
     runs-on: ubuntu-latest
     steps:
-    - run: echo ::set-env name=GIT_TAG::${GITHUB_REF#refs/tags/}
+    - run: echo "name=GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV      
 
     # Create Releases
     - uses: actions/create-release@v1
@@ -43,8 +47,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Ver.${{ github.ref }}
-        draft: true
+        release_name: v${{ github.ref }}
 
     # Download(All) Artifacts to current directory
     - uses: actions/download-artifact@v2-preview
