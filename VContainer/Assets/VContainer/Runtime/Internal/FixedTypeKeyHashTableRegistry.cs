@@ -107,20 +107,6 @@ namespace VContainer.Internal
             return false;
         }
 
-        public bool Exists(IRegistration registration)
-        {
-            if (registration.InterfaceTypes?.Count > 0)
-            {
-                foreach (var type in registration.InterfaceTypes)
-                {
-                    if (hashTable.TryGet(type, out _))
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            return hashTable.TryGet(registration.ImplementationType, out _);
-        }
+        public bool Exists(Type type) => hashTable.TryGet(type, out _);
     }
 }
