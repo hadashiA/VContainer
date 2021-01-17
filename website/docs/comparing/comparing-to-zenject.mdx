@@ -450,6 +450,30 @@ builder.RegisterFactory<Enemy>(container =>
 <tbody>
   <tr>
     <td>
+      <strong>Signal</strong>
+    </td>
+    <td>
+      <strong>Not supported</strong>
+      <br />
+      The central messaging pattern is useful, but depends largely on the style of the project, and the preferred implementation will vary.
+      You can choose any implementation of <a href="https://github.com/neuecc/UniRx#messagebroker-asyncmessagebroker">UniRx.MessageBroker</a>, <a href="https://github.com/hadashiA/UniTaskPubSub">UniTaskPubsub</a> or etc.
+    </td>
+  </tr>
+
+  <tr>
+    <td>
+      <strong>Memory Pool</strong>
+    </td>
+    <td>
+      <strong>Not supported</strong>
+      <br />
+      Currently, any Memory pool implementation is not embed.
+      Please inject the implementation according to the purpose of the project into Factory etc.
+    </td>
+  </tr>
+
+  <tr>
+    <td>
       <Inline>
       Container.Bind&lt;Foo&gt;()
           .FromComponentInNewPrefabResource("Some/Path/Foo")
