@@ -20,7 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       UNITY_LICENSE_FILE: ./tmp/ulf
-      UNITY_BIN: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity
     strategy:
       matrix:
         unityVersion:
@@ -28,6 +27,7 @@ jobs:
         - 2019.4.14f1
         - 2019.3.12f1
         scriptBackend: ['mono']
+        mode: ['code-gen', 'reflection']
         include:
         - unityVersion: 2020.1.13f1
           license: UNITY_LICENSE_2020_1_BASE64
@@ -42,7 +42,10 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: VContainer/Library
-        key: Library-VContainer-${{ matrix.unityVersion }}
+        key: Library-VContainer-${{ matrix.unityVersion }}-${{ matrix.mode }}
+    - name: VContainerSettings
+      if: matrix.mode == 'code-gen'
+      run: cp ./.github/fixtures/ProjectSettings.asset ./VContainer/ProjectSettings/ProjectSettings.asset
     - name: Dump unity license file
       shell: bash
       run: |
@@ -52,7 +55,7 @@ jobs:
         echo -n "${{ secrets[matrix.license] }}" | base64 --decode > $UNITY_LICENSE_FILE
     - name: Load License
       shell: bash
-      run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
+      run: /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
     - name: Run Tests
       shell: bash
       run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -batchmode -logFile /dev/stdout -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=${{ matrix.scriptBackend }} -nographics -silent-crashes
