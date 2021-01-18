@@ -17,6 +17,7 @@ namespace VContainer
         RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
 
         void RegisterBuildCallback(Action<IObjectResolver> container);
+        void RegisterBuildCallback<T>(T state, Action<T, IObjectResolver> container);
 
         IObjectResolver Build();
     }
@@ -51,7 +52,7 @@ namespace VContainer
 
 
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
-        List<Action<IObjectResolver>> buildCallbacks;
+        List<IBuildCallback> buildCallbacks;
 
         public RegistrationBuilder Register<T>(Lifetime lifetime)
             => Register(new RegistrationBuilder(typeof(T), lifetime));
@@ -68,8 +69,15 @@ namespace VContainer
         public void RegisterBuildCallback(Action<IObjectResolver> callback)
         {
             if (buildCallbacks == null)
-                buildCallbacks = new List<Action<IObjectResolver>>();
-            buildCallbacks.Add(callback);
+                buildCallbacks = new List<IBuildCallback>();
+            buildCallbacks.Add(new BuildCallback(callback));
+        }
+
+        public void RegisterBuildCallback<T>(T state, Action<T, IObjectResolver> callback)
+        {
+            if (buildCallbacks == null)
+                buildCallbacks = new List<IBuildCallback>();
+            buildCallbacks.Add(new BuildCallbackWithState<T>(state, callback));
         }
 
         public virtual IObjectResolver Build()
@@ -122,7 +130,7 @@ namespace VContainer
 
             foreach (var callback in buildCallbacks)
             {
-                callback.Invoke(container);
+                callback.Call(container);
             }
         }
     }

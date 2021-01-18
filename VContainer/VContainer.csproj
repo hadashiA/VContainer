@@ -52,6 +52,7 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
+     <Compile Include="Assets\VContainer\Runtime\Internal\BuildCallback.cs" />
      <Compile Include="Assets\VContainer\Runtime\Unity\VContainerSettings.cs" />
      <Compile Include="Assets\VContainer\Runtime\Internal\Registration.cs" />
      <Compile Include="Assets\VContainer\Runtime\InjectAttribute.cs" />

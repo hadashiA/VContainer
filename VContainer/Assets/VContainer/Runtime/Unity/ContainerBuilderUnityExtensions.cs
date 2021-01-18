@@ -74,7 +74,8 @@ namespace VContainer.Unity
             {
                 registrationBuilder = registrationBuilder.As(typeof(MonoBehaviour));
             }
-            return registrationBuilder.AsImplementedInterfaces();
+            registrationBuilder.AsImplementedInterfaces();
+            return registrationBuilder;
         }
 
         public static RegistrationBuilder RegisterComponent(
@@ -82,7 +83,7 @@ namespace VContainer.Unity
             MonoBehaviour component)
         {
             var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), component.GetType());
-            builder.RegisterBuildCallback(container => container.Inject(component));
+            builder.RegisterBuildCallback(component, (x, container) => container.Inject(x));
             return registrationBuilder;
         }
 
@@ -91,7 +92,9 @@ namespace VContainer.Unity
             TInterface component)
         {
             var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(TInterface));
-            builder.RegisterBuildCallback(container => container.Inject(component));
+            builder.RegisterBuildCallback(
+                component,
+                (x, container) => container.Inject(x));
             return registrationBuilder;
         }
 
@@ -117,7 +120,9 @@ namespace VContainer.Unity
             }
 
             var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(T));
-            builder.RegisterBuildCallback(container => container.Inject(component));
+            builder.RegisterBuildCallback(
+                component,
+                (x, container) => container.Inject(x));
             return registrationBuilder;
         }
 
