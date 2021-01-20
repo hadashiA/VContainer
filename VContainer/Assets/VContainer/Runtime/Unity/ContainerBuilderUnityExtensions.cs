@@ -57,17 +57,13 @@ namespace VContainer.Unity
             configuration(entryPoints);
         }
 
-        public static void UseComponents(
-            this IContainerBuilder builder,
-            Action<ComponentsBuilder> configuration)
+        public static void UseComponents(this IContainerBuilder builder, Action<ComponentsBuilder> configuration)
         {
             var components = new ComponentsBuilder(builder);
             configuration(components);
         }
 
-        public static RegistrationBuilder RegisterEntryPoint<T>(
-            this IContainerBuilder builder,
-            Lifetime lifetime)
+        public static RegistrationBuilder RegisterEntryPoint<T>(this IContainerBuilder builder, Lifetime lifetime)
         {
             var registrationBuilder = builder.Register<T>(lifetime);
             if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
@@ -77,27 +73,21 @@ namespace VContainer.Unity
             return registrationBuilder.AsImplementedInterfaces();
         }
 
-        public static RegistrationBuilder RegisterComponent(
-            this IContainerBuilder builder,
-            MonoBehaviour component)
+        public static RegistrationBuilder RegisterComponent(this IContainerBuilder builder, MonoBehaviour component)
         {
             var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), component.GetType());
             builder.RegisterBuildCallback(container => container.Inject(component));
             return registrationBuilder;
         }
 
-        public static RegistrationBuilder RegisterComponent<TInterface>(
-            this IContainerBuilder builder,
-            TInterface component)
+        public static RegistrationBuilder RegisterComponent<TInterface>(this IContainerBuilder builder, TInterface component)
         {
             var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(TInterface));
             builder.RegisterBuildCallback(container => container.Inject(component));
             return registrationBuilder;
         }
 
-        public static RegistrationBuilder RegisterComponentInHierarchy<T>(
-            this IContainerBuilder builder
-            ) where T : MonoBehaviour
+        public static RegistrationBuilder RegisterComponentInHierarchy<T>(this IContainerBuilder builder)
         {
             var lifetimeScope = (LifetimeScope)builder.ApplicationOrigin;
             var scene = lifetimeScope.gameObject.scene;
