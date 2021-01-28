@@ -12,7 +12,7 @@ namespace VContainer.Unity
         string gameObjectName;
         Component prefab;
 
-        internal ComponentRegistrationBuilder(
+        ComponentRegistrationBuilder(
             Type implementationType,
             Lifetime lifetime,
             List<Type> interfaceTypes = null)
