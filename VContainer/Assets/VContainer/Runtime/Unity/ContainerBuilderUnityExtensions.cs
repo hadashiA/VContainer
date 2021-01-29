@@ -34,15 +34,15 @@ namespace VContainer.Unity
         public RegistrationBuilder AddInstance(MonoBehaviour component)
             => containerBuilder.RegisterComponent(component);
 
-        public RegistrationBuilder AddInHierarchy<T>() where T : MonoBehaviour
+        public RegistrationBuilder AddInHierarchy<T>() where T : Component
             => containerBuilder.RegisterComponentInHierarchy<T>();
 
         public ComponentRegistrationBuilder AddOnNewGameObject<T>(Lifetime lifetime, string newGameObjectName = null)
-            where T : MonoBehaviour
+            where T : Component
             => containerBuilder.RegisterComponentOnNewGameObject<T>(lifetime, newGameObjectName);
 
         public ComponentRegistrationBuilder AddInNewPrefab<T>(T prefab, Lifetime lifetime)
-            where T : MonoBehaviour
+            where T : Component
             => containerBuilder.RegisterComponentInNewPrefab(prefab, lifetime);
     }
 
@@ -115,7 +115,7 @@ namespace VContainer.Unity
             this IContainerBuilder builder,
             Lifetime lifetime,
             string newGameObjectName = null)
-            where T : MonoBehaviour
+            where T : Component
         {
             var registrationBuilder = new ComponentRegistrationBuilder(
                 newGameObjectName,
@@ -129,7 +129,7 @@ namespace VContainer.Unity
             this IContainerBuilder builder,
             T prefab,
             Lifetime lifetime)
-            where T : MonoBehaviour
+            where T : Component
         {
             var registrationBuilder = new ComponentRegistrationBuilder(
                 prefab,
