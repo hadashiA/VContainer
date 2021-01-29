@@ -25,7 +25,7 @@ jobs:
 
     # Execute scripts: Export Package
     - name: Export unitypackage
-      run: $UNITY_BIN -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./VContainer
+      run: $UNITY_BIN -quit -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./
       working-directory: VContainer
 
     # Store artifacts.
