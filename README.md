@@ -98,7 +98,7 @@ public interface IRouteSearch
 {
 }
 
-public class RouteSearch : IRouteSearch
+public class AStarRouteSearch : IRouteSearch
 {
 }
 
