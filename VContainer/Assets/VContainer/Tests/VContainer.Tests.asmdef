@@ -1,10 +1,12 @@
 {
     "name": "VContainer.Tests",
+    "rootNamespace": "",
     "references": [
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "VContainer",
-        "GUID:734d92eba21c94caba915361bd5ac177"
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
+        "GUID:734d92eba21c94caba915361bd5ac177",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
     ],
     "includePlatforms": [],
     "excludePlatforms": [
@@ -19,12 +21,6 @@
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
     ],
-    "versionDefines": [
-        {
-            "name": "com.unity.entities",
-            "expression": "",
-            "define": "VCONTAINER_ECS_INTEGRATION"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+#if VCONTAINER_UNITASK_INTEGRATION
+using System.Threading;
+using Cysharp.Threading.Tasks;
+#endif
 
 namespace VContainer.Unity
 {
@@ -52,6 +56,13 @@ namespace VContainer.Unity
     {
         void PostLateTick();
     }
+
+#if VCONTAINER_UNITASK_INTEGRATION
+    public interface IAsyncStartable
+    {
+        UniTaskVoid StartAsync(CancellationToken cancellation);
+    }
+#endif
 
     sealed class InitializationLoopItem : IPlayerLoopItem, IDisposable
     {
@@ -282,4 +293,39 @@ namespace VContainer.Unity
 
         public void Dispose() => disposed = true;
     }
+
+#if VCONTAINER_UNITASK_INTEGRATION
+    sealed class AsyncStartableLoopItem : IPlayerLoopItem, IDisposable
+    {
+        readonly IEnumerable<IAsyncStartable> entries;
+        readonly CancellationTokenSource cts = new CancellationTokenSource();
+        bool disposed;
+
+        public AsyncStartableLoopItem(IEnumerable<IAsyncStartable> entries)
+        {
+            this.entries = entries;
+        }
+
+        public bool MoveNext()
+        {
+            if (disposed) return false;
+            foreach (var x in entries)
+            {
+                x.StartAsync(cts.Token).Forget();
+            }
+            return false;
+        }
+
+        public void Dispose()
+        {
+            lock (entries)
+            {
+                if (disposed) return;
+                cts.Cancel();
+                cts.Dispose();
+                disposed = true;
+            }
+        }
+    }
+#endif
 }

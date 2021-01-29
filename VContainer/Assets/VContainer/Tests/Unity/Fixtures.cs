@@ -1,8 +1,9 @@
+using Cysharp.Threading.Tasks;
 using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
 {
-    public sealed class SampleEntryPoint :
+    public class SampleEntryPoint :
         IInitializable,
         IPostInitializable,
         IStartable,
@@ -35,5 +36,16 @@ namespace VContainer.Tests.Unity
         void IPostTickable.PostTick() => PostTickCalls += 1;
         void ILateTickable.LateTick() => LateTickCalls += 1;
         void IPostLateTickable.PostLateTick() => PostLateTickCalls += 1;
+    }
+
+    public class SampleAsyncEntryPoint : IAsyncStartable
+    {
+        public bool Started;
+
+        public async UniTaskVoid StartAsync()
+        {
+            await UniTask.Yield();
+            Started = true;
+        }
     }
 }

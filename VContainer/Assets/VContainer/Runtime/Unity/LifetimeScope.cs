@@ -312,10 +312,10 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Startup, loopItem);
             }
 
-            var postStartable = Container.Resolve<IReadOnlyList<IPostStartable>>();
-            if (postInitializables.Count > 0)
+            var postStartables = Container.Resolve<IReadOnlyList<IPostStartable>>();
+            if (postStartables.Count > 0)
             {
-                var loopItem = new PostStartableLoopItem(postStartable);
+                var loopItem = new PostStartableLoopItem(postStartables);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostStartup, loopItem);
             }
@@ -367,6 +367,16 @@ namespace VContainer.Unity
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
+
+#if VCONTAINER_UNITASK_INTEGRATION
+            var asyncStartables = Container.Resolve<IReadOnlyList<IAsyncStartable>>();
+            if (asyncStartables.Count > 0)
+            {
+                var loopItem = new AsyncStartableLoopItem(asyncStartables);
+                disposable.Add(loopItem);
+                PlayerLoopHelper.Dispatch(PlayerLoopTiming.Startup, loopItem);
+            }
+#endif
 
 #if VCONTAINER_ECS_INTEGRATION
             Container.Resolve<IEnumerable<ComponentSystemBase>>();
