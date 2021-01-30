@@ -38,7 +38,7 @@ jobs:
     needs: [build-unity]
     runs-on: ubuntu-latest
     steps:
-    - run: echo "name=GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV      
+    - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
     # Create Releases
     - uses: actions/create-release@v1
