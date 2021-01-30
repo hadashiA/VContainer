@@ -78,6 +78,7 @@ namespace VContainer.Unity
             var registrationBuilder = builder.RegisterInstance(component);
             if (component is MonoBehaviour monoBehaviour)
             {
+                registrationBuilder.As<MonoBehaviour>().AsSelf();
                 builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
             }
             return registrationBuilder;
@@ -85,9 +86,10 @@ namespace VContainer.Unity
 
         public static RegistrationBuilder RegisterComponent<TInterface>(this IContainerBuilder builder, TInterface component)
         {
-            var registrationBuilder = builder.RegisterInstance(component);
+            var registrationBuilder = builder.RegisterInstance(component).As(typeof(TInterface));
             if (component is MonoBehaviour monoBehaviour)
             {
+                registrationBuilder.As<MonoBehaviour>();
                 builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
             }
             return registrationBuilder;
@@ -112,9 +114,10 @@ namespace VContainer.Unity
                 throw new VContainerException(typeof(T), $"Component {typeof(T)} is not in this scene {scene.path}");
             }
 
-            var registrationBuilder = builder.RegisterInstance(component);
+            var registrationBuilder = builder.RegisterInstance(component).As(typeof(T));
             if (component is MonoBehaviour monoBehaviour)
             {
+                registrationBuilder.As<MonoBehaviour>();
                 builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
             }
             return registrationBuilder;
