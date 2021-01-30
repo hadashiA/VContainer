@@ -80,6 +80,24 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void RegisterComponentInHierarchyWithBuiltinType()
+        {
+            var lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
+            var go1 = new GameObject("Parent");
+
+            go1.AddComponent<BoxCollider>();
+
+            var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentInHierarchy<BoxCollider>();
+
+            var container = builder.Build();
+            var resolved = container.Resolve<BoxCollider>();
+
+            Assert.That(resolved, Is.InstanceOf<BoxCollider>());
+        }
+
+        [Test]
         public void RegisterComponentOnNewGameObject()
         {
             {

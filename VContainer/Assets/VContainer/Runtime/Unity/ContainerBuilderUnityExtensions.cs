@@ -75,15 +75,23 @@ namespace VContainer.Unity
 
         public static RegistrationBuilder RegisterComponent(this IContainerBuilder builder, MonoBehaviour component)
         {
-            var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), component.GetType());
-            builder.RegisterBuildCallback(container => container.Inject(component));
+            var registrationBuilder = builder.RegisterInstance(component);
+            if (component is MonoBehaviour monoBehaviour)
+            {
+                registrationBuilder.As<MonoBehaviour>().AsSelf();
+                builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
+            }
             return registrationBuilder;
         }
 
         public static RegistrationBuilder RegisterComponent<TInterface>(this IContainerBuilder builder, TInterface component)
         {
-            var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(TInterface));
-            builder.RegisterBuildCallback(container => container.Inject(component));
+            var registrationBuilder = builder.RegisterInstance(component).As(typeof(TInterface));
+            if (component is MonoBehaviour monoBehaviour)
+            {
+                registrationBuilder.As<MonoBehaviour>();
+                builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
+            }
             return registrationBuilder;
         }
 
@@ -106,8 +114,12 @@ namespace VContainer.Unity
                 throw new VContainerException(typeof(T), $"Component {typeof(T)} is not in this scene {scene.path}");
             }
 
-            var registrationBuilder = builder.RegisterInstance(component).As(typeof(MonoBehaviour), typeof(T));
-            builder.RegisterBuildCallback(container => container.Inject(component));
+            var registrationBuilder = builder.RegisterInstance(component).As(typeof(T));
+            if (component is MonoBehaviour monoBehaviour)
+            {
+                registrationBuilder.As<MonoBehaviour>();
+                builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
+            }
             return registrationBuilder;
         }
 
