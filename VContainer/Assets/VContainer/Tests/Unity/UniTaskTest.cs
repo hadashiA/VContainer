@@ -11,20 +11,20 @@ namespace VContainer.Tests.Unity
         [UnityTest]
         public IEnumerator AsyncStartup() => UniTask.ToCoroutine(async () =>
         {
-            var lifetimeScope = LifetimeScope.Create(builder =>
-            {
-                builder.RegisterEntryPoint<SampleAsyncEntryPoint>(Lifetime.Scoped)
-                    .AsSelf();
-            });
+            // var lifetimeScope = LifetimeScope.Create(builder =>
+            // {
+            //     builder.RegisterEntryPoint<SampleAsyncEntryPoint>(Lifetime.Scoped)
+            //         .AsSelf();
+            // });
 
-            var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncEntryPoint>();
+            // var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncEntryPoint>();
 
             UnityEngine.Debug.Log("000000");
-            Assert.That(entryPoint.Started, Is.False);
+            // Assert.That(entryPoint.Started, Is.False);
             // yield return null;
             await UniTask.Yield();
             UnityEngine.Debug.Log("yielded yielded yielded");
-            Assert.That(entryPoint.Started, Is.True);
+            // Assert.That(entryPoint.Started, Is.True);
         });
 
         [UnityTest]

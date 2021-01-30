@@ -47,6 +47,7 @@ namespace VContainer.Unity
         // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
+            return;
             lock (Runners)
             {
                 if (initialized) return;
