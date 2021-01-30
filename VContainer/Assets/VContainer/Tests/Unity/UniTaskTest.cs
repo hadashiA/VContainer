@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
@@ -32,11 +33,11 @@ namespace VContainer.Tests.Unity
         {
             var lifetimeScope = LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<SampleAsyncEntryPointCancellable>(Lifetime.Scoped)
+                builder.RegisterEntryPoint<SampleAsyncStartableCancellable>(Lifetime.Scoped)
                     .AsSelf();
             });
 
-            var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncEntryPointCancellable>();
+            var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncStartableCancellable>();
 
             Assert.That(entryPoint.Started, Is.False);
             lifetimeScope.Dispose();
@@ -45,6 +46,26 @@ namespace VContainer.Tests.Unity
             await UniTask.Yield();
             Assert.That(entryPoint.Started, Is.False);
             Assert.That(entryPoint.Cancelled, Is.False);
+        });
+
+        [UnityTest]
+        public IEnumerator AsyncStartupExceptionHandler() => UniTask.ToCoroutine(async () =>
+        {
+            Exception caught = null;
+
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.RegisterEntryPoint<SampleAsyncStartableThrowable>(Lifetime.Scoped)
+                    .AsSelf();
+
+                builder.RegisterStartupExceptionHandler(ex => caught = ex);
+            });
+
+            var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncStartableThrowable>();
+            Assert.That(entryPoint, Is.InstanceOf<SampleAsyncStartableThrowable>());
+            await UniTask.Yield();
+            await UniTask.Yield();
+            Assert.That(caught, Is.InstanceOf<InvalidOperationException>());
         });
     }
 }

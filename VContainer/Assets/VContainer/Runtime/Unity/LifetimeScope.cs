@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Internal;
+using VContainer.Runtime.Unity;
 
 #if VCONTAINER_ECS_INTEGRATION
 using Unity.Entities;
@@ -288,6 +289,15 @@ namespace VContainer.Unity
         {
             PlayerLoopHelper.Initialize();
 
+            StartupExceptionHandler exceptionHandler = null;
+            try
+            {
+                exceptionHandler = Container.Resolve<StartupExceptionHandler>();
+            }
+            catch (VContainerException ex) when (ex.InvalidType == typeof(StartupExceptionHandler))
+            {
+            }
+
             var initializables = Container.Resolve<IReadOnlyList<IInitializable>>();
             if (initializables.Count > 0)
             {
@@ -299,7 +309,7 @@ namespace VContainer.Unity
             var postInitializables = Container.Resolve<IReadOnlyList<IPostInitializable>>();
             if (postInitializables.Count > 0)
             {
-                var loopItem = new PostInitializationLoopItem(postInitializables);
+                var loopItem = new PostInitializationLoopItem(postInitializables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
             }
@@ -307,7 +317,7 @@ namespace VContainer.Unity
             var startables = Container.Resolve<IReadOnlyList<IStartable>>();
             if (startables.Count > 0)
             {
-                var loopItem = new StartableLoopItem(startables);
+                var loopItem = new StartableLoopItem(startables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Startup, loopItem);
             }
@@ -315,7 +325,7 @@ namespace VContainer.Unity
             var postStartables = Container.Resolve<IReadOnlyList<IPostStartable>>();
             if (postStartables.Count > 0)
             {
-                var loopItem = new PostStartableLoopItem(postStartables);
+                var loopItem = new PostStartableLoopItem(postStartables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostStartup, loopItem);
             }
@@ -372,7 +382,7 @@ namespace VContainer.Unity
             var asyncStartables = Container.Resolve<IReadOnlyList<IAsyncStartable>>();
             if (asyncStartables.Count > 0)
             {
-                var loopItem = new AsyncStartableLoopItem(asyncStartables);
+                var loopItem = new AsyncStartableLoopItem(asyncStartables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Startup, loopItem);
             }

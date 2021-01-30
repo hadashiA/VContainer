@@ -40,7 +40,7 @@ namespace VContainer.Tests.Unity
         void IPostLateTickable.PostLateTick() => PostLateTickCalls += 1;
     }
 
-    public class SampleAsyncEntryPoint : IAsyncStartable
+    public class SampleAsyncStartable : IAsyncStartable
     {
         public bool Started;
 
@@ -54,7 +54,7 @@ namespace VContainer.Tests.Unity
     }
 
 
-    public class SampleAsyncEntryPointCancellable : IAsyncStartable
+    public class SampleAsyncStartableCancellable : IAsyncStartable
     {
         public bool Started;
         public bool Cancelled;
@@ -66,6 +66,15 @@ namespace VContainer.Tests.Unity
                 await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: cancellation);
                 Started = true;
             }
+        }
+    }
+
+    public class SampleAsyncStartableThrowable : IAsyncStartable
+    {
+        public async UniTask StartAsync(CancellationToken cancellation)
+        {
+            await UniTask.Yield();
+            throw new InvalidOperationException("Something went happen");
         }
     }
 }

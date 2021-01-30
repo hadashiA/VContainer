@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using VContainer.Runtime.Unity;
 #if VCONTAINER_UNITASK_INTEGRATION
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -7,71 +8,18 @@ using Cysharp.Threading.Tasks;
 
 namespace VContainer.Unity
 {
-    public interface IInitializable
-    {
-        void Initialize();
-    }
-
-    public interface IPostInitializable
-    {
-        void PostInitialize();
-    }
-
-    public interface IStartable
-    {
-        void Start();
-    }
-
-    public interface IPostStartable
-    {
-        void PostStart();
-    }
-
-    public interface IFixedTickable
-    {
-        void FixedTick();
-    }
-
-    public interface IPostFixedTickable
-    {
-        void PostFixedTick();
-    }
-
-    public interface ITickable
-    {
-        void Tick();
-    }
-
-    public interface IPostTickable
-    {
-        void PostTick();
-    }
-
-    public interface ILateTickable
-    {
-        void LateTick();
-    }
-
-    public interface IPostLateTickable
-    {
-        void PostLateTick();
-    }
-
-#if VCONTAINER_UNITASK_INTEGRATION
-    public interface IAsyncStartable
-    {
-        UniTask StartAsync(CancellationToken cancellation);
-    }
-#endif
-
     sealed class InitializationLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IInitializable> entries;
+        readonly StartupExceptionHandler exceptionHandler;
         bool disposed;
 
-        public InitializationLoopItem(IEnumerable<IInitializable> entries)
+        public InitializationLoopItem(
+            IEnumerable<IInitializable> entries,
+            StartupExceptionHandler exceptionHandler = null)
         {
             this.entries = entries;
+            this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
@@ -79,7 +27,17 @@ namespace VContainer.Unity
             if (disposed) return false;
             foreach (var x in entries)
             {
-                x.Initialize();
+                try
+                {
+                    x.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    if (exceptionHandler != null)
+                        exceptionHandler.Publish(ex);
+                    else
+                        throw;
+                }
             }
             return false;
         }
@@ -90,11 +48,15 @@ namespace VContainer.Unity
     sealed class PostInitializationLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IPostInitializable> entries;
+        readonly StartupExceptionHandler exceptionHandler;
         bool disposed;
 
-        public PostInitializationLoopItem(IEnumerable<IPostInitializable> entries)
+        public PostInitializationLoopItem(
+            IEnumerable<IPostInitializable> entries,
+            StartupExceptionHandler exceptionHandler)
         {
             this.entries = entries;
+            this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
@@ -102,7 +64,17 @@ namespace VContainer.Unity
             if (disposed) return false;
             foreach (var x in entries)
             {
-                x.PostInitialize();
+                try
+                {
+                    x.PostInitialize();
+                }
+                catch (Exception ex)
+                {
+                    if (exceptionHandler != null)
+                        exceptionHandler.Publish(ex);
+                    else
+                        throw;
+                }
             }
             return false;
         }
@@ -113,11 +85,15 @@ namespace VContainer.Unity
     sealed class StartableLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IStartable> entries;
+        readonly StartupExceptionHandler exceptionHandler;
         bool disposed;
 
-        public StartableLoopItem(IEnumerable<IStartable> entries)
+        public StartableLoopItem(
+            IEnumerable<IStartable> entries,
+            StartupExceptionHandler exceptionHandler)
         {
             this.entries = entries;
+            this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
@@ -125,7 +101,17 @@ namespace VContainer.Unity
             if (disposed) return false;
             foreach (var x in entries)
             {
-                x.Start();
+                try
+                {
+                    x.Start();
+                }
+                catch (Exception ex)
+                {
+                    if (exceptionHandler != null)
+                        exceptionHandler.Publish(ex);
+                    else
+                        throw;
+                }
             }
             return false;
         }
@@ -136,11 +122,15 @@ namespace VContainer.Unity
     sealed class PostStartableLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IPostStartable> entries;
+        readonly StartupExceptionHandler exceptionHandler;
         bool disposed;
 
-        public PostStartableLoopItem(IEnumerable<IPostStartable> entries)
+        public PostStartableLoopItem(
+            IEnumerable<IPostStartable> entries,
+            StartupExceptionHandler exceptionHandler)
         {
             this.entries = entries;
+            this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
@@ -148,7 +138,17 @@ namespace VContainer.Unity
             if (disposed) return false;
             foreach (var x in entries)
             {
-                x.PostStart();
+                try
+                {
+                    x.PostStart();
+                }
+                catch (Exception ex)
+                {
+                    if (exceptionHandler != null)
+                        exceptionHandler.Publish(ex);
+                    else
+                        throw;
+                }
             }
             return false;
         }
@@ -298,12 +298,16 @@ namespace VContainer.Unity
     sealed class AsyncStartableLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IAsyncStartable> entries;
+        readonly StartupExceptionHandler exceptionHandler;
         readonly CancellationTokenSource cts = new CancellationTokenSource();
         bool disposed;
 
-        public AsyncStartableLoopItem(IEnumerable<IAsyncStartable> entries)
+        public AsyncStartableLoopItem(
+            IEnumerable<IAsyncStartable> entries,
+            StartupExceptionHandler exceptionHandler)
         {
             this.entries = entries;
+            this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
@@ -311,7 +315,11 @@ namespace VContainer.Unity
             if (disposed) return false;
             foreach (var x in entries)
             {
-                x.StartAsync(cts.Token).Forget();
+                var task = x.StartAsync(cts.Token);
+                if (exceptionHandler != null)
+                    task.Forget(ex => exceptionHandler.Publish(ex));
+                else
+                    task.Forget();
             }
             return false;
         }
@@ -321,10 +329,10 @@ namespace VContainer.Unity
             lock (entries)
             {
                 if (disposed) return;
-                cts.Cancel();
-                cts.Dispose();
                 disposed = true;
             }
+            cts.Cancel();
+            cts.Dispose();
         }
     }
 #endif
