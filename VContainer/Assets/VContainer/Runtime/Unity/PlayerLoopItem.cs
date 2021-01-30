@@ -60,7 +60,7 @@ namespace VContainer.Unity
 #if VCONTAINER_UNITASK_INTEGRATION
     public interface IAsyncStartable
     {
-        UniTaskVoid StartAsync(CancellationToken cancellation);
+        UniTask StartAsync(CancellationToken cancellation);
     }
 #endif
 

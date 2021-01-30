@@ -11,16 +11,40 @@ namespace VContainer.Tests.Unity
         [UnityTest]
         public IEnumerator AsyncStartup() => UniTask.ToCoroutine(async () =>
         {
-            var parentLifetimeScope = LifetimeScope.Create(builder =>
+            var lifetimeScope = LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<SampleAsyncEntryPoint>(Lifetime.Scoped).AsSelf();
+                builder.RegisterEntryPoint<SampleAsyncEntryPoint>(Lifetime.Scoped)
+                    .AsSelf();
             });
 
-            var entryPoint = parentLifetimeScope.Container.Resolve<SampleAsyncEntryPoint>();
+            var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncEntryPoint>();
+
+            UnityEngine.Debug.Log("000000");
+            Assert.That(entryPoint.Started, Is.False);
+            // yield return null;
+            await UniTask.Yield();
+            UnityEngine.Debug.Log("yielded yielded yielded");
+            Assert.That(entryPoint.Started, Is.True);
+        });
+
+        [UnityTest]
+        public IEnumerator AsyncStartupCancellable() => UniTask.ToCoroutine(async () =>
+        {
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.RegisterEntryPoint<SampleAsyncEntryPointCancellable>(Lifetime.Scoped)
+                    .AsSelf();
+            });
+
+            var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncEntryPointCancellable>();
 
             Assert.That(entryPoint.Started, Is.False);
+            lifetimeScope.Dispose();
+
             await UniTask.Yield();
-            Assert.That(entryPoint.Started, Is.True);
+            await UniTask.Yield();
+            Assert.That(entryPoint.Started, Is.False);
+            Assert.That(entryPoint.Cancelled, Is.False);
         });
     }
 }

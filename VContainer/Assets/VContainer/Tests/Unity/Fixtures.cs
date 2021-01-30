@@ -1,3 +1,5 @@
+using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using VContainer.Unity;
 
@@ -42,10 +44,28 @@ namespace VContainer.Tests.Unity
     {
         public bool Started;
 
-        public async UniTaskVoid StartAsync()
+        public async UniTask StartAsync(CancellationToken cancellation)
         {
+            UnityEngine.Debug.Log("11111");
             await UniTask.Yield();
+            UnityEngine.Debug.Log("awaited awaited awaited");
             Started = true;
+        }
+    }
+
+
+    public class SampleAsyncEntryPointCancellable : IAsyncStartable
+    {
+        public bool Started;
+        public bool Cancelled;
+
+        public async UniTask StartAsync(CancellationToken cancellation)
+        {
+            using (cancellation.Register(() => Cancelled = true))
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: cancellation);
+                Started = true;
+            }
         }
     }
 }
