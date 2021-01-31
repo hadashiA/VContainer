@@ -60,3 +60,8 @@ jobs:
       with:
         name: Test results
         path: ./VContainer/tmp/TestResults.xml
+    - uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: TestResults.xml
+        path: ./VContainer/tmp/TestResults.xml
