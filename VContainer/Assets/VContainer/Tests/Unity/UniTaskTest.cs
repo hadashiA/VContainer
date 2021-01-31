@@ -1,6 +1,6 @@
-#if VCONTAINER_UNITASK_INTEGRATION
 using System;
 using System.Collections;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine.TestTools;
@@ -108,4 +108,3 @@ namespace VContainer.Tests.Unity
         });
     }
 }
-#endif

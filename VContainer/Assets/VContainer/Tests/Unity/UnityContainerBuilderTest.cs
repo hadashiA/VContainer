@@ -203,15 +203,14 @@ namespace VContainer.Tests.Unity
         [UnityTest]
         public IEnumerator DispatchMonoBehaviour()
         {
-            var lifetimeScope = default(LifetimeScope);
             var component = new GameObject("SampleBehaviour").AddComponent<SampleMonoBehaviour>();
-            using (LifetimeScope.Push(bulder =>
+            using (LifetimeScope.Enqueue(bulder =>
             {
                 bulder.Register<ServiceA>(Lifetime.Transient);
                 bulder.RegisterComponent(component);
             }))
             {
-                lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
+                new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
             }
 
             yield return null;

@@ -2,11 +2,11 @@
     "name": "VContainer.Tests",
     "rootNamespace": "",
     "references": [
-        "GUID:27619889b8ba8c24980f49ee34dbb44a",
-        "GUID:0acc523941302664db1f4e527237feb3",
-        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
-        "GUID:734d92eba21c94caba915361bd5ac177",
-        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "VContainer",
+        "Unity.Entities",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [
