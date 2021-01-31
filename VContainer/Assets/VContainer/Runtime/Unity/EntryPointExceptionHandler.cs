@@ -1,6 +1,6 @@
 using System;
 
-namespace VContainer.Runtime.Unity
+namespace VContainer.Unity
 {
     sealed class EntryPointExceptionHandler
     {

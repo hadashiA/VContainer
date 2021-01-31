@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Internal;
-using VContainer.Runtime.Unity;
 
 #if VCONTAINER_ECS_INTEGRATION
 using Unity.Entities;

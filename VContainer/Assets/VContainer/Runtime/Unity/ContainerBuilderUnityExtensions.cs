@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using VContainer.Internal;
-using VContainer.Runtime.Unity;
 
 #if VCONTAINER_ECS_INTEGRATION
 using Unity.Entities;

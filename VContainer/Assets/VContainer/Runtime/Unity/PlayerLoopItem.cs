@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using VContainer.Runtime.Unity;
 #if VCONTAINER_UNITASK_INTEGRATION
 using System.Threading;
 using Cysharp.Threading.Tasks;

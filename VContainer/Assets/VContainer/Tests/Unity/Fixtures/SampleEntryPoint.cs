@@ -1,4 +1,3 @@
-using System;
 using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
