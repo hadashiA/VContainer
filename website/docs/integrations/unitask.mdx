@@ -1,0 +1,75 @@
+---
+title: UniTask
+---
+
+[UniTask](https://github.com/Cysharp/UniTask) is a library that brings fast and powerful async/await to the Unity world.
+
+If you have the `com.cysharp.unitask` package installed in your project, the following features will be enabled.
+
+## IAsyncStartable
+
+We can create an entry point for the async UniTask.
+
+```csharp
+public class FooController : IAsyncStartable
+{
+    public async UniTask StartAsync(CancellationToken cancellation)
+    {
+        await LoadSomethingAsync(cancellation);
+        await ...
+        ...
+    }
+}
+```
+
+By creating a class like the one above and Registering it, the UniTask of StartAsync will be executed automatically.
+
+```csharp
+builder.RegisterEntryPoint<FooController>(Lifetime.Scoped);
+```
+
+For more information about RegisterEntryPoint, please check [here](../integrations/entrypoint).
+
+### StartAsync() timing
+
+The only async interface provided by VContainer is IAsyncStartable.
+UniTask can control the execution timing within the async method.
+
+If you want to schedule the process at different times, you can use UniTask's PlayerLoopTiming.
+
+```csharp
+await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
+```
+
+See https://github.com/Cysharp/UniTask#playerloop
+
+### Exception Handling
+
+- Within the async method, try/catch can be used.
+- We can use `UniTaskScheduler.UnobservedTaskException` event.
+- Alternatively, if you want to register a separate error handler for each LifetimeScope, use:
+  - `builder.RegisterEntryPointExceptionHandler(ex => ..)`
+  - See [Entry point](./entrypoint) section for more information.
+
+### CancellationToken
+
+The argument of StartAsync will be a cancellationToken.
+
+This cancellationToken will be canceled when the LifetimeScope is destroyed.
+
+### Async asset loading
+
+UniTask supports the ability to load assets and scenes asynchronously.
+This is useful when used with LifetimeScope.Enqueue* in VContainer.
+
+```csharp
+var extraAsset = await Addressables.LoadAssetAsync<ExtraAsset>(key);
+
+using (LifetimeScope.EnqueueParent(parentScope))
+using (LifetimeScope.Enqueue(builder => builder.RegisterInstance(extraAsset))
+{
+    await SceneManager.LoadSceneAsync("AdditiveScene");
+}
+```
+
+See [Scoping](../scoping/generate-child-via-scene) secion for more information.

@@ -22,6 +22,7 @@ The extra fast DI (Dependency Injection) library running on Unity Game Engine.
 - Flexible scoping
   - Application can freely create nested Lifetime Scope with any async way for you like.
 - Pre IL Code generation optimization mode
+- UniTask Integration
 - ECS Integration *beta*
 
 ## Performance
@@ -29,8 +30,6 @@ The extra fast DI (Dependency Injection) library running on Unity Game Engine.
 ![](./website/static/img/benchmark_result.png)
 
 ### GC Alloc Result Example
-
-
 
 ![](./website/static/img/gc_alloc_profiler_result.png)
 
@@ -230,6 +229,24 @@ using (LifetimeScope.Enqueue(builder =>
 {
     // Loading the scene..
 }
+```
+
+## UniTask
+
+```csharp
+public class FooController : IAsyncStartable
+{
+    public async UniTask StartAsync(CancellationToken cancellation)
+    {
+        await LoadSomethingAsync(cancellation);
+        await ...
+        ...
+    }
+}
+```
+
+```csharp
+builder.RegisterEntryPoint<FooController>(Lifetime.Scoped);
 ```
 
 ## Documentation

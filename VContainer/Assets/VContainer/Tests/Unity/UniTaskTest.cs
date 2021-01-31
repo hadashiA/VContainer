@@ -14,13 +14,10 @@ namespace VContainer.Tests.Unity
 
         public async UniTask StartAsync(CancellationToken cancellation)
         {
-            UnityEngine.Debug.Log("11111");
             await UniTask.Yield();
-            UnityEngine.Debug.Log("awaited awaited awaited");
             Started = true;
         }
     }
-
 
     public class SampleAsyncStartableCancellable : IAsyncStartable
     {
@@ -51,20 +48,18 @@ namespace VContainer.Tests.Unity
         [UnityTest]
         public IEnumerator AsyncStartup() => UniTask.ToCoroutine(async () =>
         {
-            // var lifetimeScope = LifetimeScope.Create(builder =>
-            // {
-            //     builder.RegisterEntryPoint<SampleAsyncEntryPoint>(Lifetime.Scoped)
-            //         .AsSelf();
-            // });
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.RegisterEntryPoint<SampleAsyncStartable>(Lifetime.Scoped)
+                    .AsSelf();
+            });
 
-            // var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncEntryPoint>();
+            var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncStartable>();
 
-            UnityEngine.Debug.Log("000000");
-            // Assert.That(entryPoint.Started, Is.False);
-            // yield return null;
+            Assert.That(entryPoint.Started, Is.False);
             await UniTask.Yield();
-            UnityEngine.Debug.Log("yielded yielded yielded");
-            // Assert.That(entryPoint.Started, Is.True);
+            await UniTask.Yield();
+            Assert.That(entryPoint.Started, Is.True);
         });
 
         [UnityTest]

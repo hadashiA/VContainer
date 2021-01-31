@@ -1,5 +1,5 @@
 ---
-title: Register Type
+title: Register Plain C# Type
 ---
 
 There are various ways to use Register.
@@ -122,6 +122,16 @@ builder.RegisterEntryPoint<GameController>(Lifetime.Singleton);
 this is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
 :::
 
+If you want to customize the exception handling for entry points, you can register a callback with the following.
+
+```csharp
+builder.RegisterEntryPointExceptionHandler(ex =>
+{
+    UnityEngine.Debug.LogException(ex);
+    // Additional process ...
+});
+```
+
 If you have multiple EntryPoints, you have the option to use the following declaration as grouping.
 
 ```csharp
@@ -130,6 +140,7 @@ builder.UseEntryPoints(Lifetime.Scoped, entryPoints =>
    entryPoints.Add<ScopedEntryPointA>();
    entryPoints.Add<ScopedEntryPointB>();
    entryPoints.Add<ScopedEntryPointC>().AsSelf();
+   entryPoints.OnException(ex => ...)
 });
 ```
 
@@ -139,7 +150,10 @@ This is the same as:
 builder.RegisterEntryPoint<ScopedEntryPointA>(Lifetime.Scoped);
 builder.RegisterEntryPoint<ScopedEntryPointB>(Lifetime.Scoped);
 builder.RegisterEntryPoint<ScopedEntryPointC>(Lifetime.Scoped).AsSelf();
+builder.RegisterEntryPointExceptionHandler(ex => ...);
 ```
+
+See [Plain C# Entry point](../integrations/entrypoint) section for more information.
 
 ## Register instance
 
