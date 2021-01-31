@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.unity.entities": "0.11.1-preview.4",
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.unity.ide.rider": "2.0.7",
     "com.unity.ide.visualstudio": "2.0.5",
     "com.unity.test-framework": "1.1.20",
@@ -14,6 +14,9 @@
     "com.unity.modules.jsonserialize": "1.0.0",
     "com.unity.modules.ui": "1.0.0",
     "com.unity.modules.uielements": "1.0.0",
-    "com.unity.modules.physics": "1.0.0"
+    "com.unity.modules.unitywebrequest": "1.0.0",
+    "com.unity.modules.physics": "1.0.0",
+    "com.unity.modules.physics2d": "1.0.0",
+    "com.unity.modules.particlesystem": "1.0.0"
   }
 }

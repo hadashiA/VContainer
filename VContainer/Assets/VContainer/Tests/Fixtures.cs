@@ -231,7 +231,7 @@ namespace VContainer.Tests
 
         public GenericsService(I2 service2)
         {
-            service2 = service2;
+            Service2 = service2;
         }
     }
 

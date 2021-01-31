@@ -9,6 +9,7 @@ module.exports = {
   organizationName: 'hadashiA', // Usually your GitHub org/user name.
   projectName: 'VContainer', // Usually your repo name.
   themeConfig: {
+    sidebarCollapsible: false,
     metadatas: [
       { name: 'google-site-verification', content: 'ldYnOkZTq5AfzmJzEbsFzWXAYp9tyO5IhmYQv45MMDY' },
     ],

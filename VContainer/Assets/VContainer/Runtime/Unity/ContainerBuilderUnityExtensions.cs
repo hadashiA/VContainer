@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using VContainer.Internal;
+
 #if VCONTAINER_ECS_INTEGRATION
 using Unity.Entities;
 #endif
@@ -20,6 +21,9 @@ namespace VContainer.Unity
 
         public RegistrationBuilder Add<T>()
             => containerBuilder.Register<T>(lifetime).AsImplementedInterfaces();
+
+        public void OnException(Action<Exception> exceptionHandler)
+            => containerBuilder.RegisterEntryPointExceptionHandler(exceptionHandler);
     }
 
     public readonly struct ComponentsBuilder
@@ -55,6 +59,13 @@ namespace VContainer.Unity
         {
             var entryPoints = new EntryPointsBuilder(builder, lifetime);
             configuration(entryPoints);
+        }
+
+        public static void RegisterEntryPointExceptionHandler(
+            this IContainerBuilder builder,
+            Action<Exception> exceptionHandler)
+        {
+            builder.RegisterInstance(new EntryPointExceptionHandler(exceptionHandler));
         }
 
         public static void UseComponents(this IContainerBuilder builder, Action<ComponentsBuilder> configuration)

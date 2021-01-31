@@ -1,10 +1,12 @@
 {
     "name": "VContainer.Tests",
+    "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "VContainer",
-        "GUID:734d92eba21c94caba915361bd5ac177"
+        "Unity.Entities",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [
@@ -19,12 +21,6 @@
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
     ],
-    "versionDefines": [
-        {
-            "name": "com.unity.entities",
-            "expression": "",
-            "define": "VCONTAINER_ECS_INTEGRATION"
-        }
-    ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

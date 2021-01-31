@@ -4,36 +4,39 @@ module.exports = {
       'about/what-is-vcontainer',
       'about/what-is-di',
     ],
-    'GETTING STARTED': [
+    'Getting Started': [
       'getting-started/installation',
       'getting-started/hello-world',
     ],
-    'RESOLVING': [
+    'Resolving': [
       'resolving/constructor-injection',
       'resolving/method-injection',
       'resolving/property-field-injection',
-      'resolving/auto-inject-gameobjects',
-      'resolving/implicit-relationship-types',
-      'resolving/use-container-directory',
     ],
-    'REGISTERING': [
+    'Registering': [
       'registering/register-type',
       'registering/register-factory',
       'registering/register-monobehaviour',
       'registering/register-scriptable-object',
       'registering/register-callbacks',
     ],
-    'SCOPING': [
+    'Integrations': [
+      'integrations/entrypoint',
+      'integrations/unitask',
+      'integrations/unirx',
+      'integrations/ecs'
+    ],
+    'Scoping': [
       'scoping/lifetime-overview',
-      'scoping/loading-additional-child',
+      'scoping/generate-child-via-scene',
       'scoping/generate-child-with-code-first',
       'scoping/project-root-lifetimescope'
     ],
-    'UNITY INTEGRATION': [
-      'integration/dispatching-unity-lifecycle-event',
-      'integration/ecs'
+    'Container API': [
+      'container-api/use-container-directory',
+      'container-api/implicit-relationship-types'
     ],
-    'OPTIMIZATION': [
+    'Optimization': [
       'optimization/codegen',
       'optimization/async-container-build',
       'optimization/parallel-container-build'
