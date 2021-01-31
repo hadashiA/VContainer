@@ -39,10 +39,7 @@ namespace VContainer.Tests.Unity
 
             var entryPoint = lifetimeScope.Container.Resolve<SampleEntryPoint>();
             Assert.That(entryPoint, Is.InstanceOf<SampleEntryPoint>());
-            Assert.That(entryPoint.InitializeCalled, Is.True);
-            Assert.That(entryPoint.PostInitializeCalled, Is.True);
-            Assert.That(entryPoint.StartCalled, Is.True);
-            Assert.That(entryPoint.PostStartCalled, Is.True);
+            Assert.That(entryPoint.InitializeCalled, Is.EqualTo(1));
             Assert.That(entryPoint.TickCalls, Is.EqualTo(2));
 
             var disposable = lifetimeScope.Container.Resolve<DisposableServiceA>();
@@ -50,6 +47,7 @@ namespace VContainer.Tests.Unity
 
             yield return null;
             Assert.That(disposable.Disposed, Is.True);
+            Assert.That(entryPoint.InitializeCalled, Is.EqualTo(1));
             Assert.That(entryPoint.TickCalls, Is.EqualTo(2));
         }
 
@@ -70,7 +68,7 @@ namespace VContainer.Tests.Unity
             Assert.That(parentLifetimeScopeFromContainer, Is.EqualTo(parentLifetimeScope));
             Assert.That(parentLifetimeScopeFromContainer.transform.childCount, Is.Zero);
             Assert.That(parentEntryPoint, Is.InstanceOf<SampleEntryPoint>());
-            Assert.That(parentEntryPoint.InitializeCalled, Is.True);
+            Assert.That(parentEntryPoint.InitializeCalled, Is.EqualTo(1));
             Assert.That(parentEntryPoint.TickCalls, Is.EqualTo(2));
 
             var childLifetimeScope = parentLifetimeScope.CreateChild(builder =>
@@ -89,7 +87,7 @@ namespace VContainer.Tests.Unity
             Assert.That(childLifetimeScopeFromContainer, Is.EqualTo(childLifetimeScope));
             Assert.That(childEntryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(childEntryPoint, Is.Not.EqualTo(parentEntryPoint));
-            Assert.That(childEntryPoint.InitializeCalled, Is.True);
+            Assert.That(childEntryPoint.InitializeCalled, Is.EqualTo(1));
             Assert.That(childEntryPoint.TickCalls, Is.EqualTo(2));
 
             childLifetimeScope.Dispose();

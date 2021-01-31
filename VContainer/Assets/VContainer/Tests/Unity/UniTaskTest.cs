@@ -1,3 +1,4 @@
+#if VCONTAINER_UNITASK_INTEGRATION
 using System;
 using System.Collections;
 using Cysharp.Threading.Tasks;
@@ -7,6 +8,44 @@ using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
 {
+    public class SampleAsyncStartable : IAsyncStartable
+    {
+        public bool Started;
+
+        public async UniTask StartAsync(CancellationToken cancellation)
+        {
+            UnityEngine.Debug.Log("11111");
+            await UniTask.Yield();
+            UnityEngine.Debug.Log("awaited awaited awaited");
+            Started = true;
+        }
+    }
+
+
+    public class SampleAsyncStartableCancellable : IAsyncStartable
+    {
+        public bool Started;
+        public bool Cancelled;
+
+        public async UniTask StartAsync(CancellationToken cancellation)
+        {
+            using (cancellation.Register(() => Cancelled = true))
+            {
+                await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: cancellation);
+                Started = true;
+            }
+        }
+    }
+
+    public class SampleAsyncStartableThrowable : IAsyncStartable
+    {
+        public async UniTask StartAsync(CancellationToken cancellation)
+        {
+            await UniTask.Yield();
+            throw new InvalidOperationException("Something went happen");
+        }
+    }
+
     public class UniTaskTest
     {
         [UnityTest]
@@ -58,7 +97,7 @@ namespace VContainer.Tests.Unity
                 builder.RegisterEntryPoint<SampleAsyncStartableThrowable>(Lifetime.Scoped)
                     .AsSelf();
 
-                builder.RegisterStartupExceptionHandler(ex => caught = ex);
+                builder.RegisterEntryPointExceptionHandler(ex => caught = ex);
             });
 
             var entryPoint = lifetimeScope.Container.Resolve<SampleAsyncStartableThrowable>();
@@ -69,3 +108,4 @@ namespace VContainer.Tests.Unity
         });
     }
 }
+#endif

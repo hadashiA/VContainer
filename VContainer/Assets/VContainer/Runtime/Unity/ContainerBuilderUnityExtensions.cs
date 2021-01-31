@@ -23,8 +23,8 @@ namespace VContainer.Unity
         public RegistrationBuilder Add<T>()
             => containerBuilder.Register<T>(lifetime).AsImplementedInterfaces();
 
-        public void OnStartUpException(Action<Exception> exceptionHandler)
-            => containerBuilder.RegisterStartupExceptionHandler(exceptionHandler);
+        public void OnException(Action<Exception> exceptionHandler)
+            => containerBuilder.RegisterEntryPointExceptionHandler(exceptionHandler);
     }
 
     public readonly struct ComponentsBuilder
@@ -62,11 +62,11 @@ namespace VContainer.Unity
             configuration(entryPoints);
         }
 
-        public static void RegisterStartupExceptionHandler(
+        public static void RegisterEntryPointExceptionHandler(
             this IContainerBuilder builder,
             Action<Exception> exceptionHandler)
         {
-            builder.RegisterInstance(new StartupExceptionHandler(exceptionHandler));
+            builder.RegisterInstance(new EntryPointExceptionHandler(exceptionHandler));
         }
 
         public static void UseComponents(this IContainerBuilder builder, Action<ComponentsBuilder> configuration)

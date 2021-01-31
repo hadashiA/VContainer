@@ -2,11 +2,11 @@ using System;
 
 namespace VContainer.Runtime.Unity
 {
-    sealed class StartupExceptionHandler
+    sealed class EntryPointExceptionHandler
     {
         readonly Action<Exception> handler;
 
-        public StartupExceptionHandler(Action<Exception> handler)
+        public EntryPointExceptionHandler(Action<Exception> handler)
         {
             this.handler = handler;
         }

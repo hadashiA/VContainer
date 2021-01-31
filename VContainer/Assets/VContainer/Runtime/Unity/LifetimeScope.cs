@@ -146,6 +146,10 @@ namespace VContainer.Unity
 
         public void Dispose()
         {
+            disposable.Dispose();
+            Container?.Dispose();
+            Container = null;
+
             if (this != null)
                 Destroy(gameObject);
         }
@@ -289,19 +293,19 @@ namespace VContainer.Unity
         {
             PlayerLoopHelper.Initialize();
 
-            StartupExceptionHandler exceptionHandler = null;
+            EntryPointExceptionHandler exceptionHandler = null;
             try
             {
-                exceptionHandler = Container.Resolve<StartupExceptionHandler>();
+                exceptionHandler = Container.Resolve<EntryPointExceptionHandler>();
             }
-            catch (VContainerException ex) when (ex.InvalidType == typeof(StartupExceptionHandler))
+            catch (VContainerException ex) when (ex.InvalidType == typeof(EntryPointExceptionHandler))
             {
             }
 
             var initializables = Container.Resolve<IReadOnlyList<IInitializable>>();
             if (initializables.Count > 0)
             {
-                var loopItem = new InitializationLoopItem(initializables);
+                var loopItem = new InitializationLoopItem(initializables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Initialization, loopItem);
             }
@@ -333,7 +337,7 @@ namespace VContainer.Unity
             var fixedTickables = Container.Resolve<IReadOnlyList<IFixedTickable>>();
             if (fixedTickables.Count > 0)
             {
-                var loopItem = new FixedTickableLoopItem(fixedTickables);
+                var loopItem = new FixedTickableLoopItem(fixedTickables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.FixedUpdate, loopItem);
             }
@@ -341,7 +345,7 @@ namespace VContainer.Unity
             var postFixedTickables = Container.Resolve<IReadOnlyList<IPostFixedTickable>>();
             if (postFixedTickables.Count > 0)
             {
-                var loopItem = new PostFixedTickableLoopItem(postFixedTickables);
+                var loopItem = new PostFixedTickableLoopItem(postFixedTickables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
             }
@@ -349,7 +353,7 @@ namespace VContainer.Unity
             var tickables = Container.Resolve<IReadOnlyList<ITickable>>();
             if (tickables.Count > 0)
             {
-                var loopItem = new TickableLoopItem(tickables);
+                var loopItem = new TickableLoopItem(tickables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Update, loopItem);
             }
@@ -357,7 +361,7 @@ namespace VContainer.Unity
             var postTickables = Container.Resolve<IReadOnlyList<IPostTickable>>();
             if (postTickables.Count > 0)
             {
-                var loopItem = new PostTickableLoopItem(postTickables);
+                var loopItem = new PostTickableLoopItem(postTickables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostUpdate, loopItem);
             }
@@ -365,7 +369,7 @@ namespace VContainer.Unity
             var lateTickables = Container.Resolve<IReadOnlyList<ILateTickable>>();
             if (lateTickables.Count > 0)
             {
-                var loopItem = new LateTickableLoopItem(lateTickables);
+                var loopItem = new LateTickableLoopItem(lateTickables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, loopItem);
             }
@@ -373,7 +377,7 @@ namespace VContainer.Unity
             var postLateTickables = Container.Resolve<IReadOnlyList<IPostLateTickable>>();
             if (postLateTickables.Count > 0)
             {
-                var loopItem = new PostLateTickableLoopItem(postLateTickables);
+                var loopItem = new PostLateTickableLoopItem(postLateTickables, exceptionHandler);
                 disposable.Add(loopItem);
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
