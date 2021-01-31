@@ -38,8 +38,8 @@ namespace VContainer.Tests.Unity
             var disposable = lifetimeScope.Container.Resolve<DisposableServiceA>();
             lifetimeScope.Dispose();
 
-            Assert.That(fixedTickCalls, Is.GreaterThan(1));
-            Assert.That(postFixedTickCalls, Is.GreaterThan(1));
+            Assert.That(fixedTickCalls, Is.GreaterThan(0));
+            Assert.That(postFixedTickCalls, Is.GreaterThan(0));
             Assert.That(tickCalls, Is.GreaterThan(1));
             Assert.That(postTickCalls, Is.GreaterThan(1));
             Assert.That(lateTickCalls, Is.GreaterThan(1));

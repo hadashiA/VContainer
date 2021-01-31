@@ -56,10 +56,6 @@ jobs:
     - name: Run Tests
       shell: bash
       run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -batchmode -logFile /dev/stdout -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=${{ matrix.scriptBackend }} -nographics -silent-crashes
-    - uses: actions/upload-artifact@v1
-      with:
-        name: Test results
-        path: ./VContainer/tmp/TestResults.xml
     - uses: actions/upload-artifact@v2
       if: always()
       with:
