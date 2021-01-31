@@ -64,7 +64,7 @@ module.exports = {
         },
         {
           href: 'https://github.com/hadashiA/VContainer/releases',
-          label: 'v1.4.5',
+          label: 'v1.5.0',
           position: 'right',
         },
         {
