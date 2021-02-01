@@ -2,9 +2,36 @@
 title: Register Factory
 ---
 
+Typically, in a DI container, the Factory pattern can be used to stabilize the dependency resolution.
+
+For example, if you create a factory like the following, dependency resolution will happen only once. Dependency resolution will not occur during instance creation.
 VContainer allows to register a `Func<>` delegate for the creation of an instance. This is especially useful in scenarios where instance is created at any time during execution, or multiple instances are created at any time.
 
-By registering Factory instead of instance, you can keep the dependency static and simple.
+```csharp
+class FooFactory
+{
+    public FooFactory(DependencyA dependencyA)
+    {
+        this.dependencyA = dependencyA;
+    }
+
+    public Foo Create() => new Foo(dependencyA);
+}
+```
+
+```csharp
+var factory = new FooFactory(dependencyA); // Resolve required
+
+// ...
+
+var foo1 = factory.Create(); // No Resolve
+var foo2 = factory.Create(); // No Resolve
+var foo3 = factory.Create(); // No Resolve
+```
+
+It is useful to create your own Factory class like the one above.
+If your Facotry class is simple enough, you can also use the `Func<>` injection feature of VContainer.
+
 
 ## Register `Func<>` Factory that requires only runtime parameters
 
