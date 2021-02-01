@@ -46,8 +46,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: v${{ github.ref }}
+        tag_name: ${{ env.GIT_TAG }}
+        release_name: v${{ env.GIT_TAG }}
 
     # Download(All) Artifacts to current directory
     - uses: actions/download-artifact@v2-preview
