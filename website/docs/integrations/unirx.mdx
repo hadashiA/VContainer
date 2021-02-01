@@ -31,15 +31,15 @@ public class ControllerBase : IDisposable
 
     void IDisposable.Dispose() => disposable.Dispose();
 
-    public void AddDisposable(IDisposable disposable)
+    public void AddDisposable(IDisposable item)
     {
-        disposables.Add(disposable);
+        disposable.Add(item);
     }
 }
 
 public static class DisposableExtensions
 {
-    public static T AddTo<T>(this T disposable, Heipu.Presentation.Controllers.ControllerBase controller)
+    public static T AddTo<T>(this T disposable, ControllerBase controller)
         where T: IDisposable
     {
         controller.AddDisposable(disposable);

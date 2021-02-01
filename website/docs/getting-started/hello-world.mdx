@@ -221,7 +221,7 @@ In VContainer, you need to register the dependent MonoBehaviour. Don't forget to
 
         protected override void Configure(IContainerBuilder builder)
         {
-            builder.RegisterEntryPoint<HelloWorldService>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<GamePresenter>(Lifetime.Singleton);
             builder.Register<HelloWorldService>(Lifetime.Singleton);
 +           builder.RegisterComponent(helloScreen);
         }
