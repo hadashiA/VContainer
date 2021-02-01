@@ -74,13 +74,10 @@ function DocSidebarItemCategory({
 
   // If we navigate to a category, it should automatically expand itself
   useEffect(() => {
-      if (isActive != wasActive){
-          setCollapsed(!isActive)
-      }
-    // const justBecameActive = isActive && !wasActive;
-    // if (justBecameActive && collapsed) {
-    //   setCollapsed(false);
-    // }
+    const justBecameActive = isActive && !wasActive;
+    if (justBecameActive && collapsed) {
+      setCollapsed(false);
+    }
   }, [isActive, wasActive, collapsed]);
 
   // const handleItemClick = useCallback(
