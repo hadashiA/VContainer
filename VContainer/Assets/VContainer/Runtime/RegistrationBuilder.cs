@@ -13,14 +13,14 @@ namespace VContainer
         protected List<Type> InterfaceTypes;
         protected List<IInjectParameter> Parameters;
 
-        internal RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
+        public RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
         {
             ImplementationType = implementationType;
             InterfaceTypes = interfaceTypes;
             Lifetime = lifetime;
         }
 
-        internal RegistrationBuilder(object instance)
+        public RegistrationBuilder(object instance)
         {
             ImplementationType = instance.GetType();
             Lifetime = Lifetime.Scoped;
