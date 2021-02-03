@@ -12,7 +12,7 @@ namespace VContainer
         object ApplicationOrigin { get; set; }
         bool ContainerExposed { get; set; }
 
-        RegistrationBuilder Register<T>(Lifetime lifetime);
+        RegistrationBuilder Register(Type type, Lifetime lifetime);
         RegistrationBuilder RegisterInstance(object instance);
         RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
 
@@ -49,12 +49,11 @@ namespace VContainer
         public object ApplicationOrigin { get; set; }
         public bool ContainerExposed { get; set; }
 
-
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
 
-        public RegistrationBuilder Register<T>(Lifetime lifetime)
-            => Register(new RegistrationBuilder(typeof(T), lifetime));
+        public RegistrationBuilder Register(Type type, Lifetime lifetime)
+            => Register(new RegistrationBuilder(type, lifetime));
 
         public RegistrationBuilder RegisterInstance(object instance)
             => Register(new RegistrationBuilder(instance));
