@@ -3,61 +3,78 @@ name: Test
 on: push
 
 jobs:
-  test-dotnet:
-    runs-on: ubuntu-latest
-    env:
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1
-      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
-      NUGET_XMLDOC_MODE: skip
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.101
-      - run: dotnet test -c Debug ./VContainer.StandaloneTests
+  test-package:
+  - name: Create meta list
+    working-directory: VContainer
+    run: |
+      echo "Assets/VContainer/Runtime.meta" >> metaList
+      find Assets/VContainer/Runtime -name \*.meta >> metaList
+      echo "Assets/VContainer/Editor.meta" >> metaList
+      find Assets/VContainer/Editor -name \*.meta >> metaList
+  - uses: pCYSl5EDgo/create-unitypackage@master
+    with:
+      package-path: VContainer.unitypackage
+      include-files: VContainer/metaList
+  - uses: actions/upload-artifact@v2
+    with:
+      name: VContainer.unitypackage
+      path: VContainer.unitypackage
+  
+  # test-dotnet:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  #     DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  #     NUGET_XMLDOC_MODE: skip
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-dotnet@v1
+  #       with:
+  #         dotnet-version: 3.1.101
+  #     - run: dotnet test -c Debug ./VContainer.StandaloneTests
 
-  test-unity:
-    runs-on: ubuntu-latest
-    env:
-      UNITY_LICENSE_FILE: ./tmp/ulf
-      UNITY_BIN: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity
-    strategy:
-      matrix:
-        unityVersion:
-        - 2020.1.13f1
-        - 2019.4.14f1
-        - 2019.3.12f1
-        scriptBackend: ['mono']
-        include:
-        - unityVersion: 2020.1.13f1
-          license: UNITY_LICENSE_2020_1_BASE64
-        - unityVersion: 2019.4.14f1
-          license: UNITY_LICENSE_2019_4_BASE64
-        - unityVersion: 2019.3.12f1
-          license: UNITY_LICENSE_2019_3_BASE64
-    container:
-      image: gableroux/unity3d:${{ matrix.unityVersion }}-linux-il2cpp
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v2
-      with:
-        path: VContainer/Library
-        key: Library-VContainer-${{ matrix.unityVersion }}
-    - name: Dump unity license file
-      shell: bash
-      run: |
-        mkdir ./tmp
-        mkdir ./VContainer/tmp
-        chmod 777 ./VContainer/tmp
-        echo -n "${{ secrets[matrix.license] }}" | base64 --decode > $UNITY_LICENSE_FILE
-    - name: Load License
-      shell: bash
-      run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
-    - name: Run Tests
-      shell: bash
-      run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -batchmode -logFile /dev/stdout -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=${{ matrix.scriptBackend }} -nographics -silent-crashes
-    - uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: TestResults.xml
-        path: ./VContainer/tmp/TestResults.xml
+  # test-unity:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     UNITY_LICENSE_FILE: ./tmp/ulf
+  #     UNITY_BIN: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity
+  #   strategy:
+  #     matrix:
+  #       unityVersion:
+  #       - 2020.1.13f1
+  #       - 2019.4.14f1
+  #       - 2019.3.12f1
+  #       scriptBackend: ['mono']
+  #       include:
+  #       - unityVersion: 2020.1.13f1
+  #         license: UNITY_LICENSE_2020_1_BASE64
+  #       - unityVersion: 2019.4.14f1
+  #         license: UNITY_LICENSE_2019_4_BASE64
+  #       - unityVersion: 2019.3.12f1
+  #         license: UNITY_LICENSE_2019_3_BASE64
+  #   container:
+  #     image: gableroux/unity3d:${{ matrix.unityVersion }}-linux-il2cpp
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - uses: actions/cache@v2
+  #     with:
+  #       path: VContainer/Library
+  #       key: Library-VContainer-${{ matrix.unityVersion }}
+  #   - name: Dump unity license file
+  #     shell: bash
+  #     run: |
+  #       mkdir ./tmp
+  #       mkdir ./VContainer/tmp
+  #       chmod 777 ./VContainer/tmp
+  #       echo -n "${{ secrets[matrix.license] }}" | base64 --decode > $UNITY_LICENSE_FILE
+  #   - name: Load License
+  #     shell: bash
+  #     run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
+  #   - name: Run Tests
+  #     shell: bash
+  #     run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -batchmode -logFile /dev/stdout -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=${{ matrix.scriptBackend }} -nographics -silent-crashes
+  #   - uses: actions/upload-artifact@v2
+  #     if: always()
+  #     with:
+  #       name: TestResults.xml
+  #       path: ./VContainer/tmp/TestResults.xml

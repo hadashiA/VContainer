@@ -13,9 +13,9 @@ jobs:
     - name: Create meta list
       working-directory: VContainer
       run: |
-        echo Assets/VContainer/Runtime.meta >> metaList
+        echo "Assets/VContainer/Runtime.meta" >> metaList
         find Assets/VContainer/Runtime -name \*.meta >> metaList
-        echo Assets/VContainer/Editor.meta >> metaList
+        echo "Assets/VContainer/Editor.meta" >> metaList
         find Assets/VContainer/Editor -name \*.meta >> metaList
     - uses: pCYSl5EDgo/create-unitypackage@master
       with:
