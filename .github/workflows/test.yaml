@@ -4,21 +4,25 @@ on: push
 
 jobs:
   test-package:
-  - name: Create meta list
-    working-directory: VContainer
-    run: |
-      echo "Assets/VContainer/Runtime.meta" >> metaList
-      find Assets/VContainer/Runtime -name \*.meta >> metaList
-      echo "Assets/VContainer/Editor.meta" >> metaList
-      find Assets/VContainer/Editor -name \*.meta >> metaList
-  - uses: pCYSl5EDgo/create-unitypackage@master
-    with:
-      package-path: VContainer.unitypackage
-      include-files: VContainer/metaList
-  - uses: actions/upload-artifact@v2
-    with:
-      name: VContainer.unitypackage
-      path: VContainer.unitypackage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create meta list
+      working-directory: VContainer
+      run: |
+        echo ./Assets/VContainer/Runtime.meta >> metaList
+        find ./Assets/VContainer/Runtime -name \*.meta >> metaList
+        echo ./Assets/VContainer/Editor.meta >> metaList
+        find ./Assets/VContainer/Editor -name \*.meta >> metaList
+    - uses: pCYSl5EDgo/create-unitypackage@master
+      with:
+        project-folder: ./VContainer
+        package-path: VContainer.unitypackage
+        include-files: VContainer/metaList
+    - uses: actions/upload-artifact@v2
+      with:
+        name: VContainer.unitypackage
+        path: VContainer.unitypackage
   
   # test-dotnet:
   #   runs-on: ubuntu-latest
