@@ -7,24 +7,32 @@ on:
 jobs:
   build-unity:
     runs-on: ubuntu-latest
+    env:
+      UNITY_LICENSE_FILE: ./tmp/ulf
+      UNITY_BIN: /opt/Unity/Editor/Unity
+    container:
+      image: gableroux/unity3d:2020.1.13f1-linux-il2cpp
     steps:
+    - uses: actions/checkout@v2
+    - name: Decode Unity License File
+      run: |
+        mkdir ./tmp
+        echo -n ${{ secrets.UNITY_LICENSE_2020_1_BASE64 }} | base64 --decode > $UNITY_LICENSE_FILE
+    - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
+
+    # set release tag(*.*.*) to env.GIT_TAG
     - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
-    - name: Create meta list
+    # Execute scripts: Export Package
+    - name: Export unitypackage
+      run: $UNITY_BIN -quit -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./
       working-directory: VContainer
-      run: |
-        echo Assets/VContainer/Runtime.meta >> metaList
-        find Assets/VContainer/Runtime -name \*.meta >> metaList
-        echo Assets/VContainer/Editor.meta >> metaList
-        find Assets/VContainer/Editor -name \*.meta >> metaList
-    - uses: pCYSl5EDgo/create-unitypackage@master
-      with:
-        package-path: VContainer.${{ env.GIT_TAG }}.unitypackage
-        include-files: VContainer/metaList
+
+    # Store artifacts.
     - uses: actions/upload-artifact@v2
       with:
         name: VContainer.${{ env.GIT_TAG }}.unitypackage
-        path: VContainer.${{ env.GIT_TAG }}.unitypackage
+        path: ./VContainer/VContainer.${{ env.GIT_TAG }}.unitypackage
 
   create-release:
     needs: [build-unity]
