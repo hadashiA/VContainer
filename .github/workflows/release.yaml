@@ -34,30 +34,30 @@ jobs:
         name: VContainer.${{ env.GIT_TAG }}.unitypackage
         path: ./VContainer/VContainer.${{ env.GIT_TAG }}.unitypackage
 
-  create-release:
-    needs: [build-unity]
-    runs-on: ubuntu-latest
-    steps:
-    - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+  # create-release:
+  #   needs: [build-unity]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
-    # Create Releases
-    - uses: actions/create-release@v1
-      id: create_release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.GIT_TAG }}
-        release_name: v${{ env.GIT_TAG }}
+  #   # Create Releases
+  #   - uses: actions/create-release@v1
+  #     id: create_release
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     with:
+  #       tag_name: ${{ env.GIT_TAG }}
+  #       release_name: v${{ env.GIT_TAG }}
 
-    # Download(All) Artifacts to current directory
-    - uses: actions/download-artifact@v2-preview
+  #   # Download(All) Artifacts to current directory
+  #   - uses: actions/download-artifact@v2-preview
 
-    # Upload to Releases(unitypackage)
-    - uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./VContainer.${{ env.GIT_TAG }}.unitypackage
-        asset_name: VContainer.${{ env.GIT_TAG }}.unitypackage
-        asset_content_type: application/octet-stream
+  #   # Upload to Releases(unitypackage)
+  #   - uses: actions/upload-release-asset@v1
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     with:
+  #       upload_url: ${{ steps.create_release.outputs.upload_url }}
+  #       asset_path: ./VContainer.${{ env.GIT_TAG }}.unitypackage
+  #       asset_name: VContainer.${{ env.GIT_TAG }}.unitypackage
+  #       asset_content_type: application/octet-stream
