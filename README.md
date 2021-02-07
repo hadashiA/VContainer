@@ -265,6 +265,10 @@ VContainer is inspired by:
 - [Autofac](http://autofac.org) - [Autofac Project](https://github.com/autofac/Autofac).
 - [MicroResolver](https://github.com/neuecc/MicroResolver)
 
+## Author
+
+[@hadashiA](https://twitter.com/hadashiA)
+
 ## License
 
 MIT
