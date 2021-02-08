@@ -6,8 +6,6 @@ using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
 {
-    class SampleLifetimeScope : LifetimeScope {}
-
     public class LifetimeScopeTest
     {
         [Test]

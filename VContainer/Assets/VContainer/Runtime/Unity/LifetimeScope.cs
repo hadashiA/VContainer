@@ -24,6 +24,17 @@ namespace VContainer.Unity
             void IDisposable.Dispose() => RemoveExtra();
         }
 
+        public sealed class ParentTypeNotFoundException : Exception
+        {
+            public readonly Type ParentType;
+
+            public ParentTypeNotFoundException(Type parentType)
+                : base($"No such {parentType.Name} in active scenes")
+            {
+                ParentType = parentType;
+            }
+        }
+
         [SerializeField]
         public ParentReference parentReference;
 
@@ -36,6 +47,8 @@ namespace VContainer.Unity
         static LifetimeScope overrideParent;
         static ExtraInstaller extraInstaller;
         static readonly object SyncRoot = new object();
+
+        static event Action<LifetimeScope> OnAfterBuild;
 
         static LifetimeScope Create(IInstaller installer = null)
         {
@@ -127,10 +140,17 @@ namespace VContainer.Unity
 
         protected virtual void Awake()
         {
-            Parent = GetRuntimeParent();
-            if (autoRun)
+            try
             {
-                Build();
+                Parent = GetRuntimeParent();
+                if (autoRun)
+                {
+                    Build();
+                }
+            }
+            catch (ParentTypeNotFoundException ex)
+            {
+                OnAfterBuild += OnAfterParentBuilt;
             }
         }
 
@@ -139,6 +159,7 @@ namespace VContainer.Unity
             disposable.Dispose();
             Container?.Dispose();
             Container = null;
+            OnAfterBuild -= OnAfterParentBuilt;
         }
 
         protected virtual void Configure(IContainerBuilder builder) { }
@@ -176,6 +197,8 @@ namespace VContainer.Unity
             extraInstallers.Clear();
             AutoInjectAll();
             ActivateEntryPoints();
+
+            OnAfterBuild?.Invoke(this);
         }
 
         public LifetimeScope CreateChild(IInstaller installer = null)
@@ -257,7 +280,7 @@ namespace VContainer.Unity
                 {
                     return found;
                 }
-                throw new VContainerException(null, $"LifetimeScope parent `{parentReference.Type.FullName}` is not found in any scene");
+                throw new ParentTypeNotFoundException(parentReference.Type);
             }
 
             if (VContainerSettings.Instance is VContainerSettings settings)
@@ -284,6 +307,27 @@ namespace VContainer.Unity
                 if (target != null) // Check missing reference
                 {
                     Container.InjectGameObject(target);
+                }
+            }
+        }
+
+        void OnAfterParentBuilt(LifetimeScope other)
+        {
+            if (this == null || Parent != null)
+            {
+                OnAfterBuild -= OnAfterParentBuilt;
+                return;
+            }
+
+            if (parentReference.Type != null &&
+                parentReference.Type == other.GetType())
+            {
+                OnAfterBuild -= OnAfterParentBuilt;
+
+                Parent = other;
+                if (autoRun)
+                {
+                    Build();
                 }
             }
         }
