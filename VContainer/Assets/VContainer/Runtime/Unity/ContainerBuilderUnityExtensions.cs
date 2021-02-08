@@ -106,31 +106,13 @@ namespace VContainer.Unity
             return registrationBuilder;
         }
 
-        public static RegistrationBuilder RegisterComponentInHierarchy<T>(this IContainerBuilder builder)
+        public static ComponentRegistrationBuilder RegisterComponentInHierarchy<T>(this IContainerBuilder builder)
         {
             var lifetimeScope = (LifetimeScope)builder.ApplicationOrigin;
             var scene = lifetimeScope.gameObject.scene;
-            var component = default(T);
 
-            var gameObjectBuffer = UnityEngineObjectListBuffer<GameObject>.Get();
-            scene.GetRootGameObjects(gameObjectBuffer);
-            foreach (var gameObject in gameObjectBuffer)
-            {
-                component = gameObject.GetComponentInChildren<T>(true);
-                if (component != null) break;
-            }
-
-            if (component == null)
-            {
-                throw new VContainerException(typeof(T), $"Component {typeof(T)} is not in this scene {scene.path}");
-            }
-
-            var registrationBuilder = builder.RegisterInstance(component).As(typeof(T));
-            if (component is MonoBehaviour monoBehaviour)
-            {
-                registrationBuilder.As<MonoBehaviour>();
-                builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
-            }
+            var registrationBuilder = new ComponentRegistrationBuilder(scene, typeof(T));
+            builder.Register(registrationBuilder);
             return registrationBuilder;
         }
 

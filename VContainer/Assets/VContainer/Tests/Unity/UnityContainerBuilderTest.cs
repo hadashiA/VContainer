@@ -76,7 +76,47 @@ namespace VContainer.Tests.Unity
             Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
             Assert.That(resolved.ServiceA, Is.InstanceOf<ServiceA>());
             Assert.That(resolved.transform, Is.EqualTo(go3.transform));
-            Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
+        }
+
+        [Test]
+        public void RegisterComponentInHierarchyUnderTransform()
+        {
+            var lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
+            var go1 = new GameObject("Parent");
+            var go2 = new GameObject("Child A");
+            var go3 = new GameObject("Child B");
+
+            go3.transform.SetParent(go2.transform);
+            go2.transform.SetParent(go1.transform);
+
+            var go1Component = go1.AddComponent<SampleMonoBehaviour>();
+            var go2Component = go2.AddComponent<SampleMonoBehaviour>();
+
+            {
+                var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
+                    .UnderTransform(go2Component.transform);
+
+                var container = builder.Build();
+                var resolved = container.Resolve<SampleMonoBehaviour>();
+
+                Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
+                Assert.That(resolved, Is.EqualTo(go2Component));
+            }
+
+            {
+                var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
+                    .UnderTransform(go3.transform);
+
+                var container = builder.Build();
+                Assert.Throws<VContainerException>(() =>
+                {
+                    container.Resolve<SampleMonoBehaviour>();
+                });
+            }
         }
 
         [Test]
@@ -118,8 +158,6 @@ namespace VContainer.Tests.Unity
                 Assert.That(resolved1.transform.parent, Is.EqualTo(go1.transform));
                 Assert.That(resolved2.transform.parent, Is.EqualTo(go1.transform));
                 Assert.That(resolved1, Is.Not.EqualTo(resolved2));
-
-                Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
             }
 
             {
@@ -138,15 +176,13 @@ namespace VContainer.Tests.Unity
                 Assert.That(resolved2.transform.parent, Is.Null);
                 Assert.That(resolved1, Is.EqualTo(resolved2));
             }
-
-
             {
                 var builder = new ContainerBuilder();
                 builder.Register<ServiceA>(Lifetime.Transient);
                 builder.RegisterComponentOnNewGameObject<SampleMonoBehaviour>(Lifetime.Scoped, "hoge");
 
                 var container = builder.Build();
-                Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
+                Assert.That(container.Resolve<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
             }
         }
 
@@ -196,7 +232,7 @@ namespace VContainer.Tests.Unity
                 builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
 
                 var container = builder.Build();
-                Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
+                Assert.That(container.Resolve<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
             }
         }
 

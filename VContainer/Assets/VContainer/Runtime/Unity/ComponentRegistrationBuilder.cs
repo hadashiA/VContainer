@@ -1,34 +1,27 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VContainer.Internal;
 
 namespace VContainer.Unity
 {
     public sealed class ComponentRegistrationBuilder : RegistrationBuilder
     {
+        readonly bool find;
+        readonly Scene scene;
+        readonly Component prefab;
+
         Transform parent;
         Func<Transform> parentFinder;
         string gameObjectName;
-        Component prefab;
-
-        ComponentRegistrationBuilder(
-            Type implementationType,
-            Lifetime lifetime,
-            List<Type> interfaceTypes = null)
-            : base(implementationType, lifetime, interfaceTypes)
-        {
-            InterfaceTypes = InterfaceTypes ?? new List<Type>();
-            InterfaceTypes.Add(typeof(MonoBehaviour));
-            InterfaceTypes.Add(ImplementationType);
-        }
 
         internal ComponentRegistrationBuilder(
             Component prefab,
             Type implementationType,
             Lifetime lifetime,
             List<Type> interfaceTypes = null)
-            : this(implementationType, lifetime, interfaceTypes)
+            : this(false, default, implementationType, lifetime, interfaceTypes)
         {
             this.prefab = prefab;
         }
@@ -38,15 +31,35 @@ namespace VContainer.Unity
             Type implementationType,
             Lifetime lifetime,
             List<Type> interfaceTypes = null)
-            : this(implementationType, lifetime, interfaceTypes)
+            : this(false, default, implementationType, lifetime, interfaceTypes)
         {
             this.gameObjectName = gameObjectName;
+        }
+
+        internal ComponentRegistrationBuilder(
+            Scene scene,
+            Type implementationType,
+            List<Type> interfaceTypes = null)
+            : this(true, scene, implementationType, Lifetime.Scoped, interfaceTypes)
+        {
+        }
+
+        ComponentRegistrationBuilder(
+            bool find,
+            Scene scene,
+            Type implementationType,
+            Lifetime lifetime,
+            List<Type> interfaceTypes = null)
+            : base(implementationType, lifetime, interfaceTypes)
+        {
+            this.find = find;
+            this.scene = scene;
         }
 
         public override IRegistration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
-            var destination = new ComponentDestination(prefab, parent, parentFinder, gameObjectName);
+            var destination = new ComponentDestination(find, scene, parent, parentFinder, prefab, gameObjectName);
 
             return new ComponentRegistration(
                 ImplementationType,
