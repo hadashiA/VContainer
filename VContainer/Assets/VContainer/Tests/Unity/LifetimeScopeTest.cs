@@ -112,5 +112,28 @@ namespace VContainer.Tests.Unity
             Assert.That(childEntryPoint, Is.InstanceOf<SampleEntryPoint>());
             Assert.That(childEntryPoint, Is.EqualTo(parentEntryPoint));
         }
+
+        [Test]
+        public void ParentTypeReference()
+        {
+            var prefab = Resources.Load<GameObject>("ParentChildRelationship");
+            var root = UnityEngine.Object.Instantiate(prefab);
+            var parent = root.GetComponentInChildren<SampleLifetimeScope>();
+            var child = root.GetComponentInChildren<SampleChildLifetimeScope>();
+
+            Assert.That(parent != null, Is.True);
+            Assert.That(child != null, Is.True);
+            Assert.That(child.Parent, Is.EqualTo(parent));
+        }
+
+        // [UnityTest]
+        // public void ParentTypeReferenceInvalid()
+        // {
+        //     var prefab = Resources.Load<GameObject>("ParentChildRelationshipInvalid");
+        //     Assert.Throws<LifetimeScope.ParentTypeNotFoundException>(() =>
+        //     {
+        //         UnityEngine.Object.Instantiate(prefab);
+        //     });
+        // }
     }
 }
