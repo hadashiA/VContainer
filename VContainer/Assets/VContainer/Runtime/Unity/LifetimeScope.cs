@@ -138,6 +138,8 @@ namespace VContainer.Unity
         readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<IInstaller> extraInstallers = new List<IInstaller>();
 
+        ParentTypeNotFoundException parentTypeNotFoundException;
+
         protected virtual void Awake()
         {
             try
@@ -150,7 +152,12 @@ namespace VContainer.Unity
             }
             catch (ParentTypeNotFoundException ex)
             {
-                OnAfterBuild += OnAfterParentBuilt;
+                if (gameObject.scene.isLoaded)
+                    throw;
+
+                parentTypeNotFoundException = ex;
+                OnAfterBuild += TryLateAwake;
+                SceneManager.sceneLoaded += ThrowIfParentReferenceNotFound;
             }
         }
 
@@ -159,7 +166,9 @@ namespace VContainer.Unity
             disposable.Dispose();
             Container?.Dispose();
             Container = null;
-            OnAfterBuild -= OnAfterParentBuilt;
+
+            OnAfterBuild -= TryLateAwake;
+            SceneManager.sceneLoaded -= ThrowIfParentReferenceNotFound;
         }
 
         protected virtual void Configure(IContainerBuilder builder) { }
@@ -311,23 +320,35 @@ namespace VContainer.Unity
             }
         }
 
-        void OnAfterParentBuilt(LifetimeScope other)
+        void TryLateAwake(LifetimeScope other)
         {
-            if (this == null || Parent != null)
+            if (this == null || Parent != null || parentTypeNotFoundException == null)
             {
-                OnAfterBuild -= OnAfterParentBuilt;
+                OnAfterBuild -= TryLateAwake;
                 return;
             }
 
-            if (parentReference.Type != null &&
-                parentReference.Type == other.GetType())
+            if (parentTypeNotFoundException.ParentType == other.GetType())
             {
-                OnAfterBuild -= OnAfterParentBuilt;
-
+                OnAfterBuild -= TryLateAwake;
                 Parent = other;
+                parentTypeNotFoundException = null;
                 if (autoRun)
                 {
                     Build();
+                }
+            }
+        }
+
+        void ThrowIfParentReferenceNotFound(Scene scene, LoadSceneMode mode)
+        {
+            if (gameObject.scene == scene)
+            {
+                SceneManager.sceneLoaded -= ThrowIfParentReferenceNotFound;
+
+                if (parentTypeNotFoundException != null)
+                {
+                    throw parentTypeNotFoundException;
                 }
             }
         }
