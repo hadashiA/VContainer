@@ -28,8 +28,7 @@ namespace VContainer.Unity
         {
             public readonly Type ParentType;
 
-            public ParentTypeNotFoundException(Type parentType)
-                : base($"No such {parentType.Name} in active scenes")
+            public ParentTypeNotFoundException(Type parentType, string message) : base(message)
             {
                 ParentType = parentType;
             }
@@ -46,9 +45,8 @@ namespace VContainer.Unity
 
         static LifetimeScope overrideParent;
         static ExtraInstaller extraInstaller;
+        static readonly List<LifetimeScope> WaitingList = new List<LifetimeScope>();
         static readonly object SyncRoot = new object();
-
-        static event Action<LifetimeScope> OnAfterBuild;
 
         static LifetimeScope Create(IInstaller installer = null)
         {
@@ -86,6 +84,13 @@ namespace VContainer.Unity
 
         public static LifetimeScope Find<T>(Scene scene) where T : LifetimeScope => Find(typeof(T), scene);
         public static LifetimeScope Find<T>() where T : LifetimeScope => Find(typeof(T));
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void SubscribeSceneEvents()
+        {
+            SceneManager.sceneLoaded -= ThrowIfParentReferenceNotFound;
+            SceneManager.sceneLoaded += ThrowIfParentReferenceNotFound;
+        }
 
         static LifetimeScope Find(Type type, Scene scene)
         {
@@ -131,6 +136,25 @@ namespace VContainer.Unity
             lock (SyncRoot) extraInstaller = null;
         }
 
+        static void ThrowIfParentReferenceNotFound(Scene scene, LoadSceneMode mode)
+        {
+            foreach (var waiting in WaitingList)
+            {
+                if (waiting.parentTypeNotFoundException is ParentTypeNotFoundException ex &&
+                    waiting.gameObject.scene == scene)
+                {
+                    waiting.parentTypeNotFoundException = null;
+                    waiting.Parent = Find(ex.ParentType);
+
+                    if (waiting.Parent == null)
+                        throw ex;
+
+                    if (waiting.autoRun)
+                        waiting.Build();
+                }
+            }
+        }
+
         public IObjectResolver Container { get; private set; }
         public LifetimeScope Parent { get; private set; }
         public bool IsRoot { get; set; }
@@ -156,33 +180,21 @@ namespace VContainer.Unity
                     throw;
 
                 parentTypeNotFoundException = ex;
-                OnAfterBuild += TryLateAwake;
-                SceneManager.sceneLoaded += ThrowIfParentReferenceNotFound;
+                WaitingList.Add(this);
             }
         }
 
         protected virtual void OnDestroy()
         {
-            disposable.Dispose();
-            Container?.Dispose();
-            Container = null;
-            parentTypeNotFoundException = null;
-
-            OnAfterBuild -= TryLateAwake;
-            SceneManager.sceneLoaded -= ThrowIfParentReferenceNotFound;
+            DisposeCore();
         }
 
         protected virtual void Configure(IContainerBuilder builder) { }
 
         public void Dispose()
         {
-            disposable.Dispose();
-            Container?.Dispose();
-            Container = null;
-            parentTypeNotFoundException = null;
-
-            if (this != null)
-                Destroy(gameObject);
+            DisposeCore();
+            if (this != null) Destroy(gameObject);
         }
 
         public void Build()
@@ -209,7 +221,18 @@ namespace VContainer.Unity
             AutoInjectAll();
             ActivateEntryPoints();
 
-            OnAfterBuild?.Invoke(this);
+            var type = GetType();
+            for (var i = WaitingList.Count - 1; i >= 0; i--)
+            {
+                var waiting = WaitingList[i];
+                if (waiting.parentTypeNotFoundException?.ParentType == type)
+                {
+                    waiting.parentReference.Object = this;
+                    waiting.parentTypeNotFoundException = null;
+                    WaitingList.RemoveAt(i);
+                    waiting.Awake();
+                }
+            }
         }
 
         public LifetimeScope CreateChild(IInstaller installer = null)
@@ -291,7 +314,9 @@ namespace VContainer.Unity
                 {
                     return found;
                 }
-                throw new ParentTypeNotFoundException(parentReference.Type);
+                throw new ParentTypeNotFoundException(
+                    parentReference.Type,
+                    $"{name} could not found parent reference of type : {parentReference.Type}");
             }
 
             if (VContainerSettings.Instance is VContainerSettings settings)
@@ -308,6 +333,15 @@ namespace VContainer.Unity
             return null;
         }
 
+        void DisposeCore()
+        {
+            disposable.Dispose();
+            Container?.Dispose();
+            Container = null;
+            parentTypeNotFoundException = null;
+            WaitingList.Remove(this);
+        }
+
         void AutoInjectAll()
         {
             if (autoInjectGameObjects == null)
@@ -318,39 +352,6 @@ namespace VContainer.Unity
                 if (target != null) // Check missing reference
                 {
                     Container.InjectGameObject(target);
-                }
-            }
-        }
-
-        void TryLateAwake(LifetimeScope other)
-        {
-            if (this == null || Parent != null || parentTypeNotFoundException == null)
-            {
-                OnAfterBuild -= TryLateAwake;
-                return;
-            }
-
-            if (parentTypeNotFoundException.ParentType == other.GetType())
-            {
-                OnAfterBuild -= TryLateAwake;
-                Parent = other;
-                parentTypeNotFoundException = null;
-                if (autoRun)
-                {
-                    Build();
-                }
-            }
-        }
-
-        void ThrowIfParentReferenceNotFound(Scene scene, LoadSceneMode mode)
-        {
-            if (gameObject.scene == scene)
-            {
-                SceneManager.sceneLoaded -= ThrowIfParentReferenceNotFound;
-
-                if (parentTypeNotFoundException != null)
-                {
-                    throw parentTypeNotFoundException;
                 }
             }
         }
