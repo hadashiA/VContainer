@@ -24,6 +24,17 @@ namespace VContainer.Unity
             void IDisposable.Dispose() => RemoveExtra();
         }
 
+        public sealed class ParentTypeNotFoundException : Exception
+        {
+            public readonly Type ParentType;
+
+            public ParentTypeNotFoundException(Type parentType)
+                : base($"No such {parentType.Name} in active scenes")
+            {
+                ParentType = parentType;
+            }
+        }
+
         [SerializeField]
         public ParentReference parentReference;
 
@@ -36,6 +47,8 @@ namespace VContainer.Unity
         static LifetimeScope overrideParent;
         static ExtraInstaller extraInstaller;
         static readonly object SyncRoot = new object();
+
+        static event Action<LifetimeScope> OnAfterBuild;
 
         static LifetimeScope Create(IInstaller installer = null)
         {
@@ -125,12 +138,26 @@ namespace VContainer.Unity
         readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<IInstaller> extraInstallers = new List<IInstaller>();
 
+        ParentTypeNotFoundException parentTypeNotFoundException;
+
         protected virtual void Awake()
         {
-            Parent = GetRuntimeParent();
-            if (autoRun)
+            try
             {
-                Build();
+                Parent = GetRuntimeParent();
+                if (autoRun)
+                {
+                    Build();
+                }
+            }
+            catch (ParentTypeNotFoundException ex)
+            {
+                if (gameObject.scene.isLoaded)
+                    throw;
+
+                parentTypeNotFoundException = ex;
+                OnAfterBuild += TryLateAwake;
+                SceneManager.sceneLoaded += ThrowIfParentReferenceNotFound;
             }
         }
 
@@ -139,6 +166,10 @@ namespace VContainer.Unity
             disposable.Dispose();
             Container?.Dispose();
             Container = null;
+            parentTypeNotFoundException = null;
+
+            OnAfterBuild -= TryLateAwake;
+            SceneManager.sceneLoaded -= ThrowIfParentReferenceNotFound;
         }
 
         protected virtual void Configure(IContainerBuilder builder) { }
@@ -148,6 +179,7 @@ namespace VContainer.Unity
             disposable.Dispose();
             Container?.Dispose();
             Container = null;
+            parentTypeNotFoundException = null;
 
             if (this != null)
                 Destroy(gameObject);
@@ -176,6 +208,8 @@ namespace VContainer.Unity
             extraInstallers.Clear();
             AutoInjectAll();
             ActivateEntryPoints();
+
+            OnAfterBuild?.Invoke(this);
         }
 
         public LifetimeScope CreateChild(IInstaller installer = null)
@@ -257,7 +291,7 @@ namespace VContainer.Unity
                 {
                     return found;
                 }
-                throw new VContainerException(null, $"LifetimeScope parent `{parentReference.Type.FullName}` is not found in any scene");
+                throw new ParentTypeNotFoundException(parentReference.Type);
             }
 
             if (VContainerSettings.Instance is VContainerSettings settings)
@@ -284,6 +318,39 @@ namespace VContainer.Unity
                 if (target != null) // Check missing reference
                 {
                     Container.InjectGameObject(target);
+                }
+            }
+        }
+
+        void TryLateAwake(LifetimeScope other)
+        {
+            if (this == null || Parent != null || parentTypeNotFoundException == null)
+            {
+                OnAfterBuild -= TryLateAwake;
+                return;
+            }
+
+            if (parentTypeNotFoundException.ParentType == other.GetType())
+            {
+                OnAfterBuild -= TryLateAwake;
+                Parent = other;
+                parentTypeNotFoundException = null;
+                if (autoRun)
+                {
+                    Build();
+                }
+            }
+        }
+
+        void ThrowIfParentReferenceNotFound(Scene scene, LoadSceneMode mode)
+        {
+            if (gameObject.scene == scene)
+            {
+                SceneManager.sceneLoaded -= ThrowIfParentReferenceNotFound;
+
+                if (parentTypeNotFoundException != null)
+                {
+                    throw parentTypeNotFoundException;
                 }
             }
         }

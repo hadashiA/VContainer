@@ -94,9 +94,9 @@ using (LifetimeScope.Enqueue(builder => ...)
 }
 ```
 
-## How to pre-set the parent of a scene to scene
+## How to pre-set the parent in the Inspector
 
-`LifetimeScope` can be serialized by specifying the type of parent in other scenes.
+`LifetimeScope` can be serialized by specifying the type of parent.
 
 In base scene.
 
@@ -104,4 +104,8 @@ In base scene.
 
 In additional scene.
 
-![](assets/screenshot_childlifetimescope.gif)
+![](assets/screenshot_childlifetimescope.png)
+
+:::caution
+When the scene becomes "isLoaded" state, an error will occur if the Parent Type set in the inspector is not found.
+:::
