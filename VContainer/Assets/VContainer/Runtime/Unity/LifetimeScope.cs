@@ -166,6 +166,7 @@ namespace VContainer.Unity
             disposable.Dispose();
             Container?.Dispose();
             Container = null;
+            parentTypeNotFoundException = null;
 
             OnAfterBuild -= TryLateAwake;
             SceneManager.sceneLoaded -= ThrowIfParentReferenceNotFound;
@@ -178,6 +179,7 @@ namespace VContainer.Unity
             disposable.Dispose();
             Container?.Dispose();
             Container = null;
+            parentTypeNotFoundException = null;
 
             if (this != null)
                 Destroy(gameObject);
