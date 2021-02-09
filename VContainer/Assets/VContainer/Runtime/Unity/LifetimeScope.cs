@@ -139,8 +139,7 @@ namespace VContainer.Unity
             {
                 if (gameObject.scene.isLoaded)
                     throw;
-
-                WaitForAwake(this, ex);
+                EnqueueAwake(this, ex);
             }
         }
 
@@ -181,7 +180,7 @@ namespace VContainer.Unity
 
             AutoInjectAll();
             DispatchEntryPoints();
-            ReleaseWaitingListFrom(this);
+            AwakeWaitingChildren(this);
         }
 
         public LifetimeScope CreateChild(IInstaller installer = null)
@@ -287,7 +286,7 @@ namespace VContainer.Unity
             disposable.Dispose();
             Container?.Dispose();
             Container = null;
-            CancelWaiting(this);
+            CancelAwake(this);
         }
 
         void AutoInjectAll()
