@@ -126,7 +126,7 @@ namespace VContainer.Tests.Unity
             Assert.That(child.Parent, Is.EqualTo(parent));
         }
 
-        // [UnityTest]
+        // [Test]
         // public void ParentTypeReferenceInvalid()
         // {
         //     var prefab = Resources.Load<GameObject>("ParentChildRelationshipInvalid");
