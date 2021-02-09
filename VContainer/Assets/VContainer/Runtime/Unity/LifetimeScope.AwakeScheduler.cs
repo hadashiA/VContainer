@@ -1,13 +1,26 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace VContainer.Unity
 {
+    public sealed class VContainerParentTypeReferenceNotFound : Exception
+    {
+        public readonly Type ParentType;
+
+        public VContainerParentTypeReferenceNotFound(Type parentType, string message)
+            : base(message)
+        {
+            ParentType = parentType;
+        }
+    }
+
+
     public partial class LifetimeScope
     {
-        static readonly List<(LifetimeScope, ParentTypeNotFoundException)> WaitingList =
-            new List<(LifetimeScope, ParentTypeNotFoundException)>();
+        static readonly List<(LifetimeScope, VContainerParentTypeReferenceNotFound)> WaitingList =
+            new List<(LifetimeScope, VContainerParentTypeReferenceNotFound)>();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void SubscribeSceneEvents()
@@ -16,7 +29,7 @@ namespace VContainer.Unity
             SceneManager.sceneLoaded += ReleaseWaitingList;
         }
 
-        static void WaitForAwake(LifetimeScope lifetimeScope, ParentTypeNotFoundException ex)
+        static void WaitForAwake(LifetimeScope lifetimeScope, VContainerParentTypeReferenceNotFound ex)
         {
             WaitingList.Add((lifetimeScope, ex));
         }

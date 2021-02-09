@@ -24,16 +24,6 @@ namespace VContainer.Unity
             void IDisposable.Dispose() => RemoveExtra();
         }
 
-        public sealed class ParentTypeNotFoundException : Exception
-        {
-            public readonly Type ParentType;
-
-            public ParentTypeNotFoundException(Type parentType, string message) : base(message)
-            {
-                ParentType = parentType;
-            }
-        }
-
         [SerializeField]
         public ParentReference parentReference;
 
@@ -145,7 +135,7 @@ namespace VContainer.Unity
                     Build();
                 }
             }
-            catch (ParentTypeNotFoundException ex)
+            catch (VContainerParentTypeReferenceNotFound ex)
             {
                 if (gameObject.scene.isLoaded)
                     throw;
@@ -273,7 +263,7 @@ namespace VContainer.Unity
                 {
                     return found;
                 }
-                throw new ParentTypeNotFoundException(
+                throw new VContainerParentTypeReferenceNotFound(
                     parentReference.Type,
                     $"{name} could not found parent reference of type : {parentReference.Type}");
             }
