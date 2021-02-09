@@ -17,7 +17,7 @@ namespace VContainer.Unity
     }
 
 
-    public partial class LifetimeScope
+    partial class LifetimeScope
     {
         static readonly List<(LifetimeScope, VContainerParentTypeReferenceNotFound)> WaitingList =
             new List<(LifetimeScope, VContainerParentTypeReferenceNotFound)>();
@@ -25,16 +25,16 @@ namespace VContainer.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void SubscribeSceneEvents()
         {
-            SceneManager.sceneLoaded -= ReleaseWaitingList;
-            SceneManager.sceneLoaded += ReleaseWaitingList;
+            SceneManager.sceneLoaded -= AwakeWaitingChildren;
+            SceneManager.sceneLoaded += AwakeWaitingChildren;
         }
 
-        static void WaitForAwake(LifetimeScope lifetimeScope, VContainerParentTypeReferenceNotFound ex)
+        static void EnqueueAwake(LifetimeScope lifetimeScope, VContainerParentTypeReferenceNotFound ex)
         {
             WaitingList.Add((lifetimeScope, ex));
         }
 
-        static void CancelWaiting(LifetimeScope lifetimeScope)
+        static void CancelAwake(LifetimeScope lifetimeScope)
         {
             for (var i = WaitingList.Count - 1; i >= 0; i--)
             {
@@ -45,7 +45,7 @@ namespace VContainer.Unity
             }
         }
 
-        static void ReleaseWaitingList(Scene scene, LoadSceneMode mode)
+        static void AwakeWaitingChildren(Scene scene, LoadSceneMode mode)
         {
             for (var i = WaitingList.Count - 1; i >= 0; i--)
             {
@@ -58,7 +58,7 @@ namespace VContainer.Unity
             }
         }
 
-        static void ReleaseWaitingListFrom(LifetimeScope awakedParent)
+        static void AwakeWaitingChildren(LifetimeScope awakedParent)
         {
             if (WaitingList.Count < 0) return;
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace VContainer.Unity
 {
-    public partial class LifetimeScope
+    partial class LifetimeScope
     {
         void DispatchEntryPoints()
         {
