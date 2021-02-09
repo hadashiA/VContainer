@@ -27,7 +27,7 @@ jobs:
         - 2020.1.13f1
         - 2019.4.14f1
         - 2019.3.12f1
-        scriptBackend: ['mono']
+        scriptBackend: ['mono', 'il2cpp']
         include:
         - unityVersion: 2020.1.13f1
           license: UNITY_LICENSE_2020_1_BASE64
@@ -42,7 +42,7 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: VContainer/Library
-        key: Library-VContainer-${{ matrix.unityVersion }}
+        key: Library-VContainer-${{ matrix.unityVersion }}-${{ matrix.scriptBackend }}
     - name: Dump unity license file
       shell: bash
       run: |
