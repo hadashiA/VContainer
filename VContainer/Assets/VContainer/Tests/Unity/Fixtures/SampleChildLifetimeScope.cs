@@ -4,6 +4,5 @@ namespace VContainer.Tests.Unity
 {
     public class SampleChildLifetimeScope : LifetimeScope
     {
-
     }
 }
