@@ -42,31 +42,19 @@ namespace VContainer.Unity
             return containerBuilder.RegisterComponent(component);
         }
 
-        public RegistrationBuilder AddInHierarchy<T>() where T : Component
-        {
-            var registrationBuilder = containerBuilder.RegisterComponentInHierarchy<T>();
-            if (parentTransform != null)
-                registrationBuilder.UnderTransform(parentTransform);
-            return registrationBuilder;
-        }
+        public ComponentRegistrationBuilder AddInHierarchy<T>()
+            => containerBuilder.RegisterComponentInHierarchy<T>()
+                .UnderTransform(parentTransform);
 
         public ComponentRegistrationBuilder AddOnNewGameObject<T>(Lifetime lifetime, string newGameObjectName = null)
             where T : Component
-        {
-            var registrationBuilder = containerBuilder.RegisterComponentOnNewGameObject<T>(lifetime, newGameObjectName);
-            if (parentTransform != null)
-                registrationBuilder.UnderTransform(parentTransform);
-            return registrationBuilder;
-        }
+            => containerBuilder.RegisterComponentOnNewGameObject<T>(lifetime, newGameObjectName)
+                .UnderTransform(parentTransform);
 
         public ComponentRegistrationBuilder AddInNewPrefab<T>(T prefab, Lifetime lifetime)
             where T : Component
-        {
-            var registrationBuilder = containerBuilder.RegisterComponentInNewPrefab(prefab, lifetime);
-            if (parentTransform != null)
-                registrationBuilder.UnderTransform(parentTransform);
-            return registrationBuilder;
-        }
+            => containerBuilder.RegisterComponentInNewPrefab(prefab, lifetime)
+                .UnderTransform(parentTransform);
     }
 
     public static class ContainerBuilderUnityExtensions
