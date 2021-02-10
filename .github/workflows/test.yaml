@@ -27,7 +27,7 @@ jobs:
         - 2020.1.13f1
         - 2019.4.14f1
         - 2019.3.12f1
-        scriptBackend: ['mono']
+        scriptBackend: ['IL2CPP']
         include:
         - unityVersion: 2020.1.13f1
           license: UNITY_LICENSE_2020_1_BASE64
@@ -53,11 +53,10 @@ jobs:
     - name: Load License
       shell: bash
       run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
-    - name: Run Tests
+    - name: Build UnitTest
       shell: bash
-      run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -batchmode -logFile /dev/stdout -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=${{ matrix.scriptBackend }} -nographics -silent-crashes
-    - uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: TestResults.xml
-        path: ./VContainer/tmp/TestResults.xml
+      run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -projectPath ./ -executeMethod UnitTestBuilder.BuildUnitTest /headless /ScriptBackend ${{ matrix.scriptBackend }} /BuildTarget StandaloneLinux64
+      working-directory: VContainer
+    - name: Execute UnitTest
+      run: ./VContainer/bin/UnitTest/StandaloneLinux64_${{ matrix.scriptBackend }}/test
+        
