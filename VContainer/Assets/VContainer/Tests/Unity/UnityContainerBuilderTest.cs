@@ -56,7 +56,6 @@ namespace VContainer.Tests.Unity
         [Test]
         public void RegisterComponentInHierarchy()
         {
-            var lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
             var go1 = new GameObject("Parent");
             var go2 = new GameObject("Child A");
             var go3 = new GameObject("Child B");
@@ -66,88 +65,116 @@ namespace VContainer.Tests.Unity
 
             go3.AddComponent<SampleMonoBehaviour>();
 
-            var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
-            builder.Register<ServiceA>(Lifetime.Transient);
-            builder.RegisterComponentInHierarchy<SampleMonoBehaviour>();
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>();
+            });
 
-            var container = builder.Build();
-            var resolved = container.Resolve<SampleMonoBehaviour>();
+            var resolved = lifetimeScope.Container.Resolve<SampleMonoBehaviour>();
 
             Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
             Assert.That(resolved.ServiceA, Is.InstanceOf<ServiceA>());
             Assert.That(resolved.transform, Is.EqualTo(go3.transform));
-            Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
+        }
+
+        [Test]
+        public void RegisterComponentInHierarchyUnderTransform()
+        {
+            var lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
+            var go1 = new GameObject("Parent");
+            var go2 = new GameObject("Child A");
+            var go3 = new GameObject("Child B");
+
+            go3.transform.SetParent(go2.transform);
+            go2.transform.SetParent(go1.transform);
+
+            var go1Component = go1.AddComponent<SampleMonoBehaviour>();
+            var go2Component = go2.AddComponent<SampleMonoBehaviour>();
+
+            {
+                var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
+                    .UnderTransform(go2Component.transform);
+
+                var container = builder.Build();
+                var resolved = container.Resolve<SampleMonoBehaviour>();
+
+                Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
+                Assert.That(resolved, Is.EqualTo(go2Component));
+            }
+
+            {
+                var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
+                    .UnderTransform(go3.transform);
+
+                var container = builder.Build();
+                Assert.Throws<VContainerException>(() =>
+                {
+                    container.Resolve<SampleMonoBehaviour>();
+                });
+            }
         }
 
         [Test]
         public void RegisterComponentInHierarchyWithBuiltinType()
         {
-            var lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
             var go1 = new GameObject("Parent");
-
             go1.AddComponent<BoxCollider>();
 
-            var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
-            builder.Register<ServiceA>(Lifetime.Transient);
-            builder.RegisterComponentInHierarchy<BoxCollider>();
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<BoxCollider>();
+            });
 
-            var container = builder.Build();
-            var resolved = container.Resolve<BoxCollider>();
-
+            var resolved = lifetimeScope.Container.Resolve<BoxCollider>();
             Assert.That(resolved, Is.InstanceOf<BoxCollider>());
         }
 
         [Test]
         public void RegisterComponentOnNewGameObject()
         {
-            {
-                var go1 = new GameObject("Parent");
-                var builder = new ContainerBuilder();
-                builder.Register<ServiceA>(Lifetime.Transient);
-                builder.RegisterComponentOnNewGameObject<SampleMonoBehaviour>(Lifetime.Transient, "hoge")
-                    .UnderTransform(go1.transform);
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentOnNewGameObject<SampleMonoBehaviour>(Lifetime.Scoped, "hoge");
 
-                var container = builder.Build();
-                var resolved1 = container.Resolve<SampleMonoBehaviour>();
-                var resolved2 = container.Resolve<SampleMonoBehaviour>();
+            var container = builder.Build();
+            var resolved1 = container.Resolve<SampleMonoBehaviour>();
+            var resolved2 = container.Resolve<SampleMonoBehaviour>();
+            Assert.That(resolved1.gameObject.name, Is.EqualTo("hoge"));
+            Assert.That(resolved2.gameObject.name, Is.EqualTo("hoge"));
+            Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved2, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved1.transform.parent, Is.Null);
+            Assert.That(resolved2.transform.parent, Is.Null);
+            Assert.That(resolved1, Is.EqualTo(resolved2));
+        }
 
-                Assert.That(resolved1.gameObject.name, Is.EqualTo("hoge"));
-                Assert.That(resolved2.gameObject.name, Is.EqualTo("hoge"));
-                Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
-                Assert.That(resolved2, Is.InstanceOf<SampleMonoBehaviour>());
-                Assert.That(resolved1.transform.parent, Is.EqualTo(go1.transform));
-                Assert.That(resolved2.transform.parent, Is.EqualTo(go1.transform));
-                Assert.That(resolved1, Is.Not.EqualTo(resolved2));
+        [Test]
+        public void RegisterComponentOnNewGameObjectUnderTransform()
+        {
+            var go1 = new GameObject("Parent");
 
-                Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
-            }
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentOnNewGameObject<SampleMonoBehaviour>(Lifetime.Transient, "hoge")
+                .UnderTransform(go1.transform);
 
-            {
-                var builder = new ContainerBuilder();
-                builder.Register<ServiceA>(Lifetime.Transient);
-                builder.RegisterComponentOnNewGameObject<SampleMonoBehaviour>(Lifetime.Scoped, "hoge");
+            var container = builder.Build();
+            var resolved1 = container.Resolve<SampleMonoBehaviour>();
+            var resolved2 = container.Resolve<SampleMonoBehaviour>();
 
-                var container = builder.Build();
-                var resolved1 = container.Resolve<SampleMonoBehaviour>();
-                var resolved2 = container.Resolve<SampleMonoBehaviour>();
-                Assert.That(resolved1.gameObject.name, Is.EqualTo("hoge"));
-                Assert.That(resolved2.gameObject.name, Is.EqualTo("hoge"));
-                Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
-                Assert.That(resolved2, Is.InstanceOf<SampleMonoBehaviour>());
-                Assert.That(resolved1.transform.parent, Is.Null);
-                Assert.That(resolved2.transform.parent, Is.Null);
-                Assert.That(resolved1, Is.EqualTo(resolved2));
-            }
-
-
-            {
-                var builder = new ContainerBuilder();
-                builder.Register<ServiceA>(Lifetime.Transient);
-                builder.RegisterComponentOnNewGameObject<SampleMonoBehaviour>(Lifetime.Scoped, "hoge");
-
-                var container = builder.Build();
-                Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
-            }
+            Assert.That(resolved1.gameObject.name, Is.EqualTo("hoge"));
+            Assert.That(resolved2.gameObject.name, Is.EqualTo("hoge"));
+            Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved2, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved1.transform.parent, Is.EqualTo(go1.transform));
+            Assert.That(resolved2.transform.parent, Is.EqualTo(go1.transform));
+            Assert.That(resolved1, Is.Not.EqualTo(resolved2));
         }
 
         [Test]
@@ -196,8 +223,46 @@ namespace VContainer.Tests.Unity
                 builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
 
                 var container = builder.Build();
-                Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
+                Assert.That(container.Resolve<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
             }
+        }
+
+        [Test]
+        public void UseComponentsWithParentTransform()
+        {
+            var go1 = new GameObject("Parent");
+            var go2 = new GameObject("Child A");
+            var go3 = new GameObject("Child B");
+
+            go3.transform.SetParent(go2.transform);
+            go2.transform.SetParent(go1.transform);
+
+            go1.AddComponent<SampleMonoBehaviour>();
+            go3.AddComponent<SampleMonoBehaviour>();
+
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.Register<ServiceA>(Lifetime.Scoped);
+                builder.Register<ServiceB>(Lifetime.Scoped);
+
+                builder.UseComponents(go2.transform, components =>
+                {
+                    components.AddInHierarchy<SampleMonoBehaviour>();
+                });
+
+                builder.UseComponents(go3.transform, components =>
+                {
+                    components.AddOnNewGameObject<SampleMonoBehaviour2>(Lifetime.Scoped);
+                });
+            });
+
+            var found = lifetimeScope.Container.Resolve<SampleMonoBehaviour>();
+            Assert.That(found, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(found.transform.parent, Is.EqualTo(go2.transform));
+
+            var created = lifetimeScope.Container.Resolve<SampleMonoBehaviour2>();
+            Assert.That(created, Is.InstanceOf<SampleMonoBehaviour2>());
+            Assert.That(created.transform.parent, Is.EqualTo(go3.transform));
         }
 
         [UnityTest]

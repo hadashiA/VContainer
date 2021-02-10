@@ -54,9 +54,13 @@ builder.RegisterComponentInHierarchy<YourBehaviour>()
 ## Register component to specific parent Transform
 
 ```csharp
+// Instantiate under the specified transform
 builder.RegisterComponentFromInNewPrefab<YourBehaviour>(Lifetime.Scoped)
     .UnderTransform(parent);
 
+// Find the component under the specified transform.
+builder.RegisterComponentInHierarchy<YourBehaviour>()
+    .UnderTransform(parent);
 ```
 
 Or find at runtime.
@@ -79,7 +83,7 @@ builder.UseComponents(components =>
     components.AddInHierarchy<YourBehaviour>();
     components.AddFromNewPrefab(prefab, Lifetime.Scoped);
     components.AddOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
-})
+});
 ```
 
 This is the same as:
@@ -90,6 +94,33 @@ builder.RegisterComponentInHierarchy<YourBehaviour>();
 builder.RegisterComponentFromNewPrefab(prefab, Lifetime.Scoped);
 builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
 ```
+
+You can create a group with a specified parent.
+
+```csharp
+builder.UseComponents(parentTransform, components =>
+{
+    // GetComponentInChildren under `parentTransform`
+    components.AddInHierarchy<YourBehaviour>();
+
+    // Instantiate under `parentTransform`
+    components.AddFromNewPrefab(prefab, Lifetime.Scoped);
+    components.AddOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
+})
+```
+
+This is the same as:
+
+```csharp
+builder.RegisterComponentInHierarchy<YourBehaviour>()
+    .UnderTransform(parentTransform);
+
+builder.RegisterComponentFromNewPrefab(prefab, Lifetime.Scoped)
+    .UnderTransform(parentTransform);
+builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
+    .UnderTransform(parentTransform);
+```
+
 
 ## Execute only Inject for MonoBehaviour on the scene
 

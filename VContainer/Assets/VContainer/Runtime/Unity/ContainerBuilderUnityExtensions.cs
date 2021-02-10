@@ -29,25 +29,32 @@ namespace VContainer.Unity
     public readonly struct ComponentsBuilder
     {
         readonly IContainerBuilder containerBuilder;
+        readonly Transform parentTransform;
 
-        public ComponentsBuilder(IContainerBuilder containerBuilder)
+        public ComponentsBuilder(IContainerBuilder containerBuilder, Transform parentTransform = null)
         {
             this.containerBuilder = containerBuilder;
+            this.parentTransform = parentTransform;
         }
 
-        public RegistrationBuilder AddInstance(MonoBehaviour component)
-            => containerBuilder.RegisterComponent(component);
+        public RegistrationBuilder AddInstance(Component component)
+        {
+            return containerBuilder.RegisterComponent(component);
+        }
 
-        public RegistrationBuilder AddInHierarchy<T>() where T : Component
-            => containerBuilder.RegisterComponentInHierarchy<T>();
+        public ComponentRegistrationBuilder AddInHierarchy<T>()
+            => containerBuilder.RegisterComponentInHierarchy<T>()
+                .UnderTransform(parentTransform);
 
         public ComponentRegistrationBuilder AddOnNewGameObject<T>(Lifetime lifetime, string newGameObjectName = null)
             where T : Component
-            => containerBuilder.RegisterComponentOnNewGameObject<T>(lifetime, newGameObjectName);
+            => containerBuilder.RegisterComponentOnNewGameObject<T>(lifetime, newGameObjectName)
+                .UnderTransform(parentTransform);
 
         public ComponentRegistrationBuilder AddInNewPrefab<T>(T prefab, Lifetime lifetime)
             where T : Component
-            => containerBuilder.RegisterComponentInNewPrefab(prefab, lifetime);
+            => containerBuilder.RegisterComponentInNewPrefab(prefab, lifetime)
+                .UnderTransform(parentTransform);
     }
 
     public static class ContainerBuilderUnityExtensions
@@ -61,16 +68,18 @@ namespace VContainer.Unity
             configuration(entryPoints);
         }
 
-        public static void RegisterEntryPointExceptionHandler(
-            this IContainerBuilder builder,
-            Action<Exception> exceptionHandler)
-        {
-            builder.RegisterInstance(new EntryPointExceptionHandler(exceptionHandler));
-        }
-
         public static void UseComponents(this IContainerBuilder builder, Action<ComponentsBuilder> configuration)
         {
             var components = new ComponentsBuilder(builder);
+            configuration(components);
+        }
+
+        public static void UseComponents(
+            this IContainerBuilder builder,
+            Transform root,
+            Action<ComponentsBuilder> configuration)
+        {
+            var components = new ComponentsBuilder(builder, root);
             configuration(components);
         }
 
@@ -82,6 +91,13 @@ namespace VContainer.Unity
                 registrationBuilder = registrationBuilder.As(typeof(MonoBehaviour));
             }
             return registrationBuilder.AsImplementedInterfaces();
+        }
+
+        public static void RegisterEntryPointExceptionHandler(
+            this IContainerBuilder builder,
+            Action<Exception> exceptionHandler)
+        {
+            builder.RegisterInstance(new EntryPointExceptionHandler(exceptionHandler));
         }
 
         public static RegistrationBuilder RegisterComponent(this IContainerBuilder builder, MonoBehaviour component)
@@ -106,31 +122,13 @@ namespace VContainer.Unity
             return registrationBuilder;
         }
 
-        public static RegistrationBuilder RegisterComponentInHierarchy<T>(this IContainerBuilder builder)
+        public static ComponentRegistrationBuilder RegisterComponentInHierarchy<T>(this IContainerBuilder builder)
         {
             var lifetimeScope = (LifetimeScope)builder.ApplicationOrigin;
             var scene = lifetimeScope.gameObject.scene;
-            var component = default(T);
 
-            var gameObjectBuffer = UnityEngineObjectListBuffer<GameObject>.Get();
-            scene.GetRootGameObjects(gameObjectBuffer);
-            foreach (var gameObject in gameObjectBuffer)
-            {
-                component = gameObject.GetComponentInChildren<T>(true);
-                if (component != null) break;
-            }
-
-            if (component == null)
-            {
-                throw new VContainerException(typeof(T), $"Component {typeof(T)} is not in this scene {scene.path}");
-            }
-
-            var registrationBuilder = builder.RegisterInstance(component).As(typeof(T));
-            if (component is MonoBehaviour monoBehaviour)
-            {
-                registrationBuilder.As<MonoBehaviour>();
-                builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
-            }
+            var registrationBuilder = new ComponentRegistrationBuilder(scene, typeof(T));
+            builder.Register(registrationBuilder);
             return registrationBuilder;
         }
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace VContainer.Internal
+namespace VContainer.Unity
 {
     static class UnityEngineObjectListBuffer<T> where T : UnityEngine.Object
     {
