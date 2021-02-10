@@ -59,8 +59,5 @@ jobs:
       working-directory: VContainer
     - name: Execute UnitTest
       run: |
-        ls -l ./VContainer
-        ls -l ./VContainer/bin
-        ls -l ./VContainer/bin/UnitTest
-        ./VContainer/bin/UnitTest/StandaloneLinux64_${{ matrix.scriptBackend }}/test
+        ls -l
         
