@@ -58,5 +58,9 @@ jobs:
       run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -projectPath ./ -executeMethod UnitTestBuilder.BuildUnitTest /headless /ScriptBackend ${{ matrix.scriptBackend }} /BuildTarget StandaloneLinux64
       working-directory: VContainer
     - name: Execute UnitTest
-      run: ./VContainer/bin/UnitTest/StandaloneLinux64_${{ matrix.scriptBackend }}/test
+      run: |
+        ls -l ./VContainer
+        ls -l ./VContainer/bin
+        ls -l ./VContainer/bin/UnitTest
+        ./VContainer/bin/UnitTest/StandaloneLinux64_${{ matrix.scriptBackend }}/test
         
