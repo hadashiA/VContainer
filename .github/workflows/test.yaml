@@ -60,4 +60,6 @@ jobs:
     - name: Execute UnitTest
       run: |
         ls -l
+        ls -l ./VContainer
+        ls -l ./VContainer/bin
         
