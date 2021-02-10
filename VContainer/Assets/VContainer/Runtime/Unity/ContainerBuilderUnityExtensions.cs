@@ -29,25 +29,44 @@ namespace VContainer.Unity
     public readonly struct ComponentsBuilder
     {
         readonly IContainerBuilder containerBuilder;
+        readonly Transform parentTransform;
 
-        public ComponentsBuilder(IContainerBuilder containerBuilder)
+        public ComponentsBuilder(IContainerBuilder containerBuilder, Transform parentTransform = null)
         {
             this.containerBuilder = containerBuilder;
+            this.parentTransform = parentTransform;
         }
 
-        public RegistrationBuilder AddInstance(MonoBehaviour component)
-            => containerBuilder.RegisterComponent(component);
+        public RegistrationBuilder AddInstance(Component component)
+        {
+            return containerBuilder.RegisterComponent(component);
+        }
 
         public RegistrationBuilder AddInHierarchy<T>() where T : Component
-            => containerBuilder.RegisterComponentInHierarchy<T>();
+        {
+            var registrationBuilder = containerBuilder.RegisterComponentInHierarchy<T>();
+            if (parentTransform != null)
+                registrationBuilder.UnderTransform(parentTransform);
+            return registrationBuilder;
+        }
 
         public ComponentRegistrationBuilder AddOnNewGameObject<T>(Lifetime lifetime, string newGameObjectName = null)
             where T : Component
-            => containerBuilder.RegisterComponentOnNewGameObject<T>(lifetime, newGameObjectName);
+        {
+            var registrationBuilder = containerBuilder.RegisterComponentOnNewGameObject<T>(lifetime, newGameObjectName);
+            if (parentTransform != null)
+                registrationBuilder.UnderTransform(parentTransform);
+            return registrationBuilder;
+        }
 
         public ComponentRegistrationBuilder AddInNewPrefab<T>(T prefab, Lifetime lifetime)
             where T : Component
-            => containerBuilder.RegisterComponentInNewPrefab(prefab, lifetime);
+        {
+            var registrationBuilder = containerBuilder.RegisterComponentInNewPrefab(prefab, lifetime);
+            if (parentTransform != null)
+                registrationBuilder.UnderTransform(parentTransform);
+            return registrationBuilder;
+        }
     }
 
     public static class ContainerBuilderUnityExtensions
@@ -61,16 +80,18 @@ namespace VContainer.Unity
             configuration(entryPoints);
         }
 
-        public static void RegisterEntryPointExceptionHandler(
-            this IContainerBuilder builder,
-            Action<Exception> exceptionHandler)
-        {
-            builder.RegisterInstance(new EntryPointExceptionHandler(exceptionHandler));
-        }
-
         public static void UseComponents(this IContainerBuilder builder, Action<ComponentsBuilder> configuration)
         {
             var components = new ComponentsBuilder(builder);
+            configuration(components);
+        }
+
+        public static void UseComponents(
+            this IContainerBuilder builder,
+            Transform root,
+            Action<ComponentsBuilder> configuration)
+        {
+            var components = new ComponentsBuilder(builder, root);
             configuration(components);
         }
 
@@ -82,6 +103,13 @@ namespace VContainer.Unity
                 registrationBuilder = registrationBuilder.As(typeof(MonoBehaviour));
             }
             return registrationBuilder.AsImplementedInterfaces();
+        }
+
+        public static void RegisterEntryPointExceptionHandler(
+            this IContainerBuilder builder,
+            Action<Exception> exceptionHandler)
+        {
+            builder.RegisterInstance(new EntryPointExceptionHandler(exceptionHandler));
         }
 
         public static RegistrationBuilder RegisterComponent(this IContainerBuilder builder, MonoBehaviour component)
