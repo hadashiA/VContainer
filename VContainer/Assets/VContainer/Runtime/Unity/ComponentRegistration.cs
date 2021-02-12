@@ -114,6 +114,7 @@ namespace VContainer.Unity
         Component InstantiatePrefab(IObjectResolver resolver)
         {
             var parent = destination.GetParent();
+            var wasActive = destination.Prefab.gameObject.activeSelf;
             if (destination.Prefab.gameObject.activeSelf)
             {
                 destination.Prefab.gameObject.SetActive(false);
@@ -123,6 +124,7 @@ namespace VContainer.Unity
                 ? UnityEngine.Object.Instantiate(destination.Prefab, parent)
                 : UnityEngine.Object.Instantiate(destination.Prefab);
 
+            destination.Prefab.gameObject.SetActive(wasActive);
             injector.Inject(component, resolver, Parameters);
             component.gameObject.SetActive(true);
             return component;

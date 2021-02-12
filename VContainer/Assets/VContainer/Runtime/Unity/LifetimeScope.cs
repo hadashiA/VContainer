@@ -203,12 +203,14 @@ namespace VContainer.Unity
 
         public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
         {
+            var wasActive = prefab.gameObject.activeSelf;
             if (prefab.gameObject.activeSelf && prefab.autoRun)
             {
                 prefab.gameObject.SetActive(false);
             }
 
             var child = Instantiate(prefab, transform, false);
+            prefab.gameObject.SetActive(wasActive);
             if (installer != null)
             {
                 child.extraInstallers.Add(installer);
