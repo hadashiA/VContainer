@@ -96,6 +96,52 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void CreateChildFromPrefab()
+        {
+            var parent = LifetimeScope.Create(builder =>
+            {
+                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Singleton).AsSelf();
+            });
+
+            var childPrefab = new GameObject("Child").AddComponent<SampleChildLifetimeScope>();
+
+            var child = parent.CreateChildFromPrefab(childPrefab);
+
+            var parentResolved = parent.Container.Resolve<SampleEntryPoint>();
+            var childResolved = child.Container.Resolve<SampleEntryPoint>();
+            Assert.That(parentResolved, Is.InstanceOf<SampleEntryPoint>());
+            Assert.That(childResolved, Is.InstanceOf<SampleEntryPoint>());
+            Assert.That(childResolved, Is.EqualTo(parentResolved));
+            Assert.That(child.parentReference.Object, Is.EqualTo(parent));
+            Assert.That(childPrefab.gameObject.activeSelf, Is.True);
+        }
+
+        [Test]
+        public void CreateChildFromPrefabWithInActive()
+        {
+            var parent = LifetimeScope.Create(builder =>
+            {
+                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Singleton).AsSelf();
+            });
+
+            var childPrefab = new GameObject("Child").AddComponent<SampleChildLifetimeScope>();
+            childPrefab.gameObject.SetActive(false);
+
+            var child = parent.CreateChildFromPrefab(childPrefab);
+            Assert.That(childPrefab.gameObject.activeSelf, Is.False);
+            Assert.That(child.gameObject.activeSelf, Is.False);
+
+            child.Build();
+
+            var parentResolved = parent.Container.Resolve<SampleEntryPoint>();
+            var childResolved = child.Container.Resolve<SampleEntryPoint>();
+            Assert.That(parentResolved, Is.InstanceOf<SampleEntryPoint>());
+            Assert.That(childResolved, Is.InstanceOf<SampleEntryPoint>());
+            Assert.That(childResolved, Is.EqualTo(parentResolved));
+            Assert.That(child.parentReference.Object, Is.EqualTo(parent));
+        }
+
+        [Test]
         public void CreateScopeWithSingleton()
         {
             var parentLifetimeScope = LifetimeScope.Create(builder =>
