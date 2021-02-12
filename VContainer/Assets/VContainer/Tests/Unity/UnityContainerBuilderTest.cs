@@ -181,50 +181,88 @@ namespace VContainer.Tests.Unity
         public void RegisterComponentInNewPrefab()
         {
             var prefab = new GameObject("Sample").AddComponent<SampleMonoBehaviour>();
-            {
-                var go1 = new GameObject("Parent");
-                var builder = new ContainerBuilder();
-                builder.Register<ServiceA>(Lifetime.Transient);
-                builder.RegisterComponentInNewPrefab(prefab, Lifetime.Transient)
-                    .UnderTransform(go1.transform);
 
-                var container = builder.Build();
-                var resolved1 = container.Resolve<SampleMonoBehaviour>();
-                var resolved2 = container.Resolve<SampleMonoBehaviour>();
-                Assert.That(resolved1.gameObject.name, Is.EqualTo("Sample(Clone)"));
-                Assert.That(resolved2.gameObject.name, Is.EqualTo("Sample(Clone)"));
-                Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
-                Assert.That(resolved2, Is.InstanceOf<SampleMonoBehaviour>());
-                Assert.That(resolved1.transform.parent, Is.EqualTo(go1.transform));
-                Assert.That(resolved2.transform.parent, Is.EqualTo(go1.transform));
-                Assert.That(resolved1, Is.Not.EqualTo(resolved2));
-            }
+            var go1 = new GameObject("Parent");
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentInNewPrefab(prefab, Lifetime.Transient)
+                .UnderTransform(go1.transform);
 
-            {
-                var builder = new ContainerBuilder();
-                builder.Register<ServiceA>(Lifetime.Transient);
-                builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
+            var container = builder.Build();
+            var resolved1 = container.Resolve<SampleMonoBehaviour>();
+            var resolved2 = container.Resolve<SampleMonoBehaviour>();
+            Assert.That(resolved1.gameObject.name, Is.EqualTo("Sample(Clone)"));
+            Assert.That(resolved2.gameObject.name, Is.EqualTo("Sample(Clone)"));
+            Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved2, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved1.transform.parent, Is.EqualTo(go1.transform));
+            Assert.That(resolved2.transform.parent, Is.EqualTo(go1.transform));
+            Assert.That(resolved1, Is.Not.EqualTo(resolved2));
+            Assert.That(prefab.gameObject.activeSelf, Is.True);
+        }
 
-                var container = builder.Build();
-                var resolved1 = container.Resolve<SampleMonoBehaviour>();
-                var resolved2 = container.Resolve<SampleMonoBehaviour>();
-                Assert.That(resolved1.gameObject.name, Is.EqualTo("Sample(Clone)"));
-                Assert.That(resolved2.gameObject.name, Is.EqualTo("Sample(Clone)"));
-                Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
-                Assert.That(resolved2, Is.InstanceOf<SampleMonoBehaviour>());
-                Assert.That(resolved1.transform.parent, Is.Null);
-                Assert.That(resolved2.transform.parent, Is.Null);
-                Assert.That(resolved1, Is.EqualTo(resolved2));
-            }
+        [Test]
+        public void RegisterComponentInNewPrefabScoped()
+        {
+            var prefab = new GameObject("Sample").AddComponent<SampleMonoBehaviour>();
 
-            {
-                var builder = new ContainerBuilder();
-                builder.Register<ServiceA>(Lifetime.Transient);
-                builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
 
-                var container = builder.Build();
-                Assert.That(container.Resolve<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
-            }
+            var container = builder.Build();
+            var resolved1 = container.Resolve<SampleMonoBehaviour>();
+            var resolved2 = container.Resolve<SampleMonoBehaviour>();
+            Assert.That(resolved1.gameObject.name, Is.EqualTo("Sample(Clone)"));
+            Assert.That(resolved2.gameObject.name, Is.EqualTo("Sample(Clone)"));
+            Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved2, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved1.transform.parent, Is.Null);
+            Assert.That(resolved2.transform.parent, Is.Null);
+            Assert.That(resolved1, Is.EqualTo(resolved2));
+            Assert.That(prefab.gameObject.activeSelf, Is.True);
+        }
+
+        [Test]
+        public void RegisterComponentInNewPrefabWithAwake()
+        {
+            var prefab = new GameObject("Sample").AddComponent<SampleMonoBehaviour>();
+
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton);
+
+            var container = builder.Build();
+            var resolved1 = container.Resolve<SampleMonoBehaviour>();
+            Assert.That(resolved1.gameObject.name, Is.EqualTo("Sample(Clone)"));
+            Assert.That(resolved1, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved1.transform.parent, Is.Null);
+            Assert.That(prefab.gameObject.activeSelf, Is.True);
+            Assert.That(resolved1.gameObject.activeSelf, Is.True);
+            Assert.That(resolved1.ServiceA, Is.InstanceOf<ServiceA>());
+            Assert.That(resolved1.ServiceAInAwake, Is.InstanceOf<ServiceA>());
+        }
+
+        [Test]
+        public void RegisterComponentInNewPrefabWithInActive()
+        {
+            var prefab = new GameObject("Sample").AddComponent<SampleMonoBehaviour>();
+            prefab.gameObject.SetActive(false);
+
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton);
+
+            var container = builder.Build();
+            var resolved = container.Resolve<SampleMonoBehaviour>();
+            Assert.That(resolved.gameObject.name, Is.EqualTo("Sample(Clone)"));
+            Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved.transform.parent, Is.Null);
+
+            Assert.That(prefab.gameObject.activeSelf, Is.False);
+            Assert.That(resolved.gameObject.activeSelf, Is.False);
+            Assert.That(resolved.ServiceA, Is.InstanceOf<ServiceA>());
+            Assert.That(resolved.ServiceAInAwake, Is.Null);
         }
 
         [Test]
