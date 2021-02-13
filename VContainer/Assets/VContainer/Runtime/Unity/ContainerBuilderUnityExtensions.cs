@@ -64,14 +64,12 @@ namespace VContainer.Unity
             Lifetime lifetime,
             Action<EntryPointsBuilder> configuration)
         {
-            var entryPoints = new EntryPointsBuilder(builder, lifetime);
-            configuration(entryPoints);
+            configuration(new EntryPointsBuilder(builder, lifetime));
         }
 
         public static void UseComponents(this IContainerBuilder builder, Action<ComponentsBuilder> configuration)
         {
-            var components = new ComponentsBuilder(builder);
-            configuration(components);
+            configuration(new ComponentsBuilder(builder));
         }
 
         public static void UseComponents(
@@ -79,8 +77,7 @@ namespace VContainer.Unity
             Transform root,
             Action<ComponentsBuilder> configuration)
         {
-            var components = new ComponentsBuilder(builder, root);
-            configuration(components);
+            configuration(new ComponentsBuilder(builder, root));
         }
 
         public static RegistrationBuilder RegisterEntryPoint<T>(this IContainerBuilder builder, Lifetime lifetime)

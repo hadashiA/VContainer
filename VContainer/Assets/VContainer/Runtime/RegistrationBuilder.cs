@@ -108,7 +108,7 @@ namespace VContainer
             return this;
         }
 
-        public RegistrationBuilder WithParameter<TParam>(object value)
+        public RegistrationBuilder WithParameter<TParam>(TParam value)
         {
             return WithParameter(typeof(TParam), value);
         }
