@@ -272,13 +272,24 @@ namespace VContainer.Unity
             // Find root from settings
             if (VContainerSettings.Instance is VContainerSettings settings)
             {
-                if (settings.RootLifetimeScope != null)
+                var rootLifetimeScope = settings.RootLifetimeScope;
+#if UNITY_EDITOR
+                var disableDomainReloading = UnityEditor.EditorSettings.enterPlayModeOptionsEnabled &&
+                                             (UnityEditor.EditorSettings.enterPlayModeOptions &
+                                              UnityEditor.EnterPlayModeOptions.DisableDomainReload) > 0;
+                if (rootLifetimeScope == null && disableDomainReloading)
                 {
-                    if (settings.RootLifetimeScope.Container == null)
+                    var path = UnityEditor.AssetDatabase.GetAssetPath(rootLifetimeScope);
+                    UnityEngine.Debug.LogError($"VContainerSettings.RootLifetimeScope is missing : {path}. Please try to re-compile C# scripts just once.");
+                }
+#endif
+                if (rootLifetimeScope != null)
+                {
+                    if (rootLifetimeScope.Container == null)
                     {
-                        settings.RootLifetimeScope.Build();
+                        rootLifetimeScope.Build();
                     }
-                    return settings.RootLifetimeScope;
+                    return rootLifetimeScope;
                 }
             }
             return null;
