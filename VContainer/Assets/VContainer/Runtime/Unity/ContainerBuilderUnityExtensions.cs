@@ -37,7 +37,7 @@ namespace VContainer.Unity
             this.parentTransform = parentTransform;
         }
 
-        public RegistrationBuilder AddInstance(Component component)
+        public RegistrationBuilder AddInstance<TInterface>(TInterface component)
         {
             return containerBuilder.RegisterComponent(component);
         }
