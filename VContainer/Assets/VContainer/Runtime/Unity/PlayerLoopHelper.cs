@@ -1,5 +1,5 @@
 using System;
-using UnityEngine;
+using System.Threading;
 #if UNITY_2019_3_OR_NEWER
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -42,16 +42,13 @@ namespace VContainer.Unity
     static class PlayerLoopHelper
     {
         static readonly PlayerLoopRunner[] Runners = new PlayerLoopRunner[10];
-        static bool initialized;
+        static long initialized;
 
         // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void Initialize()
         {
-            lock (Runners)
-            {
-                if (initialized) return;
-                initialized = true;
-            }
+            if (Interlocked.CompareExchange(ref initialized, 1, 0) != 0)
+                return;
 
             for (var i = 0; i < Runners.Length; i++)
             {
