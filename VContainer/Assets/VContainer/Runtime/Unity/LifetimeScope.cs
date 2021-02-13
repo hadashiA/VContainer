@@ -279,8 +279,7 @@ namespace VContainer.Unity
                                               UnityEditor.EnterPlayModeOptions.DisableDomainReload) > 0;
                 if (rootLifetimeScope == null && disableDomainReloading)
                 {
-                    var path = UnityEditor.AssetDatabase.GetAssetPath(rootLifetimeScope);
-                    UnityEngine.Debug.LogError($"VContainerSettings.RootLifetimeScope is missing : {path}. Please try to re-compile C# scripts just once.");
+                    UnityEngine.Debug.LogError("VContainerSettings.RootLifetimeScope is missing. Please try to re-compile C# scripts just once.");
                 }
 #endif
                 if (rootLifetimeScope != null)
