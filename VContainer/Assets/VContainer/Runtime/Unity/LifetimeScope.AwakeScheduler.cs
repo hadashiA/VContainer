@@ -22,7 +22,11 @@ namespace VContainer.Unity
         static readonly List<(LifetimeScope, VContainerParentTypeReferenceNotFound)> WaitingList =
             new List<(LifetimeScope, VContainerParentTypeReferenceNotFound)>();
 
+#if UNITY_2019_3_OR_NEWER
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+#else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+#endif
         static void SubscribeSceneEvents()
         {
             SceneManager.sceneLoaded -= AwakeWaitingChildren;

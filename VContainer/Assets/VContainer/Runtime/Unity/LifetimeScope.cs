@@ -256,6 +256,7 @@ namespace VContainer.Unity
             if (parentReference.Object != null)
                 return parentReference.Object;
 
+            // Find in scene via type
             if (parentReference.Type != null && parentReference.Type != GetType())
             {
                 var found = Find(parentReference.Type);
@@ -268,6 +269,7 @@ namespace VContainer.Unity
                     $"{name} could not found parent reference of type : {parentReference.Type}");
             }
 
+            // Find root from settings
             if (VContainerSettings.Instance is VContainerSettings settings)
             {
                 if (settings.RootLifetimeScope != null)
