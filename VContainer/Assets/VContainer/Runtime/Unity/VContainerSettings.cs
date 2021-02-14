@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using UnityEngine;
-using VContainer.Unity;
 
 namespace VContainer.Unity
 {
@@ -45,7 +44,7 @@ namespace VContainer.Unity
             UnityEditor.PlayerSettings.SetPreloadedAssets(preloadedAssets.ToArray());
         }
 
-        [UnityEditor.InitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void LoadInstanceFromAssetDatabase()
         {
             var guids = UnityEditor.AssetDatabase.FindAssets("t:VContainerSettings");
