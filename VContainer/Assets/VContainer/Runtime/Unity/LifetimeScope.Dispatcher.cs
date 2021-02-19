@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+#if VCONTAINER_ECS_INTEGRATION
+using Unity.Entities;
+#endif
 
 namespace VContainer.Unity
 {
