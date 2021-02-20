@@ -18,52 +18,41 @@ jobs:
 
   test-unity:
     runs-on: ubuntu-latest
-    env:
-      UNITY_LICENSE_FILE: ./tmp/ulf
-      UNITY_BATCH: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout
     strategy:
       matrix:
         unityVersion:
-        - 2020.1.13f1
-        - 2019.4.14f1
-        - 2019.3.12f1
-        - 2018.4.30f1
+        - 2020.2.3f1
+        # - 2019.4.19f1
+        # - 2018.4.31f1
         include:
-        - unityVersion: 2020.1.13f1
-          imageTag: 2020.1.13f1-linux-il2cpp
-          license: UNITY_LICENSE_2020_1_BASE64
-        - unityVersion: 2019.4.14f1
-          imageTag: 2019.4.14f1-linux-il2cpp
-          license: UNITY_LICENSE_2019_4_BASE64
-        - unityVersion: 2019.3.12f1
-          imageTag: 2019.3.12f1-linux-il2cpp
-          license: UNITY_LICENSE_2019_3_BASE64
-        - unityVersion: 2018.4.30f1
-          imageTag: 2018.4.30f1
-          license: UNITY_LICENSE_2018_4_BASE64
-    container:
-      image: gableroux/unity3d:${{ matrix.imageTag }}
+        - unityVersion: 2020.2.3f1
+          license: UNITY_LICENSE_2020_1
+        # - unityVersion: 2019.4.14f1
+        #   imageTag: 2019.4.14f1-linux-il2cpp
+        #   license: UNITY_LICENSE_2019_4_BASE64
+        # - unityVersion: 2019.3.12f1
+        #   imageTag: 2019.3.12f1-linux-il2cpp
+        #   license: UNITY_LICENSE_2019_3_BASE64
+        # - unityVersion: 2018.4.30f1
+        #   imageTag: 2018.4.30f1
+        #   license: UNITY_LICENSE_2018_4_BASE64
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
       with:
         path: VContainer/Library
         key: Library-VContainer-${{ matrix.unityVersion }}
-    - name: Dump unity license file
-      shell: bash
-      run: |
-        mkdir ./tmp
-        mkdir ./VContainer/tmp
-        chmod 777 ./VContainer/tmp
-        echo -n "${{ secrets[matrix.license] }}" | base64 --decode > $UNITY_LICENSE_FILE
-    - name: Load License
-      shell: bash
-      run: eval $UNITY_BATCH -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
-    - name: Run Tests
-      shell: bash
-      run: eval $UNITY_BATCH -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -testSettingsFile $GITHUB_WORKSPACE/testSettings.json
-    - uses: actions/upload-artifact@v2
-      if: always()
+        restore-keys: |
+          Library-VContainer-
+          Library-        
+    - uses: game-ci/unity-test-runner@v2.0-alpha-2
+      env:
+        UNITY_LICENSE: ${{ secrets[matrix.license] }}
       with:
-        name: TestResults.xml
-        path: ./VContainer/tmp/TestResults.xml
+        projectPath: ./VContainer
+        unityVersion: ${{ matrix.unityVersion }}
+        customParameters: -testSettingsFile ${{ github.workspace }}/testSettings.json
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Test results
+        path: artifacts
