@@ -27,6 +27,7 @@ jobs:
         - 2020.1.13f1
         - 2019.4.14f1
         - 2019.3.12f1
+        - 2018.4.30f1
         include:
         - unityVersion: 2020.1.13f1
           imageTag: 2020.1.13f1-linux-il2cpp
