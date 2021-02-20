@@ -29,7 +29,7 @@ jobs:
           license: UNITY_LICENSE_2020_1
         - unityVersion: 2019.4.19f1
           license: UNITY_LICENSE_2019_4
-        - unityVersion: 2018.4.30f1
+        - unityVersion: 2018.4.31f1
           license: UNITY_LICENSE_2018_4
     steps:
     - uses: actions/checkout@v2
