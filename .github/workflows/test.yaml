@@ -23,7 +23,7 @@ jobs:
         unityVersion:
         - 2020.2.3f1
         - 2019.4.19f1
-        - 2018.4.31f1
+        externalPackage: ['None', 'UniTask', 'ECS']
         include:
         - unityVersion: 2020.2.3f1
           license: UNITY_LICENSE_2020_1
@@ -36,10 +36,23 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: VContainer/Library
-        key: Library-VContainer-${{ matrix.unityVersion }}
+        key: Library-VContainer-${{ matrix.unityVersion }}-${{ matrix.externalPackage }}
         restore-keys: |
           Library-VContainer-
-          Library-        
+          Library-
+
+    - name: Add com.cysharp.unitask
+      if: matrix.externalPackage == 'UniTask'
+      shell: bash
+      run: |
+        sed -i '2a "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",' ./VContainer/Packages/manifest.json
+
+    - name: Add com.unity.entities
+      if: matrix.externalPackage == 'ECS'
+      shell: bash
+      run: |
+        sed -i '2a "com.unity.entities": "0.11.1-preview.4",' ./VContainer/Packages/manifest.json
+  
     - uses: game-ci/unity-test-runner@v2.0-alpha-2
       env:
         UNITY_LICENSE: ${{ secrets[matrix.license] }}
