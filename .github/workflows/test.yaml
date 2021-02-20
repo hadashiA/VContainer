@@ -23,7 +23,8 @@ jobs:
         unityVersion:
         - 2020.2.3f1
         - 2019.4.19f1
-        externalPackage: ['None', 'UniTask', 'ECS']
+        # externalPackage: ['None', 'UniTask', 'ECS']
+        externalPackage: ['None', 'UniTask']
         include:
         - unityVersion: 2020.2.3f1
           license: UNITY_LICENSE_2020_1
@@ -51,7 +52,7 @@ jobs:
       if: matrix.externalPackage == 'ECS'
       shell: bash
       run: |
-        sed -i '2a "com.unity.entities": "0.11.1-preview.4",' ./VContainer/Packages/manifest.json
+        sed -i '2a "com.unity.entities": "0.17.0-preview.41",' ./VContainer/Packages/manifest.json
   
     - uses: game-ci/unity-test-runner@v2.0-alpha-2
       env:
