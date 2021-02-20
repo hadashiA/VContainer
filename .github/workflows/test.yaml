@@ -51,7 +51,7 @@ jobs:
       with:
         projectPath: ./VContainer
         unityVersion: ${{ matrix.unityVersion }}
-        # customParameters: -testSettingsFile ${{ github.workspace }}/testSettings.json
+        customParameters: -testSettingsFile ./testSettings.json
     - uses: actions/upload-artifact@v2
       with:
         name: Test results
