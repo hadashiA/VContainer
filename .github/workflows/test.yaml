@@ -28,11 +28,14 @@ jobs:
         include:
         - unityVersion: 2020.2.3f1
           license: UNITY_LICENSE_2020_1
+        - unityVersion: 2020.2.3f1
+          license: UNITY_LICENSE_2020_1
+          externalPackage: 'ECS'
         - unityVersion: 2019.4.19f1
           license: UNITY_LICENSE_2019_4
-        - unityVersion: 2018.4.31f1
-          license: UNITY_LICENSE_2018_4
-          externalPackage: 'None'
+        # - unityVersion: 2018.4.31f1
+        #   license: UNITY_LICENSE_2018_4
+        #   externalPackage: 'None'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
