@@ -1,3 +1,4 @@
+#if VCONTAINER_UNITASK_INTEGRATION
 using System;
 using System.Collections;
 using System.Threading;
@@ -103,3 +104,4 @@ namespace VContainer.Tests.Unity
         });
     }
 }
+#endif
