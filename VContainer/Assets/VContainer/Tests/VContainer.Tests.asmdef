@@ -21,6 +21,17 @@
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
     ],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "",
+            "define": "VCONTAINER_UNITASK_INTEGRATION"
+        },
+        {
+            "name": "com.unity.entities",
+            "expression": "",
+            "define": "VCONTAINER_ECS_INTEGRATION"
+        }
+    ],
     "noEngineReferences": false
 }
