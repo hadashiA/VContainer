@@ -18,46 +18,56 @@ jobs:
 
   test-unity:
     runs-on: ubuntu-latest
-    env:
-      UNITY_LICENSE_FILE: ./tmp/ulf
-      UNITY_BIN: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity
     strategy:
       matrix:
         unityVersion:
-        - 2020.1.13f1
-        - 2019.4.14f1
-        - 2019.3.12f1
-        scriptBackend: ['mono']
+        - 2020.2.3f1
+        - 2019.4.19f1
+        # externalPackage: ['None', 'UniTask', 'ECS']
+        externalPackage: ['None', 'UniTask']
         include:
-        - unityVersion: 2020.1.13f1
-          license: UNITY_LICENSE_2020_1_BASE64
-        - unityVersion: 2019.4.14f1
-          license: UNITY_LICENSE_2019_4_BASE64
-        - unityVersion: 2019.3.12f1
-          license: UNITY_LICENSE_2019_3_BASE64
-    container:
-      image: gableroux/unity3d:${{ matrix.unityVersion }}-linux-il2cpp
+        - unityVersion: 2020.2.3f1
+          license: UNITY_LICENSE_2020_1
+        - unityVersion: 2019.4.19f1
+          license: UNITY_LICENSE_2019_4
+        - unityVersion: 2019.3.15f1
+          license: UNITY_LICENSE_2019_3
+        - externalPackage: 'ECS'
+          unityVersion: 2020.2.3f1
+          license: UNITY_LICENSE_2020_1
+        # - unityVersion: 2018.4.31f1
+        #   license: UNITY_LICENSE_2018_4
+        #   externalPackage: 'None'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
       with:
         path: VContainer/Library
-        key: Library-VContainer-${{ matrix.unityVersion }}
-    - name: Dump unity license file
+        key: Library-VContainer-${{ matrix.unityVersion }}-${{ matrix.externalPackage }}
+        restore-keys: |
+          Library-VContainer-
+          Library-
+
+    - name: Add com.cysharp.unitask
+      if: matrix.externalPackage == 'UniTask'
       shell: bash
       run: |
-        mkdir ./tmp
-        mkdir ./VContainer/tmp
-        chmod 777 ./VContainer/tmp
-        echo -n "${{ secrets[matrix.license] }}" | base64 --decode > $UNITY_LICENSE_FILE
-    - name: Load License
+        sed -i '2a "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",' ./VContainer/Packages/manifest.json
+
+    - name: Add com.unity.entities
+      if: matrix.externalPackage == 'ECS'
       shell: bash
-      run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -quit -batchmode -nographics -silent-crashes -logFile /dev/stdout -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
-    - name: Run Tests
-      shell: bash
-      run: xvfb-run --error-file=/dev/stdout --auto-servernum --server-args='-screen 0 1024x768x24' /opt/Unity/Editor/Unity -batchmode -logFile /dev/stdout -projectPath ./VContainer -runTests -testResults $GITHUB_WORKSPACE/VContainer/tmp/TestResults.xml -testPlatform playmode -buildTarget StandaloneLinux64 -scriptbackend=${{ matrix.scriptBackend }} -nographics -silent-crashes
-    - uses: actions/upload-artifact@v2
-      if: always()
+      run: |
+        sed -i '2a "com.unity.entities": "0.17.0-preview.41",' ./VContainer/Packages/manifest.json
+  
+    - uses: game-ci/unity-test-runner@v2.0-alpha-2
+      env:
+        UNITY_LICENSE: ${{ secrets[matrix.license] }}
       with:
-        name: TestResults.xml
-        path: ./VContainer/tmp/TestResults.xml
+        projectPath: ./VContainer
+        unityVersion: ${{ matrix.unityVersion }}
+        # customParameters: -testSettingsFile ./testSettings.json
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Test results
+        path: artifacts
