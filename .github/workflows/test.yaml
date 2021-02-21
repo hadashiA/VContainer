@@ -32,6 +32,7 @@ jobs:
           license: UNITY_LICENSE_2019_4
         - unityVersion: 2018.4.31f1
           license: UNITY_LICENSE_2018_4
+          externalPackage: 'None'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
