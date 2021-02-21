@@ -12,6 +12,7 @@ jobs:
         unityVersion:
         - 2020.2.3f1
         - 2019.4.19f1
+        - 2019.3.15f1
         - 2018.4.31f1
     steps:
     - name: Request manual activation file
