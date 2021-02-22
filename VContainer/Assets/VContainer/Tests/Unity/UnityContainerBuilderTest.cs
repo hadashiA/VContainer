@@ -111,10 +111,9 @@ namespace VContainer.Tests.Unity
                 builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
                     .UnderTransform(go3.transform);
 
-                var container = builder.Build();
                 Assert.Throws<VContainerException>(() =>
                 {
-                    container.Resolve<SampleMonoBehaviour>();
+                    var container = builder.Build();
                 });
             }
         }
@@ -133,6 +132,22 @@ namespace VContainer.Tests.Unity
 
             var resolved = lifetimeScope.Container.Resolve<BoxCollider>();
             Assert.That(resolved, Is.InstanceOf<BoxCollider>());
+        }
+
+        [Test]
+        public void RegisterComponentInHierarchyAutoInject()
+        {
+            var go1 = new GameObject("SampleMonoBehaviour");
+            var target = go1.AddComponent<SampleMonoBehaviour>();
+
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
+                    .UnderTransform(go1.transform);
+            });
+
+            Assert.That(target.ServiceA, Is.InstanceOf<ServiceA>());
         }
 
         [Test]

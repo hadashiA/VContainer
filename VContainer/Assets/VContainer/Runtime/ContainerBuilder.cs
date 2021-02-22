@@ -87,13 +87,28 @@ namespace VContainer
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
             Parallel.For(0, registrationBuilders.Count, i =>
             {
-                registrations[i] = registrationBuilders[i].Build();
-            });
+                var registrationBuilder = registrationBuilders[i];
+                var registration = registrationBuilder.Build();
+                registrations[i] = registration;
 
+                if (registrationBuilder.BuildCallback is Action<IRegistration, IObjectResolver> callback)
+                {
+                    // TODO: Reduce allocation
+                    RegisterBuildCallback(container => callback(registration, container));
+                }
+            });
 #else
             for (var i = 0; i < registrationBuilders.Count; i++)
             {
-                registrations[i] = registrationBuilders[i].Build();
+                var registrationBuilder = registrationBuilders[i];
+                var registration = registrationBuilder.Build();
+                registrations[i] = registration;
+
+                if (registrationBuilder.BuildCallback is Action<IRegistration, IObjectResolver> callback)
+                {
+                    // TODO: Reduce allocation
+                    RegisterBuildCallback(container => callback(registration, container));
+                }
             }
 #endif
             if (ContainerExposed)
