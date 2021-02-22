@@ -125,6 +125,7 @@ namespace VContainer.Unity
             var scene = lifetimeScope.gameObject.scene;
 
             var registrationBuilder = new ComponentRegistrationBuilder(scene, typeof(T));
+            registrationBuilder.OnAfterBuild((registration, container) => registration.SpawnInstance(container));
             builder.Register(registrationBuilder);
             return registrationBuilder;
         }
