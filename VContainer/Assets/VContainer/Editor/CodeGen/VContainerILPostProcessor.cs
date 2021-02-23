@@ -14,11 +14,14 @@ namespace VContainer.Editor.CodeGen
 
         public override bool WillProcess(ICompiledAssembly compiledAssembly)
         {
-            var settings = VContainerSettings.Instance;
-            return settings != null &&
-                   settings.CodeGen.Enabled &&
-                   settings.CodeGen.AssemblyNames.Contains(compiledAssembly.Name) &&
-                   compiledAssembly.References.Any(x => x.EndsWith("VContainer.dll"));
+            if (VContainerSettings.Instance is VContainerSettings settings)
+            {
+                return settings.CodeGen.Enabled &&
+                       settings.CodeGen.AssemblyNames.Contains(compiledAssembly.Name) &&
+                       compiledAssembly.References.Any(x => x.EndsWith("VContainer.dll"));
+            }
+
+            return false;
         }
 
         public override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)
