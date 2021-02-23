@@ -4,7 +4,6 @@ using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using VContainer.Unity;
 
 namespace VContainer.Editor.CodeGen
 {
@@ -14,14 +13,11 @@ namespace VContainer.Editor.CodeGen
 
         public override bool WillProcess(ICompiledAssembly compiledAssembly)
         {
-            if (VContainerSettings.Instance is VContainerSettings settings)
-            {
-                return settings.CodeGen.Enabled &&
-                       settings.CodeGen.AssemblyNames.Contains(compiledAssembly.Name) &&
-                       compiledAssembly.References.Any(x => x.EndsWith("VContainer.dll"));
-            }
+            var referenceDlls = compiledAssembly.References
+                .Select(Path.GetFileNameWithoutExtension);
 
-            return false;
+            return referenceDlls.Any(x => x == "VContainer") &&
+                   referenceDlls.Any(x => x == "VContainer.EnableCodeGen");
         }
 
         public override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)
@@ -30,10 +26,7 @@ namespace VContainer.Editor.CodeGen
                 return null;
 
             var assemblyDefinition = Utils.LoadAssemblyDefinition(compiledAssembly);
-
-            var generator = new InjectionILGenerator(
-                assemblyDefinition.MainModule,
-                VContainerSettings.Instance.CodeGen.Namespaces);
+            var generator = new InjectionILGenerator(assemblyDefinition.MainModule, null);
 
             if (generator.TryGenerate(out var diagnosticMessages))
             {

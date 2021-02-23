@@ -54,9 +54,7 @@ namespace VContainer.Editor.CodeGen
         MethodReference resolveMethodRef;
         MethodReference resolveOrParameterMethodRef;
 
-        public InjectionILGenerator(
-            ModuleDefinition module,
-            IList<string> targetNamespaces)
+        public InjectionILGenerator(ModuleDefinition module, IList<string> targetNamespaces)
         {
             this.module = module;
             this.targetNamespaces = targetNamespaces;
@@ -94,7 +92,17 @@ namespace VContainer.Editor.CodeGen
             if (count > 0)
             {
                 var assemblyName = module.Assembly.Name.Name;
-                UnityEngine.Debug.Log($"VContainer code generation optimization for {assemblyName} {count} types ({sw.Elapsed.TotalMilliseconds}ms)");
+                var message =
+                    $"VContainer code generation optimization for {assemblyName} {count} types ({sw.Elapsed.TotalMilliseconds}ms)";
+#if UNITY_2020_2_OR_NEWER
+                diagnosticMessages.Add(new DiagnosticMessage
+                {
+                    DiagnosticType = DiagnosticType.Warning,
+                    MessageData = message
+                });
+#else
+                UnityEngine.Debug.Log(message);
+#endif
                 return true;
             }
             return false;
