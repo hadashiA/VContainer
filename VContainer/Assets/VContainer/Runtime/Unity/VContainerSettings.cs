@@ -1,26 +1,14 @@
-using System;
 using System.Linq;
 using UnityEngine;
 
 namespace VContainer.Unity
 {
-    [Serializable]
-    public sealed class CodeGenSettings
-    {
-        public bool Enabled;
-        public string[] AssemblyNames;
-        public string[] Namespaces;
-    }
-
     public sealed class VContainerSettings : ScriptableObject
     {
+        public static VContainerSettings Instance { get; private set; }
+
         [SerializeField]
         public LifetimeScope RootLifetimeScope;
-
-        [SerializeField]
-        public CodeGenSettings CodeGen;
-
-        public static VContainerSettings Instance { get; private set; }
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Create/VContainer/VContainer Settings")]
