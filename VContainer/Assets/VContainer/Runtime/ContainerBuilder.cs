@@ -34,10 +34,10 @@ namespace VContainer
 
         public IScopedObjectResolver BuildScope()
         {
-            var registrations = BuildRegistrations();
+            var (registrations, callbacks) = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             var container = new ScopedContainer(registry, root, parent);
-            EmitCallbacks(container);
+            EmitCallbacks(container, callbacks);
             return container;
         }
 
@@ -73,16 +73,17 @@ namespace VContainer
 
         public virtual IObjectResolver Build()
         {
-            var registrations = BuildRegistrations();
+            var (registrations, callbacks) = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             var container = new Container(registry);
-            EmitCallbacks(container);
+            EmitCallbacks(container, callbacks);
             return container;
         }
 
-        protected IReadOnlyList<IRegistration> BuildRegistrations()
+        protected (IReadOnlyList<IRegistration>, IReadOnlyList<(IRegistration, Action<IRegistration, IObjectResolver>)>) BuildRegistrations()
         {
             var registrations = new IRegistration[registrationBuilders.Count + (ContainerExposed ? 1 : 0)];
+            var callbacks = new List<(IRegistration, Action<IRegistration, IObjectResolver>)>(registrations.Length);
 
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
             Parallel.For(0, registrationBuilders.Count, i =>
@@ -93,8 +94,7 @@ namespace VContainer
 
                 if (registrationBuilder.BuildCallback is Action<IRegistration, IObjectResolver> callback)
                 {
-                    // TODO: Reduce allocation
-                    RegisterBuildCallback(container => callback(registration, container));
+                    callbacks.Add((registration, callback));
                 }
             });
 #else
@@ -106,8 +106,7 @@ namespace VContainer
 
                 if (registrationBuilder.BuildCallback is Action<IRegistration, IObjectResolver> callback)
                 {
-                    // TODO: Reduce allocation
-                    RegisterBuildCallback(container => callback(registration, container));
+                    callbacks.Add((registration, callback));
                 }
             }
 #endif
@@ -127,11 +126,19 @@ namespace VContainer
                 TypeAnalyzer.CheckCircularDependency(x.ImplementationType);
             }
 #endif
-            return registrations;
+            return (registrations, callbacks);
         }
 
-        protected void EmitCallbacks(IObjectResolver container)
+        protected void EmitCallbacks(
+            IObjectResolver container,
+            IEnumerable<(IRegistration, Action<IRegistration, IObjectResolver>)> callbacks)
         {
+            foreach (var x in callbacks)
+            {
+                var (registration, callback) = x;
+                callback.Invoke(registration, container);
+            }
+
             if (buildCallbacks == null) return;
 
             foreach (var callback in buildCallbacks)
