@@ -35,24 +35,34 @@ namespace VContainer.Unity
             if (string.IsNullOrEmpty(path))
                 return;
 
-            var configObject = CreateInstance<VContainerSettings>();
-            UnityEditor.AssetDatabase.CreateAsset(configObject, path);
+            var newSettings = CreateInstance<VContainerSettings>();
+            UnityEditor.AssetDatabase.CreateAsset(newSettings, path);
 
-            // Add the config asset to the build
             var preloadedAssets = UnityEditor.PlayerSettings.GetPreloadedAssets().ToList();
-            preloadedAssets.Add(configObject);
+            preloadedAssets.RemoveAll(x => x is VContainerSettings);
+            preloadedAssets.Add(newSettings);
             UnityEditor.PlayerSettings.SetPreloadedAssets(preloadedAssets.ToArray());
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void LoadInstanceFromAssetDatabase()
+        public static void LoadInstanceFromPreloadAssets()
         {
-            var guids = UnityEditor.AssetDatabase.FindAssets("t:VContainerSettings");
-            if (guids.Length > 0)
+            var preloadAsset = UnityEditor.PlayerSettings.GetPreloadedAssets().FirstOrDefault(x => x is VContainerSettings);
+            if (preloadAsset is VContainerSettings instance)
             {
-                var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
-                Instance = UnityEditor.AssetDatabase.LoadAssetAtPath<VContainerSettings>(path);
+                instance.OnEnable();
             }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void RuntimeInitialize()
+        {
+            LoadInstanceFromPreloadAssets();
+        }
+
+        [UnityEditor.InitializeOnLoadMethod]
+        static void EditorInitialize()
+        {
+            LoadInstanceFromPreloadAssets();
         }
 #endif
 
