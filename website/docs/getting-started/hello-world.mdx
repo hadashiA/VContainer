@@ -181,7 +181,7 @@ public class HelloScreen : MonoBehaviour
 In normal Unity programming, you embed logic calls in HelloScreen, but if you're using DI, you can separate HelloScreen and   any control flow.
 
 ```diff  title="GamePresenter.cs"
-public class GamePresenter
+namespace MyGame
 {
 -    public class GamePresenter : ITickable
 +    public class GamePresenter : IStartable
