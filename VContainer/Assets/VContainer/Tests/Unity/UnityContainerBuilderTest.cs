@@ -39,7 +39,6 @@ namespace VContainer.Tests.Unity
 
                 Assert.That(container.Resolve<SampleMonoBehaviour>(), Is.EqualTo(component));
                 Assert.That(container.Resolve<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
-                Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
             }
             {
                 var builder = new ContainerBuilder();
@@ -49,7 +48,6 @@ namespace VContainer.Tests.Unity
                 var container = builder.Build();
 
                 Assert.That(container.Resolve<IComponent>(), Is.EqualTo(component));
-                Assert.That(container.Resolve<MonoBehaviour>(), Is.InstanceOf<MonoBehaviour>());
             }
         }
 

@@ -97,24 +97,14 @@ namespace VContainer.Unity
             builder.RegisterInstance(new EntryPointExceptionHandler(exceptionHandler));
         }
 
-        public static RegistrationBuilder RegisterComponent(this IContainerBuilder builder, MonoBehaviour component)
-        {
-            var registrationBuilder = builder.RegisterInstance(component);
-            if (component is MonoBehaviour monoBehaviour)
-            {
-                registrationBuilder.As<MonoBehaviour>().AsSelf();
-                builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
-            }
-            return registrationBuilder;
-        }
-
         public static RegistrationBuilder RegisterComponent<TInterface>(this IContainerBuilder builder, TInterface component)
         {
             var registrationBuilder = builder.RegisterInstance(component).As(typeof(TInterface));
-            if (component is MonoBehaviour monoBehaviour)
+            if (component is MonoBehaviour)
             {
-                registrationBuilder.As<MonoBehaviour>();
-                builder.RegisterBuildCallback(container => container.Inject(monoBehaviour));
+                // Force inject execution
+                registrationBuilder
+                    .OnAfterBuild((registration, container) => registration.SpawnInstance(container));
             }
             return registrationBuilder;
         }
@@ -125,6 +115,7 @@ namespace VContainer.Unity
             var scene = lifetimeScope.gameObject.scene;
 
             var registrationBuilder = new ComponentRegistrationBuilder(scene, typeof(T));
+            // Force inject execution
             registrationBuilder.OnAfterBuild((registration, container) => registration.SpawnInstance(container));
             builder.Register(registrationBuilder);
             return registrationBuilder;
