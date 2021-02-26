@@ -122,9 +122,13 @@ namespace VContainer.Internal
 
             if (injectConstructor == null)
             {
-                throw new VContainerException(type, $"Type does not found injectable constructor, type: {type.Name}");
+#if UNITY_2018_4_OR_NEWER
+                // It seems that Unity sometimes strips the constructor of Component at build time.
+                // In that case, allow null.
+                if (!type.IsSubclassOf(typeof(UnityEngine.Component)))
+#endif
+                    throw new VContainerException(type, $"Type does not found injectable constructor, type: {type.Name}");
             }
-
             // Methods, [Inject] Only
             var injectMethods = default(List<InjectMethodInfo>);
             foreach (var methodInfo in type.GetRuntimeMethods())
@@ -187,9 +191,12 @@ namespace VContainer.Internal
             stack.Push(type);
             if (Cache.TryGetValue(type, out var injectTypeInfo))
             {
-                foreach (var x in injectTypeInfo.InjectConstructor.ParameterInfos)
+                if (injectTypeInfo.InjectConstructor != null)
                 {
-                    CheckCircularDependencyRecursive(x.ParameterType, stack);
+                    foreach (var x in injectTypeInfo.InjectConstructor.ParameterInfos)
+                    {
+                        CheckCircularDependencyRecursive(x.ParameterType, stack);
+                    }
                 }
 
                 if (injectTypeInfo.InjectMethods != null)
