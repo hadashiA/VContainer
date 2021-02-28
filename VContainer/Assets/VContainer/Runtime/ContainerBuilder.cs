@@ -15,10 +15,9 @@ namespace VContainer
         RegistrationBuilder Register(Type type, Lifetime lifetime);
         RegistrationBuilder RegisterInstance(object instance);
         RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
-
         void RegisterBuildCallback(Action<IObjectResolver> container);
 
-        IObjectResolver Build();
+        bool Exists(Type type, bool includeInterfaceTypes = false);
     }
 
     public sealed class ScopedContainerBuilder : ContainerBuilder
@@ -69,6 +68,19 @@ namespace VContainer
             if (buildCallbacks == null)
                 buildCallbacks = new List<Action<IObjectResolver>>();
             buildCallbacks.Add(callback);
+        }
+
+        public bool Exists(Type type, bool includeInterfaceTypes = false)
+        {
+            foreach (var registrationBuilder in registrationBuilders)
+            {
+                if (registrationBuilder.ImplementationType == type ||
+                    includeInterfaceTypes && registrationBuilder.InterfaceTypes?.Contains(type) == true)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public virtual IObjectResolver Build()
