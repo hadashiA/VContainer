@@ -10,7 +10,6 @@ namespace VContainer
         object Resolve(Type type);
         object Resolve(IRegistration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
-        void Inject(object instance);
         void Inject(object instance, params IInjectParameter[] parameters);
         T CreateInstance<T>(params IInjectParameter[] parameters);
     }
@@ -88,12 +87,6 @@ namespace VContainer
             var containerBuilder = new ScopedContainerBuilder(Root, this);
             installation?.Invoke(containerBuilder);
             return containerBuilder.BuildScope();
-        }
-
-        public void Inject(object instance)
-        {
-            var injector = InjectorCache.GetOrBuild(instance.GetType());
-            injector.Inject(instance, this, null);
         }
 
         public void Inject(object instance, params IInjectParameter[] parameters)
@@ -195,12 +188,6 @@ namespace VContainer
 
         public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
             => rootScope.CreateScope(installation);
-
-        public void Inject(object instance)
-        {
-            var injector = InjectorCache.GetOrBuild(instance.GetType());
-            injector.Inject(instance, this, null);
-        }
 
         public void Inject(object instance, params IInjectParameter[] parameters)
         {
