@@ -21,8 +21,8 @@ namespace VContainer.Internal
         public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
             InjectMethods(instance, resolver, parameters);
-            InjectProperties(instance, resolver);
-            InjectFields(instance, resolver);
+            InjectProperties(instance, resolver, parameters);
+            InjectFields(instance, resolver, parameters);
         }
 
         public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
@@ -56,26 +56,34 @@ namespace VContainer.Internal
             }
         }
 
-        void InjectFields(object obj, IObjectResolver resolver)
+        void InjectFields(object obj, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
             if (injectTypeInfo.InjectFields == null)
                 return;
 
             foreach (var x in injectTypeInfo.InjectFields)
             {
-                var fieldValue = resolver.Resolve(x.FieldType);
+                var fieldValue = resolver.ResolveOrParameter(
+                    x.FieldType,
+                    x.Name,
+                    parameters);
+
                 x.SetValue(obj, fieldValue);
             }
         }
 
-        void InjectProperties(object obj, IObjectResolver resolver)
+        void InjectProperties(object obj, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
             if (injectTypeInfo.InjectProperties == null)
                 return;
 
             foreach (var x in injectTypeInfo.InjectProperties)
             {
-                var propValue = resolver.Resolve(x.PropertyType);
+                var propValue = resolver.ResolveOrParameter(
+                    x.PropertyType,
+                    x.Name,
+                    parameters);
+
                 x.SetValue(obj, propValue);
             }
         }
