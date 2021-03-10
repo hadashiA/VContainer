@@ -12,6 +12,7 @@ module.exports = {
       'resolving/constructor-injection',
       'resolving/method-injection',
       'resolving/property-field-injection',
+      'resolving/gameobject-injection'
     ],
     'Registering': [
       'registering/register-type',

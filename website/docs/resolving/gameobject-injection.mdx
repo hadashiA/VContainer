@@ -1,0 +1,27 @@
+---
+id: gameobject-injection
+title: Inject into MonoBehaviour
+sidebar_label: MonoBehaviour
+---
+
+MonoBehaviour cannot use a constructor. Use [method injection](./method-injection) instead.
+
+Note, however, that not all MonoBehaviour with the `[Inject]` attribute will have Method Injection performed automatically.
+
+There are 3 ways to perform an Inject to MonoBehaviour.
+
+1. Use `RegisterComponent*` to register the MonoBehaviour instance to the container.
+    - In this case, the registered MonoBehaviour will both Inject and be Injected into other classes.
+    - See [Register MonoBehaviour](../registering/register-monobehaviour)
+2. Use the Factory pattern to create an injected instance
+    - See [Register Factory](../registering/register-factory)
+3. If you want to do "Inject to MonoBehaviour only", you can set it in the inspector of LieftimeScope.
+    - All MonoBehaviour (including children) in the specified GameObject in the inspector will be automatically Injected when the LifetimeScope is initialized.
+    - ![](./assets/screenshot_auto_inject_gameobjects.png)
+
+## Why isn't the Inject to MonoBehaviour automatic?
+
+- In Unity, it is difficult to implicitly hook MonoBehaviour generation for all cases. Rather than having some cases that are automatically Injected and some that are not, we decided to explicitly state which cases are Injected.
+- In VContainer, does not actively recommend executing Inject to MonoBehaviour.
+  - This is because the purpose of VContainer and DI is inversion of control of MonoBehaviour.
+  - Also, if MonoBehaviour needs to execute an Inject to work, then you are destroying the strength of Unity's prefab portability.
