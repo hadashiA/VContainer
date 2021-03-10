@@ -19,7 +19,7 @@ There are 3 ways to perform an Inject to MonoBehaviour.
     - All MonoBehaviour (including children) in the specified GameObject in the inspector will be automatically Injected when the LifetimeScope is initialized.
     - ![](./assets/screenshot_auto_inject_gameobjects.png)
 
-## Why isn't the Inject to MonoBehaviour automatic?
+## Why doesn't the Inject to all MonoBehaviour run automatically?
 
 - In Unity, it is difficult to implicitly hook MonoBehaviour generation for all cases. Rather than having some cases that are automatically Injected and some that are not, we decided to explicitly state which cases are Injected.
 - In VContainer, does not actively recommend executing Inject to MonoBehaviour.

@@ -7,7 +7,7 @@
   "keywords": ["DI", "Dependency Injection", "DI Container"],
   "license": "MIT",
   "dependencies": {
-    "nuget.mono-cecil": "0.1.6-preview"
+    "com.unity.nuget.mono-cecil": "1.10.1"
   }
 }
 
