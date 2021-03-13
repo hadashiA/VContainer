@@ -11,13 +11,13 @@ namespace VContainer.Tests
         {
         }
 
-        class HasNoAttributeConstructor
+        class HasMultipleConstructor
         {
-            public HasNoAttributeConstructor(int x)
+            public HasMultipleConstructor(int x)
             {
             }
 
-            public HasNoAttributeConstructor(int x, int y)
+            public HasMultipleConstructor(int x, int y)
             {
             }
         }
@@ -40,6 +40,18 @@ namespace VContainer.Tests
             }
         }
 
+        class HasInjectAndNoInjectConstructor
+        {
+            [Inject]
+            public HasInjectAndNoInjectConstructor(int x)
+            {
+            }
+
+            public HasInjectAndNoInjectConstructor(int x, int y)
+            {
+            }
+        }
+
         class HasMultipleInjectConstructor
         {
             [Inject]
@@ -47,31 +59,56 @@ namespace VContainer.Tests
             {
             }
 
+            [Inject]
             public HasMultipleInjectConstructor(int x, int y)
             {
             }
         }
 
         [Test]
-        public void Analyze()
+        public void AnalyzeNoConstructor()
         {
-            {
-                var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasNoConstructor));
-                Assert.That(injectTypeInfo.InjectConstructor.ParameterInfos.Length, Is.EqualTo(0));
-            }
+            var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasNoConstructor));
+            Assert.That(injectTypeInfo.InjectConstructor.ParameterInfos.Length, Is.EqualTo(0));
+        }
 
+        [Test]
+        public void AnalyzeNoAttributeConstructor()
+        {
+            var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasMultipleConstructor));
+            Assert.That(injectTypeInfo.InjectConstructor.ParameterInfos.Length, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void AnalyzeAttributeConstructor()
+        {
+            var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasInjectConstructor));
+            Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
+            Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetParameters().Length, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void AnalyzeCombinedConstructor()
+        {
+            var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasInjectAndNoInjectConstructor));
+            Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
+            Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetParameters().Length, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void AnalyzeDuplicateAttributeConstructor()
+        {
+            Assert.Throws<VContainerException>(() =>
             {
-                var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasNoAttributeConstructor));
-                Assert.That(injectTypeInfo.InjectConstructor.ParameterInfos.Length, Is.EqualTo(2));
-            }
-            {
-                var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasInjectConstructor));
-                Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetCustomAttribute<InjectAttribute>(), Is.Not.Null);
-            }
-            {
-                var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasStaticConstructor));
-                Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.IsStatic, Is.False);
-            }
+                TypeAnalyzer.Analyze(typeof(HasMultipleInjectConstructor));
+            });
+        }
+
+        [Test]
+        public void AnalyzeStaticConstructor()
+        {
+            var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasStaticConstructor));
+            Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.IsStatic, Is.False);
         }
     }
 }
