@@ -97,19 +97,19 @@ namespace VContainer.Internal
             var typeInfo = type.GetTypeInfo();
 
             // Constructor, single [Inject] constructor -> single most parameters constuctor
-            var injectConstructorCount = 0;
+            var annotatedConstructorCount = 0;
             var maxParameters = -1;
             foreach (var constructorInfo in typeInfo.GetConstructors(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
             {
                 if (constructorInfo.IsDefined(typeof(InjectAttribute), false))
                 {
-                    if (++injectConstructorCount > 1)
+                    if (++annotatedConstructorCount > 1)
                     {
                         throw new VContainerException(type, "Type found multiple [Inject] marked constructors, type:" + type.Name);
                     }
                     injectConstructor = new InjectConstructorInfo(constructorInfo);
                 }
-                else if (injectConstructorCount <= 0)
+                else if (annotatedConstructorCount <= 0)
                 {
                     var parameterInfos = constructorInfo.GetParameters();
                     if (parameterInfos.Length > maxParameters)
