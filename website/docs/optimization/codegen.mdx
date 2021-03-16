@@ -43,31 +43,16 @@ class ClassA
 
 ## How to enable code generation mode
 
-### 1. Add VContainerSettings in your project
+### 1. Add `VContainer.EnableCodeGen` asmdef to your references
 
-Choose `Assets -> Create -> VContainer -> VContainer Settings`.
-And select directory.
+If you have asmdef in your project that refers to the following 2 asmdef, they are targets for IL weaving.
 
-:::note
-This menu will automatically add VContainerSettings to preload-assets.
-:::
+- `VContainer`
+- `VContainer.EnableCodeGen`
 
-### 2. Specify target assemblies
+![](./assets/screenshot_enablecodegen.png)
 
-Set the following from the inspector of VContainerSettings.asset.
-
-![](assets/screenshot_vcontainersettings.png)
-
-- Prepare Code Generation section
-  - **Enabled** : enable/disable code generation feature at build time.
-  - **Target Assemblies** : Specify the assembly you want to pre-IL generate.
-      - "+" button shows valid choices
-      - The Assembly specified here must reference VContainer.dll.
-      - If not specified, no pre-code generation will be done
-  - **Namespace Filter** : You can filter the target by specifying namespace.
-      - "+" button shows valid choices.
-
-## 3. Build your assembly
+### 2. Build your assembly
 
 The next time the specified assembly is compiled, VContainer will make changes to the compiled dll.
 
@@ -75,5 +60,8 @@ If it succeeds, it will be logged. For example:
 
 > VContainer code generation optimization for MyGame.dll 24 types (40.0355ms)
 
+:::note
+In Unity 2020.2 and later, the ILPostProcessor can no longer output logs.
+As a temporary measure, the above log is output as a warning, but it may be removed in the future.
+:::
 
-VContainer code generation optimization for VContainer.Benchmark.Fixtures 24 types (40.0355ms)
