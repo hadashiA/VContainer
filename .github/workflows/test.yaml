@@ -24,8 +24,8 @@ jobs:
         - 2020.3.0f1
         - 2019.4.22f1
         - 2019.3.15f1
-        # externalPackage: ['None', 'UniTask', 'ECS']
-        externalPackage: ['None', 'UniTask']
+        # feature: ['None', 'UniTask', 'ECS']
+        feature: ['Default', 'UniTask', 'CodeGen']
         include:
         - unityVersion: 2020.3.0f1
           license: UNITY_LICENSE_2020_3
@@ -33,8 +33,8 @@ jobs:
           license: UNITY_LICENSE_2019_4
         - unityVersion: 2019.3.15f1
           license: UNITY_LICENSE_2019_3
-        - externalPackage: 'ECS'
-          unityVersion: 2020.3.0f1
+        - unityVersion: 2020.3.0f1
+          feature: 'ECS'
           license: UNITY_LICENSE_2020_3
         # - unityVersion: 2018.4.31f1
         #   license: UNITY_LICENSE_2018_4
@@ -44,22 +44,28 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: VContainer/Library
-        key: Library-VContainer-${{ matrix.unityVersion }}-${{ matrix.externalPackage }}
+        key: Library-VContainer-${{ matrix.unityVersion }}-${{ matrix.feature }}
         restore-keys: |
           Library-VContainer-
           Library-
 
-    - name: Add com.cysharp.unitask
-      if: matrix.externalPackage == 'UniTask'
+    - name: Add UniTask
+      if: matrix.feature == 'UniTask'
       shell: bash
       run: |
         sed -i '2a "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",' ./VContainer/Packages/manifest.json
 
-    - name: Add com.unity.entities
-      if: matrix.externalPackage == 'ECS'
+    - name: Add Unity.Entities
+      if: matrix.feature == 'ECS'
       shell: bash
       run: |
         sed -i '2a "com.unity.entities": "0.17.0-preview.41",' ./VContainer/Packages/manifest.json
+
+    - name: Enable CodeGen
+      if: matrix.feature == 'CodeGen'
+      shell: bash
+      run: |
+        sed -i '4a "VContainer.EnableCodeGen",' ./VContainer/Assets/VContainer/Tests/VContainer.Tests.asmdef
   
     - uses: game-ci/unity-test-runner@v2.0-alpha-2
       env:
