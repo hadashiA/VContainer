@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using VContainer.Internal;
 
 namespace VContainer.Tests
 {
@@ -365,9 +366,15 @@ namespace VContainer.Tests
             builder.Register<HasCircularDependency1>(Lifetime.Transient);
             builder.Register<HasCircularDependency2>(Lifetime.Transient);
 
-            // Assert.Throws<AggregateException>(() => builder.Build());
-            Assert.Throws<VContainerException>(() => builder.Build(),
-                "Circular dependency detected! type: VContainer.Tests.HasCircularDependency1");
+            var injector = InjectorCache.GetOrBuild(typeof(HasCircularDependency1));
+
+            // Only reflection mode can detect circular dependency errors at runtime.
+            if (injector is ReflectionInjector)
+            {
+                // Assert.Throws<AggregateException>(() => builder.Build());
+                Assert.Throws<VContainerException>(() => builder.Build(),
+                    "Circular dependency detected! type: VContainer.Tests.HasCircularDependency1");
+            }
         }
 
         [Test]
