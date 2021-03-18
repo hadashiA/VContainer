@@ -24,8 +24,7 @@ jobs:
         - 2020.3.0f1
         - 2019.4.22f1
         - 2019.3.15f1
-        # feature: ['None', 'UniTask', 'ECS']
-        feature: ['Default', 'UniTask', 'CodeGen']
+        features: ['Default', 'UniTask', 'CodeGen', 'UniTask,CodeGen']
         include:
         - unityVersion: 2020.3.0f1
           license: UNITY_LICENSE_2020_3
@@ -36,9 +35,12 @@ jobs:
         - unityVersion: 2020.3.0f1
           feature: 'ECS'
           license: UNITY_LICENSE_2020_3
+        - unityVersion: 2020.3.0f1
+          feature: 'ECS,CodeGen'
+          license: UNITY_LICENSE_2020_3
         # - unityVersion: 2018.4.31f1
         #   license: UNITY_LICENSE_2018_4
-        #   externalPackage: 'None'
+        #   features: 'Default'
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
@@ -50,19 +52,19 @@ jobs:
           Library-
 
     - name: Add UniTask
-      if: matrix.feature == 'UniTask'
+      if: contains(matrix.feature, 'UniTask')
       shell: bash
       run: |
         sed -i '2a "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",' ./VContainer/Packages/manifest.json
 
     - name: Add Unity.Entities
-      if: matrix.feature == 'ECS'
+      if: contains(matrix.feature, 'ECS')
       shell: bash
       run: |
         sed -i '2a "com.unity.entities": "0.17.0-preview.41",' ./VContainer/Packages/manifest.json
 
     - name: Enable CodeGen
-      if: matrix.feature == 'CodeGen'
+      if: contains(matrix.feature, 'CodeGen')
       shell: bash
       run: |
         sed -i '4a "VContainer.EnableCodeGen",' ./VContainer/Assets/VContainer/Tests/VContainer.Tests.asmdef
