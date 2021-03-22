@@ -2,11 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VContainer.Internal;
-
-#if VCONTAINER_ECS_INTEGRATION
-using Unity.Entities;
-#endif
 
 namespace VContainer.Unity
 {
@@ -122,7 +117,6 @@ namespace VContainer.Unity
         public LifetimeScope Parent { get; private set; }
         public bool IsRoot { get; set; }
 
-        readonly CompositeDisposable disposable = new CompositeDisposable();
         readonly List<IInstaller> extraInstallers = new List<IInstaller>();
 
         protected virtual void Awake()
@@ -179,7 +173,6 @@ namespace VContainer.Unity
             extraInstallers.Clear();
 
             AutoInjectAll();
-            DispatchEntryPoints();
             AwakeWaitingChildren(this);
         }
 
@@ -287,7 +280,6 @@ namespace VContainer.Unity
 
         void DisposeCore()
         {
-            disposable.Dispose();
             Container?.Dispose();
             Container = null;
             CancelAwake(this);

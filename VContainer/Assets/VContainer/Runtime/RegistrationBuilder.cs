@@ -6,14 +6,14 @@ namespace VContainer
 {
     public class RegistrationBuilder
     {
-        public Action<IRegistration, IObjectResolver> BuildCallback { get; protected set; }
+        public Action<IRegistration, IObjectResolver> BuildCallback { get; private set; }
 
-        protected readonly Type ImplementationType;
-        protected readonly Lifetime Lifetime;
-        protected readonly object SpecificInstance;
+        internal readonly Type ImplementationType;
+        internal readonly Lifetime Lifetime;
+        internal readonly object SpecificInstance;
 
-        protected List<Type> InterfaceTypes;
-        protected List<IInjectParameter> Parameters;
+        internal List<Type> InterfaceTypes;
+        internal List<IInjectParameter> Parameters;
 
         public RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
         {

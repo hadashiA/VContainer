@@ -1,26 +1,36 @@
+using System;
 using System.Collections.Generic;
+using VContainer.Internal;
 #if VCONTAINER_ECS_INTEGRATION
 using Unity.Entities;
 #endif
 
 namespace VContainer.Unity
 {
-    partial class LifetimeScope
+    public sealed class EntryPointDispatcher : IDisposable
     {
-        void DispatchEntryPoints()
+        readonly IObjectResolver container;
+        readonly CompositeDisposable disposable = new CompositeDisposable();
+
+        public EntryPointDispatcher(IObjectResolver container)
+        {
+            this.container = container;
+        }
+
+        public void Dispatch()
         {
             PlayerLoopHelper.Initialize();
 
             EntryPointExceptionHandler exceptionHandler = null;
             try
             {
-                exceptionHandler = Container.Resolve<EntryPointExceptionHandler>();
+                exceptionHandler = container.Resolve<EntryPointExceptionHandler>();
             }
             catch (VContainerException ex) when (ex.InvalidType == typeof(EntryPointExceptionHandler))
             {
             }
 
-            var initializables = Container.Resolve<IReadOnlyList<IInitializable>>();
+            var initializables = container.Resolve<IReadOnlyList<IInitializable>>();
             if (initializables.Count > 0)
             {
                 var loopItem = new InitializationLoopItem(initializables, exceptionHandler);
@@ -28,7 +38,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Initialization, loopItem);
             }
 
-            var postInitializables = Container.Resolve<IReadOnlyList<IPostInitializable>>();
+            var postInitializables = container.Resolve<IReadOnlyList<IPostInitializable>>();
             if (postInitializables.Count > 0)
             {
                 var loopItem = new PostInitializationLoopItem(postInitializables, exceptionHandler);
@@ -36,7 +46,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
             }
 
-            var startables = Container.Resolve<IReadOnlyList<IStartable>>();
+            var startables = container.Resolve<IReadOnlyList<IStartable>>();
             if (startables.Count > 0)
             {
                 var loopItem = new StartableLoopItem(startables, exceptionHandler);
@@ -44,7 +54,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Startup, loopItem);
             }
 
-            var postStartables = Container.Resolve<IReadOnlyList<IPostStartable>>();
+            var postStartables = container.Resolve<IReadOnlyList<IPostStartable>>();
             if (postStartables.Count > 0)
             {
                 var loopItem = new PostStartableLoopItem(postStartables, exceptionHandler);
@@ -52,7 +62,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostStartup, loopItem);
             }
 
-            var fixedTickables = Container.Resolve<IReadOnlyList<IFixedTickable>>();
+            var fixedTickables = container.Resolve<IReadOnlyList<IFixedTickable>>();
             if (fixedTickables.Count > 0)
             {
                 var loopItem = new FixedTickableLoopItem(fixedTickables, exceptionHandler);
@@ -60,7 +70,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.FixedUpdate, loopItem);
             }
 
-            var postFixedTickables = Container.Resolve<IReadOnlyList<IPostFixedTickable>>();
+            var postFixedTickables = container.Resolve<IReadOnlyList<IPostFixedTickable>>();
             if (postFixedTickables.Count > 0)
             {
                 var loopItem = new PostFixedTickableLoopItem(postFixedTickables, exceptionHandler);
@@ -68,7 +78,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
             }
 
-            var tickables = Container.Resolve<IReadOnlyList<ITickable>>();
+            var tickables = container.Resolve<IReadOnlyList<ITickable>>();
             if (tickables.Count > 0)
             {
                 var loopItem = new TickableLoopItem(tickables, exceptionHandler);
@@ -76,7 +86,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Update, loopItem);
             }
 
-            var postTickables = Container.Resolve<IReadOnlyList<IPostTickable>>();
+            var postTickables = container.Resolve<IReadOnlyList<IPostTickable>>();
             if (postTickables.Count > 0)
             {
                 var loopItem = new PostTickableLoopItem(postTickables, exceptionHandler);
@@ -84,7 +94,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostUpdate, loopItem);
             }
 
-            var lateTickables = Container.Resolve<IReadOnlyList<ILateTickable>>();
+            var lateTickables = container.Resolve<IReadOnlyList<ILateTickable>>();
             if (lateTickables.Count > 0)
             {
                 var loopItem = new LateTickableLoopItem(lateTickables, exceptionHandler);
@@ -92,7 +102,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, loopItem);
             }
 
-            var postLateTickables = Container.Resolve<IReadOnlyList<IPostLateTickable>>();
+            var postLateTickables = container.Resolve<IReadOnlyList<IPostLateTickable>>();
             if (postLateTickables.Count > 0)
             {
                 var loopItem = new PostLateTickableLoopItem(postLateTickables, exceptionHandler);
@@ -101,7 +111,7 @@ namespace VContainer.Unity
             }
 
 #if VCONTAINER_UNITASK_INTEGRATION
-            var asyncStartables = Container.Resolve<IReadOnlyList<IAsyncStartable>>();
+            var asyncStartables = container.Resolve<IReadOnlyList<IAsyncStartable>>();
             if (asyncStartables.Count > 0)
             {
                 var loopItem = new AsyncStartableLoopItem(asyncStartables, exceptionHandler);
@@ -111,15 +121,16 @@ namespace VContainer.Unity
 #endif
 
 #if VCONTAINER_ECS_INTEGRATION
-            Container.Resolve<IEnumerable<ComponentSystemBase>>();
+            container.Resolve<IEnumerable<ComponentSystemBase>>();
 
-            var worldHelpers = Container.Resolve<IEnumerable<WorldConfigurationHelper>>();
+            var worldHelpers = container.Resolve<IEnumerable<WorldConfigurationHelper>>();
             foreach (var x in worldHelpers)
             {
                 x.SortSystems();
             }
 #endif
-        }
+       }
 
+        public void Dispose() => disposable.Dispose();
     }
 }

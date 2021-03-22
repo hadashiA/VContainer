@@ -82,12 +82,17 @@ namespace VContainer.Unity
 
         public static RegistrationBuilder RegisterEntryPoint<T>(this IContainerBuilder builder, Lifetime lifetime)
         {
-            var registrationBuilder = builder.Register<T>(lifetime);
-            if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
+            if (!builder.Exists(typeof(EntryPointDispatcher), false))
             {
-                registrationBuilder = registrationBuilder.As(typeof(MonoBehaviour));
+                builder.Register<EntryPointDispatcher>(Lifetime.Scoped);
+                builder.RegisterContainer();
+
+                builder.RegisterBuildCallback(container =>
+                {
+                    container.Resolve<EntryPointDispatcher>().Dispatch();
+                });
             }
-            return registrationBuilder.AsImplementedInterfaces();
+            return builder.Register<T>(lifetime).AsImplementedInterfaces();
         }
 
         public static void RegisterEntryPointExceptionHandler(
