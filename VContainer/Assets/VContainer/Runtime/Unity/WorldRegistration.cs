@@ -36,7 +36,7 @@ namespace VContainer.Unity
                 world.CreateSystem<InitializationSystemGroup>();
                 world.CreateSystem<SimulationSystemGroup>();
                 world.CreateSystem<PresentationSystemGroup>();
-                ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world, PlayerLoop.GetCurrentPlayerLoop());
+                ScriptBehaviourUpdateOrder.AddWorldToCurrentPlayerLoop(world);
             }
             return world;
         }
