@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -24,6 +25,17 @@ namespace VContainer.Tests.Unity
             Assert.That(container.Resolve<IPostTickable>(), Is.InstanceOf<IPostTickable>());
             Assert.That(container.Resolve<ILateTickable>(), Is.InstanceOf<ILateTickable>());
             Assert.That(container.Resolve<IPostLateTickable>(), Is.InstanceOf<IPostLateTickable>());
+        }
+
+        [Test]
+        public void RegisterEntryPointMultiple()
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped);
+            builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped);
+
+            var container = builder.Build();
+            Assert.That(container.Resolve<IReadOnlyList<EntryPointDispatcher>>().Count, Is.EqualTo(1));
         }
 
         [Test]
