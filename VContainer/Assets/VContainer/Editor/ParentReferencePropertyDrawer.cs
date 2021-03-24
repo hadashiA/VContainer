@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using VContainer.Unity;
@@ -15,10 +16,26 @@ namespace VContainer.Editor
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                var types = assembly.GetTypes();
+                if (assembly.FullName.StartsWith("UnityEngine.") ||
+                    assembly.FullName.StartsWith("Unity.") ||
+                    assembly.FullName.StartsWith("System."))
+                {
+                    continue;
+                }
+
+                Type[] types;
+                try
+                {
+                    types = assembly.GetTypes();
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    types = ex.Types;
+                }
+
                 foreach (var type in types)
                 {
-                    if (type.IsSubclassOf(typeof(LifetimeScope)))
+                    if (type?.IsSubclassOf(typeof(LifetimeScope)) == true)
                     {
                         result.Add(type.FullName);
                     }
