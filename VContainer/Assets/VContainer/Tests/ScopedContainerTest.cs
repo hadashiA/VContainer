@@ -199,5 +199,31 @@ namespace VContainer.Tests
             var ctorInjectable = new ServiceA(new NoDependencyServiceA());
             Assert.DoesNotThrow(() => childContainer.Inject(ctorInjectable));
         }
+
+
+        [Test]
+        public void RegisterDisposableInstance()
+        {
+            var instance1 = new DisposableServiceA();
+
+            var builder = new ContainerBuilder();
+            builder.RegisterInstance(instance1);
+
+            var container = builder.Build();
+            var childContainer = container.CreateScope();
+
+            var resolveFromParent = container.Resolve<DisposableServiceA>();
+            var resolveFromChild = childContainer.Resolve<DisposableServiceA>();
+
+            Assert.That(resolveFromParent, Is.InstanceOf<DisposableServiceA>());
+            Assert.That(resolveFromChild, Is.InstanceOf<DisposableServiceA>());
+            Assert.That(resolveFromParent, Is.EqualTo(resolveFromChild));
+
+            childContainer.Dispose();
+            Assert.That(resolveFromParent.Disposed, Is.False);
+
+            container.Dispose();
+            Assert.That(resolveFromParent.Disposed, Is.True);
+        }
     }
 }
