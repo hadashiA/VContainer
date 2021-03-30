@@ -12,7 +12,7 @@ using VContainer.Internal;
 
 namespace VContainer.Editor.CodeGen
 {
-    public sealed class InjectionILGenerator
+    sealed class InjectionILGenerator
     {
         readonly ModuleDefinition module;
         readonly IList<string> targetNamespaces;
@@ -198,7 +198,6 @@ namespace VContainer.Editor.CodeGen
             var injectMethodDef = injectorTypeDef.Methods.Single(x => x.Name == "Inject");
 
             injectorTypeDef.Methods.Add(methodDef);
-
 
             methodDef.Parameters.Add(new ParameterDefinition(ObjectResolverTypeRef)
             {

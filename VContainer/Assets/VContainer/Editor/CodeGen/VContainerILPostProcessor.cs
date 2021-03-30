@@ -35,6 +35,16 @@ namespace VContainer.Editor.CodeGen
                     return new ILPostProcessResult(null, diagnosticMessages);
                 }
 
+                // TODO:
+                var (selfReference, selfReferenceIndex) = assemblyDefinition.MainModule.AssemblyReferences
+                    .Select((x, i) => (x, i))
+                    .FirstOrDefault(e => e.x.Name == assemblyDefinition.Name.Name);
+
+                if (selfReference != null)
+                {
+                    assemblyDefinition.MainModule.AssemblyReferences.RemoveAt(selfReferenceIndex);
+                }
+
                 var pe = new MemoryStream();
                 var pdb = new MemoryStream();
                 var writerParameters = new WriterParameters
