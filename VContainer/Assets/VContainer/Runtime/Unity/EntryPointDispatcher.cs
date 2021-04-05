@@ -12,6 +12,7 @@ namespace VContainer.Unity
         readonly IObjectResolver container;
         readonly CompositeDisposable disposable = new CompositeDisposable();
 
+        [Inject]
         public EntryPointDispatcher(IObjectResolver container)
         {
             this.container = container;
