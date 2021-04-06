@@ -28,7 +28,7 @@ namespace VContainer.Tests.Unity
         {
             var lifetimeScope = LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
+                builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf();
                 builder.Register<DisposableServiceA>(Lifetime.Scoped);
             });
 
@@ -54,7 +54,7 @@ namespace VContainer.Tests.Unity
         {
             var parentLifetimeScope = LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
+                builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf();
             });
 
             yield return null;
@@ -71,7 +71,7 @@ namespace VContainer.Tests.Unity
 
             var childLifetimeScope = parentLifetimeScope.CreateChild(builder =>
             {
-                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
+                builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf();
                 builder.Register<DisposableServiceA>(Lifetime.Scoped);
             });
 
@@ -100,7 +100,7 @@ namespace VContainer.Tests.Unity
         {
             var parent = LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Singleton).AsSelf();
+                builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf();
             });
 
             var childPrefab = new GameObject("Child").AddComponent<SampleChildLifetimeScope>();
@@ -121,7 +121,7 @@ namespace VContainer.Tests.Unity
         {
             var parent = LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Singleton).AsSelf();
+                builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf();
             });
 
             var childPrefab = new GameObject("Child").AddComponent<SampleChildLifetimeScope>();
@@ -146,7 +146,7 @@ namespace VContainer.Tests.Unity
         {
             var parentLifetimeScope = LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Singleton).AsSelf();
+                builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf();
             });
 
             var parentEntryPoint = parentLifetimeScope.Container.Resolve<SampleEntryPoint>();
