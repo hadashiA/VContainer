@@ -80,7 +80,7 @@ namespace VContainer.Unity
             configuration(new ComponentsBuilder(builder, root));
         }
 
-        public static RegistrationBuilder RegisterEntryPoint<T>(this IContainerBuilder builder, Lifetime lifetime)
+        public static RegistrationBuilder RegisterEntryPoint<T>(this IContainerBuilder builder, Lifetime lifetime = Lifetime.Singleton)
         {
             if (!builder.Exists(typeof(EntryPointDispatcher), false))
             {

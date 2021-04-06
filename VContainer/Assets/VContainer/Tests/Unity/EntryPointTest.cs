@@ -12,7 +12,7 @@ namespace VContainer.Tests.Unity
         {
             var lifetimeScope = LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
+                builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf();
                 builder.Register<DisposableServiceA>(Lifetime.Scoped);
             });
 
@@ -64,8 +64,8 @@ namespace VContainer.Tests.Unity
 
             LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<InitializableThrowable>(Lifetime.Scoped);
-                builder.RegisterEntryPointExceptionHandler(ex => { handled += 1; });
+                builder.RegisterEntryPoint<InitializableThrowable>();
+                builder.RegisterEntryPointExceptionHandler(ex => handled += 1);
             });
 
             yield return null;
@@ -81,7 +81,7 @@ namespace VContainer.Tests.Unity
 
             LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<PostInitializableThrowable>(Lifetime.Scoped);
+                builder.RegisterEntryPoint<PostInitializableThrowable>();
                 builder.RegisterEntryPointExceptionHandler(ex => { handled += 1; });
             });
 
@@ -98,7 +98,7 @@ namespace VContainer.Tests.Unity
 
             LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<StartableThrowable>(Lifetime.Scoped);
+                builder.RegisterEntryPoint<StartableThrowable>();
                 builder.RegisterEntryPointExceptionHandler(ex => { handled += 1; });
             });
 
@@ -115,7 +115,7 @@ namespace VContainer.Tests.Unity
 
             LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<PostStartableThrowable>(Lifetime.Scoped);
+                builder.RegisterEntryPoint<PostStartableThrowable>();
                 builder.RegisterEntryPointExceptionHandler(ex => { handled += 1; });
             });
 
@@ -132,7 +132,7 @@ namespace VContainer.Tests.Unity
 
             LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<TickableThrowable>(Lifetime.Scoped);
+                builder.RegisterEntryPoint<TickableThrowable>();
                 builder.RegisterEntryPointExceptionHandler(ex => { handled += 1; });
             });
 
@@ -149,8 +149,8 @@ namespace VContainer.Tests.Unity
 
             LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<PostTickableThrowable>(Lifetime.Scoped);
-                builder.RegisterEntryPointExceptionHandler(ex => { handled += 1; });
+                builder.RegisterEntryPoint<PostTickableThrowable>();
+                builder.RegisterEntryPointExceptionHandler(ex => handled += 1);
             });
 
             yield return null;
@@ -166,8 +166,8 @@ namespace VContainer.Tests.Unity
 
             LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<LateTickableThrowable>(Lifetime.Scoped);
-                builder.RegisterEntryPointExceptionHandler(ex => { handled += 1; });
+                builder.RegisterEntryPoint<LateTickableThrowable>();
+                builder.RegisterEntryPointExceptionHandler(ex => handled += 1);
             });
 
             yield return null;
@@ -183,8 +183,8 @@ namespace VContainer.Tests.Unity
 
             LifetimeScope.Create(builder =>
             {
-                builder.RegisterEntryPoint<PostLateTickableThrowable>(Lifetime.Scoped);
-                builder.RegisterEntryPointExceptionHandler(ex => { handled += 1; });
+                builder.RegisterEntryPoint<PostLateTickableThrowable>();
+                builder.RegisterEntryPointExceptionHandler(ex => handled += 1);
             });
 
             yield return null;

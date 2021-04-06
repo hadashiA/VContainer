@@ -14,7 +14,7 @@ namespace VContainer.Tests.Unity
         public void RegisterEntryPoint()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<SampleEntryPoint>();
 
             var container = builder.Build();
             Assert.That(container.Resolve<IInitializable>(), Is.InstanceOf<IInitializable>());
@@ -31,9 +31,8 @@ namespace VContainer.Tests.Unity
         public void RegisterEntryPointMultiple()
         {
             var builder = new ContainerBuilder();
-            builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped);
-            builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped);
-
+            builder.RegisterEntryPoint<SampleEntryPoint>();
+            builder.RegisterEntryPoint<SampleEntryPoint2>();
             var container = builder.Build();
             Assert.That(container.Resolve<IReadOnlyList<EntryPointDispatcher>>().Count, Is.EqualTo(1));
         }
