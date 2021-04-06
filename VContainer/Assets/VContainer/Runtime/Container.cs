@@ -11,7 +11,6 @@ namespace VContainer
         object Resolve(IRegistration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
         void Inject(object instance);
-        void Inject(object instance, params IInjectParameter[] parameters);
     }
 
     public interface IScopedObjectResolver : IObjectResolver
@@ -193,12 +192,6 @@ namespace VContainer
         {
             var injector = InjectorCache.GetOrBuild(instance.GetType());
             injector.Inject(instance, this, null);
-        }
-
-        public void Inject(object instance, params IInjectParameter[] parameters)
-        {
-            var injector = InjectorCache.GetOrBuild(instance.GetType());
-            injector.Inject(instance, this, parameters);
         }
 
         public void Dispose()
