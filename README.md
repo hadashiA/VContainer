@@ -80,7 +80,7 @@ public class GameLifetimeScope : LifetimeScope
 {
     public override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterEntryPoint<ActorPresenter>(Lifetime.Scoped);
+        builder.RegisterEntryPoint<ActorPresenter>();
 
         builder.Register<CharacterService>(Lifetime.Scoped);
         builder.Register<IRouteSearch, AStarRouteSearch>(Lifetime.Singleton);
@@ -246,7 +246,7 @@ public class FooController : IAsyncStartable
 ```
 
 ```csharp
-builder.RegisterEntryPoint<FooController>(Lifetime.Scoped);
+builder.RegisterEntryPoint<FooController>();
 ```
 
 ## Documentation
