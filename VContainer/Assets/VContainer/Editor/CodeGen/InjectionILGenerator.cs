@@ -9,6 +9,7 @@ using Unity.CompilationPipeline.Common.Diagnostics;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
 using VContainer.Internal;
+using VContainer.Unity;
 
 namespace VContainer.Editor.CodeGen
 {
@@ -72,7 +73,7 @@ namespace VContainer.Editor.CodeGen
             {
                 try
                 {
-                    if (TryGenerate(typeDef, diagnosticMessages))
+                    if (TryGenerateInjection(typeDef, diagnosticMessages))
                     {
                         count += 1;
                     }
@@ -108,7 +109,7 @@ namespace VContainer.Editor.CodeGen
             return false;
         }
 
-        bool TryGenerate(TypeDefinition typeDef, List<DiagnosticMessage> diagnosticMessages)
+        bool TryGenerateInjection(TypeDefinition typeDef, List<DiagnosticMessage> diagnosticMessages)
         {
             var type = Type.GetType($"{typeDef.FullName}, {module.Assembly.FullName}");
 
@@ -120,12 +121,26 @@ namespace VContainer.Editor.CodeGen
             {
                 injectTypeInfo = TypeAnalyzer.Analyze(type);
             }
-            catch (Exception ex)
+            catch (VContainerException ex)
             {
                 diagnosticMessages.Add(new DiagnosticMessage
                 {
                     DiagnosticType = DiagnosticType.Warning,
                     MessageData = $"Failed to analyze {type.FullName} : {ex.Message}"
+                });
+                return false;
+            }
+
+            try
+            {
+                CheckCircularDependencyRecursive(type, new Stack<Type>());
+            }
+            catch (VContainerException ex)
+            {
+                diagnosticMessages.Add(new DiagnosticMessage
+                {
+                    DiagnosticType = DiagnosticType.Error,
+                    MessageData = ex.Message
                 });
                 return false;
             }
@@ -145,6 +160,51 @@ namespace VContainer.Editor.CodeGen
                (targetNamespaces == null ||
                 targetNamespaces.Count <= 0 ||
                 targetNamespaces.Contains(type.Namespace));
+
+        void CheckCircularDependencyRecursive(Type type, Stack<Type> stack)
+        {
+            if (!NeedsInjectType(type)) return;
+
+            if (stack.Contains(type))
+            {
+                throw new VContainerException(type, $"VContainer circular dependency detected! type: {type.FullName}");
+            }
+            stack.Push(type);
+
+            var injectTypeInfo = TypeAnalyzer.Analyze(type);
+
+            foreach (var x in injectTypeInfo.InjectConstructor.ParameterInfos)
+            {
+                CheckCircularDependencyRecursive(x.ParameterType, stack);
+            }
+
+            if (injectTypeInfo.InjectMethods != null)
+            {
+                foreach (var methodInfo in injectTypeInfo.InjectMethods)
+                {
+                    foreach (var x in methodInfo.ParameterInfos)
+                    {
+                        CheckCircularDependencyRecursive(x.ParameterType, stack);
+                    }
+                }
+            }
+
+            if (injectTypeInfo.InjectFields != null)
+            {
+                foreach (var x in injectTypeInfo.InjectFields)
+                {
+                    CheckCircularDependencyRecursive(x.FieldType, stack);
+                }
+            }
+
+            if (injectTypeInfo.InjectProperties != null)
+            {
+                foreach (var x in injectTypeInfo.InjectProperties)
+                {
+                    CheckCircularDependencyRecursive(x.PropertyType, stack);
+                }
+            }
+        }
 
         void GenerateInnerInjectorType(TypeDefinition typeDef, InjectTypeInfo injectTypeInfo)
         {
