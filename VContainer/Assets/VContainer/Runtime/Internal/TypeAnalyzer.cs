@@ -122,11 +122,13 @@ namespace VContainer.Internal
 
             if (injectConstructor == null)
             {
+                var allowNoConstructor = type.IsEnum;
 #if UNITY_2018_4_OR_NEWER
                 // It seems that Unity sometimes strips the constructor of Component at build time.
                 // In that case, allow null.
-                if (!type.IsSubclassOf(typeof(UnityEngine.Component)))
+                allowNoConstructor |= type.IsSubclassOf(typeof(UnityEngine.Component));
 #endif
+                if (!allowNoConstructor)
                     throw new VContainerException(type, $"Type does not found injectable constructor, type: {type.Name}");
             }
             // Methods, [Inject] Only

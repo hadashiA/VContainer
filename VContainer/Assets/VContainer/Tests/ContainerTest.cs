@@ -253,6 +253,17 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void RegisterInstanceWithEnum()
+        {
+            var builder = new ContainerBuilder();
+            builder.RegisterInstance(Lifetime.Scoped);
+
+            var container = builder.Build();
+            var enumResolved = container.Resolve<Lifetime>();
+            Assert.That(enumResolved, Is.EqualTo(Lifetime.Scoped));
+        }
+
+        [Test]
         public void RegisterMultipleDisposables()
         {
             var builder = new ContainerBuilder();
