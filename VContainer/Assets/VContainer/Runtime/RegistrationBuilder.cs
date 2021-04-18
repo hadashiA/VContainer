@@ -25,7 +25,7 @@ namespace VContainer
         public RegistrationBuilder(object instance)
         {
             ImplementationType = instance.GetType();
-            Lifetime = Lifetime.Scoped;
+            Lifetime = Lifetime.Singleton;
             SpecificInstance = instance;
         }
 
@@ -56,8 +56,7 @@ namespace VContainer
 
         public RegistrationBuilder AsSelf()
         {
-            InterfaceTypes = InterfaceTypes ?? new List<Type>();
-            InterfaceTypes.Add(ImplementationType);
+            AddInterfaceType(ImplementationType);
             return this;
         }
 
@@ -91,8 +90,10 @@ namespace VContainer
 
         public RegistrationBuilder As(params Type[] interfaceTypes)
         {
-            InterfaceTypes = InterfaceTypes ?? new List<Type>();
-            InterfaceTypes.AddRange(interfaceTypes);
+            foreach (var interfaceType in interfaceTypes)
+            {
+                AddInterfaceType(interfaceType);
+            }
             return this;
         }
 
@@ -128,7 +129,8 @@ namespace VContainer
                 throw new VContainerException(interfaceType, $"{ImplementationType.FullName} is not assignable from {interfaceType.FullName}");
             }
             InterfaceTypes = InterfaceTypes ?? new List<Type>();
-            InterfaceTypes.Add(interfaceType);
+            if (!InterfaceTypes.Contains(interfaceType))
+                InterfaceTypes.Add(interfaceType);
         }
    }
 }
