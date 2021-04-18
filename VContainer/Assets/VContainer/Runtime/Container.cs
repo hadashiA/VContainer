@@ -94,12 +94,6 @@ namespace VContainer
             injector.Inject(instance, this, null);
         }
 
-        public void Inject(object instance, params IInjectParameter[] parameters)
-        {
-            var injector = InjectorCache.GetOrBuild(instance.GetType());
-            injector.Inject(instance, this, parameters);
-        }
-
         public bool TryGetRegistration(Type type, out IRegistration registration)
             => registry.TryGet(type, out registration);
 

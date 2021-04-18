@@ -154,7 +154,22 @@ namespace VContainer.Tests
             grandChildSingletonDisposable = grandChildContainer.Resolve<DisposableServiceB>();
             grandChildContainer.Dispose();
             Assert.That(grandChildSingletonDisposable.Disposed, Is.True);
+        }
 
+
+        [Test]
+        public void CreateScopeWithRegisterOnlyInterfaces()
+        {
+            var builder = new ContainerBuilder();
+            var container = builder.Build();
+            var child = container.CreateScope(childBuilder =>
+            {
+                childBuilder.Register<NoDependencyServiceA>(Lifetime.Singleton).AsImplementedInterfaces();
+                childBuilder.Register<ServiceA>(Lifetime.Singleton).AsImplementedInterfaces();
+            });
+
+            var singletonAsInterface = child.Resolve<I4>();
+            Assert.That(singletonAsInterface, Is.InstanceOf<ServiceA>());
         }
 
         [Test]

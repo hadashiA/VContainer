@@ -26,6 +26,12 @@ namespace VContainer.Internal
                     {
                         AddToBuildBuffer(buildBuffer, interfaceType, registration);
                     }
+
+                    // Mark the ImplementationType with a guard because we need to check if it exists later.
+                    if (!buildBuffer.ContainsKey(registration.ImplementationType))
+                    {
+                        buildBuffer.Add(registration.ImplementationType, null);
+                    }
                 }
                 else
                 {
@@ -83,7 +89,7 @@ namespace VContainer.Internal
         public bool TryGet(Type interfaceType, out IRegistration registration)
         {
             if (hashTable.TryGet(interfaceType, out registration))
-                return true;
+                return registration != null;
 
             // Auto falling back to collection from one
             if (interfaceType.IsGenericType)
