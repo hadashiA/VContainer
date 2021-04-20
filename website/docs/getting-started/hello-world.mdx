@@ -9,7 +9,7 @@ The basic way for integrating VContainer into your application is:
 - When playing scene, LifetimeScope automatically build Container and dispatch to the own PlayerLoopSystem.
 
 :::note
-Normally, "scope" is repeatedly created and destroyed during the game. `LifetimeScope` assumes this and has a parent-child relationship.
+Normally, a "scope" is repeatedly created and destroyed during the game. `LifetimeScope` assumes this and has a parent-child relationship.
 :::
 
 **1. Write a class that depends on other classes**
@@ -37,7 +37,7 @@ Next, let's write a setting that can auto-wiring the class.
 - Name it `GameLifetimeScope.cs`.
 
 :::note
-VContainer will automatically template C# scripts ending in *LifetimeScope.
+VContainer will automatically a template for C# scripts ending in *LifetimeScope.
 :::
 
 You instruct `builder` and register the class above.
@@ -59,7 +59,7 @@ namespace MyGame
 ```
 
 :::note
-VContainer always required a `Lifetime` argument explicitly. This gives us transparency and consistency.
+VContainer always requires a `Lifetime` argument explicitly. This gives us transparency and consistency.
 :::
 
 **3. Create GameObject attached your LifetimeScope**
@@ -136,7 +136,7 @@ Now, `Tick()` will be executed at the timing of Unity's Update.
 
 As such, it's a good practice to keep any side effect entry points through the marker interface.  
 
-( By design, for MonoBehaviour is enough to use Start / Update etc. The marker interface of VContainer is a function to separate the entry point of domain logic and presentation logic. )
+(By design, for MonoBehaviour is enough to use Start / Update etc. The marker interface of VContainer is a function to separate the entry point of domain logic and presentation logic. )
 
 We should register this as running on Unity's life cycle events.
 

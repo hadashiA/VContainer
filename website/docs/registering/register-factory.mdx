@@ -5,7 +5,7 @@ title: Register Factory
 Typically, in a DI container, the Factory pattern can be used to stabilize the dependency resolution.
 
 For example, if you create a factory like the following, dependency resolution will happen only once. Dependency resolution will not occur during instance creation.
-VContainer allows to register a `Func<>` delegate for the creation of an instance. This is especially useful in scenarios where instance is created at any time during execution, or multiple instances are created at any time.
+VContainer allows to register a `Func<>` delegate for the creation of an instance. This is especially useful in scenarios where the instance is created at any time during execution, or multiple instances are created at any time.
 
 ```csharp
 class FooFactory
