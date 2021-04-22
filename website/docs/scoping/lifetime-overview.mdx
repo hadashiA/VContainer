@@ -8,7 +8,7 @@ title: Lifetime Overview
 - Scoped    : Instance per `LifetimeScope`.
   - If LifetimeScope is single, similar to Singleton.
   - If you create a LifetimeScope child, the instance will be different for each child.
-  - When LifetimeScope is destroyed, release references and calls all the registered `IDisposable`.
+  - When LifetimeScope is destroyed, its references are released and it calls all the registered `IDisposable`.
 
 ## Lifetime with Parent/Child relationship
 
@@ -30,6 +30,6 @@ it has following behaviours:
   - When a `LifetimeScope` is destroyed, objects with `IDisposable` implemented are called `Dispose()`.
 
 :::caution
-If scene is alive and only `LifetimeScope` is destroyed, MonoBehaviour registered as `Lifetime.Scoped` is not automatically destroyed.
+If the scene is alive and only `LifetimeScope` is destroyed, MonoBehaviours registered as `Lifetime.Scoped` are not automatically destroyed.
 If you want to destroy with `LifetimeScope`, make it a child transform of `LifetimeScope` or consider implement IDisposable.
 :::

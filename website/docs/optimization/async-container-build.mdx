@@ -19,7 +19,7 @@ var lifetimeScope = LifetimeScope.Find<MyLifetimeScope>(nextScene.Scene);
 await UniTask.Run(() => lifetimeScope.Build());
 ```
 
-:warning: Unity dependent features such as `builder.RegisterComponentInHierarcky()` do not work on background threads.
+:warning: Unity dependent features such as `builder.RegisterComponentInHierarchy()` do not work on background threads.
 
 If this causes an error, use Awake instead.
 
@@ -40,7 +40,7 @@ class GameLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        // It can run background thread.
+        // This can run on a background thread now.
         builder.RegisterInstance(groundInScene);
     }
 }

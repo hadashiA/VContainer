@@ -22,6 +22,6 @@ There are 3 ways to perform an Inject to MonoBehaviour.
 ## Why doesn't the Inject to all MonoBehaviour run automatically?
 
 - In Unity, it is difficult to implicitly hook MonoBehaviour generation for all cases. Rather than having some cases that are automatically Injected and some that are not, we decided to explicitly state which cases are Injected.
-- In VContainer, does not actively recommend executing Inject to MonoBehaviour.
+- VContainer does not actively recommend executing Inject to MonoBehaviour.
   - This is because the purpose of VContainer and DI is inversion of control of MonoBehaviour.
   - Also, if MonoBehaviour needs to execute an Inject to work, then you are destroying the strength of Unity's prefab portability.
