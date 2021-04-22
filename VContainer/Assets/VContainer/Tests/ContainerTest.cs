@@ -198,6 +198,24 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void ResolveLastOneWhenConflicted()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Transient);
+            builder.Register<I1, MultipleInterfaceServiceB>(Lifetime.Transient);
+
+            builder.Register<I3, MultipleInterfaceServiceB>(Lifetime.Transient);
+            builder.Register<I3, MultipleInterfaceServiceA>(Lifetime.Transient);
+            builder.Register<I3, MultipleInterfaceServiceB>(Lifetime.Transient);
+
+            var container = builder.Build();
+            var i1 = container.Resolve<I1>();
+            var i3 = container.Resolve<I3>();
+            Assert.That(i1, Is.InstanceOf<MultipleInterfaceServiceB>());
+            Assert.That(i3, Is.InstanceOf<MultipleInterfaceServiceB>());
+        }
+
+        [Test]
         public void ResolveOnceAsCollection()
         {
             var builder = new ContainerBuilder();
