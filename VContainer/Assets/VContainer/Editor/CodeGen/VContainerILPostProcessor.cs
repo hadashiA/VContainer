@@ -26,10 +26,8 @@ namespace VContainer.Editor.CodeGen
             if (!WillProcess(compiledAssembly))
                 return null;
 
-            var assembly = Assembly.Load(compiledAssembly.InMemoryAssembly.PeData);
-
             var assemblyDefinition = Utils.LoadAssemblyDefinition(compiledAssembly);
-            var generator = new InjectionILGenerator(assemblyDefinition.MainModule, assembly, null);
+            var generator = new InjectionILGenerator(assemblyDefinition.MainModule, compiledAssembly, null);
 
             if (generator.TryGenerate(out var diagnosticMessages))
             {
