@@ -10,7 +10,6 @@ namespace VContainer
     public interface IContainerBuilder
     {
         object ApplicationOrigin { get; set; }
-        bool ContainerExposed { get; set; }
 
         RegistrationBuilder Register(Type type, Lifetime lifetime);
         RegistrationBuilder RegisterInstance(object instance);
@@ -46,7 +45,6 @@ namespace VContainer
     public class ContainerBuilder : IContainerBuilder
     {
         public object ApplicationOrigin { get; set; }
-        public bool ContainerExposed { get; set; }
 
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
@@ -94,7 +92,7 @@ namespace VContainer
 
         protected (IReadOnlyList<IRegistration>, IReadOnlyList<(IRegistration, Action<IRegistration, IObjectResolver>)>) BuildRegistrations()
         {
-            var registrations = new IRegistration[registrationBuilders.Count + (ContainerExposed ? 1 : 0)];
+            var registrations = new IRegistration[registrationBuilders.Count + 1];
             var callbacks = new List<(IRegistration, Action<IRegistration, IObjectResolver>)>(registrations.Length);
 
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
@@ -122,10 +120,7 @@ namespace VContainer
                 }
             }
 #endif
-            if (ContainerExposed)
-            {
-                registrations[registrations.Length - 1] = ContainerRegistration.Default;
-            }
+            registrations[registrations.Length - 1] = ContainerRegistration.Default;
 
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
             Parallel.For(0, registrations.Count, i =>

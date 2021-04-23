@@ -117,7 +117,9 @@ namespace VContainer
             return registrationBuilder;
         }
 
+        [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
         public static void RegisterContainer(this IContainerBuilder builder)
-            => builder.ContainerExposed = true;
+        {
+        }
     }
 }
