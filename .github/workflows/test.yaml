@@ -70,7 +70,7 @@ jobs:
       run: |
         sed -i '4a "VContainer.EnableCodeGen",' ./VContainer/Assets/VContainer/Tests/VContainer.Tests.asmdef
   
-    - uses: game-ci/unity-test-runner@v2.0-alpha-2
+    - uses: game-ci/unity-test-runner@v2.0-alpha-4
       env:
         UNITY_LICENSE: ${{ secrets[matrix.license] }}
       with:
