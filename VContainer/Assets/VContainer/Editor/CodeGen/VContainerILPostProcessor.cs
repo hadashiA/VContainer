@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 using Mono.Cecil;
@@ -25,8 +26,10 @@ namespace VContainer.Editor.CodeGen
             if (!WillProcess(compiledAssembly))
                 return null;
 
+            var assembly = Assembly.Load(compiledAssembly.InMemoryAssembly.PeData);
+
             var assemblyDefinition = Utils.LoadAssemblyDefinition(compiledAssembly);
-            var generator = new InjectionILGenerator(assemblyDefinition.MainModule, null);
+            var generator = new InjectionILGenerator(assemblyDefinition.MainModule, assembly, null);
 
             if (generator.TryGenerate(out var diagnosticMessages))
             {

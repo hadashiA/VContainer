@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -15,6 +16,7 @@ namespace VContainer.Editor.CodeGen
     sealed class InjectionILGenerator
     {
         readonly ModuleDefinition module;
+        readonly Assembly assembly;
         readonly IList<string> targetNamespaces;
 
         TypeReference ObjectResolverTypeRef =>
@@ -54,9 +56,13 @@ namespace VContainer.Editor.CodeGen
         MethodReference resolveMethodRef;
         MethodReference resolveOrParameterMethodRef;
 
-        public InjectionILGenerator(ModuleDefinition module, IList<string> targetNamespaces)
+        public InjectionILGenerator(
+            ModuleDefinition module,
+            Assembly assembly,
+            IList<string> targetNamespaces)
         {
             this.module = module;
+            this.assembly = assembly;
             this.targetNamespaces = targetNamespaces;
         }
 
@@ -110,9 +116,18 @@ namespace VContainer.Editor.CodeGen
 
         bool TryGenerate(TypeDefinition typeDef, List<DiagnosticMessage> diagnosticMessages)
         {
-            var type = Type.GetType($"{typeDef.FullName}, {module.Assembly.FullName}");
+            var type = assembly.GetType(typeDef.FullName);
+            if (type == null)
+            {
+                diagnosticMessages.Add(new DiagnosticMessage
+                {
+                    DiagnosticType = DiagnosticType.Warning,
+                    MessageData = $"Skip IL waving because cant detect type: {typeDef.FullName}"
+                });
+                return false;
+            }
 
-            if (type == null || !NeedsInjectType(type))
+            if (!NeedsInjectType(type))
                 return false;
 
             InjectTypeInfo injectTypeInfo;
