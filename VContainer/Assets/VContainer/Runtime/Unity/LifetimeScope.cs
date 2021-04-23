@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace VContainer.Unity
 {
+    [DefaultExecutionOrder(-5000)]
     public partial class LifetimeScope : MonoBehaviour, IDisposable
     {
         public readonly struct ParentOverrideScope : IDisposable
