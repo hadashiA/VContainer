@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
 using Unity.CompilationPipeline.Common.Diagnostics;
+using Unity.CompilationPipeline.Common.ILPostProcessing;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using TypeAttributes = Mono.Cecil.TypeAttributes;
 using VContainer.Internal;
@@ -15,7 +18,10 @@ namespace VContainer.Editor.CodeGen
     sealed class InjectionILGenerator
     {
         readonly ModuleDefinition module;
+        readonly ICompiledAssembly compiledAssembly;
         readonly IList<string> targetNamespaces;
+
+        Assembly currentAssembly;
 
         TypeReference ObjectResolverTypeRef =>
             objectResolverTypeRef ?? (objectResolverTypeRef = module.ImportReference(typeof(IObjectResolver)));
@@ -54,9 +60,13 @@ namespace VContainer.Editor.CodeGen
         MethodReference resolveMethodRef;
         MethodReference resolveOrParameterMethodRef;
 
-        public InjectionILGenerator(ModuleDefinition module, IList<string> targetNamespaces)
+        public InjectionILGenerator(
+            ModuleDefinition module,
+            ICompiledAssembly compiledAssembly,
+            IList<string> targetNamespaces = null)
         {
             this.module = module;
+            this.compiledAssembly = compiledAssembly;
             this.targetNamespaces = targetNamespaces;
         }
 
@@ -70,9 +80,11 @@ namespace VContainer.Editor.CodeGen
 
             foreach (var typeDef in module.Types)
             {
+                if (typeDef.FullName == "<Module>") continue;
+
                 try
                 {
-                    if (TryGenerate(typeDef, diagnosticMessages))
+                    if (TryGenerateType(typeDef, diagnosticMessages))
                     {
                         count += 1;
                     }
@@ -108,11 +120,46 @@ namespace VContainer.Editor.CodeGen
             return false;
         }
 
-        bool TryGenerate(TypeDefinition typeDef, List<DiagnosticMessage> diagnosticMessages)
-        {
-            var type = Type.GetType($"{typeDef.FullName}, {module.Assembly.FullName}");
+        bool NeedsInjectType(Type type)
+            => !type.IsEnum &&
+               !type.IsValueType &&
+               !type.IsInterface &&
+               !(type.IsAbstract && type.IsSealed) &&
+               !typeof(Delegate).IsAssignableFrom(type) &&
+               !typeof(Attribute).IsAssignableFrom(type) &&
+               !type.IsGenericType &&
+               (targetNamespaces == null ||
+                targetNamespaces.Count <= 0 ||
+                targetNamespaces.Contains(type.Namespace));
 
-            if (type == null || !NeedsInjectType(type))
+        Type GetTypeFromDef(TypeDefinition typeDef)
+        {
+            try
+            {
+                return Type.GetType($"{typeDef.FullName}, {module.Assembly.FullName}");
+            }
+            catch (FileLoadException)
+            {
+                if (currentAssembly == null)
+                    currentAssembly = Assembly.Load(compiledAssembly.InMemoryAssembly.PeData);
+                return currentAssembly.GetType(typeDef.FullName);
+            }
+        }
+
+        bool TryGenerateType(TypeDefinition typeDef, List<DiagnosticMessage> diagnosticMessages)
+        {
+            var type = GetTypeFromDef(typeDef);
+            if (type == null)
+            {
+                diagnosticMessages.Add(new DiagnosticMessage
+                {
+                    DiagnosticType = DiagnosticType.Warning,
+                    MessageData = $"Skip IL waving because cant detect type: {typeDef.FullName}"
+                });
+                return false;
+            }
+
+            if (!NeedsInjectType(type))
                 return false;
 
             InjectTypeInfo injectTypeInfo;
@@ -125,7 +172,7 @@ namespace VContainer.Editor.CodeGen
                 diagnosticMessages.Add(new DiagnosticMessage
                 {
                     DiagnosticType = DiagnosticType.Warning,
-                    MessageData = $"Failed to analyze {type.FullName} : {ex.Message}"
+                    MessageData = $"Failed to analyze {type.FullName} : {ex.GetType()} {ex.Message}"
                 });
                 return false;
             }
@@ -133,18 +180,6 @@ namespace VContainer.Editor.CodeGen
             GenerateInnerInjectorType(typeDef, injectTypeInfo);
             return true;
         }
-
-        bool NeedsInjectType(Type type)
-            => !type.IsEnum &&
-               !type.IsValueType &&
-               !type.IsInterface &&
-               !(type.IsAbstract && type.IsSealed) &&
-               !typeof(Delegate).IsAssignableFrom(type) &&
-               !typeof(Attribute).IsAssignableFrom(type) &&
-               !type.IsGenericType &&
-               (targetNamespaces == null ||
-                targetNamespaces.Count <= 0 ||
-                targetNamespaces.Contains(type.Namespace));
 
         void GenerateInnerInjectorType(TypeDefinition typeDef, InjectTypeInfo injectTypeInfo)
         {
