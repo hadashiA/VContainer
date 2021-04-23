@@ -59,6 +59,9 @@ namespace VContainer.Internal
                     AddCollectionToBuildBuffer(buf, collection);
                 }
                 collection.Add(registration);
+
+                // Overwritten by the later registration
+                buf[service] = registration;
             }
             else
             {
