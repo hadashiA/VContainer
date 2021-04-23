@@ -85,8 +85,6 @@ namespace VContainer.Unity
             if (!builder.Exists(typeof(EntryPointDispatcher), false))
             {
                 builder.Register<EntryPointDispatcher>(Lifetime.Scoped);
-                builder.RegisterContainer();
-
                 builder.RegisterBuildCallback(container =>
                 {
                     container.Resolve<EntryPointDispatcher>().Dispatch();
