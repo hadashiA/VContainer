@@ -21,21 +21,24 @@ jobs:
     strategy:
       matrix:
         unityVersion:
-        - 2020.3.0f1
-        - 2019.4.22f1
+        - 2021.1.4f1
+        - 2020.3.5f1
+        - 2019.4.25f1
         - 2019.3.15f1
         # feature: ['None', 'UniTask', 'ECS']
         feature: ['Default', 'UniTask', 'CodeGen']
         include:
-        - unityVersion: 2020.3.0f1
+        - unityVersion: 2021.1.4f1
+          license: UNITY_LICENSE_2021_1
+        - unityVersion: 2020.3.5f1
           license: UNITY_LICENSE_2020_3
-        - unityVersion: 2019.4.22f1
+        - unityVersion: 2019.4.25f1
           license: UNITY_LICENSE_2019_4
         - unityVersion: 2019.3.15f1
           license: UNITY_LICENSE_2019_3
-        - unityVersion: 2020.3.0f1
+        - unityVersion: 2021.1.4f1
           feature: 'ECS'
-          license: UNITY_LICENSE_2020_3
+          license: UNITY_LICENSE_2021_1
         # - unityVersion: 2018.4.31f1
         #   license: UNITY_LICENSE_2018_4
         #   externalPackage: 'None'
@@ -67,7 +70,7 @@ jobs:
       run: |
         sed -i '4a "VContainer.EnableCodeGen",' ./VContainer/Assets/VContainer/Tests/VContainer.Tests.asmdef
   
-    - uses: game-ci/unity-test-runner@v2.0-alpha-2
+    - uses: game-ci/unity-test-runner@v2.0-alpha-4
       env:
         UNITY_LICENSE: ${{ secrets[matrix.license] }}
       with:
