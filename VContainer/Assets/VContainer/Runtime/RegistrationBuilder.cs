@@ -112,9 +112,10 @@ namespace VContainer
             return this;
         }
 
-        void AddInterfaceType(Type interfaceType)
+        protected void AddInterfaceType(Type interfaceType)
         {
-            if (!interfaceType.IsAssignableFrom(ImplementationType))
+            if (!ImplementationType.IsGenericTypeDefinition &&
+                !interfaceType.IsAssignableFrom(ImplementationType))
             {
                 throw new VContainerException(interfaceType, $"{ImplementationType.FullName} is not assignable from {interfaceType.FullName}");
             }

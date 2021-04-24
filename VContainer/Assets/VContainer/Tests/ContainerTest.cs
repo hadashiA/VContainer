@@ -237,14 +237,68 @@ namespace VContainer.Tests
         {
             var builder = new ContainerBuilder();
             builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
-            builder.Register<GenericsService<I2>>(Lifetime.Singleton);
+            builder.Register<GenericService<I2>>(Lifetime.Singleton);
             builder.Register<GenericsArgumentService>(Lifetime.Singleton);
 
             var container = builder.Build();
 
             var resolved = container.Resolve<GenericsArgumentService>();
-            Assert.That(resolved.GenericsService, Is.InstanceOf<GenericsService<I2>>());
-            Assert.That(resolved.GenericsService.ParameterService, Is.InstanceOf<NoDependencyServiceA>());
+
+            Assert.That(resolved.GenericService, Is.InstanceOf<GenericService<I2>>());
+            Assert.That(resolved.GenericService.InnerService1, Is.InstanceOf<NoDependencyServiceA>());
+        }
+
+        [Test]
+        public void ResolveOpenGeneric()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient);
+            builder.Register<I3, NoDependencyServiceB>(Lifetime.Transient);
+            builder.Register<I4, ServiceA>(Lifetime.Transient);
+
+            builder.RegisterGeneric(typeof(GenericService<>), Lifetime.Transient);
+            builder.RegisterGeneric(typeof(GenericService2<,>), Lifetime.Transient);
+
+            var container = builder.Build();
+            var resolved1 = container.Resolve<GenericService<I2>>();
+            var resolved2 = container.Resolve<GenericService2<I2, I3>>();
+
+            Assert.That(resolved1, Is.InstanceOf<GenericService<I2>>());
+            Assert.That(resolved1.InnerService1, Is.InstanceOf<NoDependencyServiceA>());
+
+            Assert.That(resolved2, Is.InstanceOf<GenericService2<I2, I3>>());
+            Assert.That(resolved2.InnerService1, Is.InstanceOf<NoDependencyServiceA>());
+            Assert.That(resolved2.InnerService2, Is.InstanceOf<NoDependencyServiceB>());
+            Assert.That(resolved2.InnerService3, Is.InstanceOf<ServiceA>());
+        }
+
+        [Test]
+        public void ResolveOpenGenericAsInterface()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient);
+            builder.Register<I3, NoDependencyServiceB>(Lifetime.Transient);
+            builder.Register<I4, ServiceA>(Lifetime.Transient);
+
+            builder.RegisterGeneric(typeof(IOpenGenericService<>), typeof(GenericService<>), Lifetime.Transient);
+            builder.RegisterGeneric(typeof(IOpenGenericService2<,>), typeof(GenericService2<,>), Lifetime.Transient);
+
+            var container = builder.Build();
+            var resolved1 = container.Resolve<IOpenGenericService<I2>>();
+            var resolved2 = container.Resolve<IOpenGenericService2<I2, I3>>();
+
+            Assert.That(resolved1, Is.InstanceOf<GenericService<I2>>());
+            Assert.That(resolved1.InnerService1, Is.InstanceOf<NoDependencyServiceA>());
+
+            Assert.That(resolved2, Is.InstanceOf<GenericService2<I2, I3>>());
+            Assert.That(resolved2.InnerService1, Is.InstanceOf<NoDependencyServiceA>());
+            Assert.That(resolved2.InnerService2, Is.InstanceOf<NoDependencyServiceB>());
+            Assert.That(resolved2.InnerService3, Is.InstanceOf<ServiceA>());
+        }
+
+        [Test]
+        public void ResolveOpenGenericAsImplementedInterfaces()
+        {
         }
 
         [Test]
@@ -426,6 +480,21 @@ namespace VContainer.Tests
         {
             var builder = new ContainerBuilder();
             Assert.Throws<VContainerException>(() => builder.Register<NoDependencyServiceA>(Lifetime.Scoped).As<I1>());
+        }
+
+        [Test]
+        public void RegisterInvalidOpenGeneric()
+        {
+            var builder = new ContainerBuilder();
+            Assert.Throws<ArgumentException>(() =>
+            {
+                builder.RegisterGeneric(typeof(NoDependencyServiceA), Lifetime.Singleton);
+            });
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                builder.RegisterGeneric(typeof(I1), typeof(GenericService2<,>), Lifetime.Singleton);
+            });
         }
 
         [Test]

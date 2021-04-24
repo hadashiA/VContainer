@@ -3,16 +3,6 @@ using NUnit.Framework;
 
 namespace VContainer.Tests
 {
-    class Foo
-    {
-        public int Param1 { get; set; }
-        public int Param2 { get; set; }
-        public int Param3 { get; set; }
-        public int Param4 { get; set; }
-        public I2 Service2 { get; set; }
-        public I3 Service3 { get; set; }
-    }
-
     [TestFixture]
     public class FactoryTest
     {

@@ -30,6 +30,29 @@ namespace VContainer.Tests
     {
     }
 
+    interface IOpenGenericService<T>
+    {
+        T InnerService1 { get; }
+        I2 InnerService2 { get; }
+    }
+
+    interface IOpenGenericService2<T1, T2>
+    {
+        T1 InnerService1 { get; }
+        T2 InnerService2 { get; }
+        I4 InnerService3 { get; }
+    }
+
+    interface IRequestHandler<TRequest>
+    {
+        void Execute(TRequest request);
+    }
+
+    interface IRequestHandler<TRequest, TResponse>
+    {
+        TResponse Execute(TRequest request);
+    }
+
     class AllInjectionFeatureService : I1
     {
         public bool ConstructorCalled;
@@ -225,23 +248,92 @@ namespace VContainer.Tests
         }
     }
 
-    class GenericsService<T>
+    class GenericService<T> : IOpenGenericService<T>
     {
-        public readonly I2 ParameterService;
+        public T InnerService1 { get; }
+        public I2 InnerService2 { get; }
 
-        public GenericsService(I2 parameterService)
+        public GenericService(T innerService, I2 innerService2)
         {
-            ParameterService = parameterService;
+            InnerService1 = innerService;
+            InnerService2 = innerService2;
+        }
+    }
+
+    class GenericService2<T1, T2> : IOpenGenericService2<T1, T2>
+    {
+        public T1 InnerService1 { get; }
+        public T2 InnerService2 { get; }
+        public I4 InnerService3 { get; }
+
+        public GenericService2(T1 innerService1, T2 innerService2, I4 innerService3)
+        {
+            InnerService1 = innerService1;
+            InnerService2 = innerService2;
+            InnerService3 = innerService3;
         }
     }
 
     class GenericsArgumentService
     {
-        public readonly GenericsService<I2> GenericsService;
+        public readonly GenericService<I2> GenericService;
 
-        public GenericsArgumentService(GenericsService<I2> genericsService)
+        public GenericsArgumentService(GenericService<I2> genericService)
         {
-            GenericsService = genericsService;
+            GenericService = genericService;
         }
+    }
+
+    class Foo
+    {
+        public int Param1 { get; set; }
+        public int Param2 { get; set; }
+        public int Param3 { get; set; }
+        public int Param4 { get; set; }
+        public I2 Service2 { get; set; }
+        public I3 Service3 { get; set; }
+    }
+
+    class Bar
+    {
+        public int X { get; set; }
+    }
+
+    class FooHandler : IRequestHandler<Foo>
+    {
+        public void Execute(Foo request)
+        {
+        }
+    }
+
+    class FooHandler2 : IRequestHandler<Foo>
+    {
+        public readonly I2 ParameterService;
+
+        public FooHandler2(I2 service2)
+        {
+            ParameterService = service2;
+        }
+
+        public void Execute(Foo request)
+        {
+        }
+    }
+
+    class FooBarHandler : IRequestHandler<Foo, Bar>
+    {
+        public Bar Execute(Foo request) => new Bar { X = 100 };
+    }
+
+    class FooBarHandler2 : IRequestHandler<Foo, Bar>
+    {
+        public readonly I2 service2;
+
+        public FooBarHandler2(I2 service2)
+        {
+            this.service2 = service2;
+        }
+
+        public Bar Execute(Foo request) => new Bar { X = 200 };
     }
 }

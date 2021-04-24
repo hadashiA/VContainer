@@ -9,9 +9,9 @@ namespace VContainer.Internal
         [ThreadStatic]
         static IDictionary<Type, IRegistration> buildBuffer = new Dictionary<Type, IRegistration>(128);
 
-        readonly FixedTypeKeyHashtable<IRegistration> hashTable;
+        readonly FixedTypeKeyHashtable<IRegistration> table;
 
-        public static FixedTypeKeyHashTableRegistry Build(IReadOnlyList<IRegistration> registrations)
+        public static FixedTypeKeyHashTableRegistry Build(IEnumerable<IRegistration> registrations)
         {
             // ThreadStatic
             if (buildBuffer == null)
@@ -84,41 +84,57 @@ namespace VContainer.Internal
             }
         }
 
-        FixedTypeKeyHashTableRegistry(FixedTypeKeyHashtable<IRegistration> hashTable)
+        FixedTypeKeyHashTableRegistry(FixedTypeKeyHashtable<IRegistration> table)
         {
-            this.hashTable = hashTable;
+            this.table = table;
         }
 
         public bool TryGet(Type interfaceType, out IRegistration registration)
         {
-            if (hashTable.TryGet(interfaceType, out registration))
+            if (table.TryGet(interfaceType, out registration))
                 return registration != null;
 
             if (interfaceType.IsConstructedGenericType)
             {
-                var genericType = interfaceType.GetGenericTypeDefinition();
-                return TryFallbackSingleCollection(interfaceType, genericType, out registration);
+                var openGenericType = interfaceType.GetGenericTypeDefinition();
+                return TryFallbackSingleCollection(interfaceType, openGenericType, out registration) ||
+                       TryFallbackGeneric(interfaceType, openGenericType, out registration);
             }
             return false;
         }
 
-        public bool Exists(Type type) => hashTable.TryGet(type, out _);
+        public bool Exists(Type type) => table.TryGet(type, out _);
 
-        bool TryFallbackSingleCollection(Type interfaceType, Type genericType, out IRegistration registration)
+        bool TryFallbackSingleCollection(Type interfaceType, Type openGenericType, out IRegistration registration)
         {
-            if (genericType == typeof(IEnumerable<>) ||
-                genericType == typeof(IReadOnlyList<>))
+            if (openGenericType == typeof(IEnumerable<>) ||
+                openGenericType == typeof(IReadOnlyList<>))
             {
                 var elementType = interfaceType.GetGenericArguments()[0];
                 var collectionRegistration = new CollectionRegistration(elementType);
                 // ReSharper disable once InconsistentlySynchronizedField
-                if (hashTable.TryGet(elementType, out var elementRegistration) && elementRegistration != null)
+                if (table.TryGet(elementType, out var elementRegistration) && elementRegistration != null)
                 {
                     collectionRegistration.Add(elementRegistration);
                 }
                 registration = collectionRegistration;
                 return true;
             }
+            registration = null;
+            return false;
+        }
+
+        bool TryFallbackGeneric(Type interfaceType, Type interfaceOpenGenericType, out IRegistration registration)
+        {
+            if (table.TryGet(interfaceOpenGenericType, out var x) &&
+                x is GenericFallbackRegistration openGenericRegistration)
+            {
+                registration = openGenericRegistration.BuildGenericRegistration(
+                    interfaceOpenGenericType,
+                    interfaceType);
+                return true;
+            }
+
             registration = null;
             return false;
         }

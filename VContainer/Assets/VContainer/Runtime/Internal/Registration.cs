@@ -41,25 +41,23 @@ namespace VContainer.Internal
         public Lifetime Lifetime => Lifetime.Transient; // Collection refernce is transient. Members can have each lifetimes.
 
         readonly Type elementType;
-
-        readonly List<Type> interfaceTypes;
+        readonly Type[] interfaceTypes;
         readonly IList<IRegistration> registrations = new List<IRegistration>();
-
-        public CollectionRegistration(Type elementType) : this(
-            typeof(List<>).MakeGenericType(elementType),
-            elementType)
-        {
-        }
 
         public CollectionRegistration(Type listType, Type elementType)
         {
             this.elementType = elementType;
             ImplementationType = listType;
-            interfaceTypes = new List<Type>
+            interfaceTypes = new []
             {
                 typeof(IEnumerable<>).MakeGenericType(elementType),
                 typeof(IReadOnlyList<>).MakeGenericType(elementType),
             };
+        }
+
+        public CollectionRegistration(Type elementType)
+            : this(typeof(List<>).MakeGenericType(elementType), elementType)
+        {
         }
 
         public void Add(IRegistration registration)
