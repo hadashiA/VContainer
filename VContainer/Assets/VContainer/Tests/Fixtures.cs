@@ -227,11 +227,11 @@ namespace VContainer.Tests
 
     class GenericsService<T>
     {
-        public readonly I2 Service2;
+        public readonly I2 ParameterService;
 
-        public GenericsService(I2 service2)
+        public GenericsService(I2 parameterService)
         {
-            Service2 = service2;
+            ParameterService = parameterService;
         }
     }
 

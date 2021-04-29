@@ -55,7 +55,7 @@ namespace VContainer.Internal
                 }
                 else
                 {
-                    collection = new CollectionRegistration(service) { exists };
+                    collection = new CollectionRegistration(collectionService, service) { exists };
                     AddCollectionToBuildBuffer(buf, collection);
                 }
                 collection.Add(registration);
@@ -97,14 +97,14 @@ namespace VContainer.Internal
             if (interfaceType.IsConstructedGenericType)
             {
                 var genericType = interfaceType.GetGenericTypeDefinition();
-                return TryGetCollection(interfaceType, genericType, out registration);
+                return TryFallbackSingleCollection(interfaceType, genericType, out registration);
             }
             return false;
         }
 
         public bool Exists(Type type) => hashTable.TryGet(type, out _);
 
-        bool TryGetCollection(Type interfaceType, Type genericType, out IRegistration registration)
+        bool TryFallbackSingleCollection(Type interfaceType, Type genericType, out IRegistration registration)
         {
             if (genericType == typeof(IEnumerable<>) ||
                 genericType == typeof(IReadOnlyList<>))
