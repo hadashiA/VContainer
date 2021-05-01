@@ -285,9 +285,9 @@ namespace VContainer.Tests
             var builder = new ContainerBuilder();
             builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient);
 
-            builder.Register(container =>
+            builder.Register(c =>
             {
-                return new ServiceA(container.Resolve<I2>());
+                return new ServiceA(c.Resolve<I2>());
             }, Lifetime.Scoped);
 
             var container = builder.Build();
@@ -302,9 +302,9 @@ namespace VContainer.Tests
             var builder = new ContainerBuilder();
             builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient);
 
-            builder.Register<I4>(container =>
+            builder.Register<I4>(c =>
             {
-                return new ServiceA(container.Resolve<I2>());
+                return new ServiceA(c.Resolve<I2>());
             }, Lifetime.Scoped);
 
             var container = builder.Build();
@@ -317,7 +317,7 @@ namespace VContainer.Tests
         public void RegisterFromFuncWithDisposable()
         {
             var builder = new ContainerBuilder();
-            builder.Register(container =>
+            builder.Register(_ =>
             {
                 return new DisposableServiceA();
             }, Lifetime.Scoped);
