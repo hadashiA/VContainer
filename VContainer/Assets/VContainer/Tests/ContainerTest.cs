@@ -280,6 +280,58 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void RegisterFromFunc()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient);
+
+            builder.Register(container =>
+            {
+                return new ServiceA(container.Resolve<I2>());
+            }, Lifetime.Scoped);
+
+            var container = builder.Build();
+            var resolved = container.Resolve<ServiceA>();
+            Assert.That(resolved, Is.InstanceOf<ServiceA>());
+            Assert.That(resolved.Service2, Is.InstanceOf<NoDependencyServiceA>());
+        }
+
+        [Test]
+        public void RegisterFromFuncWithInterface()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient);
+
+            builder.Register<I4>(container =>
+            {
+                return new ServiceA(container.Resolve<I2>());
+            }, Lifetime.Scoped);
+
+            var container = builder.Build();
+            var resolved = container.Resolve<I4>();
+            Assert.That(resolved, Is.InstanceOf<ServiceA>());
+            Assert.Throws<VContainerException>(() => container.Resolve<ServiceA>());
+        }
+
+        [Test]
+        public void RegisterFromFuncWithDisposable()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register(container =>
+            {
+                return new DisposableServiceA();
+            }, Lifetime.Scoped);
+
+            var container = builder.Build();
+            var resolved = container.Resolve<DisposableServiceA>();
+            Assert.That(resolved, Is.InstanceOf<DisposableServiceA>());
+            Assert.That(resolved.Disposed, Is.False);
+
+            container.Dispose();
+            Assert.That(resolved.Disposed, Is.True);
+        }
+
+        [Test]
         public void RegisterMultipleDisposables()
         {
             var builder = new ContainerBuilder();
