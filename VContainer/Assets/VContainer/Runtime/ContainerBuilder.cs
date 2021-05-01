@@ -12,8 +12,8 @@ namespace VContainer
         object ApplicationOrigin { get; set; }
 
         RegistrationBuilder Register(Type type, Lifetime lifetime);
-        RegistrationBuilder RegisterInstance(object instance);
         RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
+
         void RegisterBuildCallback(Action<IObjectResolver> container);
 
         bool Exists(Type type, bool includeInterfaceTypes = false);
@@ -51,9 +51,6 @@ namespace VContainer
 
         public RegistrationBuilder Register(Type type, Lifetime lifetime)
             => Register(new RegistrationBuilder(type, lifetime));
-
-        public RegistrationBuilder RegisterInstance(object instance)
-            => Register(new RegistrationBuilder(instance));
 
         public RegistrationBuilder Register(RegistrationBuilder registrationBuilder)
         {

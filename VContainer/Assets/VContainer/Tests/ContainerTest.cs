@@ -252,22 +252,20 @@ namespace VContainer.Tests
             var builder = new ContainerBuilder();
             var instance1 = new NoDependencyServiceB();
             var instance2 = new MultipleInterfaceServiceA();
-            builder.RegisterInstance<I3>(instance1);
-            builder.RegisterInstance<I1, I2>(instance2);
+            builder.RegisterInstance(instance1);
+            builder.RegisterInstance<I2>(instance2);
 
             var container = builder.Build();
 
-            var resolve1a = container.Resolve<I3>();
-            var resolve1b = container.Resolve<I3>();
+            var resolve1a = container.Resolve<NoDependencyServiceB>();
+            var resolve1b = container.Resolve<NoDependencyServiceB>();
+            var resolve2a = container.Resolve<I2>();
+            var resolve2b = container.Resolve<I2>();
             Assert.That(resolve1a, Is.EqualTo(instance1));
             Assert.That(resolve1b, Is.EqualTo(instance1));
-            Assert.Throws<VContainerException>(() => container.Resolve<NoDependencyServiceB>());
-
-            var resolve2a = container.Resolve<I1>();
-            var resolve2b = container.Resolve<I2>();
             Assert.That(resolve2a, Is.EqualTo(instance2));
             Assert.That(resolve2b, Is.EqualTo(instance2));
-            Assert.Throws<VContainerException>(() => container.Resolve<MultipleInterfaceServiceA>());
+            Assert.Throws<VContainerException>(() => container.Resolve<I3>());
         }
 
         [Test]

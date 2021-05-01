@@ -31,16 +31,7 @@ namespace VContainer
         public static RegistrationBuilder RegisterInstance<TInterface>(
             this IContainerBuilder builder,
             TInterface instance)
-            => builder.RegisterInstance(instance).As(typeof(TInterface));
-
-        public static RegistrationBuilder RegisterInstance<TInterface1, TInterface2>(
-            this IContainerBuilder builder,
-            object instance)
-            => builder.RegisterInstance(instance).As(typeof(TInterface1), typeof(TInterface2));
-
-        public static RegistrationBuilder RegisterInstance<TInterface1, TInterface2, TInterface3>(
-            this IContainerBuilder builder, object instance)
-            => builder.RegisterInstance(instance).As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
+            => builder.Register(new InstanceRegistrationBuilder(instance)).As(typeof(TInterface));
 
         public static RegistrationBuilder RegisterFactory<T>(
             this IContainerBuilder builder,

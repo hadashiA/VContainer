@@ -10,23 +10,14 @@ namespace VContainer
 
         internal readonly Type ImplementationType;
         internal readonly Lifetime Lifetime;
-        internal readonly object SpecificInstance;
 
         internal List<Type> InterfaceTypes;
         internal List<IInjectParameter> Parameters;
 
-        public RegistrationBuilder(Type implementationType, Lifetime lifetime, List<Type> interfaceTypes = null)
+        public RegistrationBuilder(Type implementationType, Lifetime lifetime)
         {
             ImplementationType = implementationType;
-            InterfaceTypes = interfaceTypes;
             Lifetime = lifetime;
-        }
-
-        public RegistrationBuilder(object instance)
-        {
-            ImplementationType = instance.GetType();
-            Lifetime = Lifetime.Singleton;
-            SpecificInstance = instance;
         }
 
         public virtual IRegistration Build()
@@ -38,8 +29,7 @@ namespace VContainer
                 Lifetime,
                 InterfaceTypes,
                 Parameters,
-                injector,
-                SpecificInstance);
+                injector);
         }
 
         public RegistrationBuilder As<TInterface>()
