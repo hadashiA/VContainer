@@ -10,14 +10,14 @@ namespace VContainer.Internal
         public IReadOnlyList<Type> InterfaceTypes { get; }
         public Lifetime Lifetime { get; }
 
-        readonly object instance;
+        readonly object implementationInstance;
         readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> parameters;
 
         long injected;
 
         public InstanceRegistration(
-            object instance,
+            object implementationInstance,
             Type implementationType,
             Lifetime lifetime,
             IReadOnlyList<Type> interfaceTypes,
@@ -28,7 +28,7 @@ namespace VContainer.Internal
             Lifetime = lifetime;
             InterfaceTypes = interfaceTypes;
 
-            this.instance = instance;
+            this.implementationInstance = implementationInstance;
             this.injector = injector;
             this.parameters = parameters;
         }
@@ -37,9 +37,9 @@ namespace VContainer.Internal
         {
             if (Interlocked.CompareExchange(ref injected, 1, 0) == 0)
             {
-                injector.Inject(instance, resolver, parameters);
+                injector.Inject(implementationInstance, resolver, parameters);
             }
-            return instance;
+            return implementationInstance;
         }
     }
 }
