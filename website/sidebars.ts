@@ -25,6 +25,7 @@ module.exports = {
       'integrations/entrypoint',
       'integrations/unitask',
       'integrations/unirx',
+      'integrations/messagepipe',
       'integrations/ecs'
     ],
     'Scoping': [
