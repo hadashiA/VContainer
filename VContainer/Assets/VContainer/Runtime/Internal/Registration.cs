@@ -56,10 +56,16 @@ namespace VContainer.Internal
         readonly List<Type> interfaceTypes;
         readonly IList<IRegistration> registrations = new List<IRegistration>();
 
-        public CollectionRegistration(Type elementType)
+        public CollectionRegistration(Type elementType) : this(
+            typeof(List<>).MakeGenericType(elementType),
+            elementType)
+        {
+        }
+
+        public CollectionRegistration(Type listType, Type elementType)
         {
             this.elementType = elementType;
-            ImplementationType = typeof(List<>).MakeGenericType(elementType);
+            ImplementationType = listType;
             interfaceTypes = new List<Type>
             {
                 typeof(IEnumerable<>).MakeGenericType(elementType),

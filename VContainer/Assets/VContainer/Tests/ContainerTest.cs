@@ -244,6 +244,7 @@ namespace VContainer.Tests
 
             var resolved = container.Resolve<GenericsArgumentService>();
             Assert.That(resolved.GenericsService, Is.InstanceOf<GenericsService<I2>>());
+            Assert.That(resolved.GenericsService.ParameterService, Is.InstanceOf<NoDependencyServiceA>());
         }
 
         [Test]
