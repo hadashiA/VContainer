@@ -11,16 +11,15 @@ namespace VContainer.Unity
         readonly string worldName;
         Type systemGroupType;
 
-        internal SystemRegistrationBuilder(
-            Type implementationType,
-            string worldName,
-            List<Type> interfaceTypes = null)
-        : base(implementationType, default, interfaceTypes)
+        internal SystemRegistrationBuilder(Type implementationType, string worldName)
+            : base(implementationType, default)
         {
             this.worldName = worldName;
-            InterfaceTypes = InterfaceTypes ?? new List<Type>();
-            InterfaceTypes.Add(typeof(ComponentSystemBase));
-            InterfaceTypes.Add(ImplementationType);
+            InterfaceTypes = new List<Type>
+            {
+                typeof(ComponentSystemBase),
+                implementationType
+            };
         }
 
         public override IRegistration Build()
