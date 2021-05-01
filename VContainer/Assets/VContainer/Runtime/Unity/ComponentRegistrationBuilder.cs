@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Internal;
@@ -19,9 +18,8 @@ namespace VContainer.Unity
         internal ComponentRegistrationBuilder(
             Component prefab,
             Type implementationType,
-            Lifetime lifetime,
-            List<Type> interfaceTypes = null)
-            : this(false, default, implementationType, lifetime, interfaceTypes)
+            Lifetime lifetime)
+            : this(false, default, implementationType, lifetime)
         {
             this.prefab = prefab;
         }
@@ -29,18 +27,14 @@ namespace VContainer.Unity
         internal ComponentRegistrationBuilder(
             string gameObjectName,
             Type implementationType,
-            Lifetime lifetime,
-            List<Type> interfaceTypes = null)
-            : this(false, default, implementationType, lifetime, interfaceTypes)
+            Lifetime lifetime)
+            : this(false, default, implementationType, lifetime)
         {
             this.gameObjectName = gameObjectName;
         }
 
-        internal ComponentRegistrationBuilder(
-            Scene scene,
-            Type implementationType,
-            List<Type> interfaceTypes = null)
-            : this(true, scene, implementationType, Lifetime.Scoped, interfaceTypes)
+        internal ComponentRegistrationBuilder(Scene scene, Type implementationType)
+            : this(true, scene, implementationType, Lifetime.Scoped)
         {
         }
 
@@ -48,9 +42,8 @@ namespace VContainer.Unity
             bool find,
             Scene scene,
             Type implementationType,
-            Lifetime lifetime,
-            List<Type> interfaceTypes = null)
-            : base(implementationType, lifetime, interfaceTypes)
+            Lifetime lifetime)
+            : base(implementationType, lifetime)
         {
             this.find = find;
             this.scene = scene;

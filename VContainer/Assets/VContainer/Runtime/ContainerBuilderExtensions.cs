@@ -28,18 +28,26 @@ namespace VContainer
             where TImplement : TInterface1, TInterface2, TInterface3
             => builder.Register<TImplement>(lifetime).As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
 
+        public static RegistrationBuilder Register<TInterface>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, TInterface> implementationConfiguration,
+            Lifetime lifetime)
+            where TInterface : class
+            => builder.Register(new FuncRegistrationBuilder(implementationConfiguration, typeof(TInterface), lifetime));
+
         public static RegistrationBuilder RegisterInstance<TInterface>(
             this IContainerBuilder builder,
             TInterface instance)
-            => builder.RegisterInstance(instance).As(typeof(TInterface));
+            => builder.Register(new InstanceRegistrationBuilder(instance)).As(typeof(TInterface));
 
         public static RegistrationBuilder RegisterInstance<TInterface1, TInterface2>(
             this IContainerBuilder builder,
-            object instance)
+            TInterface1 instance)
             => builder.RegisterInstance(instance).As(typeof(TInterface1), typeof(TInterface2));
 
         public static RegistrationBuilder RegisterInstance<TInterface1, TInterface2, TInterface3>(
-            this IContainerBuilder builder, object instance)
+            this IContainerBuilder builder,
+            TInterface1 instance)
             => builder.RegisterInstance(instance).As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
 
         public static RegistrationBuilder RegisterFactory<T>(
