@@ -5,15 +5,29 @@ using VContainer.Internal;
 
 namespace VContainer.Unity
 {
+    struct ComponentDestination
+    {
+        public Transform Parent;
+        public Func<Transform> ParentFinder;
+
+        public Transform GetParent()
+        {
+            if (Parent != null)
+                return Parent;
+            if (ParentFinder != null)
+                return ParentFinder();
+            return null;
+        }
+    }
+
     public sealed class ComponentRegistrationBuilder : RegistrationBuilder
     {
-        readonly bool find;
+        readonly bool finding;
         readonly Scene scene;
         readonly Component prefab;
-
-        Transform parent;
-        Func<Transform> parentFinder;
-        string gameObjectName;
+        readonly string gameObjectName;
+        
+        ComponentDestination destination;
 
         internal ComponentRegistrationBuilder(
             Component prefab,
@@ -39,39 +53,61 @@ namespace VContainer.Unity
         }
 
         ComponentRegistrationBuilder(
-            bool find,
+            bool finding,
             Scene scene,
             Type implementationType,
             Lifetime lifetime)
             : base(implementationType, lifetime)
         {
-            this.find = find;
+            this.finding = finding;
             this.scene = scene;
         }
 
         public override IRegistration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
-            var destination = new ComponentDestination(find, scene, parent, parentFinder, prefab, gameObjectName);
 
-            return new ComponentRegistration(
+            if (finding)
+            {
+                return new FindComponentRegistration(
+                    ImplementationType,
+                    InterfaceTypes,
+                    Parameters,
+                    injector,
+                    scene,
+                    destination);
+            }
+            if (prefab != null)
+            {
+                return new PrefabComponentRegistration(
+                    prefab,
+                    ImplementationType,
+                    Lifetime,
+                    InterfaceTypes,
+                    Parameters,
+                    injector,
+                    destination);
+            }
+
+            return new NewGameObjectComponentRegistration(
                 ImplementationType,
                 Lifetime,
                 InterfaceTypes,
                 Parameters,
                 injector,
-                destination);
+                destination,
+                gameObjectName);
         }
 
         public ComponentRegistrationBuilder UnderTransform(Transform parent)
         {
-            this.parent = parent;
+            destination.Parent = parent;
             return this;
         }
 
         public ComponentRegistrationBuilder UnderTransform(Func<Transform> parentFinder)
         {
-            this.parentFinder = parentFinder;
+            destination.ParentFinder = parentFinder;
             return this;
         }
    }
