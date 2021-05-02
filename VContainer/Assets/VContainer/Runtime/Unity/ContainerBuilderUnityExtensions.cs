@@ -10,6 +10,18 @@ namespace VContainer.Unity
 {
     public readonly struct EntryPointsBuilder
     {
+        public static void EnsureDispatcherRegistered(IContainerBuilder containerBuilder)
+        {
+            if (!containerBuilder.Exists(typeof(EntryPointDispatcher), false))
+            {
+                containerBuilder.Register<EntryPointDispatcher>(Lifetime.Scoped);
+                containerBuilder.RegisterBuildCallback(container =>
+                {
+                    container.Resolve<EntryPointDispatcher>().Dispatch();
+                });
+            }
+        }
+
         readonly IContainerBuilder containerBuilder;
         readonly Lifetime lifetime;
 
@@ -64,6 +76,7 @@ namespace VContainer.Unity
             Lifetime lifetime,
             Action<EntryPointsBuilder> configuration)
         {
+            EntryPointsBuilder.EnsureDispatcherRegistered(builder);
             configuration(new EntryPointsBuilder(builder, lifetime));
         }
 
@@ -82,14 +95,7 @@ namespace VContainer.Unity
 
         public static RegistrationBuilder RegisterEntryPoint<T>(this IContainerBuilder builder, Lifetime lifetime = Lifetime.Singleton)
         {
-            if (!builder.Exists(typeof(EntryPointDispatcher), false))
-            {
-                builder.Register<EntryPointDispatcher>(Lifetime.Scoped);
-                builder.RegisterBuildCallback(container =>
-                {
-                    container.Resolve<EntryPointDispatcher>().Dispatch();
-                });
-            }
+            EntryPointsBuilder.EnsureDispatcherRegistered(builder);
             return builder.Register<T>(lifetime).AsImplementedInterfaces();
         }
 
