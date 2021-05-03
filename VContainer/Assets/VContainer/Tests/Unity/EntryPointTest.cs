@@ -28,6 +28,7 @@ namespace VContainer.Tests.Unity
             Assert.That(entryPoint.PostStartCalled, Is.EqualTo(1));
 
             yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
 
             Assert.That(entryPoint.FixedTickCalls, Is.GreaterThan(0));
             Assert.That(entryPoint.PostFixedTickCalls, Is.GreaterThan(0));
