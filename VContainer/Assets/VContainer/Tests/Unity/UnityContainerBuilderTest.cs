@@ -128,6 +128,29 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void RegisterComponentInHierarchyUnderInactive()
+        {
+            var lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
+            var parent = new GameObject("Parent");
+            var child = new GameObject("Child A");
+
+            child.transform.SetParent(parent.transform);
+            child.gameObject.SetActive(false);
+
+            var component = child.AddComponent<SampleMonoBehaviour>();
+
+            var builder = new ContainerBuilder { ApplicationOrigin = lifetimeScope };
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
+                .UnderTransform(parent.transform);
+
+            var container = builder.Build();
+            var resolved = container.Resolve<SampleMonoBehaviour>();
+            Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(resolved.gameObject, Is.EqualTo(child));
+        }
+
+        [Test]
         public void RegisterComponentInHierarchyWithBuiltinType()
         {
             var go1 = new GameObject("Parent");

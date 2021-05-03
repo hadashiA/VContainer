@@ -40,7 +40,7 @@ namespace VContainer.Unity
             var parent = destination.GetParent();
             if (parent != null)
             {
-                component = parent.GetComponentInChildren(ImplementationType);
+                component = parent.GetComponentInChildren(ImplementationType, true);
                 if (component == null)
                 {
                     throw new VContainerException(ImplementationType, $"Component {ImplementationType} is not in the parent {parent.name}");
