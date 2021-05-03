@@ -22,18 +22,30 @@ namespace VContainer.Unity
 
     public sealed class ComponentRegistrationBuilder : RegistrationBuilder
     {
-        readonly bool finding;
-        readonly Scene scene;
+        readonly object instance;
         readonly Component prefab;
         readonly string gameObjectName;
-        
+
         ComponentDestination destination;
+        Scene scene;
+
+        internal ComponentRegistrationBuilder(object instance)
+            : base(instance.GetType(), Lifetime.Singleton)
+        {
+            this.instance = instance;
+        }
+
+        internal ComponentRegistrationBuilder(in Scene scene, Type implementationType)
+            : base(implementationType, Lifetime.Scoped)
+        {
+            this.scene = scene;
+        }
 
         internal ComponentRegistrationBuilder(
             Component prefab,
             Type implementationType,
             Lifetime lifetime)
-            : this(false, default, implementationType, lifetime)
+            : base(implementationType, lifetime)
         {
             this.prefab = prefab;
         }
@@ -42,32 +54,25 @@ namespace VContainer.Unity
             string gameObjectName,
             Type implementationType,
             Lifetime lifetime)
-            : this(false, default, implementationType, lifetime)
-        {
-            this.gameObjectName = gameObjectName;
-        }
-
-        internal ComponentRegistrationBuilder(Scene scene, Type implementationType)
-            : this(true, scene, implementationType, Lifetime.Scoped)
-        {
-        }
-
-        ComponentRegistrationBuilder(
-            bool finding,
-            Scene scene,
-            Type implementationType,
-            Lifetime lifetime)
             : base(implementationType, lifetime)
         {
-            this.finding = finding;
-            this.scene = scene;
+            this.gameObjectName = gameObjectName;
         }
 
         public override IRegistration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
 
-            if (finding)
+            if (instance != null)
+            {
+                return new InstanceComponentRegistration(
+                    instance,
+                    ImplementationType,
+                    InterfaceTypes,
+                    Parameters,
+                    injector);
+            }
+            if (scene.IsValid())
             {
                 return new FindComponentRegistration(
                     ImplementationType,

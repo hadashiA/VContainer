@@ -9,7 +9,7 @@ namespace VContainer.Unity
     {
         public Type ImplementationType { get; }
         public IReadOnlyList<Type> InterfaceTypes { get; }
-        public Lifetime Lifetime => Lifetime.Singleton;
+        public Lifetime Lifetime => Lifetime.Scoped;
 
         readonly IReadOnlyList<IInjectParameter> parameters;
         readonly IInjector injector;

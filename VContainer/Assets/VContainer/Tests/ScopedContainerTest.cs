@@ -217,7 +217,7 @@ namespace VContainer.Tests
 
 
         [Test]
-        public void RegisterDisposableInstance()
+        public void InstanceRegistrationDoesNotDisposal()
         {
             var instance1 = new DisposableServiceA();
 
@@ -238,7 +238,7 @@ namespace VContainer.Tests
             Assert.That(resolveFromParent.Disposed, Is.False);
 
             container.Dispose();
-            Assert.That(resolveFromParent.Disposed, Is.True);
+            Assert.That(resolveFromParent.Disposed, Is.False);
         }
     }
 }

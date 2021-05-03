@@ -108,13 +108,10 @@ namespace VContainer.Unity
 
         public static RegistrationBuilder RegisterComponent<TInterface>(this IContainerBuilder builder, TInterface component)
         {
-            var registrationBuilder = builder.RegisterInstance(component).As(typeof(TInterface));
-            if (component is MonoBehaviour)
-            {
-                // Force inject execution
-                registrationBuilder
-                    .OnAfterBuild((registration, container) => registration.SpawnInstance(container));
-            }
+            var registrationBuilder = new ComponentRegistrationBuilder(component).As(typeof(TInterface));
+            // Force inject execution
+            registrationBuilder.OnAfterBuild((registration, container) => registration.SpawnInstance(container));
+            builder.Register(registrationBuilder);
             return registrationBuilder;
         }
 
