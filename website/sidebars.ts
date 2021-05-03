@@ -12,13 +12,16 @@ module.exports = {
       'resolving/constructor-injection',
       'resolving/method-injection',
       'resolving/property-field-injection',
-      'resolving/gameobject-injection'
+      'resolving/gameobject-injection',
+      'resolving/container-api',
     ],
     'Registering': [
       'registering/register-type',
+      'registering/register-using-delegate',
       'registering/register-factory',
       'registering/register-monobehaviour',
       'registering/register-scriptable-object',
+      'registering/register-collection',
       'registering/register-callbacks',
     ],
     'Integrations': [
@@ -26,22 +29,18 @@ module.exports = {
       'integrations/unitask',
       'integrations/unirx',
       'integrations/messagepipe',
-      'integrations/ecs'
+      'integrations/ecs',
     ],
     'Scoping': [
       'scoping/lifetime-overview',
       'scoping/generate-child-via-scene',
       'scoping/generate-child-with-code-first',
-      'scoping/project-root-lifetimescope'
-    ],
-    'Container API': [
-      'container-api/use-container-directory',
-      'container-api/implicit-relationship-types'
+      'scoping/project-root-lifetimescope',
     ],
     'Optimization': [
       'optimization/codegen',
       'optimization/async-container-build',
-      'optimization/parallel-container-build'
+      'optimization/parallel-container-build',
     ],
     'Comparing to other libraries': [
       'comparing/comparing-to-zenject'
