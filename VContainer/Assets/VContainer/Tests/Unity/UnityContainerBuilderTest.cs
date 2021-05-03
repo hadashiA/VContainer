@@ -41,25 +41,40 @@ namespace VContainer.Tests.Unity
         public void RegisterComponent()
         {
             var component = new GameObject("SampleBehaviour").AddComponent<SampleMonoBehaviour>();
-            {
-                var builder = new ContainerBuilder();
-                builder.Register<ServiceA>(Lifetime.Transient);
-                builder.RegisterComponent(component);
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponent(component);
 
-                var container = builder.Build();
+            var container = builder.Build();
 
-                Assert.That(container.Resolve<SampleMonoBehaviour>(), Is.EqualTo(component));
-                Assert.That(container.Resolve<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
-            }
-            {
-                var builder = new ContainerBuilder();
-                builder.Register<ServiceA>(Lifetime.Transient);
-                builder.RegisterComponent<IComponent>(component);
+            Assert.That(container.Resolve<SampleMonoBehaviour>(), Is.EqualTo(component));
+            Assert.That(container.Resolve<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
+        }
 
-                var container = builder.Build();
+        [Test]
+        public void RegisterComponentAsInterface()
+        {
+            var component = new GameObject("SampleBehaviour").AddComponent<SampleMonoBehaviour>();
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponent<IComponent>(component);
 
-                Assert.That(container.Resolve<IComponent>(), Is.EqualTo(component));
-            }
+            var container = builder.Build();
+
+            Assert.That(container.Resolve<IComponent>(), Is.EqualTo(component));
+        }
+
+        [Test]
+        public void RegisterComponentWithAutoInjection()
+        {
+            var component = new GameObject("SampleBehaviour").AddComponent<SampleMonoBehaviour>();
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponent<IComponent>(component);
+
+            var container = builder.Build();
+
+            Assert.That(component.ServiceA, Is.InstanceOf<ServiceA>());
         }
 
         [Test]

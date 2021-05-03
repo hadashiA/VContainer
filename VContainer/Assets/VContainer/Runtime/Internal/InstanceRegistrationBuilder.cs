@@ -12,15 +12,11 @@ namespace VContainer.Internal
 
         public override IRegistration Build()
         {
-            var injector = InjectorCache.GetOrBuild(ImplementationType);
-
             return new InstanceRegistration(
                 implementationInstance,
                 ImplementationType,
                 Lifetime,
-                InterfaceTypes,
-                Parameters,
-                injector);
+                InterfaceTypes);
         }
     }
 }

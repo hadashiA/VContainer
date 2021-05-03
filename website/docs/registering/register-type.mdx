@@ -166,7 +166,7 @@ builder.RegisterInstance(obj);
 ```
 
 :::note
-`RegisterIntance` always has a `Scoped` lifetime, so it has no arguments.
+`RegisterIntance` always has a `Singleton` lifetime, so it has no arguments.
 :::
 
 It can resolve like this:
@@ -177,6 +177,18 @@ class ClassA
     public ClassA(ServiceA serviceA) { /* ... */ }
 }
 ```
+
+:::note
+Instances registered with RegisterInstance are not managed by the container.
+
+- Dispose will not be executed automatically.
+- Method Injection will not be executed automatically
+
+If you want the container to manage the created instances, consider using the following instead
+
+- [Register(_ => instance, ...)](./register-using-delegate)
+- [RegisterComponent(...)](./register-monobehaviour)
+:::
 
 ##  Register instance as interface
 

@@ -107,7 +107,7 @@ namespace VContainer
         object CreateTrackedInstance(IRegistration registration)
         {
             var lazy = sharedInstances.GetOrAdd(registration, createInstance);
-            if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable)
+            if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable && !(registration is InstanceRegistration))
             {
                 disposables.Add(disposable);
             }
@@ -165,7 +165,7 @@ namespace VContainer
 
                 case Lifetime.Singleton:
                     var singleton = sharedInstances.GetOrAdd(registration, createInstance);
-                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable)
+                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration is InstanceRegistration))
                     {
                         disposables.Add(disposable);
                     }
