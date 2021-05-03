@@ -208,9 +208,8 @@ namespace VContainer.Unity
             if (system is null)
                 throw new ArgumentException($"{typeof(T).FullName} is not in the world {world}");
 
-            return builder.RegisterInstance(system)
-                .As(typeof(ComponentSystemBase))
-                .AsSelf();
+            return builder.RegisterComponent(system)
+                .As(typeof(ComponentSystemBase), typeof(T));
         }
 
         // Use custom world
