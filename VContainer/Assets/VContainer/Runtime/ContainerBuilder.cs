@@ -10,12 +10,8 @@ namespace VContainer
     public interface IContainerBuilder
     {
         object ApplicationOrigin { get; set; }
-
-        RegistrationBuilder Register(Type type, Lifetime lifetime);
-        RegistrationBuilder Register(RegistrationBuilder registrationBuilder);
-
+        T Register<T>(T registrationBuilder) where T : RegistrationBuilder;
         void RegisterBuildCallback(Action<IObjectResolver> container);
-
         bool Exists(Type type, bool includeInterfaceTypes = false);
     }
 
@@ -49,10 +45,7 @@ namespace VContainer
         readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
 
-        public RegistrationBuilder Register(Type type, Lifetime lifetime)
-            => Register(new RegistrationBuilder(type, lifetime));
-
-        public RegistrationBuilder Register(RegistrationBuilder registrationBuilder)
+        public T Register<T>(T registrationBuilder) where T : RegistrationBuilder
         {
             registrationBuilders.Add(registrationBuilder);
             return registrationBuilder;

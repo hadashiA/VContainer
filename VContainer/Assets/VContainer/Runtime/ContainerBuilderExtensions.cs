@@ -5,6 +5,12 @@ namespace VContainer
 {
     public static class ContainerBuilderExtensions
     {
+        public static RegistrationBuilder Register(
+            this IContainerBuilder builder,
+            Type type,
+            Lifetime lifetime)
+            => builder.Register(new RegistrationBuilder(type, lifetime));
+
         public static RegistrationBuilder Register<T>(
             this IContainerBuilder builder,
             Lifetime lifetime)
@@ -79,51 +85,31 @@ namespace VContainer
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<T>> factoryFactory,
             Lifetime lifetime)
-        {
-            var registrationBuilder = new FactoryRegistration<T>(factoryFactory, lifetime);
-            builder.Register(registrationBuilder);
-            return registrationBuilder;
-        }
+            => builder.Register(new FactoryRegistration<T>(factoryFactory, lifetime));
 
         public static RegistrationBuilder RegisterFactory<TParam1, T>(
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<TParam1, T>> factoryFactory,
             Lifetime lifetime)
-        {
-            var registrationBuilder = new FactoryRegistration<TParam1, T>(factoryFactory, lifetime);
-            builder.Register(registrationBuilder);
-            return registrationBuilder;
-        }
+            => builder.Register(new FactoryRegistration<TParam1, T>(factoryFactory, lifetime));
 
         public static RegistrationBuilder RegisterFactory<TParam1, TParam2, T>(
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<TParam1, TParam2, T>> factoryFactory,
             Lifetime lifetime)
-        {
-            var registrationBuilder = new FactoryRegistration<TParam1, TParam2, T>(factoryFactory, lifetime);
-            builder.Register(registrationBuilder);
-            return registrationBuilder;
-        }
+            => builder.Register(new FactoryRegistration<TParam1, TParam2, T>(factoryFactory, lifetime));
 
         public static RegistrationBuilder RegisterFactory<TParam1, TParam2, TParam3, T>(
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<TParam1, TParam2, TParam3, T>> factoryFactory,
             Lifetime lifetime)
-        {
-            var registrationBuilder = new FactoryRegistration<TParam1, TParam2, TParam3, T>(factoryFactory, lifetime);
-            builder.Register(registrationBuilder);
-            return registrationBuilder;
-        }
+            => builder.Register(new FactoryRegistration<TParam1, TParam2, TParam3, T>(factoryFactory, lifetime));
 
         public static RegistrationBuilder RegisterFactory<TParam1, TParam2, TParam3, TParam4, T>(
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<TParam1, TParam2, TParam3, TParam4, T>> factoryFactory,
             Lifetime lifetime)
-        {
-            var registrationBuilder = new FactoryRegistration<TParam1, TParam2, TParam3, TParam4, T>(factoryFactory, lifetime);
-            builder.Register(registrationBuilder);
-            return registrationBuilder;
-        }
+            => builder.Register(new FactoryRegistration<TParam1, TParam2, TParam3, TParam4, T>(factoryFactory, lifetime));
 
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
         public static void RegisterContainer(this IContainerBuilder builder)
