@@ -56,6 +56,32 @@ namespace VContainer
             TInterface1 instance)
             => builder.RegisterInstance(instance).As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
 
+        public static GenericFallbackRegistrationBuilder RegisterGeneric(
+            this IContainerBuilder builder,
+            Type openGenericImplementationType,
+            Lifetime lifetime)
+            => builder.Register(new GenericFallbackRegistrationBuilder(
+                openGenericImplementationType,
+                lifetime));
+
+        public static GenericFallbackRegistrationBuilder RegisterGeneric(
+            this IContainerBuilder builder,
+            Type openGenericInterfaceType,
+            Type openGenericImplementationType,
+            Lifetime lifetime)
+        {
+            if (!openGenericInterfaceType.IsGenericTypeDefinition)
+            {
+                throw new ArgumentException($"{openGenericInterfaceType} is not an open generic type");
+            }
+            var registrationBuilder = new GenericFallbackRegistrationBuilder(
+                openGenericImplementationType,
+                lifetime);
+            registrationBuilder.As(openGenericInterfaceType);
+            builder.Register(registrationBuilder);
+            return registrationBuilder;
+        }
+
         public static RegistrationBuilder RegisterFactory<T>(
             this IContainerBuilder builder,
             Func<T> factory)
