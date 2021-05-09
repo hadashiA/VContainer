@@ -54,8 +54,12 @@ builder.RegisterComponentInHierarchy<YourBehaviour>()
 ## Register component to specific parent Transform
 
 ```csharp
-// Instantiate under the specified transform
+// Instantiate new GameObject under the specified transform
 builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped)
+    .UnderTransform(parent);
+
+// Instantiate new prefab under the specified transform
+builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped)
     .UnderTransform(parent);
 
 // Find the component under the specified transform.
