@@ -109,18 +109,18 @@ function DocSidebarItemCategory({
     }
   }, [isActive, wasActive, collapsed]);
 
-  const handleItemClick = useCallback(
-    (e) => {
-      e.preventDefault();
-
-      if (!menuListHeight) {
-        handleMenuListHeight();
-      }
-
-      setTimeout(() => setCollapsed((state) => !state), 100);
-    },
-    [menuListHeight],
-  );
+  // const handleItemClick = useCallback(
+  //   (e) => {
+  //     e.preventDefault();
+  //
+  //     if (!menuListHeight) {
+  //       handleMenuListHeight();
+  //     }
+  //
+  //     setTimeout(() => setCollapsed((state) => !state), 100);
+  //   },
+  //   [menuListHeight],
+  // );
 
   if (items.length === 0) {
     return null;
@@ -131,17 +131,33 @@ function DocSidebarItemCategory({
       className={clsx('menu__list-item', {
         'menu__list-item--collapsed': collapsed,
       })}>
-      <a
+      {/*<a*/}
+      {/*  className={clsx('menu__link', {*/}
+      {/*    'menu__link--sublist': collapsible,*/}
+      {/*    'menu__link--active': collapsible && isActive,*/}
+      {/*    [styles.menuLinkText]: !collapsible,*/}
+      {/*  })}*/}
+      {/*  onClick={collapsible ? handleItemClick : undefined}*/}
+      {/*  href={collapsible ? '#!' : undefined}*/}
+      {/*  {...props}>*/}
+      {/*  {label}*/}
+      {/*</a>*/}
+      <Link
         className={clsx('menu__link', {
           'menu__link--sublist': collapsible,
-          'menu__link--active': collapsible && isActive,
           [styles.menuLinkText]: !collapsible,
         })}
-        onClick={collapsible ? handleItemClick : undefined}
-        href={collapsible ? '#!' : undefined}
+        to={items[0].href}
+        {...
+          {
+            isNavLink: true,
+            exact: true,
+            onClick: onItemClick,
+          }
+        }
         {...props}>
         {label}
-      </a>
+      </Link>
       <ul
         className="menu__list"
         ref={menuListRef}
