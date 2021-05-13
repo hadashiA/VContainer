@@ -33,18 +33,21 @@ namespace VContainer.Editor
                 return;
             }
 
+            if (!scriptPath.EndsWith("LifetimeScope.cs"))
+            {
+                return;
+            }
+
+            var content = MonoInstallerTemplate.Replace("#SCRIPTNAME#", basename);
+
             if (scriptPath.StartsWith("Assets/"))
             {
                 scriptPath = scriptPath.Substring("Assets/".Length);
             }
 
             var fullPath = Path.Combine(Application.dataPath, scriptPath);
-            if (scriptPath.EndsWith("LifetimeScope.cs"))
-            {
-                var content = MonoInstallerTemplate.Replace("#SCRIPTNAME#", basename);
-                File.WriteAllText(fullPath, content);
-                AssetDatabase.Refresh();
-            }
+            File.WriteAllText(fullPath, content);
+            AssetDatabase.Refresh();
         }
     }
 }
