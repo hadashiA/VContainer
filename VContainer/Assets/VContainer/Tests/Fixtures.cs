@@ -35,6 +35,8 @@ namespace VContainer.Tests
         public bool ConstructorCalled;
         public bool Method1Called;
         public bool Method2Called;
+        public bool MethodCalledAfterFieldInjected;
+        public bool MethodCalledAfterPropertyInjected;
 
         I2 privateProperty;
 
@@ -78,12 +80,14 @@ namespace VContainer.Tests
         public void MethodInjectable1(I3 service3, I4 service4)
         {
             Method1Called = true;
+            MethodCalledAfterFieldInjected = privateFieldInjectable != null;
         }
 
         [Inject]
         public void MethodInjectable2(I5 service5, I6 service6)
         {
             Method2Called = true;
+            MethodCalledAfterPropertyInjected = privateProperty != null;
         }
 
         public I4 GetPrivateFieldInjectable() => privateFieldInjectable;
