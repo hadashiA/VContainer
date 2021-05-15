@@ -85,31 +85,31 @@ namespace VContainer
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<T>> factoryFactory,
             Lifetime lifetime)
-            => builder.Register(new FactoryRegistration<T>(factoryFactory, lifetime));
+            => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<T>), lifetime));
 
         public static RegistrationBuilder RegisterFactory<TParam1, T>(
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<TParam1, T>> factoryFactory,
             Lifetime lifetime)
-            => builder.Register(new FactoryRegistration<TParam1, T>(factoryFactory, lifetime));
+            => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, T>), lifetime));
 
         public static RegistrationBuilder RegisterFactory<TParam1, TParam2, T>(
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<TParam1, TParam2, T>> factoryFactory,
             Lifetime lifetime)
-            => builder.Register(new FactoryRegistration<TParam1, TParam2, T>(factoryFactory, lifetime));
+            => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, TParam2, T>), lifetime));
 
         public static RegistrationBuilder RegisterFactory<TParam1, TParam2, TParam3, T>(
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<TParam1, TParam2, TParam3, T>> factoryFactory,
             Lifetime lifetime)
-            => builder.Register(new FactoryRegistration<TParam1, TParam2, TParam3, T>(factoryFactory, lifetime));
+            => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, TParam2, TParam3, T>), lifetime));
 
         public static RegistrationBuilder RegisterFactory<TParam1, TParam2, TParam3, TParam4, T>(
             this IContainerBuilder builder,
             Func<IObjectResolver, Func<TParam1, TParam2, TParam3, TParam4, T>> factoryFactory,
             Lifetime lifetime)
-            => builder.Register(new FactoryRegistration<TParam1, TParam2, TParam3, TParam4, T>(factoryFactory, lifetime));
+            => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, TParam2, TParam3, TParam4, T>), lifetime));
 
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
         public static void RegisterContainer(this IContainerBuilder builder)
