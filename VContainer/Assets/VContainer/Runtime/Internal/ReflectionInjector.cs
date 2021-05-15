@@ -20,9 +20,9 @@ namespace VContainer.Internal
 
         public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
-            InjectMethods(instance, resolver, parameters);
-            InjectProperties(instance, resolver);
             InjectFields(instance, resolver);
+            InjectProperties(instance, resolver);
+            InjectMethods(instance, resolver, parameters);
         }
 
         public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)

@@ -163,6 +163,8 @@ namespace VContainer.Tests
             Assert.That(((AllInjectionFeatureService)obj1).ConstructorCalled, Is.True);
             Assert.That(((AllInjectionFeatureService)obj1).Method1Called, Is.True);
             Assert.That(((AllInjectionFeatureService)obj1).Method2Called, Is.True);
+            Assert.That(((AllInjectionFeatureService)obj1).MethodCalledAfterFieldInjected, Is.True);
+            Assert.That(((AllInjectionFeatureService)obj1).MethodCalledAfterPropertyInjected, Is.True);
             Assert.That(((AllInjectionFeatureService)obj1).GetPrivateProperty(), Is.InstanceOf<I2>());
             Assert.That(((AllInjectionFeatureService)obj1).PublicPropertyInjectable, Is.InstanceOf<I3>());
             Assert.That(((AllInjectionFeatureService)obj1).GetPrivateFieldInjectable(), Is.InstanceOf<I4>());

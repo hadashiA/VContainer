@@ -335,6 +335,44 @@ namespace VContainer.Editor.CodeGen
                 processor.Emit(OpCodes.Stloc_S, instanceVariableDef);
             }
 
+            if (injectTypeInfo.InjectFields != null)
+            {
+                foreach (var injectField in injectTypeInfo.InjectFields)
+                {
+                    var fieldRef = module.ImportReference(injectField);
+                    var fieldTypeRef = Utils.CreateParameterTypeReference(module, injectField.FieldType, typeDef);
+
+                    processor.Emit(OpCodes.Ldloc_S, instanceVariableDef);
+
+                    // TODO: Add ExceptionHandler
+                    // instance.Field = resolver.Resolve(Type)
+                    processor.Emit(OpCodes.Ldarg_2);
+                    processor.Emit(OpCodes.Ldtoken, fieldTypeRef);
+                    processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
+                    processor.Emit(OpCodes.Call, ResolveMethodRef);
+                    processor.Emit(OpCodes.Stfld, fieldRef);
+                }
+            }
+
+            if (injectTypeInfo.InjectProperties != null)
+            {
+                foreach (var injectProperty in injectTypeInfo.InjectProperties)
+                {
+                    var propertySetterRef = module.ImportReference(injectProperty.SetMethod);
+                    var propertyTypeRef = Utils.CreateParameterTypeReference(module, injectProperty.PropertyType, typeDef);
+
+                    processor.Emit(OpCodes.Ldloc_S, instanceVariableDef);
+
+                    // TODO: Add ExceptionHandler
+                    // instance.Property = resolver.Resolve(Type)
+                    processor.Emit(OpCodes.Ldarg_2);
+                    processor.Emit(OpCodes.Ldtoken, propertyTypeRef);
+                    processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
+                    processor.Emit(OpCodes.Call, ResolveMethodRef);
+                    processor.Emit(OpCodes.Callvirt, propertySetterRef);
+                }
+            }
+
             if (injectTypeInfo.InjectMethods != null)
             {
                 foreach (var injectMethod in injectTypeInfo.InjectMethods)
@@ -362,44 +400,6 @@ namespace VContainer.Editor.CodeGen
                         processor.Emit(OpCodes.Ldloc_S, paramVariableDef);
                     }
                     processor.Emit(OpCodes.Callvirt, injectMethodRef);
-                }
-            }
-
-            if (injectTypeInfo.InjectProperties != null)
-            {
-                foreach (var injectProperty in injectTypeInfo.InjectProperties)
-                {
-                    var propertySetterRef = module.ImportReference(injectProperty.SetMethod);
-                    var propertyTypeRef = Utils.CreateParameterTypeReference(module, injectProperty.PropertyType, typeDef);
-
-                    processor.Emit(OpCodes.Ldloc_S, instanceVariableDef);
-
-                    // TODO: Add ExceptionHandler
-                    // instance.Property = resolver.Resolve(Type)
-                    processor.Emit(OpCodes.Ldarg_2);
-                    processor.Emit(OpCodes.Ldtoken, propertyTypeRef);
-                    processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
-                    processor.Emit(OpCodes.Call, ResolveMethodRef);
-                    processor.Emit(OpCodes.Callvirt, propertySetterRef);
-                }
-            }
-
-            if (injectTypeInfo.InjectFields != null)
-            {
-                foreach (var injectField in injectTypeInfo.InjectFields)
-                {
-                    var fieldRef = module.ImportReference(injectField);
-                    var fieldTypeRef = Utils.CreateParameterTypeReference(module, injectField.FieldType, typeDef);
-
-                    processor.Emit(OpCodes.Ldloc_S, instanceVariableDef);
-
-                    // TODO: Add ExceptionHandler
-                    // instance.Field = resolver.Resolve(Type)
-                    processor.Emit(OpCodes.Ldarg_2);
-                    processor.Emit(OpCodes.Ldtoken, fieldTypeRef);
-                    processor.Emit(OpCodes.Call, GetTypeFromHandleRef);
-                    processor.Emit(OpCodes.Call, ResolveMethodRef);
-                    processor.Emit(OpCodes.Stfld, fieldRef);
                 }
             }
 
