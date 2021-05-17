@@ -6,8 +6,6 @@ namespace VContainer
 {
     public class RegistrationBuilder
     {
-        public Action<IRegistration, IObjectResolver> BuildCallback { get; private set; }
-
         internal readonly Type ImplementationType;
         internal readonly Lifetime Lifetime;
 
@@ -104,12 +102,6 @@ namespace VContainer
         public RegistrationBuilder WithParameter<TParam>(TParam value)
         {
             return WithParameter(typeof(TParam), value);
-        }
-
-        public RegistrationBuilder OnAfterBuild(Action<IRegistration, IObjectResolver> callback)
-        {
-            BuildCallback = callback;
-            return this;
         }
 
         void AddInterfaceType(Type interfaceType)

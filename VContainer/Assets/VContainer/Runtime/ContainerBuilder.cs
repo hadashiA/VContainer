@@ -28,10 +28,10 @@ namespace VContainer
 
         public IScopedObjectResolver BuildScope()
         {
-            var (registrations, callbacks) = BuildRegistrations();
+            var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             var container = new ScopedContainer(registry, root, parent);
-            EmitCallbacks(container, callbacks);
+            EmitCallbacks(container);
             return container;
         }
 
@@ -73,17 +73,16 @@ namespace VContainer
 
         public virtual IObjectResolver Build()
         {
-            var (registrations, callbacks) = BuildRegistrations();
+            var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             var container = new Container(registry);
-            EmitCallbacks(container, callbacks);
+            EmitCallbacks(container);
             return container;
         }
 
-        protected (IReadOnlyList<IRegistration>, IReadOnlyList<(IRegistration, Action<IRegistration, IObjectResolver>)>) BuildRegistrations()
+        protected IReadOnlyList<IRegistration> BuildRegistrations()
         {
             var registrations = new IRegistration[registrationBuilders.Count + 1];
-            var callbacks = new List<(IRegistration, Action<IRegistration, IObjectResolver>)>(registrations.Length);
 
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
             Parallel.For(0, registrationBuilders.Count, i =>
@@ -91,11 +90,6 @@ namespace VContainer
                 var registrationBuilder = registrationBuilders[i];
                 var registration = registrationBuilder.Build();
                 registrations[i] = registration;
-
-                if (registrationBuilder.BuildCallback is Action<IRegistration, IObjectResolver> callback)
-                {
-                    callbacks.Add((registration, callback));
-                }
             });
 #else
             for (var i = 0; i < registrationBuilders.Count; i++)
@@ -103,11 +97,6 @@ namespace VContainer
                 var registrationBuilder = registrationBuilders[i];
                 var registration = registrationBuilder.Build();
                 registrations[i] = registration;
-
-                if (registrationBuilder.BuildCallback is Action<IRegistration, IObjectResolver> callback)
-                {
-                    callbacks.Add((registration, callback));
-                }
             }
 #endif
             registrations[registrations.Length - 1] = ContainerRegistration.Default;
@@ -123,19 +112,11 @@ namespace VContainer
                 TypeAnalyzer.CheckCircularDependency(x.ImplementationType);
             }
 #endif
-            return (registrations, callbacks);
+            return registrations;
         }
 
-        protected void EmitCallbacks(
-            IObjectResolver container,
-            IEnumerable<(IRegistration, Action<IRegistration, IObjectResolver>)> callbacks)
+        protected void EmitCallbacks(IObjectResolver container)
         {
-            foreach (var x in callbacks)
-            {
-                var (registration, callback) = x;
-                callback.Invoke(registration, container);
-            }
-
             if (buildCallbacks == null) return;
 
             foreach (var callback in buildCallbacks)
