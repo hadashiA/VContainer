@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 
 #if UNITY_2020_2_OR_NEWER
-using System.Reflection;
 using UnityEditor.Compilation;
 #endif
 
@@ -11,12 +10,17 @@ namespace VContainer.Editor
 {
     public sealed class ScriptTemplateProcessor : UnityEditor.AssetModificationProcessor
     {
+#if UNITY_2020_2_OR_NEWER
+        const string RootNamespaceBeginTag = "#ROOTNAMESPACEBEGIN#";
+        const string RootNamespaceEndTag = "#ROOTNAMESPACEEND#";
+#endif
+
         const string MonoInstallerTemplate =
             "using VContainer;\n" +
             "using VContainer.Unity;\n" +
             "\n" +
 #if UNITY_2020_2_OR_NEWER
-            "    #ROOTNAMESPACEBEGIN#\n" +
+            RootNamespaceBeginTag + "\n" +
 #endif
             "public class #SCRIPTNAME# : LifetimeScope\n" +
             "{\n" +
@@ -25,23 +29,9 @@ namespace VContainer.Editor
             "    }\n" +
             "}\n" +
 #if UNITY_2020_2_OR_NEWER
-            "#ROOTNAMESPACEEND#\n" +
+            RootNamespaceEndTag + "\n" +
 #endif
             "";
-
-#if UNITY_2020_2_OR_NEWER
-        static MethodInfo _RemoveOrInsertNamespace = null;
-        // https://github.com/Unity-Technologies/UnityCsReference/blob/2020.2/Editor/Mono/ProjectWindow/ProjectWindowUtil.cs#L495-L550
-        static string RemoveOrInsertNamespace(string content, string rootNamespace)
-        {
-            if (_RemoveOrInsertNamespace == null)
-            {
-                _RemoveOrInsertNamespace = typeof(ProjectWindowUtil).GetMethod("RemoveOrInsertNamespace", BindingFlags.Static | BindingFlags.NonPublic);
-            }
-
-            return (string)_RemoveOrInsertNamespace.Invoke(null, new object[]{ content, rootNamespace });
-        }
-#endif
 
         public static void OnWillCreateAsset(string metaPath)
         {
@@ -69,7 +59,7 @@ namespace VContainer.Editor
 #if UNITY_2020_2_OR_NEWER
             {
                 var rootNamespace = CompilationPipeline.GetAssemblyRootNamespaceFromScriptPath(scriptPath);
-                content = RemoveOrInsertNamespace(content, rootNamespace);
+                content = RemoveOrInsertNamespaceSimple(content, rootNamespace);
             }
 #endif
 
@@ -82,5 +72,36 @@ namespace VContainer.Editor
             File.WriteAllText(fullPath, content);
             AssetDatabase.Refresh();
         }
+
+#if UNITY_2020_2_OR_NEWER
+        // https://github.com/Unity-Technologies/UnityCsReference/blob/2020.2/Editor/Mono/ProjectWindow/ProjectWindowUtil.cs#L495-L550
+        static string RemoveOrInsertNamespaceSimple(string content, string rootNamespace)
+        {
+            const char eol = '\n';
+
+            if (string.IsNullOrWhiteSpace(rootNamespace))
+            {
+                return content
+                    .Replace(RootNamespaceBeginTag + eol, "")
+                    .Replace(RootNamespaceEndTag + eol, "");
+            }
+
+            var lines = content.Split(eol);
+
+            var startAt = ArrayUtility.IndexOf(lines, RootNamespaceBeginTag);
+            var endAt = ArrayUtility.IndexOf(lines, RootNamespaceEndTag);
+
+            lines[startAt] = $"namespace {rootNamespace}\n{{";
+            {
+                for (var i = startAt + 1; i < endAt; ++i)
+                {
+                    lines[i] = $"    {lines[i]}";
+                }
+            }
+            lines[endAt] = "}";
+
+            return string.Join(eol.ToString(), lines);
+        }
+#endif
     }
 }
