@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -12,36 +13,9 @@ namespace VContainer.Editor
     {
         static string[] GetAllTypeNames()
         {
-            var result = new List<string> { "None" };
-
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (assembly.FullName.StartsWith("UnityEngine.") ||
-                    assembly.FullName.StartsWith("Unity.") ||
-                    assembly.FullName.StartsWith("System."))
-                {
-                    continue;
-                }
-
-                Type[] types;
-                try
-                {
-                    types = assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException ex)
-                {
-                    types = ex.Types;
-                }
-
-                foreach (var type in types)
-                {
-                    if (type?.IsSubclassOf(typeof(LifetimeScope)) == true)
-                    {
-                        result.Add(type.FullName);
-                    }
-                }
-            }
-            return result.ToArray();
+            return TypeCache.GetTypesDerivedFrom<LifetimeScope>()
+                .Select(type => type.FullName)
+                .ToArray();
         }
 
         static string GetLabel(Type type) => $"{type.Namespace}/{type.Name}";
