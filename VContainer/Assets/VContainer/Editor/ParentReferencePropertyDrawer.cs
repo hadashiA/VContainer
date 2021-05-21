@@ -13,8 +13,9 @@ namespace VContainer.Editor
     {
         static string[] GetAllTypeNames()
         {
-            return TypeCache.GetTypesDerivedFrom<LifetimeScope>()
-                .Select(type => type.FullName)
+            return new List<string> { "None" }
+                .Concat(TypeCache.GetTypesDerivedFrom<LifetimeScope>()
+                    .Select(type => type.FullName))
                 .ToArray();
         }
 
