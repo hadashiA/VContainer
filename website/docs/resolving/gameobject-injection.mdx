@@ -10,14 +10,16 @@ Note, however, that not all MonoBehaviour with the `[Inject]` attribute will hav
 
 There are 3 ways to perform an Inject to MonoBehaviour.
 
-1. Use `RegisterComponent*` to register the MonoBehaviour instance to the container.
-    - In this case, the registered MonoBehaviour will both Inject and be Injected into other classes.
-    - See [Register MonoBehaviour](../registering/register-monobehaviour)
-2. Use the Factory pattern to create an injected instance
-    - See [Register Factory](../registering/register-factory)
-3. If you want to do "Inject to MonoBehaviour only", you can set it in the inspector of LieftimeScope.
+1. If you want to do "Inject to MonoBehaviour only", you can set it in the inspector of LieftimeScope.
     - All MonoBehaviour (including children) in the specified GameObject in the inspector will be automatically Injected when the LifetimeScope is initialized.
     - ![](./assets/screenshot_auto_inject_gameobjects.png)
+2. Use `RegisterComponent*` to register the MonoBehaviour instance to the container.
+    - In this case, the registered MonoBehaviour will both Inject and be Injected into other classes.
+    - See [Register MonoBehaviour](../registering/register-monobehaviour)
+2. To inject into the dynamically generated MonoBehaviour at runtime, use IObjectResolver.Instantiate instead of UnityEngine.Object.Instantiate. (Facotry patterns and object generation expressions can be registered.)
+    - See [Register Callbacks](../registering/register-callback)
+    - See [Register Factory](../registering/register-factory)
+
 
 ## Why doesn't the Inject to all MonoBehaviour run automatically?
 
