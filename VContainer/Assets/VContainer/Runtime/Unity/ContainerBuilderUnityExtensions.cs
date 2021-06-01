@@ -73,6 +73,13 @@ namespace VContainer.Unity
     {
         public static void UseEntryPoints(
             this IContainerBuilder builder,
+            Action<EntryPointsBuilder> configuration)
+        {
+            builder.UseEntryPoints(Lifetime.Singleton, configuration);
+        }
+
+        public static void UseEntryPoints(
+            this IContainerBuilder builder,
             Lifetime lifetime,
             Action<EntryPointsBuilder> configuration)
         {
