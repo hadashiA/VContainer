@@ -1,29 +1,26 @@
 ---
 id: gameobject-injection
-title: Inject into MonoBehaviour
+title: Injecting into MonoBehaviours
 sidebar_label: MonoBehaviour
 ---
 
-MonoBehaviour cannot use a constructor. Use [method injection](./method-injection) instead.
+As `MonoBehaviour`s [do not support constructors](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake), you must use [method injection](./method-injection) to inject them with dependencies.
 
-Note, however, that not all MonoBehaviour with the `[Inject]` attribute will have Method Injection performed automatically.
+Note that the presence of the `[Inject]` attribute on a `MonoBehaviour`'s method **does not** imply that it will automatically be called. You must inject dependencies manually in one of the following three ways:
 
-There are 3 ways to perform an Inject to MonoBehaviour.
-
-1. If you want to do "Inject to MonoBehaviour only", you can set it in the inspector of LieftimeScope.
-    - All MonoBehaviour (including children) in the specified GameObject in the inspector will be automatically Injected when the LifetimeScope is initialized.
-    - ![](./assets/screenshot_auto_inject_gameobjects.png)
-2. Use `RegisterComponent*` to register the MonoBehaviour instance to the container.
-    - In this case, the registered MonoBehaviour will both Inject and be Injected into other classes.
+1. If you want to inject into a specific `MonoBehaviour`, you can specify it in the `LifetimeScope`'s inspector.
+    - The `MonoBehaviour`s of all specified `GameObject` (and their children) will be automatically `Inject`ed when the `LifetimeScope` is initialized. ![](./assets/screenshot_auto_inject_gameobjects.png)
+2. Use one of the `RegisterComponent*` methods to register the `MonoBehaviour` instance to the container.
+    - In this case, the registered `MonoBehaviour` will both `Inject` and be `Inject`ed into other classes.
     - See [Register MonoBehaviour](../registering/register-monobehaviour)
-2. To inject into the dynamically generated MonoBehaviour at runtime, use IObjectResolver.Instantiate instead of UnityEngine.Object.Instantiate. (Facotry patterns and object generation expressions can be registered.)
+3. To inject into dynamically-generated `MonoBehaviour`s at runtime (e.g. from prefabs), use `IObjectResolver.Instantiate` instead of [`UnityEngine.Object.Instantiate`](https://docs.unity3d.com/ScriptReference/Object.Instantiate). (Factory patterns and object generation expressions can be registered.)
     - See [Register Callbacks](../registering/register-callbacks)
     - See [Register Factory](../registering/register-factory)
 
 
-## Why doesn't the Inject to all MonoBehaviour run automatically?
+## Why doesn't VContainer automatically inject into all `MonoBehaviour`s?
 
-- In Unity, it is difficult to implicitly hook MonoBehaviour generation for all cases. Rather than having some cases that are automatically Injected and some that are not, we decided to explicitly state which cases are Injected.
-- VContainer does not actively recommend executing Inject to MonoBehaviour.
+- Unity doesn't provide a good way to listen for the creation of all `GameObject`s or `MonoBehaviour`s. Rather than having some cases that are automatically `Inject`ed and some that are not, we decided on explicit `Inject`ion that you can use to fit your own needs.
+- We do not recommend excecuting `Inject` directly on `MonoBehaviour`s; instead, use `InjectGameObject` on the owning `GameObject`.
   - This is because the purpose of VContainer and DI is inversion of control of MonoBehaviour.
-  - Also, if MonoBehaviour needs to execute an Inject to work, then you are destroying the strength of Unity's prefab portability.
+  - If a `MonoBehaviour` needs an explicit `Inject` call, you risk losing the advantages of Unity's prefab portability. 
