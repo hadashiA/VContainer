@@ -242,10 +242,6 @@ namespace VContainer.Unity
         {
             if (IsRoot) return null;
 
-            var nextParent = overrideParent;
-            if (nextParent != null)
-                return nextParent;
-
             if (parentReference.Object != null)
                 return parentReference.Object;
 
@@ -261,6 +257,10 @@ namespace VContainer.Unity
                     parentReference.Type,
                     $"{name} could not found parent reference of type : {parentReference.Type}");
             }
+
+            var nextParent = overrideParent;
+            if (nextParent != null)
+                return nextParent;
 
             // Find root from settings
             if (VContainerSettings.Instance is VContainerSettings settings)
