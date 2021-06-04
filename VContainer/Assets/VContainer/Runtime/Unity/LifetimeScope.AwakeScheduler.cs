@@ -16,7 +16,6 @@ namespace VContainer.Unity
         }
     }
 
-
     partial class LifetimeScope
     {
         static readonly List<(LifetimeScope, VContainerParentTypeReferenceNotFound)> WaitingList =
