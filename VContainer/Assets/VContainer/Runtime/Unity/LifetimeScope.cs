@@ -35,7 +35,7 @@ namespace VContainer.Unity
 
         static LifetimeScope Create(IInstaller installer = null)
         {
-            var gameObject = new GameObject("LifeTimeScope");
+            var gameObject = new GameObject("LifetimeScope");
             gameObject.SetActive(false);
             var newScope = gameObject.AddComponent<LifetimeScope>();
             if (installer != null)
@@ -132,7 +132,7 @@ namespace VContainer.Unity
             }
             catch (VContainerParentTypeReferenceNotFound ex)
             {
-                if (gameObject.scene.isLoaded)
+                if (gameObject.scene.isLoaded && WaitingList.Count <= 0)
                     throw;
                 EnqueueAwake(this, ex);
             }
@@ -179,7 +179,7 @@ namespace VContainer.Unity
 
         public LifetimeScope CreateChild(IInstaller installer = null)
         {
-            var childGameObject = new GameObject("LifeTimeScope (Child)");
+            var childGameObject = new GameObject("LifetimeScope (Child)");
             childGameObject.SetActive(false);
             childGameObject.transform.SetParent(transform, false);
             var child = childGameObject.AddComponent<LifetimeScope>();
@@ -253,7 +253,7 @@ namespace VContainer.Unity
             if (parentReference.Type != null && parentReference.Type != GetType())
             {
                 var found = Find(parentReference.Type);
-                if (found != null)
+                if (found != null && found.Container != null)
                 {
                     return found;
                 }

@@ -28,8 +28,8 @@ namespace VContainer.Unity
 #endif
         static void SubscribeSceneEvents()
         {
-            SceneManager.sceneLoaded -= AwakeWaitingChildren;
-            SceneManager.sceneLoaded += AwakeWaitingChildren;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         static void EnqueueAwake(LifetimeScope lifetimeScope, VContainerParentTypeReferenceNotFound ex)
@@ -48,34 +48,43 @@ namespace VContainer.Unity
             }
         }
 
-        static void AwakeWaitingChildren(Scene scene, LoadSceneMode mode)
-        {
-            for (var i = WaitingList.Count - 1; i >= 0; i--)
-            {
-                var (waiting, ex) = WaitingList[i];
-                if (waiting.gameObject.scene == scene)
-                {
-                    WaitingList.RemoveAt(i);
-                    waiting.Awake(); // Re-throw if parent not found.
-                }
-            }
-        }
-
-        static void AwakeWaitingChildren(LifetimeScope awakedParent)
+        static void AwakeWaitingChildren(LifetimeScope awakenParent)
         {
             if (WaitingList.Count < 0) return;
 
-            var type = awakedParent.GetType();
+            var type = awakenParent.GetType();
 
             for (var i = WaitingList.Count - 1; i >= 0; i--)
             {
                 var (waiting, ex) = WaitingList[i];
                 if (ex.ParentType == type)
                 {
-                    waiting.parentReference.Object = awakedParent;
+                    waiting.parentReference.Object = awakenParent;
                     WaitingList.RemoveAt(i);
                     waiting.Awake();
                 }
+            }
+        }
+
+
+        static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            var list = new List<(LifetimeScope, VContainerParentTypeReferenceNotFound)>();
+
+            for (var i = WaitingList.Count - 1; i >= 0; i--)
+            {
+                var (waitingScope, ex) = WaitingList[i];
+                if (waitingScope.gameObject.scene == scene)
+                {
+                    WaitingList.RemoveAt(i);
+                    list.Add((waitingScope, ex));
+                }
+            }
+
+            foreach (var entry in list)
+            {
+                var (waitingScope, _) = entry;
+                waitingScope.Awake(); // Re-throw if parent not found
             }
         }
     }
