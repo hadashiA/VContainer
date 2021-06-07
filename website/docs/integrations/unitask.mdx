@@ -23,10 +23,10 @@ public class FooController : IAsyncStartable
 }
 ```
 
-Once a class that implements `IAsyncStartable` is registered its `StartAsync` method will be executed automatically, similarly to `IInitializable`.
+Once a class that implements `IAsyncStartable` is registered its `StartAsync` method will be executed automatically, similarly to `IStartable`.
 
 ```csharp
-builder.RegisterEntryPoint<FooController>(Lifetime.Scoped);
+builder.RegisterEntryPoint<FooController>();
 ```
 
 For more information about `RegisterEntryPoint`, see [here](../integrations/entrypoint).
