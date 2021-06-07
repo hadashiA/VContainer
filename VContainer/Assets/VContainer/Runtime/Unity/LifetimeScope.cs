@@ -130,7 +130,7 @@ namespace VContainer.Unity
                     Build();
                 }
             }
-            catch (VContainerParentTypeReferenceNotFound ex)
+            catch (VContainerParentTypeReferenceNotFound)
             {
                 if (WaitingList.Contains(this))
                 {
