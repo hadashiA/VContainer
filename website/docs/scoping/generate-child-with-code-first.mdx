@@ -35,7 +35,7 @@ class LevelLoader
             lifetimeScopePrefab, builder =>
             {
                 builder.RegisterInstance(someExtraAsset);
-                builder.RegisterEntryPoint<ExtraEntryPoint>(Lifetime.Scoped);
+                builder.RegisterEntryPoint<ExtraEntryPoint>();
                 // ...
             });
 

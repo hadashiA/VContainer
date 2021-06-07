@@ -135,7 +135,7 @@ builder.RegisterEntryPointExceptionHandler(ex =>
 If you have multiple EntryPoints, you have the option to use the following declaration as grouping.
 
 ```csharp
-builder.UseEntryPoints(Lifetime.Scoped, entryPoints =>
+builder.UseEntryPoints(entryPoints =>
 {
    entryPoints.Add<ScopedEntryPointA>();
    entryPoints.Add<ScopedEntryPointB>();
@@ -147,9 +147,9 @@ builder.UseEntryPoints(Lifetime.Scoped, entryPoints =>
 This is the same as:
 
 ```csharp
-builder.RegisterEntryPoint<ScopedEntryPointA>(Lifetime.Scoped);
-builder.RegisterEntryPoint<ScopedEntryPointB>(Lifetime.Scoped);
-builder.RegisterEntryPoint<ScopedEntryPointC>(Lifetime.Scoped).AsSelf();
+builder.RegisterEntryPoint<ScopedEntryPointA>();
+builder.RegisterEntryPoint<ScopedEntryPointB>();
+builder.RegisterEntryPoint<ScopedEntryPointC>().AsSelf();
 builder.RegisterEntryPointExceptionHandler(ex => ...);
 ```
 
