@@ -94,7 +94,7 @@ namespace VContainer.Editor.CodeGen
                     diagnosticMessages.Add(new DiagnosticMessage
                     {
                         DiagnosticType = DiagnosticType.Error,
-                        MessageData = $"VContainer failed pre code gen for {typeDef.FullName} : {ex.Message}\n{ex.StackTrace}"
+                        MessageData = $"VContainer failed pre code gen for {typeDef.FullName} : {ex} {ex.Message}\n{ex.StackTrace}"
                     });
                     return false;
                 }
@@ -148,13 +148,27 @@ namespace VContainer.Editor.CodeGen
 
         bool TryGenerateType(TypeDefinition typeDef, List<DiagnosticMessage> diagnosticMessages)
         {
-            var type = GetTypeFromDef(typeDef);
+            Type type;
+            try
+            {
+                type = GetTypeFromDef(typeDef);
+            }
+            catch (Exception ex)
+            {
+                diagnosticMessages.Add(new DiagnosticMessage
+                {
+                    DiagnosticType = DiagnosticType.Warning,
+                    MessageData = $"Skip IL waving because cannot detect type: {typeDef.FullName}. {ex} {ex.Message}"
+                });
+                return false;
+
+            }
             if (type == null)
             {
                 diagnosticMessages.Add(new DiagnosticMessage
                 {
                     DiagnosticType = DiagnosticType.Warning,
-                    MessageData = $"Skip IL waving because cant detect type: {typeDef.FullName}"
+                    MessageData = $"Skip IL waving because cannot detect type: {typeDef.FullName}"
                 });
                 return false;
             }
@@ -172,7 +186,7 @@ namespace VContainer.Editor.CodeGen
                 diagnosticMessages.Add(new DiagnosticMessage
                 {
                     DiagnosticType = DiagnosticType.Warning,
-                    MessageData = $"Failed to analyze {type.FullName} : {ex.GetType()} {ex.Message}"
+                    MessageData = $"Failed to analyze {type.FullName} : {ex} {ex.Message}"
                 });
                 return false;
             }
