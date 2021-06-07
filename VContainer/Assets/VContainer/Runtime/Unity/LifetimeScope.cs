@@ -132,9 +132,11 @@ namespace VContainer.Unity
             }
             catch (VContainerParentTypeReferenceNotFound ex)
             {
-                if (gameObject.scene.isLoaded && WaitingList.Count <= 0)
+                if (WaitingList.Contains(this))
+                {
                     throw;
-                EnqueueAwake(this, ex);
+                }
+                EnqueueAwake(this);
             }
         }
 
