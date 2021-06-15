@@ -1,0 +1,52 @@
+---
+title: Register ScriptableObject
+---
+
+It is useful to register the setting information saved as ScriptableObject Asset as follows.
+
+```csharp
+[Serializable]
+public class CameraSettings
+{
+    public float MoveSpeed = 10f;
+    public float DefaultDistance = 5f;
+    public float ZoomMax = 20f;
+    public float ZoomMin = 5f;
+}
+
+[Serializable]
+public class ActorSettings
+{
+    public float MoveSpeed = 0.5f;
+    public float FlyingTime = 2f;
+    public Vector3 FlyingInitialVelocity = Vector3.zero;
+}
+
+[CreateAssetMenu(fileName = "GameSettings", menuName = "MyGame/Settings")]
+public class GameSettings : ScriptableObject
+{
+    [SerializeField]
+    public CameraSettings cameraSetting
+
+    [SerializeField]
+    public ActorSettings actorSettings;
+}
+```
+
+And
+- Create `GameSettings` assets from menu.
+- Register the created asset with LifetimeScope.
+
+```csharp
+public class SomeLifetimeScope : LifetimeScope
+{
+    [SerializeField]
+    GameSettings settings;
+
+    protected override void Configure(IContainerBuilder builder)
+    {
+        builder.RegisterInstance(settings.cameraSettings);
+        builder.RegisterInstance(settings.actorSettings);
+    }
+}
+```

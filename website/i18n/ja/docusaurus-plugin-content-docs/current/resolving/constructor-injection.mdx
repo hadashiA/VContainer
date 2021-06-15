@@ -1,0 +1,65 @@
+---
+id: constructor-injection
+title: Constructor Injection
+---
+
+VContainer automatically collects and calls registered class constructors.
+
+:::note
+- At this time, all the parameters of the constructor must be registered.
+- If the dependency cannot be resolved, throws exception when validating LifetimeScope or building Container.
+:::
+
+Here is basic idiom with DI.
+
+```csharp
+class ClassA
+{
+    readonly IServiceA serviceA;
+    readonly IServiceB serviceB;
+    readonly SomeUnityComponent component;
+
+    public ClassA(
+        IServiceA serviceA,
+        IServiceB serviceB,
+        SomeUnityComponent component)
+    {
+        this.serviceA = serviceA;
+        this.serviceB = serviceB;
+        this.component = component;
+    }
+}
+```
+
+:::caution
+Constructors are often stripped in the IL2CPP environment.
+To prevent this problem, add the `[Inject]` Attribute explicitly.
+:::
+
+```csharp
+    [Inject]
+    public ClassA(
+        IServiceA serviceA,
+        IServiceB serviceB,
+        SomeUnityComponent component)
+    {
+        // ...
+    }
+```
+
+:::note
+If class has multiple constructors, the one with `[Inject]` has priority.
+:::
+
+:::tip Recommendation
+Use Constructor Injection whenever possible.
+The constructor & readonly field idiom is:
+- The instantiated object has a compiler-level guarantee that the dependencies have been resolved.
+- No magic in the class code. Instantiate easily without DI container. (e.g. Unit testing)
+- If you look at the constructor, the dependency is clear.
+  - If too many constructor arguments, it can be considered overly responsible.
+:::
+
+## MonoBehaviour
+
+MonoBehaviour cannot use a constructor. Use [method injection](/resolving/method-injection) instead.

@@ -1,0 +1,52 @@
+---
+title: Register using delegate
+---
+
+Instance creation can be delegated to a lambda expression or another method or class.
+
+```csharp
+builder.Register<IFoo>(_ =>
+{
+    var foo = new Foo();
+    // Do something;
+    return foo;
+}, Lifetime.Scoped);
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IFoo foo) { /* ...*/ }
+}
+```
+
+The first argument that can be used in the expression is `IObjectResolver`.
+Using this, we can retrieve and use the registered object.
+
+```csharp
+builder.Register<IFoo>(container =>
+{
+    var serviceA = container.Resolve<ServiceA>();
+    return serviceA.ProvideFoo();
+}, Lifetime.Scoped);
+```
+
+`IObjectResolver.Instantiate` can also be used to generate GameObjects executed inject.
+
+```csharp
+builder.Register(container =>
+{
+    return container.Instantiate(prefab);
+}, Lifetime.Scoped);
+
+```
+See [Use Container directory](../resolving/container-api) more information.
+
+:::note
+These delegates will be executed only once during scope construction.
+If you want to create an instance at any time during runtime, please refer to [Register Factory](./register-factory).
+:::
+
+

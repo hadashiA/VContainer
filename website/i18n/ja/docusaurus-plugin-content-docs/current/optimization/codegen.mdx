@@ -1,0 +1,67 @@
+---
+title: Pre IL Code Generation
+---
+
+:::caution
+this feature requires Unity 2019.3 or later.
+:::
+
+VContainer has the ability to perform the meta programming part faster by generating IL code at compile time.
+As a result, there is no reflection at runtime, and it is expected to be 3-6x faster.
+It works in the IL2CPP environment.
+
+With VContainer, for example, the following code (as IL) is automatically generated:
+
+```csharp
+class ClassA
+{
+    private sealed class __GeneratedInjector : IInjector
+    {
+        public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
+        {
+            I6 fromConstructor = resolver.ResolveOrParameter<I6>("fromConstructor1", parameters);
+            I7 fromConstructor2 = resolver.ResolveOrParameter<I7>("fromConstructor2", parameters);
+            return new ClassA(fromConstructor, fromConstructor2);
+        }
+
+        public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
+        {
+            ClassA clasA = (ClassA)instance;
+            I3 service = resolver.ResolveOrParameter<I3>("service3", parameters);
+            I4 service2 = resolver.ResolveOrParameter<I4>("service4", parameters);
+            allInjectionFeatureService.MethodInjectable1(service, service2);
+            I5 service3 = resolver.ResolveOrParameter<I5>("service5", parameters);
+            I6 service4 = resolver.ResolveOrParameter<I6>("service6", parameters);
+            classA.MethodInjectable2(service3, service4);
+            classA.PrivatePropertyInjectable = resolver.Resolve<I2>();
+            classA.PublicPropertyInjectable = resolver.Resolve<I3>();
+            classA.privateFieldInjectable = resolver.Resolve<I4>();
+            classA.PublicFieldInjectable = resolver.Resolve<I5>();
+        }
+   }
+```
+
+## How to enable code generation mode
+
+### 1. Add `VContainer.EnableCodeGen` asmdef to your references
+
+If you have asmdef in your project that refers to the following 2 asmdef, they are targets for IL weaving.
+
+- `VContainer`
+- `VContainer.EnableCodeGen`
+
+![](./assets/screenshot_enablecodegen.png)
+
+### 2. Build your assembly
+
+The next time the specified assembly is compiled, VContainer will make changes to the compiled dll.
+
+If it succeeds, it will be logged. For example:
+
+> VContainer code generation optimization for MyGame.dll 24 types (40.0355ms)
+
+:::note
+In Unity 2020.2 and later, the ILPostProcessor can no longer output logs.
+As a temporary measure, the above log is output as a warning, but it may be removed in the future.
+:::
+

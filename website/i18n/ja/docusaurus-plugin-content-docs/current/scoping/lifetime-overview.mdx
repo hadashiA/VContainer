@@ -1,0 +1,30 @@
+---
+title: Lifetime Overview
+---
+
+ここでは Register時に指定できる `Lifetime` の種類についてまとめます。
+
+- `Singleton` : 複数のコンテナを通じて1つだけインスタンスを生成します。
+  - 同じ型を同じコンテナに複数登録することができません。
+  - 登録したオブジェクトが `IDisposable` を実装している場合、コンテナの破棄と共にオブジェクトは Dispose されます。
+- `Scoped` : コンテナ毎に1つずつインスタンスが生成されます。
+  - コンテナが1つだけの場合、`Singoleton` と差異はありません。
+  - 登録したオブジェクトが `IDisposable` を実装している場合、コンテナの破棄と共にオブジェクトは Dispose されます。
+- `Transient` : オブジェクトがコンテナから取り出される度に別々のインスタンスが生成されます。
+
+## Lifetimeとスコープの親子関係
+
+コンテナは親子関係をつくることができます。子がオブジェクトを取得しようとした場合のLifetimeの挙動は以下のようになっています。
+
+- 基本的なこと: 取り出そうとしたオブジェクトがみつからない場合、コンテナは自身の親を辿って対象を探します。
+- `Lifetime.Singleton`
+  - 子に親と同じ型を登録した場合、子は自身のオブジェクトを生成して保持します。(あるいはもっとも近い親のインスタンスを探します)
+- `Lifetime.Scoped`
+  - 親にしか登録がない場合を含め、全ての子がそれぞれオブジェクトを生成して保持します。
+- `LifeTime.Transient`
+  - If parent and child have the same registration, the child will create its own instance.
+
+:::caution
+If the scene is alive and only `LifetimeScope` is destroyed, MonoBehaviours registered as `Lifetime.Scoped` are not automatically destroyed.
+If you want to destroy with `LifetimeScope`, make it a child transform of `LifetimeScope` or consider implement IDisposable.
+:::

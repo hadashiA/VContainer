@@ -1,0 +1,33 @@
+---
+id: method-injection
+title: Method Injection
+---
+
+If constructor injection is not available, use method injection.
+
+Typically this is for MonoBehaviour.
+
+```csharp
+public class SomeBehaviour : MonoBehaviour
+{
+    float speed;
+
+    [Inject]
+    public void Construct(GameSettings settings)
+    {
+        speed = settings.speed;
+    }
+}
+```
+
+:::tip Recommendation
+Consider whether injection to MonoBehaviour is necessary.
+In a code base where domain logic and presentation are well decoupled, MonoBehaviour should act as a View component.
+
+In my opinion, View components should only be responsible for rendering and should be flexible.
+
+Of course, In order for the View component to work, it needs to pass state at runtime.
+But the "state" of an object and its dependency of functionality of other objects are different.
+
+It's enough to pass the state as arguments instead of `[Inject]`.
+:::
