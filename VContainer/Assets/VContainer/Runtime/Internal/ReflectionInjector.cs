@@ -43,7 +43,7 @@ namespace VContainer.Internal
                     }
                     catch (VContainerException ex)
                     {
-                        throw new VContainerException(parameterInfo.ParameterType, $"Failed to resolve {injectTypeInfo.Type.FullName} : {ex.Message}");
+                        throw new VContainerException(parameterInfo.ParameterType, $"Failed to resolve {injectTypeInfo.Type} : {ex.Message}");
                     }
                 }
                 var instance = injectTypeInfo.InjectConstructor.ConstructorInfo.Invoke(parameterValues);
@@ -103,7 +103,7 @@ namespace VContainer.Internal
                         }
                         catch (VContainerException ex)
                         {
-                            throw new VContainerException(parameterInfo.ParameterType, $"Failed to resolve {injectTypeInfo.Type.FullName} : {ex.Message}");
+                            throw new VContainerException(parameterInfo.ParameterType, $"Failed to resolve {injectTypeInfo.Type} : {ex.Message}");
                         }
                     }
                     method.MethodInfo.Invoke(obj, parameterValues);

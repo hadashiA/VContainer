@@ -24,6 +24,12 @@ namespace VContainer.Unity
             this.initialization = initialization;
         }
 
+        public override string ToString()
+        {
+            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
+            return $"WorldRegistration {ImplementationType.Name} ContractTypes=[{contractTypes}] {Lifetime}";
+        }
+
         public object SpawnInstance(IObjectResolver resolver)
         {
             var world = new World(name);

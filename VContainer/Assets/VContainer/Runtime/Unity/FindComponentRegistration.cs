@@ -33,6 +33,12 @@ namespace VContainer.Unity
             this.destination = destination;
         }
 
+        public override string ToString()
+        {
+            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
+            return $"FindComponentRegistration {ImplementationType} ContractTypes=[{contractTypes}] {Lifetime} {injector.GetType().Name})";
+        }
+
         public object SpawnInstance(IObjectResolver resolver)
         {
             var component = default(Component);
@@ -43,7 +49,7 @@ namespace VContainer.Unity
                 component = parent.GetComponentInChildren(ImplementationType, true);
                 if (component == null)
                 {
-                    throw new VContainerException(ImplementationType, $"Component {ImplementationType} is not in the parent {parent.name}");
+                    throw new VContainerException(ImplementationType, $"{ImplementationType} is not in the parent {parent.name} : {this}");
                 }
             }
             else if (scene.IsValid())
@@ -57,12 +63,12 @@ namespace VContainer.Unity
                 }
                 if (component == null)
                 {
-                    throw new VContainerException(ImplementationType, $"Component {ImplementationType} is not in this scene {scene.path}");
+                    throw new VContainerException(ImplementationType, $"{ImplementationType} is not in this scene {scene.path} : {this}");
                 }
             }
             else
             {
-                throw new VContainerException(ImplementationType, "Invalid Component find target");
+                throw new VContainerException(ImplementationType, $"Invalid Component find target {this}");
             }
 
             if (component is MonoBehaviour monoBehaviour)

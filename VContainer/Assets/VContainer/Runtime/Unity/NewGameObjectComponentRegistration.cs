@@ -33,6 +33,12 @@ namespace VContainer.Unity
             this.destination = destination;
             this.newGameObjectName = newGameObjectName;
         }
+        
+        public override string ToString()
+        {
+            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
+            return $"NewGameObjectComponentRegistration {ImplementationType} ContractTypes=[{contractTypes}] {Lifetime} {injector.GetType().Name})";
+        }
 
         public object SpawnInstance(IObjectResolver resolver)
         {
