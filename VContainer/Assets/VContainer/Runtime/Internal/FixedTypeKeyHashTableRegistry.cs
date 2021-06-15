@@ -79,7 +79,7 @@ namespace VContainer.Internal
                 }
                 catch (ArgumentException)
                 {
-                    throw new VContainerException(collectionType, $"Registration with the same key already exists: {collectionType} {collectionRegistration}");
+                    throw new VContainerException(collectionType, $"Registration with the same key already exists: {collectionRegistration}");
                 }
             }
         }

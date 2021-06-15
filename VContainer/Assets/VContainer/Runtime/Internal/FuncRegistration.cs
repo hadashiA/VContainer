@@ -24,6 +24,13 @@ namespace VContainer.Internal
             this.implementationProvider = implementationProvider;
         }
 
+
+        public override string ToString()
+        {
+            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
+            return $"FuncRegistration {ImplementationType} ContractTypes=[{contractTypes}] {Lifetime}";
+        }
+
         public object SpawnInstance(IObjectResolver resolver) => implementationProvider(resolver);
     }
 }

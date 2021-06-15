@@ -33,6 +33,12 @@ namespace VContainer.Unity
             this.prefab = prefab;
             this.destination = destination;
         }
+        
+        public override string ToString()
+        {
+            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
+            return $"PrefabComponentRegistration {ImplementationType} Prefab={prefab} ContractTypes=[{contractTypes}] {Lifetime} {injector.GetType().Name})";
+        }
 
         public object SpawnInstance(IObjectResolver resolver)
         {

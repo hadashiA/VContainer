@@ -26,6 +26,12 @@ namespace VContainer.Unity
             this.parameters = parameters;
             this.injector = injector;
         }
+        
+        public override string ToString()
+        {
+            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
+            return $"InstanceComponentRegistration {instance.GetType()} ContractTypes=[{contractTypes}] {Lifetime} {injector.GetType().Name})]";
+        }
 
         public object SpawnInstance(IObjectResolver resolver)
         {

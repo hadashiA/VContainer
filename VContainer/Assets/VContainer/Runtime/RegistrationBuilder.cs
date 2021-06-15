@@ -108,7 +108,7 @@ namespace VContainer
         {
             if (!interfaceType.IsAssignableFrom(ImplementationType))
             {
-                throw new VContainerException(interfaceType, $"{ImplementationType.FullName} is not assignable from {interfaceType.FullName}");
+                throw new VContainerException(interfaceType, $"{ImplementationType} is not assignable from {interfaceType}");
             }
             InterfaceTypes = InterfaceTypes ?? new List<Type>();
             if (!InterfaceTypes.Contains(interfaceType))

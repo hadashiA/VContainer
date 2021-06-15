@@ -28,7 +28,11 @@ namespace VContainer.Internal
             this.parameters = parameters;
         }
 
-        public override string ToString() => $"ConcreteType={ImplementationType.Name} ContractTypes={string.Join(", ", InterfaceTypes)} {Lifetime} {injector.GetType().Name}";
+        public override string ToString()
+        {
+            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
+            return $"Registration {ImplementationType.Name} ContractTypes=[{contractTypes}] {Lifetime} {injector.GetType().Name}";
+        }
 
         public object SpawnInstance(IObjectResolver resolver)
             => injector.CreateInstance(resolver, parameters);
@@ -60,6 +64,12 @@ namespace VContainer.Internal
                 typeof(IEnumerable<>).MakeGenericType(elementType),
                 typeof(IReadOnlyList<>).MakeGenericType(elementType),
             };
+        }
+
+        public override string ToString()
+        {
+            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
+            return $"CollectionRegistration {ImplementationType} ContractTypes=[{contractTypes}] {Lifetime}";
         }
 
         public void Add(IRegistration registration)
