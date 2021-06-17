@@ -3,9 +3,7 @@ id: method-injection
 title: Method Injection
 ---
 
-If constructor injection is not available, use method injection.
-
-Typically this is for MonoBehaviour.
+If you need to inject dependencies into a type but can't do so with constructors, consider using method injection instead. This is most useful for `MonoBehaviour`s but can be done with any class, including test cases within the [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest).
 
 ```csharp
 public class SomeBehaviour : MonoBehaviour
@@ -20,14 +18,14 @@ public class SomeBehaviour : MonoBehaviour
 }
 ```
 
+The `[Inject]`-annotated method can have any name and any accessibility level.
+
+If you inject dependencies into `MonoBehavior`s, you must be mindful of when the `[Inject]`-annotated method is called with respect to [Unity's object lifecycle](https://docs.unity3d.com/Manual/ExecutionOrder). If your [`Awake()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake), [`Start()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Start), or [`OnEnable()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnEnable) methods need any dependencies from VContainer, consider moving their logic into your injection method.
+
 :::tip Recommendation
-Consider whether injection to MonoBehaviour is necessary.
-In a code base where domain logic and presentation are well decoupled, MonoBehaviour should act as a View component.
+Consider whether injection into `MonoBehaviour`s is necessary.
 
-In my opinion, View components should only be responsible for rendering and should be flexible.
+In an ideal code base where presentation and domain logic are properly decoupled, `MonoBehaviour`s would act as views that are only responsible for rendering (or other user-visible feedback).
 
-Of course, In order for the View component to work, it needs to pass state at runtime.
-But the "state" of an object and its dependency of functionality of other objects are different.
-
-It's enough to pass the state as arguments instead of `[Inject]`.
+Of course, views still need to be able to access the state of the thing they're displaying (i.e. the game world). But a view can depend on other objects without maintaining its own state. Depending on how your game state is represented, it might be enough to provide it to your views through event arguments or serializable fields rather than `[Inject]`.
 :::
