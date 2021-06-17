@@ -20,7 +20,7 @@ public class SomeBehaviour : MonoBehaviour
 
 The `[Inject]`-annotated method can have any name and any accessibility level.
 
-If you inject dependencies into `MonoBehavior`s, you must be mindful of when the `[Inject]`-annotated method is called with respect to [Unity's object lifecycle](https://docs.unity3d.com/Manual/ExecutionOrder). If your [`Awake()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake), [`Start()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Start), or [`OnEnable()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnEnable) methods need any dependencies from VContainer, consider moving their logic into your injection method.
+If you inject dependencies into `MonoBehaviour`s, you must be mindful of when the `[Inject]`-annotated method is called with respect to [Unity's object lifecycle](https://docs.unity3d.com/Manual/ExecutionOrder). If your [`Awake()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake), [`Start()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Start), or [`OnEnable()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnEnable) methods need any dependencies from VContainer, consider moving their logic into your injection method.
 
 :::tip Recommendation
 Consider whether injection into `MonoBehaviour`s is necessary.
