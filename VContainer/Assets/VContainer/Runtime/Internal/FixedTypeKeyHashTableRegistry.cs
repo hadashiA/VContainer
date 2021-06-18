@@ -20,11 +20,12 @@ namespace VContainer.Internal
 
             foreach (var registration in registrations)
             {
-                if (registration.InterfaceTypes?.Count > 0)
+                if (registration.InterfaceTypes is IReadOnlyList<Type> interfaceTypes)
                 {
-                    foreach (var interfaceType in registration.InterfaceTypes)
+                    // ReSharper disable once ForCanBeConvertedToForeach
+                    for (var i = 0; i < interfaceTypes.Count; i++)
                     {
-                        AddToBuildBuffer(buildBuffer, interfaceType, registration);
+                        AddToBuildBuffer(buildBuffer, interfaceTypes[i], registration);
                     }
 
                     // Mark the ImplementationType with a guard because we need to check if it exists later.
@@ -71,8 +72,10 @@ namespace VContainer.Internal
 
         static void AddCollectionToBuildBuffer(IDictionary<Type, IRegistration> buf, CollectionRegistration collectionRegistration)
         {
-            foreach (var collectionType in collectionRegistration.InterfaceTypes)
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var i = 0; i < collectionRegistration.InterfaceTypes.Count; i++)
             {
+                var collectionType = collectionRegistration.InterfaceTypes[i];
                 try
                 {
                     buf.Add(collectionType, collectionRegistration);

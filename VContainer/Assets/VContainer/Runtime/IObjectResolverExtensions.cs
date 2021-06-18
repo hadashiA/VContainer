@@ -19,8 +19,10 @@ namespace VContainer
         {
             if (parameters != null)
             {
-                foreach (var parameter in parameters)
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < parameters.Count; i++)
                 {
+                    var parameter = parameters[i];
                     if (parameter.Match(parameterType, parameterName))
                     {
                         return parameter.Value;
