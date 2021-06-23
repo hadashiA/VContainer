@@ -38,10 +38,10 @@ class ClassA
 }
 ```
 
-If you regularly use `IObjectResolver` in a certain pattern, consider writing an [extension method](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods) for it. In fact, almost every `IObjectResolver` API is an extension method (including in the preceding code sample).
+If you regularly use `IObjectResolver.Inject` in a certain pattern, consider writing an [extension method](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods) for it. In fact, almost every `IObjectResolver` API is an extension method (including in the preceding code sample).
 
 :::caution
-Only use `IObjectResolver` explicitly if the other supported injection techniques don't fit your needs, as it's slow and not optimized by the [IL code generator](../optimization/codegen). Even VContainer callbacks that expose `IObjectResolver` (e.g. [build callbacks](../registering/register-callbacks) or [certain factory functions](../registering/register-factory#register-func-factory-that-requires-container-dependencies-and-runtime-parameters)) should minimize its use.
+Only use `IObjectResolver.Resolve` explicitly if the other supported injection techniques don't fit your needs, as it's slow and not optimized by the [IL code generator](../optimization/codegen). Even VContainer callbacks that expose `IObjectResolver` (e.g. [build callbacks](../registering/register-callbacks) or [certain factory functions](../registering/register-factory#register-func-factory-that-requires-container-dependencies-and-runtime-parameters)) should minimize its use.
 
 `LifetimeScope` (which VContainer also registers automatically) has an `IObjectResolver` reference through its `Container` property.
 
