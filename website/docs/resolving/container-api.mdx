@@ -12,22 +12,25 @@ class ClassA
     public ClassA(IObjectResolver container)
     {
         // Get (or create) whatever is registered as ServiceA.
-        // This might be a subclass if you registered the subclass as a ServiceA.
+        // This might be a subclass if you registered the
+        // subclass as a ServiceA.
         var serviceA = container.Resolve<ServiceA>();
 
-        // Inject all relevant dependencies into foo. Injecting an object twice will
-        // overwrite all properties or fields marked with [Inject], or it will call
-        // whatever method is marked with [Inject].
+        // Inject all relevant dependencies into foo. Injecting
+        // an object twice will overwrite any property or
+        // field (or call the method) which is marked with [Inject].
         container.Inject(foo);
 
-        // Inject dependencies into the MonoBehaviours of this GameObject and its children.
-        // Injection occurs regardless of whether the targeted GameObjects and MonoBehaviours
-        // are enabled or not.
+        // Inject dependencies into the MonoBehaviours of this
+        // GameObject and its descendents, regardless of whether
+        // the targeted GameObjects and MonoBehaviours are enabled.
         container.InjectGameObject(gameObject);
 
-        // Instantiate a GameObject from a prefab and inject its MonoBehaviours (and those
-        // of its descendents) with dependencies. If you're creating GameObjects through
-        // other means (e.g. procedurally or from Addressables) then consider using InjectGameObject.
+        // Instantiate a GameObject from a prefab and inject
+        // its MonoBehaviours (and those of its descendents) with
+        // dependencies. If you're creating GameObjects through
+        // other means (e.g. procedurally or from Addressables)
+        // then consider using InjectGameObject.
         var object1 = container.Instantiate(prefab);
         var object2 = container.Instantiate(prefab, parent);
         var object3 = container.Instantiate(prefab, position, rotation, parent);
