@@ -2,9 +2,9 @@
 title: Register Factory
 ---
 
-Typically, in a DI container, the Factory pattern can be used to stabilize the dependency resolution.
+VContainer generally constructs registered dependencies the first time they're resolved (with the exception of [registered instances](../register-type#register-instance)). If you need finer control over when a dependency is created, you can register and use a factory function.
 
-For example, if you create a factory like the following, dependency resolution will happen only once. Dependency resolution will not occur during instance creation.
+In the following example, if you create a factory like the following, dependency resolution will happen only once. Dependency resolution will not occur during instance creation.
 VContainer allows to register a `Func<>` delegate for the creation of an instance. This is especially useful in scenarios where the instance is created at any time during execution, or multiple instances are created at any time.
 
 ```csharp
@@ -110,6 +110,11 @@ builder.RegisterFactory<CharacterType, CharacterActor>(container =>
 See [Use Container directory](../resolving/container-api) more information.
 
 :::note
-`Func <>` factory is like a short hand.
-In complex cases, consider defining and registering your own factory class。
+Using a lambda function for a `Func<>` registration is shorthand for a common case. In complex scenarios, consider defining and registering your own factory class. In fact, you can register object methods as factories
 :::
+
+# Stateful Factories
+
+Although the name "factory" suggests that a new object is constructed with each invocation, that's not a requirement.
+
+Object methods can be registered as factories
