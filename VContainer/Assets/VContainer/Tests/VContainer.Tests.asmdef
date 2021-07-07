@@ -2,9 +2,10 @@
     "name": "VContainer.Tests",
     "rootNamespace": "",
     "references": [
+        "VContainer.Annotations",
+        "VContainer",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "VContainer",
         "Unity.Entities",
         "UniTask"
     ],
