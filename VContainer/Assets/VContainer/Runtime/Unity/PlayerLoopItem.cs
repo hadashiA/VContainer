@@ -150,7 +150,7 @@ namespace VContainer.Unity
 
     sealed class FixedTickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly IEnumerable<IFixedTickable> entries;
+        readonly List<IFixedTickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
@@ -158,7 +158,7 @@ namespace VContainer.Unity
             IEnumerable<IFixedTickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
-            this.entries = entries;
+            this.entries = entries.ToList();
             this.exceptionHandler = exceptionHandler;
         }
 
@@ -259,7 +259,7 @@ namespace VContainer.Unity
 
     sealed class PostTickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly IEnumerable<IPostTickable> entries;
+        readonly List<IPostTickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
@@ -267,7 +267,7 @@ namespace VContainer.Unity
             IEnumerable<IPostTickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
-            this.entries = entries;
+            this.entries = entries.ToList();
             this.exceptionHandler = exceptionHandler;
         }
 
