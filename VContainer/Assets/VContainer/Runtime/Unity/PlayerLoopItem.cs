@@ -250,7 +250,6 @@ namespace VContainer.Unity
                     return false;
                 }
             }
-
             return !disposed;
         }
 
