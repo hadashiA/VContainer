@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 #if VCONTAINER_UNITASK_INTEGRATION
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -221,7 +222,7 @@ namespace VContainer.Unity
 
     sealed class TickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly IEnumerable<ITickable> entries;
+        readonly List<ITickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
@@ -229,7 +230,7 @@ namespace VContainer.Unity
             IEnumerable<ITickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
-            this.entries = entries;
+            this.entries = entries.ToList();
             this.exceptionHandler = exceptionHandler;
         }
 
@@ -249,6 +250,7 @@ namespace VContainer.Unity
                     return false;
                 }
             }
+
             return !disposed;
         }
 
