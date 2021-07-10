@@ -150,23 +150,24 @@ namespace VContainer.Unity
 
     sealed class FixedTickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly List<IFixedTickable> entries;
+        readonly IReadOnlyList<IFixedTickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
         public FixedTickableLoopItem(
-            IEnumerable<IFixedTickable> entries,
+            IReadOnlyList<IFixedTickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
-            this.entries = entries.ToList();
+            this.entries = entries;
             this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
         {
             if (disposed) return false;
-            foreach (var x in entries)
+            for (var i = 0; i < entries.Count; i++)
             {
+                var x = entries[i];
                 try
                 {
                     x.FixedTick();
@@ -186,23 +187,24 @@ namespace VContainer.Unity
 
     sealed class PostFixedTickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly List<IPostFixedTickable> entries;
+        readonly IReadOnlyList<IPostFixedTickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
         public PostFixedTickableLoopItem(
-            IEnumerable<IPostFixedTickable> entries,
+            IReadOnlyList<IPostFixedTickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
-            this.entries = entries.ToList();
+            this.entries = entries;
             this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
         {
             if (disposed) return false;
-            foreach (var x in entries)
+            for (var i = 0; i < entries.Count; i++)
             {
+                var x = entries[i];
                 try
                 {
                     x.PostFixedTick();
@@ -222,23 +224,24 @@ namespace VContainer.Unity
 
     sealed class TickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly List<ITickable> entries;
+        readonly IReadOnlyList<ITickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
         public TickableLoopItem(
-            IEnumerable<ITickable> entries,
+            IReadOnlyList<ITickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
-            this.entries = entries.ToList();
+            this.entries = entries;
             this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
         {
             if (disposed) return false;
-            foreach (var x in entries)
+            for (var i = 0; i < entries.Count; i++)
             {
+                var x = entries[i];
                 try
                 {
                     x.Tick();
@@ -258,23 +261,24 @@ namespace VContainer.Unity
 
     sealed class PostTickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly List<IPostTickable> entries;
+        readonly IReadOnlyList<IPostTickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
         public PostTickableLoopItem(
-            IEnumerable<IPostTickable> entries,
+            IReadOnlyList<IPostTickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
-            this.entries = entries.ToList();
+            this.entries = entries;
             this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
         {
             if (disposed) return false;
-            foreach (var x in entries)
+            for (var i = 0; i < entries.Count; i++)
             {
+                var x = entries[i];
                 try
                 {
                     x.PostTick();
@@ -294,12 +298,12 @@ namespace VContainer.Unity
 
     sealed class LateTickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly IEnumerable<ILateTickable> entries;
+        readonly IReadOnlyList<ILateTickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
         public LateTickableLoopItem(
-            IEnumerable<ILateTickable> entries,
+            IReadOnlyList<ILateTickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
             this.entries = entries;
@@ -309,8 +313,9 @@ namespace VContainer.Unity
         public bool MoveNext()
         {
             if (disposed) return false;
-            foreach (var x in entries)
+            for (var i = 0; i < entries.Count; i++)
             {
+                var x = entries[i];
                 try
                 {
                     x.LateTick();
@@ -330,23 +335,24 @@ namespace VContainer.Unity
 
     sealed class PostLateTickableLoopItem : IPlayerLoopItem, IDisposable
     {
-        readonly List<IPostLateTickable> entries;
+        readonly IReadOnlyList<IPostLateTickable> entries;
         readonly EntryPointExceptionHandler exceptionHandler;
         bool disposed;
 
         public PostLateTickableLoopItem(
-            IEnumerable<IPostLateTickable> entries,
+            IReadOnlyList<IPostLateTickable> entries,
             EntryPointExceptionHandler exceptionHandler)
         {
-            this.entries = entries.ToList();
+            this.entries = entries;
             this.exceptionHandler = exceptionHandler;
         }
 
         public bool MoveNext()
         {
             if (disposed) return false;
-            foreach (var x in entries)
+            for (var i = 0; i < entries.Count; i++)
             {
+                var x = entries[i];
                 try
                 {
                     x.PostLateTick();
