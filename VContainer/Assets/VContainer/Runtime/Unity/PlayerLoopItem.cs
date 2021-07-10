@@ -167,10 +167,9 @@ namespace VContainer.Unity
             if (disposed) return false;
             for (var i = 0; i < entries.Count; i++)
             {
-                var x = entries[i];
                 try
                 {
-                    x.FixedTick();
+                    entries[i].FixedTick();
                 }
                 catch (Exception ex)
                 {
@@ -204,10 +203,9 @@ namespace VContainer.Unity
             if (disposed) return false;
             for (var i = 0; i < entries.Count; i++)
             {
-                var x = entries[i];
                 try
                 {
-                    x.PostFixedTick();
+                    entries[i].PostFixedTick();
                 }
                 catch (Exception ex)
                 {
@@ -241,10 +239,9 @@ namespace VContainer.Unity
             if (disposed) return false;
             for (var i = 0; i < entries.Count; i++)
             {
-                var x = entries[i];
                 try
                 {
-                    x.Tick();
+                    entries[i].Tick();
                 }
                 catch (Exception ex)
                 {
@@ -278,10 +275,9 @@ namespace VContainer.Unity
             if (disposed) return false;
             for (var i = 0; i < entries.Count; i++)
             {
-                var x = entries[i];
                 try
                 {
-                    x.PostTick();
+                    entries[i].PostTick();
                 }
                 catch (Exception ex)
                 {
@@ -315,10 +311,9 @@ namespace VContainer.Unity
             if (disposed) return false;
             for (var i = 0; i < entries.Count; i++)
             {
-                var x = entries[i];
                 try
                 {
-                    x.LateTick();
+                    entries[i].LateTick();
                 }
                 catch (Exception ex)
                 {
@@ -352,10 +347,9 @@ namespace VContainer.Unity
             if (disposed) return false;
             for (var i = 0; i < entries.Count; i++)
             {
-                var x = entries[i];
                 try
                 {
-                    x.PostLateTick();
+                    entries[i].PostLateTick();
                 }
                 catch (Exception ex)
                 {
