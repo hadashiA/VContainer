@@ -83,23 +83,23 @@ module.exports = {
       ],
     },
     footer: {
-      // copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} <a href="https://twitter.com/hadashiA">hadashiA</a>`,
       // logo: {
       //   alt: 'VContainer',
       //   src: 'img/favicon.png',
       //   href: 'https://github.com/hadashiA/VContainer',
       // },
-      links: [
-        {
-          title: 'Author',
-          items: [
-            {
-              label: '@hadashiA',
-              href: 'https://twitter.com/hadashiA',
-            },
-          ],
-        }
-      ]
+      // links: [
+      //   {
+      //     title: 'Author',
+      //     items: [
+      //       {
+      //         label: '@hadashiA',
+      //         href: 'https://twitter.com/hadashiA',
+      //       },
+      //     ],
+      //   }
+      // ]
     },
     algolia: {
       appId: process.env.ALGOLIA_APP_ID,

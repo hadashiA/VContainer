@@ -13,18 +13,18 @@ import {GCAllocGraph} from "../../../../../src/components/GCAllocGraph"
 # VContainer
 
 VContainerは Unity(ゲームエンジン)上で動作する高速なDIフレームワークです。(DI = Dependency Injection のこと)
-"V" は、Unity の頭文字 "U" を スリムにした形状をイメージして名付けられました...!
+VContainerの "V" は、Unity の頭文字 "U" を スリムにした形状をイメージして名付けられました…!
 
 - **高速なResolve:** Zenjectとの比較でおよそ [5-10倍の性能](#performance) 。
 - **GCにやさしい:** オブジェクトを解決する操作は **ゼロアロケーション** 。(生成したインスタンス自身を除く)
 - **コンパクトなサイズ:** internal 型や .callvirt 命令とかも少ない。ビルドサイズにやさしい。
 - **過不足のない機能:** シンプルで透明性のあるAPI。過度に複雑で理解し難い設定を避けます。
-- **堅牢性:** 実行中の競合問題の心配がありません。デフォルトでスレッドセーフ。
+- **イミュータブルなコンテナ:** 実行中の競合問題の心配がありません。デフォルトでスレッドセーフ。
 
 #### 主な機能 {#features}
 
 - [Constructor Injection](/resolving/constructor-injection) / [Method Injection](/resolving/method-injection) / [Property & Field Injection](/resolving/property-field-injection)
-- [PlayerLoopSystemで ピュアC# エントリポイントの作成](/integrations/entrypoint)
+- [PlayerLoopSystem上への ピュアC#  のスケジュール](/integrations/entrypoint)
 - [柔軟なスコープ生成](/scoping/lifetime-overview)
 - [ILコード生成による最適化](/optimization/codegen)
 - [UniTask連携](/integrations/unitask)
@@ -77,7 +77,7 @@ public class GameLifetimeScope : LifetimeScope
 }
 ```
 
-クラス定義:
+クラス定義の例)
 
 ```csharp
 public interface IRouteSearch
@@ -108,7 +108,6 @@ public class ActorsView : MonoBehaviour
 }
 ```
 
-and
 
 ```csharp
 public class ActorPresenter : IStartable
@@ -133,7 +132,6 @@ public class ActorPresenter : IStartable
 
 - この例では、CharacterService の routeSearch が自動的に AStarRouteSearch のインスタンスとして設定されます。
 - エントリポイントとして登録した `ActorPresenter` はUnityのライフサイクル上にスケジュールされます。
-
 - くわしくは:
   - [Getting Started](/getting-started/hello-world)
 
@@ -225,9 +223,12 @@ using (LifetimeScope.Enqueue(builder =>
 }
 ```
 
+- くわしくは:
+  - [Scoping](/scoping/lifetime-overview)
+
 ## UniTask
 
-下のようにに、`async UniTask` なメソッドを処理の起点にすることもできるようになっています。
+`async UniTask` なメソッドを処理の起点にすることもできるようになっています。
 
 ```csharp
 public class FooController : IAsyncStartable

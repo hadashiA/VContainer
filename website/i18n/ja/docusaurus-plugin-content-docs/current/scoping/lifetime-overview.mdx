@@ -2,29 +2,35 @@
 title: Lifetime Overview
 ---
 
-ここでは Register時に指定できる `Lifetime` の種類についてまとめます。
+コンテナに登録されたオブジェクトは、内部的には必ず以下の3種類の寿命の何れかになります。
 
-- `Singleton` : 複数のコンテナを通じて1つだけインスタンスを生成します。
+多くの場合は、 `Register*` メソッドの `Lifetime` 引数でこれを指定するようになっています。
+
+- `Singleton` : 複数のコンテナを通じてインスタンスを1つだけ使い回します。
   - 同じ型を同じコンテナに複数登録することができません。
   - 登録したオブジェクトが `IDisposable` を実装している場合、コンテナの破棄と共にオブジェクトは Dispose されます。
 - `Scoped` : コンテナ毎に1つずつインスタンスが生成されます。
-  - コンテナが1つだけの場合、`Singoleton` と差異はありません。
+  - コンテナが1つだけの場合、`Singoleton` と特に差異はありません。
   - 登録したオブジェクトが `IDisposable` を実装している場合、コンテナの破棄と共にオブジェクトは Dispose されます。
 - `Transient` : オブジェクトがコンテナから取り出される度に別々のインスタンスが生成されます。
+  - 自動的なDisposeは行われません。
 
 ## Lifetimeとスコープの親子関係
 
-コンテナは親子関係をつくることができます。子がオブジェクトを取得しようとした場合のLifetimeの挙動は以下のようになっています。
+コンテナは親子関係をつくることができます。
 
-- 基本的なこと: 取り出そうとしたオブジェクトがみつからない場合、コンテナは自身の親を辿って対象を探します。
+子コンテナは、取り出そうとしたオブジェクトがみつからない場合、対象がみつかるまで自身の親を辿って探します。
+
+このとき、Lifetimeによって以下のような挙動の違いがあります。
+
 - `Lifetime.Singleton`
-  - 子に親と同じ型を登録した場合、子は自身のオブジェクトを生成して保持します。(あるいはもっとも近い親のインスタンスを探します)
+  - 子に親と同じ型を登録した場合、子は自身のオブジェクトを生成して保持します。あるいは、もっとも近い親のインスタンスを探します。
 - `Lifetime.Scoped`
-  - 親にしか登録がない場合を含め、全ての子がそれぞれオブジェクトを生成して保持します。
+  - 自身か、あるいはもっとも近い親の登録を探し、コンテナはそれぞれがオブジェクトを生成して保持します。
 - `LifeTime.Transient`
-  - If parent and child have the same registration, the child will create its own instance.
+  - 自身か、あるいはもっとも近い親の登録を探し、それを利用して毎回インスタンスを作成します。
 
 :::caution
-If the scene is alive and only `LifetimeScope` is destroyed, MonoBehaviours registered as `Lifetime.Scoped` are not automatically destroyed.
-If you want to destroy with `LifetimeScope`, make it a child transform of `LifetimeScope` or consider implement IDisposable.
+シーンが破棄される前に `LifetimeScope` を破棄した場合、コンテナに登録された GameObject が自動的に破棄されるわけではありません。
+登録された GameObject を `LifetimeScope` と一緒に破棄したい場合は、` LifetimeScope` のTransformの子要素とするか、IDisposableの実装を検討してください。
 :::

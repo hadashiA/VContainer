@@ -2,19 +2,19 @@
 title: Hello World
 ---
 
-The basic way for integrating VContainer into your application is:
+VContainerの基本的な使い方は以下です。
 
-- Create a component that inherits `LifetimeScope` in your scene. It has one container and one scope.
-- Register dependencies with C# code in a subclass of LifetimeScope. This is the composition root.
-- When playing scene, LifetimeScope automatically build Container and dispatch to the own PlayerLoopSystem.
+- `LifetimeScope` を継承したコンポーネントを作り、シーンに置きます。これが1つのコンテナ(1つのスコープ)を表現します。
+- LifetimeScopeのメソッドをオーバライドして、依存関係を管理したいオブジェクトを登録していきます。(これがいわゆる Composition Root)
+- シーンをプレイすると、`LifetimeScope` は自動的にコンテナをつくり、独自の Player Loop System のスケジュールを始めます。
 
 :::note
-Normally, a "scope" is repeatedly created and destroyed during the game. `LifetimeScope` assumes this and has a parent-child relationship.
+通常、スコープは ゲーム実行中に 何度も生成/破棄されることがあります。 `LifetimeScope` はこれを想定しており、動的な生成や、親子関係をつくる機能も持っています。
 :::
 
-**1. Write a class that depends on other classes**
+**1. 他オブジェクトへ機能を委譲するクラスをつくる**
 
-Let's say Hello world.
+一例として、「Hello World」って言うだけのサービスクラスをつくってみます。
 
 ```csharp title="HelloWorldService.cs"
 namespace MyGame
@@ -29,18 +29,21 @@ namespace MyGame
 }
 ```
 
-**2. Define composition root**
 
-Next, let's write a setting that can auto-wiring the class.
+**2. DIの設定を施す(Composition Root)**
 
-- Right click in a folder within the Project Tab and Choose **Create -> C# Script**.
-- Name it `GameLifetimeScope.cs`.
+さきほどの何の変哲もないクラスをDIコンテナに登録すると、必要な箇所へ自動的に参照関係をつくることができるようになります。(Auto-Wiring)
+
+コンテナをつくるため、LifetimeScope を継承したコンポーネントを作成しましょう。
+
+- Projectウインドウの右クリックメニュー、`Create -> C# Script` から、新しいMonoBehaviourクラス定義ファイルを作成します。
+- ここでは `GameLifetimeScope.cs` という名前をつけます。
 
 :::note
-VContainer will automatically a template for C# scripts ending in *LifetimeScope.
+VContainer は、名前が「LifetimeScope」で終わる C# スクリプトのファイルに対して自動的にテンプレートを適用します。
 :::
 
-You instruct `builder` and register the class above.
+作成したクラスの中の `Configure` メソッドをオーバライドして、DIの設定を行います。
 
 ```diff title="GameLifetimeScope.cs"
 using VContainer;
@@ -59,21 +62,23 @@ namespace MyGame
 ```
 
 :::note
-VContainer always requires a `Lifetime` argument explicitly. This gives us transparency and consistency.
+VContainer では上記のようなクラス登録時、`Lifetime` を明示的に引数で指定するようになっています。
+
+Lifetimeについて詳しくは [Lifetime Overview](/scoping/lifetime-overview) を参照して下さい。
 :::
 
-**3. Create GameObject attached your LifetimeScope**
+**3. 作成したLifetimeScopeをGameObjectにアタッチ**
 
-Right Click inside the Hierarchy tab and select **Create Empty**. And name `GameLifetimeScope` it.
-
-Then attach the Component created above.
+LifetimeScopeをシーンに配置します。ヒエラルキウインドウの右クリックメニューから 「Create Empty」でGameObjectをつくり、名前は `GameLifetimeScope` にしておきましょう。
+前の工程でつくった `GameLifetimeScope` をここにアタッチします。
 
 ![](assets/screenshot_gamelifetimescope.png)
 
-**4. How to use your new HelloWorldService  ?**
+**4. HelloWorldService を呼び出すには**
 
-Registered objects will automatically have dependency injection.
-Like below:
+`builder` を使用して登録したクラスたちは、自動的に参照関係が構築されます。
+
+たとえば以下のように、`HelloWorldService` へ仕事を委譲するクラスも追加しましょう。
 
 ```csharp title="GamePresenter.cs"
 using VContainer;
@@ -93,20 +98,26 @@ namespace MyGame
 }
 ```
 
-And let's also register this class.
+このクラスは、コンストラクタで `HelloWorldService` を引数にとっています。DIコンテナは、このような定義をみつけて、自動的に必要なオブジェクトをコンストラクタに渡してくれます。
+
+このクラスもDIコンテナへ登録してみましょう。
 
 ```diff
 builder.Register<HelloWorldService>(Lifetime.Singleton);
 + builder.Register<GamePresenter>(Lifetime.Singleton);
 ```
 
-**5. Execute your registerd object on PlayerLoopSystem**
+**5. 独自の C#クラスを Unityの PlayerLoopSystem上で走らせる**
 
-To write an application in Unity, we have to interrupt Unity's lifecycle events.
-(Typically MonoBehaviour's Start / Update / OnDestroy / etc..)
+通常、Unityでアプリケーションとかゲームを書くには、Unityのライフサイクルイベント上でコードを実行しなければいけないはずです。
 
-Objects registered with VContainer can do this independently of MonoBehaviour.
-This is done automatically by implementing and registering some marker interfaces.
+通常、Unityでは MonoBehaviour の `Start` / `Update` / `OnDestroy` などがそれに相当します。
+
+このような処理の起点のことを、VContainerでは 「EntryPoint」と呼んでいます。
+
+VContainerでは、特別なInterfaceを実装したクラスを登録しておくことで、MonoBehaviourを使用せずに EntryPointをつくることができます。
+
+上記で定義した GamePresenter を EntryPoint にしてみましょう。
 
 ```diff title="GamePresenter.cs"
 using VContainer;
@@ -132,26 +143,23 @@ using VContainer.Unity;
  }
 ```
 
-Now, `Tick()` will be executed at the timing of Unity's Update.
+この変更で、UnityのUpdateのタイミングで、 `ITickable.Tick()` メソッドが自動的に呼ばれるようにしています。
 
-As such, it's a good practice to keep any side effect entry points through the marker interface.  
+基本的には、副作用の実行の開始はコンストラクタではなく EntryPointを介して行うのが良いでしょう。
 
-(By design, for MonoBehaviour is enough to use Start / Update etc. The marker interface of VContainer is a function to separate the entry point of domain logic and presentation logic. )
+:::note
+MonoBehaviourに関して言えば、`Start` や `Update` などを使えばおそらく十分です。VContainerのEntryPointは、ドメインロジックとプレゼンテーションロジックを分離するために役に立ちます。
+:::
 
-We should register this as running on Unity's life cycle events.
+さて、以上を実際にUnityのライフサイクルイベントで動作させるには、`RegisterEntryPoint` メソッドで登録しておく必要があることに注意して下さい。
 
 ```diff title="GameLifetimeScope.cs"
 - builder.Register<GamePresenter>(Lifetime.Singleton);
 + builder.RegisterEntryPoint<GamePresenter>();
 ```
 
-:::note
-- RegisterEntryPoint&lt;GamePresenter&gt;() is an alias to register interfaces related to Unity's PlayerLoop event.
-    - Similar to Register&lt;GamePresenter&gt;(Lifetime.Singleton).As&lt;ITickable&gt;()
-- Registering lifecycle events without relying on MonoBehaviour facilitates decupling of domain logic and presentation !
-:::
-
-If you have multiple EntryPoints, you can also use the following declaration as grouping.
+:::tip
+たくさんの EntryPoint を登録したいときは、以下のように一箇所にまとめて書く記法が用意されています。
 
 ```csharp title="GameLifetimeScope.cs"
 builder.UseEntryPoints(Lifetime.Singleton, entryPoints =>
@@ -163,13 +171,14 @@ builder.UseEntryPoints(Lifetime.Singleton, entryPoints =>
 })
 ```
 
-This makes it clearer that EntryPoints are given special treatment by design.
+EntryPoint は設計上、特別な場所ですので、目立つようになっていると良いでしょう。
+:::
 
-**6. Inversion of Control (IoC)**
+**6. 制御の反転 (IoC = Inversion Of Control)**
 
-It typically calls logic in response to events such as user input. 
+ユーザの入力を受けて、まわりまわってなにかのロジックが実行されることを考えてみます。
 
-Consider the following View Component.
+たとえば以下のような Viewコンポーネントがあるとします。
 
 ```csharp title="HelloScreen.cs"
 public class HelloScreen : MonoBehaviour
@@ -178,7 +187,13 @@ public class HelloScreen : MonoBehaviour
 }
 ```
 
-In normal Unity programming, you embed logic calls in HelloScreen, but if you're using DI, you can separate HelloScreen and   any control flow.
+Unity では、ここでの HelloScreen のような入力を受けつけるクラスに、直接 、入力を受けた後の処理を書いてしまうこともできるわけですが、アプリケーションの設計においてはそららを分離することが大事です。
+「どんな入力に反応するか」、「なにを実行するか」、「どこへ出力するか」、これらがそれぞれフレキシブルに組み合わせられるようになっていると、色々な場面で自然にパーツの使い回しがききます。
+
+やり方はいくつか考えられますが、ここでは 制御フローを司る専用のEntryPointをつくり、必要なオブジェクトを注入していきます。
+
+このようにすると、`HelloScreen` に対して何かを注入したり、`HelloScreen` が直接誰かを呼び出したりするコードが一切必要ありません。 `HelloScreen` はどこのシーンで使うこともでき、より独立しています。
+
 
 ```diff  title="GamePresenter.cs"
 namespace MyGame
@@ -205,13 +220,9 @@ namespace MyGame
 }
 ```
 
-By doing this, we succeeded in separating the domain logic / control flow / view component.
+入力を受けとる `HelloScreen` の方ではなく、制御フロー専門のクラスがロジックを呼び出すようにできました。 つまりこれが制御の反転ってわけです。
 
-- **GamePresenter:** Responsible only for Control Flow.
-- **HelloWorldService:** Responsible only for the functionality that can be called anytime, anywhere
-- **HelloScreen**: Responsible only for View.
-
-In VContainer, you need to register the dependent MonoBehaviour. Don't forget to register HelloScreen.
+GamePresenter へ HelloScreen を注入したいので、DIの設定を忘れず追加しておきます。
 
 ```diff  title="GameLifetimeScope.cs"
     public class GameLifetimeScope : LifetimeScope
@@ -227,3 +238,10 @@ In VContainer, you need to register the dependent MonoBehaviour. Don't forget to
         }
     }
 ```
+
+- **GamePresenter:** は、制御フローのみに責任をもちます。どの入力に反応してなにを実行すべきかをつなぎ合わせます。
+- **HelloWorldService:** は、Hello World って出力することそれだけに責任を持ちます。
+- **HelloScreen**: は、Viewコンポーネントです。画面に表示する内容だけに責任を持ちます。
+
+ドメインロジック / 制御フロー / Viewコンポーネント をそれぞれ分割し、PresenterへのDIによって参照関係をつなげることができました。一般にこういうコンセプトは MVP(Model-View-Presenter) と呼ばれています。
+
