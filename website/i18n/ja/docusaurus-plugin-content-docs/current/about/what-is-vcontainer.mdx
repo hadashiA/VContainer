@@ -12,19 +12,20 @@ import {GCAllocGraph} from "../../../../../src/components/GCAllocGraph"
 
 # VContainer
 
-VContainerは Unity(ゲームエンジン)上で動作する高速なDIフレームワークです。(DI = Dependency Injection のこと)
-VContainerの "V" は、Unity の頭文字 "U" を スリムにした形状をイメージして名付けられました…!
+VContainerは Unity(ゲームエンジン)上で動作する高速なDIフレームワークです。(DI = Dependency Injection のこと。)
+
+"V" は、Unity の頭文字 "U" を スリムにした形状をイメージして名付けられました…!
 
 - **高速なResolve:** Zenjectとの比較でおよそ [5-10倍の性能](#performance) 。
-- **GCにやさしい:** オブジェクトを解決する操作は **ゼロアロケーション** 。(生成したインスタンス自身を除く)
+- **GCにやさしい:** オブジェクト解決時 **ゼロアロケーション** 。(生成したインスタンス自身を除く)
 - **コンパクトなサイズ:** internal 型や .callvirt 命令とかも少ない。ビルドサイズにやさしい。
 - **過不足のない機能:** シンプルで透明性のあるAPI。過度に複雑で理解し難い設定を避けます。
-- **イミュータブルなコンテナ:** 実行中の競合問題の心配がありません。デフォルトでスレッドセーフ。
+- **イミュータブルなコンテナ:** 一度コンテナをつくったら遅い処理がほとんどない。スレッドセーフ。
 
 #### 主な機能 {#features}
 
-- [Constructor Injection](/resolving/constructor-injection) / [Method Injection](/resolving/method-injection) / [Property & Field Injection](/resolving/property-field-injection)
-- [PlayerLoopSystem上への ピュアC#  のスケジュール](/integrations/entrypoint)
+- [コンストラクタ インジェクション](/resolving/constructor-injection) / [メソッド インジェクション](/resolving/method-injection) / [プロパティ & フィールド インジェクション](/resolving/property-field-injection)
+- [PlayerLoopSystem上への 独自C#型のスケジュール](/integrations/entrypoint)
 - [柔軟なスコープ生成](/scoping/lifetime-overview)
 - [ILコード生成による最適化](/optimization/codegen)
 - [UniTask連携](/integrations/unitask)
@@ -130,8 +131,8 @@ public class ActorPresenter : IStartable
 }
 ```
 
-- この例では、CharacterService の routeSearch が自動的に AStarRouteSearch のインスタンスとして設定されます。
-- エントリポイントとして登録した `ActorPresenter` はUnityのライフサイクル上にスケジュールされます。
+- この例では、 `CharacterService` の `routeSearch` が自動的に `AStarRouteSearch` のインスタンスとして設定されます。
+- エントリポイントとして登録した `ActorPresenter` は,Unityのライフサイクル上にスケジュールされます。
 - くわしくは:
   - [Getting Started](/getting-started/hello-world)
 

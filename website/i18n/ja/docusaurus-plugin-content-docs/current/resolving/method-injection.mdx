@@ -20,22 +20,4 @@ public class SomeBehaviour : MonoBehaviour
 }
 ```
 
-:::tip Recommendation
-`MonoBehaviour` **への** インジェクションは必要な場合のみに留めておくことを(控え目に)おすすめしておきます。
-
-`GameObject` や `MonoBehaviour` は、Prefabとしてほぼ完全な形でシリアライズして保存しておけることに1つの強力さがあります。DIを行わなければ動作しないMonoBehaviourは、この強力なポータビリティを破壊してしまうという面があります。
-
-また、ドメインロジックとプレゼンテーションがうまく分離されている場合、`MonoBehaviour` の典型的な役割は主にViewコンポーネントということになります。
-
-Viewコンポーネントのようなオブジェクトは、実行中に任意のタイミングで生成/破棄が行われるので、
-
-通常、Viewコンポーネントは入力などのイベントを外側に通知することができるため、Viewに
-In my opinion, View components should only be responsible for rendering and should be flexible.
-
-Of course, In order for the View component to work, it needs to pass state at runtime.
-But the "state" of an object and its dependency of functionality of other objects are different.
-
-It's enough to pass the state as arguments instead of `[Inject]`.
-:::
-
 `MonoBehaviour` や `GameObject` の管理について詳しくは [MonoBehaviourへのインジェクション](gameobject-injection) を参照して下さい。

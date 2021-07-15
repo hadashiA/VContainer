@@ -20,12 +20,4 @@ public class SomeBehaviour : MonoBehaviour
 
 The `[Inject]`-annotated method can have any name and any accessibility level.
 
-:::tip Recommendation
-Consider whether injection into `MonoBehaviour`s is necessary.
-
-In an ideal code base where presentation and domain logic are properly decoupled, `MonoBehaviour`s would act as views that are only responsible for rendering (or other user-visible feedback).
-
-Of course, views still need to be able to access the state of the thing they're displaying (i.e. the game world). But a view can depend on other objects without maintaining its own state. Depending on how your game state is represented, it might be enough to provide it to your views through event arguments or serializable fields rather than `[Inject]`.
-
-If you inject dependencies into `MonoBehaviour`s, you must know when the `[Inject]`-annotated method is called with respect to [Unity's object lifecycle](https://docs.unity3d.com/Manual/ExecutionOrder). If your [`Awake()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake), [`Start()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Start), or [`OnEnable()`](https://docs.unity3d.com/ScriptReference/MonoBehaviour.OnEnable) methods need any dependencies from VContainer, consider moving their logic into your injection method.
-:::
+For more information about managing `MonoBehaviour` and `GameObjects`, see [Injection into MonoBehaviour](gameobject-injection).

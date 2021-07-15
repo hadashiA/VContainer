@@ -17,10 +17,21 @@ Note that the presence of the `[Inject]` attribute on a `MonoBehaviour`'s method
     - See [Register Callbacks](../registering/register-callbacks)
     - See [Register Factory](../registering/register-factory)
 
-
 ## Why doesn't VContainer automatically inject into all `MonoBehaviour`s?
 
 - Unity doesn't provide a good way to listen for the creation of all `GameObject`s or `MonoBehaviour`s. Rather than having some cases that are automatically `Inject`ed and some that are not, we decided on explicit `Inject`ion that you can use to fit your own needs.
 - We do not recommend excecuting `Inject` directly on `MonoBehaviour`s; instead, use `InjectGameObject` on the owning `GameObject`.
   - This is because the purpose of VContainer and DI is inversion of control of MonoBehaviour.
   - If a `MonoBehaviour` needs an explicit `Inject` call, you risk losing the advantages of Unity's prefab portability. 
+
+
+:::tip Recommendation
+`MonoBehaviour` **への** インジェクションは必要な場合のみに留めておくことをおすすめします。
+
+`GameObject` や `MonoBehaviour` は、ほぼ完全な形でシーンやPrefabへシリアライズして保存しておけるという利点があります。DIを行わなければ動作しないMonoBehaviourは、この強力なポータビリティを破壊してしまう面があります。
+
+また、ドメインロジックとプレゼンテーションがうまく分離されている場合、`MonoBehaviour` の典型的な役割は主にViewコンポーネントということになります。
+Viewコンポーネントはしばしばイベントや出来事を検知する起点になりますが、MonoBehaviourが直接的に外部のオブジェクトを参照して機能を呼び出すよりも、自身で検知したイベントを外部へ通知するなどして 「参照される側」でいる方がより柔軟性は高く、役割分担が自然になります。
+
+もちろん、Viewコンポーネントが動作するには、画面に表示したいデータ/状態を知る必要がありますが、実行時にめまぐるしく変化するデータは、`[Inject]` による注入の対象とせず、単なる引数や「値」として扱うことが適しています。
+:::
