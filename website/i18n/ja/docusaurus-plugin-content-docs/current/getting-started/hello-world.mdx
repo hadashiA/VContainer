@@ -109,11 +109,8 @@ builder.Register<HelloWorldService>(Lifetime.Singleton);
 
 **5. 独自の C#クラスを Unityの PlayerLoopSystem上で走らせる**
 
-通常、Unityでアプリケーションとかゲームを書くには、Unityのライフサイクルイベント上でコードを実行しなければいけないはずです。
-
-通常、Unityでは MonoBehaviour の `Start` / `Update` / `OnDestroy` などがそれに相当します。
-
-このような処理の起点のことを、VContainerでは 「EntryPoint」と呼んでいます。
+Unityでアプリケーションとかゲームを書くには、Unityのライフサイクルイベント上でコードを実行しなければいけないはずです。
+通常は MonoBehaviour の `Start` / `Update` / `OnDestroy` などを使用することになりますが、このような処理の起点のことを、VContainerでは 「EntryPoint」と呼んでいます。
 
 VContainerでは、特別なInterfaceを実装したクラスを登録しておくことで、MonoBehaviourを使用せずに EntryPointをつくることができます。
 

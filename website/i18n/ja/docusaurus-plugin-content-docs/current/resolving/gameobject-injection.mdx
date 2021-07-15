@@ -14,8 +14,7 @@ sidebar_label: MonoBehaviour
 2. `RegisterComponent*` メソッドによって `MonoBehaviour` をコンテナへ登録する。
     - この場合、登録された `MonoBehaviour` へのインジェクションが行われると共に、他のオブジェクトからインジェクションされる側になることができます。
     - See [Register MonoBehaviour](../registering/register-monobehaviour)
-3. 実行時に動的に生成される `MonoBehaviour` (e.g. Prefabを使用する場合など)は、[`UnityEngine.Object.Instantiate`](https://docs.unity3d.com/ScriptReference/Object.Instantiate) の 代わりに `IObjectResolver.Instantiate` を使用することで、インジェクトを実行しつつインスタンスを生成することができます。
-(ファクトリパターン、あるいはオブジェクト生成のラムダ式を登録する方法が提供されています)
+3. 実行時に動的に生成される `MonoBehaviour` (e.g. Prefabを使用する場合など)は、[`UnityEngine.Object.Instantiate`](https://docs.unity3d.com/ScriptReference/Object.Instantiate) の 代わりに `IObjectResolver.Instantiate` を使用することで、インジェクトを実行しつつインスタンスを生成することができます。(ファクトリパターン、あるいはオブジェクト生成のラムダ式を登録する方法が提供されています)
     - See [Register Callbacks](../registering/register-callbacks)
     - See [Register Factory](../registering/register-factory)
 
