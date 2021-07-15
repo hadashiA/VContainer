@@ -8,14 +8,14 @@ DI(=Dependency Injection) は、オブジェクト指向プログラミングに
 
 DIで参照関係を組み立てると、アプリケーションのコードを変更せずともクラス同士の依存関係をつなぎかえることができるので、テスタビリティやある種のメンテナンス性が改善する... とかとか一般的には言われています。
 
-……そんな教科書的な話の全てがクライアントサイドでも強いメリットを持つとも限りませんが、依存関係を結びつけるやりかたに一貫したスタイルを持ち込むことにはある種の快適さがあることは確かです。特に複雑なコードベースでは威力を発揮するかもしれません。
+……そんな教科書的な話の全てがクライアントサイドでも強いメリットを持つとも限りませんが、依存関係を結びつけるやりかたに一貫したスタイルを持ち込むことにはある種の快適さがあることは確かです。
 
 :::note
-C# では、サーバやコンソールアプリケーションを書くための 設定・ロギング・などなどを整備する標準的な仕組みとして [Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-5.0) という仕組みがありますが、これはDIをベースにしたフレームワークとしてデザインされてます。
-.NET Core/.NET 5以降、サーバのフレームワークとしてデファクトスタンダードといえる [ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-5.0) もまた、Generic Host の上でDIベースとしてつくり直されています。
+C# では、サーバやコンソールアプリケーションを書くための 設定・ロギング・などなどを整備する標準的な仕組み [Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-5.0) がありますが、これはDIをベースにしたフレームワークとしてデザインされてます。
+.NET Core/.NET 5以降、サーバのフレームワークとしてデファクトスタンダードといえる [ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-5.0) もまた、Generic Host を利用したDIベースのスタイルです。
 
 Generic Host をはじめとする Mircosoft.Extensions.* の名前を冠したパッケージは、 [dotnet/runtime](https://github.com/dotnet/runtime) リポジトリ内で管理されており、
-.NET環境やサーバサイドでは標準的な位置付けです。[Microsoft.Extensions.DependencyInjection](https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection) は、DIの基本的な機能を提供している他、DIのインターフェイスを標準化して、実装は他のライブラリと置き換える、といった仕組みも持っています。
+.NET環境やサーバサイドでは標準的な位置付けです。[Microsoft.Extensions.DependencyInjection](https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection) は、DIの基本的な機能を提供している他、DIのインターフェイスを標準化して、実装を他のライブラリと置き換える、といった仕組みも持っています。
 
 C# でDIを使用するプログラミングをするなら要チェックだ!
 :::
@@ -27,7 +27,7 @@ C# でDIを使用するプログラミングをするなら要チェックだ!
 
 よさそうです。しかし実際にこれを完璧に行おうとするのは意外に簡単ではありません。
 あるクラスのコードのなかに別のクラスへの委譲を書こうとすると、単純に考えれば、委譲先のオジェクトの生成方法または取得方法もそこに書くことになりそうです。しかし考えてみると、それは委譲元が委譲先の実装を選んでしまうことになりますし、委譲先のインターフェイスさえ知っていれば十分な場合でも、委譲元ではコードを書き換えないと実装が交換可能ではありません。
-実を言うと、突き詰めていけば、このことを避けるには外側からオブジェクトの参照を渡してあげるしかありません。DI っていうのはつまりそれを行うパターンのことです。
+実を言うと、突き詰めていけば、これを避けるには外側からオブジェクトの参照を渡してあげるしかありません。DI っていうのはつまりそれを行うパターンのことです。
 
 - 合わせて読みたい:
   - [Manning | Dependency Injection in .NET](https://www.manning.com/books/dependency-injection-in-dot-net)
