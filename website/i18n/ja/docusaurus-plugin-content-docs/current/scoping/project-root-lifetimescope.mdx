@@ -1,0 +1,18 @@
+---
+title: Project root LifetimeScope
+---
+
+すべてのLifetimeScopeの親になるルートLifetimeScopeを指定しておくことができます。
+
+手順は以下です。
+
+- 1. まず、LifetimeScope のプレハブを作成します。
+- 2. `VContainerSettings` を作成します。
+    - `Assets -> Create -> VContainer -> VContainer Settings`
+- 3. VContainerSettings のインスペクタの **Root Lifetime Scope** へ 、ルートにしたいLifetimeScopeのプレハブを指定します。
+
+![](assets/screenshot_vcontainersettings_collapse.png)
+
+:::caution
+VContainerSettings を作成すると、自動的に プロジェクトの Preload Assets に登録されます。
+:::

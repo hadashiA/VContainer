@@ -1,0 +1,64 @@
+---
+title: Container API
+---
+
+You can also access the DI container directly via `IObjectResolver`. VContainer automatically registers `IObjectResolver` and injects it wherever it's needed, so you can obtain it just as you would for any other dependency.
+
+For example:
+
+```csharp
+class ClassA
+{
+    public ClassA(IObjectResolver container)
+    {
+        // Get (or create) whatever is registered as ServiceA.
+        // This might be a subclass if you registered the
+        // subclass as a ServiceA.
+        var serviceA = container.Resolve<ServiceA>();
+
+        // Inject all relevant dependencies into foo. Injecting
+        // an object twice will overwrite any property or
+        // field (or call the method) which is marked with [Inject].
+        container.Inject(foo);
+
+        // Inject dependencies into the MonoBehaviours of this
+        // GameObject and its descendents, regardless of whether
+        // the targeted GameObjects and MonoBehaviours are enabled.
+        container.InjectGameObject(gameObject);
+
+        // Instantiate a GameObject from a prefab and inject
+        // its MonoBehaviours (and those of its descendents) with
+        // dependencies. If you're creating GameObjects through
+        // other means (e.g. procedurally or from Addressables)
+        // then consider using InjectGameObject.
+        var object1 = container.Instantiate(prefab);
+
+        // There are also overloads that mimic Object.Instantiate.
+        var object2 = container.Instantiate(prefab, parent);
+        var object3 = container.Instantiate(prefab, position, rotation, parent);
+    }
+}
+```
+
+If you regularly use `IObjectResolver.Inject` in a certain pattern, consider writing an [extension method](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/extension-methods) for it. In fact, almost every `IObjectResolver` API is an extension method (including in the preceding code sample).
+
+:::tip
+You should only need to use `IObjectResolver.Resolve` explicitly if the other supported injection techniques don't fit your needs, or if using a VContainer callback that exposes `IObjectResolver` (e.g. [build callbacks](../registering/register-callbacks) or [certain factory functions](../registering/register-factory#register-func-factory-that-requires-container-dependencies-and-runtime-parameters)). All resolution techniques have similar performance if you use the [IL generator](../optimization/codegen), but directly using `Resolve` requires more code and obscures your intent.
+:::
+
+`LifetimeScope` has an `IObjectResolver` reference through its `Container` property. VContainer also registers it automatically, but you won't need it too often after the container is built.
+
+```csharp
+class ClassA
+{
+    public ClassA(LifetimeScope currentScope)
+    {
+        // You can inject LifetimeScope if you need to, but
+        // in this case it would be enough to just inject ServiceA.
+        var foo = currentScope.Container.Resolve<ServiceA>();
+    }
+}
+```
+
+
+

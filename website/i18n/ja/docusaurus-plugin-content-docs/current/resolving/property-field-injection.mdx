@@ -1,0 +1,27 @@
+---
+id: property-field-injection
+title: プロパティ/フィールド インジェクション
+---
+
+If the object has a local default and Inject is optional,
+Property/Field Injection can be used.
+
+```csharp
+class ClassA
+{
+    [Inject]
+    IServiceA serviceA { get; set; } // Will be overwritten if something is registered.
+
+    public ClassA()
+    {
+        serviceA = ServiceA.GoodLocalDefault;
+    }
+}
+```
+
+It can resolve like this:
+
+```csharp
+    [Inject]
+    IServiceA serviceA;
+```
