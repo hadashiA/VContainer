@@ -4,34 +4,27 @@ title: MonoBehaviourへのインジェクション
 sidebar_label: MonoBehaviour
 ---
 
-As `MonoBehaviour`s [do not support constructors](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake), you must use [method injection](./method-injection) to inject them with dependencies.
+`MonoBehaviour` は コンストラクタを直接呼び出すことは [できません](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake)。
+代わりに[メソッドインジェクション](/resolving/method-injection)が利用できます。
 
-Note that the presence of the `[Inject]` attribute on a `MonoBehaviour`'s method **does not** imply that it will automatically be called. You must inject dependencies manually in one of the following three ways:
+但し、`MonoBehaviour` のメソッドに `[Inject]` アトリビュートがあっても、それだけでメソッドが自動的に呼び出されるわけではありません。次の3つの方法のいずれかの設定が必要です。
 
-1. If you want to inject into a specific `MonoBehaviour`, you can specify it in the `LifetimeScope`'s inspector.
-    - The `MonoBehaviour`s of all specified `GameObject` (and their children) will be automatically `Inject`ed when the `LifetimeScope` is initialized. ![](./assets/screenshot_auto_inject_gameobjects.png)
-2. Use one of the `RegisterComponent*` methods to register the `MonoBehaviour` instance to the container.
-    - In this case, the registered `MonoBehaviour` will both `Inject` and be `Inject`ed into other classes.
+1. シーン上の特定の `MonoBehaviour` **への** インジェクションのみが必要な場合は、`LifetimeScope` のインスペクタからGameObjectを設定します。
+    - 指定された全ての`GameObject`（とそのヒエラルキ配下も含む）の`MonoBehaviour` は、`LifetimeScope` が初期化される際に自動的に`Inject` が実行されます。![](./assets/screenshot_auto_inject_gameobjects.png)
+2. `RegisterComponent*` メソッドによって `MonoBehaviour` をコンテナへ登録する。
+    - この場合、登録された `MonoBehaviour` へのインジェクションが行われると共に、他のオブジェクトからインジェクションされる側になることができます。
     - See [Register MonoBehaviour](../registering/register-monobehaviour)
-3. To inject into dynamically-generated `MonoBehaviour`s at runtime (e.g. from prefabs), use `IObjectResolver.Instantiate` instead of [`UnityEngine.Object.Instantiate`](https://docs.unity3d.com/ScriptReference/Object.Instantiate). (Factory patterns and object generation expressions can be registered.)
+3. 実行時に動的に生成される `MonoBehaviour` (e.g. Prefabを使用する場合など)は、[`UnityEngine.Object.Instantiate`](https://docs.unity3d.com/ScriptReference/Object.Instantiate) の 代わりに `IObjectResolver.Instantiate` を使用することで、インジェクトを実行しつつインスタンスを生成することができます。
+(ファクトリパターン、あるいはオブジェクト生成のラムダ式を登録する方法が提供されています)
     - See [Register Callbacks](../registering/register-callbacks)
     - See [Register Factory](../registering/register-factory)
 
-## Why doesn't VContainer automatically inject into all `MonoBehaviour`s?
+## あらゆる `MonoBehaviour` へ自動的にインジェクトが行われないのはなぜ ?
 
-- Unity doesn't provide a good way to listen for the creation of all `GameObject`s or `MonoBehaviour`s. Rather than having some cases that are automatically `Inject`ed and some that are not, we decided on explicit `Inject`ion that you can use to fit your own needs.
-- We do not recommend excecuting `Inject` directly on `MonoBehaviour`s; instead, use `InjectGameObject` on the owning `GameObject`.
-  - This is because the purpose of VContainer and DI is inversion of control of MonoBehaviour.
-  - If a `MonoBehaviour` needs an explicit `Inject` call, you risk losing the advantages of Unity's prefab portability. 
-
-
-:::tip Recommendation
-`MonoBehaviour` **への** インジェクションは必要な場合のみに留めておくことをおすすめします。
-
-`GameObject` や `MonoBehaviour` は、ほぼ完全な形でシーンやPrefabへシリアライズして保存しておけるという利点があります。DIを行わなければ動作しないMonoBehaviourは、この強力なポータビリティを破壊してしまう面があります。
-
-また、ドメインロジックとプレゼンテーションがうまく分離されている場合、`MonoBehaviour` の典型的な役割は主にViewコンポーネントということになります。
-Viewコンポーネントはしばしばイベントや出来事を検知する起点になりますが、MonoBehaviourが直接的に外部のオブジェクトを参照して機能を呼び出すよりも、自身で検知したイベントを外部へ通知するなどして 「参照される側」でいる方がより柔軟性は高く、役割分担が自然になります。
-
-もちろん、Viewコンポーネントが動作するには、画面に表示したいデータ/状態を知る必要がありますが、実行時にめまぐるしく変化するデータは、`[Inject]` による注入の対象とせず、単なる引数や「値」として扱うことが適しています。
-:::
+- Unityでは、全ての `GameObject` や `MonoBehaviour` の生成時に確実に何かの処理を挟む良い方法がありません。そのため、暗黙のうちに自動的にインジェクトされるケース/そうでないケースが混在するよりも、必要に応じて明示するスタイルをとっています。
+- `MonoBehaviour` へロジックへの参照をインジェクトするよりは、`MonoBehaviour` を参照をインジェクト **される側** とすることをどちらかというと推奨しています。
+    -`MonoBehaviour` はコードをなんでも書けるC#クラスであると同時に、実行時に動的な生成/破棄が発生します。動的な寿命のオブジェクトへのインジェクションは参照の管理が複雑です。このもっとも簡単な解決策はそれをやらないことです。
+    - VContainerやDIの目的のひとつは、オブジェクト同士の所有関係を自由に構築し、MonoBehaviourのような末端ではない場所へ制御を反転(IoC) することにもあります。
+        - Viewコンポーネントはしばしばイベントや出来事を検知する起点になりますが、自身で検知したイベントを所有権を持つ外部へ通知するスタイルが可能です。
+    - `Inject` が実行されなければ動作しない `MonoBehaviour` は、UnityのPrefabの強力なポータビリティを損なってしまう面があります。
+    - もちろん、Viewコンポーネントが動作するには、画面に表示したいデータ/状態を知る必要がありますが、実行時にめまぐるしく変化するデータは、`[Inject]` による注入の対象とせず、単なる「値」として引数などで扱うことが適しています。

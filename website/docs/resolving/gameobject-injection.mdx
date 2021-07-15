@@ -22,5 +22,9 @@ Note that the presence of the `[Inject]` attribute on a `MonoBehaviour`'s method
 
 - Unity doesn't provide a good way to listen for the creation of all `GameObject`s or `MonoBehaviour`s. Rather than having some cases that are automatically `Inject`ed and some that are not, we decided on explicit `Inject`ion that you can use to fit your own needs.
 - We do not recommend excecuting `Inject` directly on `MonoBehaviour`s; instead, use `InjectGameObject` on the owning `GameObject`.
+  - `MonoBehaviour` is a C# class that allows you to write code for anything, also, it is dynamically created/destroyed at runtime. Injection into an object with a dynamic lifetime complicates reference management. The simplest solution to this is to not do it.
   - This is because the purpose of VContainer and DI is inversion of control of MonoBehaviour.
-  - If a `MonoBehaviour` needs an explicit `Inject` call, you risk losing the advantages of Unity's prefab portability. 
+      - View component is often the starting point for detecting events and happenings, but it can also be styled to notify the outside world that it has ownership of the events it detects.
+  - If a `MonoBehaviour` needs an explicit `Inject` call, you risk losing the advantages of Unity's prefab portability.
+  - Of course, in order for the View component to work, it needs to know the data/state to be displayed on the screen, but data that changes rapidly at runtime is not subject to injection by `[Inject]`, and is better handled as mere "values" by arguments.
+
