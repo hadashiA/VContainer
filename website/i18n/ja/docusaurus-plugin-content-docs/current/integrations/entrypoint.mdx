@@ -2,19 +2,15 @@
 title: Plain C# Entry point
 ---
 
-VContainerを使うと、素のC#オブジェクトをアプリケーションの処理の起点にすることができます。
 VContainer allows plain C# to be the starting point for application processing.
-
-これを `MonoBehaviour` の代わりに使用することで、制御フローのみをUnityの色々な機能とは分離することができます。
-
-以下は簡単な例です:
+Using it instead of MonoBehaviour, which has a lot of features, can help you build a simple control flow.
 
 ```csharp
 clas FooController : IStartable
 {
     void IStartable.Start()
     {
-        // イベント監視やルーチンなどを開始...
+        // Do something ...
     }
 }
 ```
@@ -23,9 +19,7 @@ clas FooController : IStartable
 builder.RegisterEntryPoint<FooController>();
 ```
 
-:::tip
 See [register](../registering/register-type#register-lifecycle-marker-interfaces)
-:::
 
 VContainer does this with its own PlayerLoopSystem.
 
@@ -38,8 +32,8 @@ Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: 
 
 | VContaienr entry point                | Timing |
 |:--------------------------------------|:----------------------------------|
-| `IInitializable.Initialize()`         | Early `PlayerLoop.Initialization` |
-| `IPostInitializable.PostInitialize()` | Late `PlayerLoop.Initialization`  |
+| `IInitializable.Initialize()`         | Immediately after building the container |
+| `IPostInitializable.PostInitialize()` | Late `IInitializable.Initialize()`  |
 | `IStartable.Start()`                  | Nearly `MonoBehaviour.Start()`    |
 | `IPostStartable.PostStart()`          | After `MonoBehaviour.Start()`     |
 | `IFixedTickable.FixedTick()`          | Nearly `MonoBehaviour.FixedUpdate()` |

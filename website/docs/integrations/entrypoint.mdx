@@ -32,8 +32,8 @@ Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: 
 
 | VContaienr entry point                | Timing |
 |:--------------------------------------|:----------------------------------|
-| `IInitializable.Initialize()`         | Early `PlayerLoop.Initialization` |
-| `IPostInitializable.PostInitialize()` | Late `PlayerLoop.Initialization`  |
+| `IInitializable.Initialize()`         | Immediately after building the container |
+| `IPostInitializable.PostInitialize()` | Late `IInitializable.Initialize()`  |
 | `IStartable.Start()`                  | Nearly `MonoBehaviour.Start()`    |
 | `IPostStartable.PostStart()`          | After `MonoBehaviour.Start()`     |
 | `IFixedTickable.FixedTick()`          | Nearly `MonoBehaviour.FixedUpdate()` |
