@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 #if VCONTAINER_UNITASK_INTEGRATION
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -8,76 +7,6 @@ using Cysharp.Threading.Tasks;
 
 namespace VContainer.Unity
 {
-    sealed class InitializationLoopItem : IPlayerLoopItem, IDisposable
-    {
-        readonly IEnumerable<IInitializable> entries;
-        readonly EntryPointExceptionHandler exceptionHandler;
-        bool disposed;
-
-        public InitializationLoopItem(
-            IEnumerable<IInitializable> entries,
-            EntryPointExceptionHandler exceptionHandler)
-        {
-            this.entries = entries;
-            this.exceptionHandler = exceptionHandler;
-        }
-
-        public bool MoveNext()
-        {
-            if (disposed) return false;
-            foreach (var x in entries)
-            {
-                try
-                {
-                    x.Initialize();
-                }
-                catch (Exception ex)
-                {
-                    if (exceptionHandler == null) throw;
-                    exceptionHandler.Publish(ex);
-                }
-            }
-            return false;
-        }
-
-        public void Dispose() => disposed = true;
-    }
-
-    sealed class PostInitializationLoopItem : IPlayerLoopItem, IDisposable
-    {
-        readonly IEnumerable<IPostInitializable> entries;
-        readonly EntryPointExceptionHandler exceptionHandler;
-        bool disposed;
-
-        public PostInitializationLoopItem(
-            IEnumerable<IPostInitializable> entries,
-            EntryPointExceptionHandler exceptionHandler)
-        {
-            this.entries = entries;
-            this.exceptionHandler = exceptionHandler;
-        }
-
-        public bool MoveNext()
-        {
-            if (disposed) return false;
-            foreach (var x in entries)
-            {
-                try
-                {
-                    x.PostInitialize();
-                }
-                catch (Exception ex)
-                {
-                    if (exceptionHandler == null) throw;
-                    exceptionHandler.Publish(ex);
-                }
-            }
-            return false;
-        }
-
-        public void Dispose() => disposed = true;
-    }
-
     sealed class StartableLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IStartable> entries;
