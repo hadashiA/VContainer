@@ -125,7 +125,7 @@ namespace VContainer
                 }
                 scope = scope.Parent;
             }
-            throw new VContainerException(type, $"No such registration of type: {type.FullName}");
+            throw new VContainerException(type, $"No such registration of type: {type}");
         }
     }
 
@@ -153,7 +153,7 @@ namespace VContainer
             {
                 return Resolve(registration);
             }
-            throw new VContainerException(type, $"No such registration of type: {type.FullName}");
+            throw new VContainerException(type, $"No such registration of type: {type}");
         }
 
         public object Resolve(IRegistration registration)

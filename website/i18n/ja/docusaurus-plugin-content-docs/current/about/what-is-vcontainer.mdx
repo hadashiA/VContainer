@@ -1,0 +1,257 @@
+---
+sidebar_label: VContainer とは
+title: About
+description: VContainer - the fastest DI (Dependency Injection) for Unity Game Engine
+slug: /
+hide_table_of_contents: false
+hide_title: true
+---
+
+import {BenchmarkGraph} from "../../../../../src/components/BenchmarkGraph"
+import {GCAllocGraph} from "../../../../../src/components/GCAllocGraph"
+
+# VContainer
+
+VContainerは Unity(ゲームエンジン)上で動作する高速なDIフレームワークです。(DI = Dependency Injection のこと。)
+
+"V" は、Unity の頭文字 "U" を 鉛筆削りで鋭く削ってスリムにした形状をイメージしています。
+
+- **高速なResolve:** Zenjectとの比較でおよそ [5-10倍の性能](#performance) 。
+- **GCにやさしい:** オブジェクト解決時 **ゼロアロケーション** 。(生成したインスタンス自身を除く)
+- **コンパクトなサイズ:** internal 型や .callvirt 命令とかも少ない。ビルドサイズにやさしい。
+- **過不足のない機能:** シンプルで透明性のあるAPI。過度に複雑で理解し難い設定を避けます。
+- **イミュータブルなコンテナ:** 一度コンテナをつくったら遅い処理がほとんどない。スレッドセーフ。
+
+#### 主な機能 {#features}
+
+- [コンストラクタ インジェクション](/resolving/constructor-injection) / [メソッド インジェクション](/resolving/method-injection) / [プロパティ & フィールド インジェクション](/resolving/property-field-injection)
+- [PlayerLoopSystem上への 独自C#型のスケジュール](/integrations/entrypoint)
+- [柔軟なスコープ生成](/scoping/lifetime-overview)
+- [ILコード生成による最適化](/optimization/codegen)
+- [UniTask連携](/integrations/unitask)
+- [ECS連携](/integrations/ecs) *beta*
+
+## DI + Inversion of Control for Unity
+
+![image](assets/vcontainer@2x.png)
+
+通常、Unityは `MonoBehaviour` を継承したクラスのみを処理の起点にできますが、VContainerを用いることでオブジェクト同士の参照関係/所有関係を自由に構築したり、純粋なC# クラスのエントリポイントをつくることができます。これはUnityのコンポーネントに依存する部分・見た目の部分と、その他純粋なロジックを分離する設計の手助けになります。
+
+このような制御の反転はIoC(Inversion of Control) などと呼ばれていて、DIコンテナの設計上の利点のひとつです。
+
+- くわしくは:
+  - [DIって何?](/about/what-is-di)
+- 合わせて読みたい:
+  - [Unity専用最速DIコンテナVContainer と、UnityにおけるDIの勘所 - hadashiA](https://scrapbox.io/hadashiA/Unity%E5%B0%82%E7%94%A8%E6%9C%80%E9%80%9FDI%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8AVContainer_%E3%81%A8%E3%80%81Unity%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8BDI%E3%81%AE%E5%8B%98%E6%89%80)
+  - [Manning | Dependency Injection in .NET](https://www.manning.com/books/dependency-injection-in-dot-net)
+  - [Lightweight IoC Container for Unity - Seba's Lab](https://www.sebaslab.com/ioc-container-unity-part-1/)
+
+## パフォーマンス {#performance}
+
+### Benchmark result for 10,000 iterations for each test case (Unity 2019.x / IL2CPP Standalone macOS)
+
+<BenchmarkGraph height={260} />
+
+- デフォルトでは、VContainerやZenjectはDIのために実行時のリフレクションを使います。
+- "VContainer (CodeGen)" は コンパイル時 IL コード生成による高速化モード時の性能です。
+
+### GC Alloc result in the Resolve Complex test case (Unity Editor profiled)
+
+<GCAllocGraph height={260} />
+
+## 基本の使い方 {#basic-usage}
+
+VContainerを使うには、最初にスコープを表現するコンポーネントを作成します。設定をC#コードで記述することで、自動的にオブジェクト同士の参照が組み立てられます。
+
+```csharp
+public class GameLifetimeScope : LifetimeScope
+{
+    public override void Configure(IContainerBuilder builder)
+    {
+        builder.RegisterEntryPoint<ActorPresenter>();
+
+        builder.Register<CharacterService>(Lifetime.Scoped);
+        builder.Register<IRouteSearch, AStarRouteSearch>(Lifetime.Singleton);
+
+        builder.RegisterComponentInHierarchy<ActorsView>();
+    }
+}
+```
+
+クラス定義の例)
+
+```csharp
+public interface IRouteSearch
+{
+    /* ... */
+}
+
+public class AStarRouteSearch : IRouteSearch
+{
+    /* ... */
+}
+
+public class CharacterService
+{
+    readonly IRouteSearch routeSearch;
+
+    public CharacterService(IRouteSearch routeSearch)
+    {
+        this.routeSearch = routeSearch;
+    }
+}
+```
+
+```csharp
+public class ActorsView : MonoBehaviour
+{
+    // ...
+}
+```
+
+
+```csharp
+public class ActorPresenter : IStartable
+{
+    readonly CharacterService service;
+    readonly ActorsView actorsView;
+
+    public ActorPresenter(
+        CharacterService service,
+        ActorsView actorsView)
+    {
+        this.service = service;
+        this.actorsView = actorsView;
+    }
+
+    void IStartable.Start()
+    {
+        // VContainerのPlayerLoopSystemが`Start`を呼び出します。
+    }
+}
+```
+
+- この例では、 `CharacterService` の `routeSearch` が自動的に `AStarRouteSearch` のインスタンスとして設定されます。
+- エントリポイントとして登録した `ActorPresenter` は,Unityのライフサイクル上にスケジュールされます。
+- くわしくは:
+  - [Getting Started](/getting-started/hello-world)
+
+### 動的なスコープ生成と非同期
+
+LifetimeScopeは、動的に子スコープを作ることができます。ゲームでよく発生する非同期のリソース読み込みに対応できます。
+
+```csharp
+public void LoadLevel()
+{
+    // ... 追加のアセットを実行時に読み込んだりする ...!
+
+    // 子スコープ作成の例
+    instantScope = currentScope.CreateChild();
+
+    // 特定のプレハブを使用した子スコープ作成の例
+    instantScope = currentScope.CreateChildFromPrefab(lifetimeScopePrefab);
+
+    // 追加でインスタンスを登録した子スコープ作成の例
+    instantScope = currentScope.CreateChildFromPrefab(
+        lifetimeScopePrefab,
+        builder =>
+        {
+            // Extra Registrations ...
+        });
+
+    instantScope = currentScope.CreateChild(builder =>
+    {
+        // ExtraRegistrations ...
+    });
+
+    instantScope = currentScope.CreateChild(extraInstaller);
+}
+
+public void UnloadLevel()
+{
+    // スコープの破棄
+    // コンテナが管理しているオブジェクトもDisposeされる
+    instantScope.Dispose();
+}
+```
+
+また、追加のUnityシーンをAdditiveで読み込む際に、LifetimeScopeの親子関係を作ることもできます。
+
+```csharp
+class SceneLoader
+{
+    readonly LifetimeScope currentScope;
+
+    public SceneLoader(LifetimeScope currentScope)
+    {
+        currentScope = currentScope; // Inject the LifetimeScope to which this class belongs
+    }
+
+    IEnumerator LoadSceneAsync()
+    {
+        // LifetimeScope generated in this block will be parented by `this.lifetimeScope`
+        using (LifetimeScope.EnqueueParent(currentScope))
+        {
+            // If this scene has a LifetimeScope, its parent will be `parent`.
+            var loading = SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+            while (!loading.isDone)
+            {
+                yield return null;
+            }
+        }
+    }
+
+    // UniTask example
+    async UniTask LoadSceneAsync()
+    {
+        using (LifetimeScope.EnqueueParent(parent))
+        {
+            await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
+        }
+    }
+}
+```
+
+```csharp
+// LifetimeScopes generated during this block will be additionally Registered.
+using (LifetimeScope.Enqueue(builder =>
+{
+    // Register for the next scene not yet loaded
+    builder.RegisterInstance(extraInstance);
+}))
+{
+    // Loading the scene..
+}
+```
+
+- くわしくは:
+  - [Scoping](/scoping/lifetime-overview)
+
+## UniTask
+
+`async UniTask` なメソッドを処理の起点にすることもできるようになっています。
+
+```csharp
+public class FooController : IAsyncStartable
+{
+    public async UniTask StartAsync(CancellationToken cancellation)
+    {
+        await LoadSomethingAsync(cancellation);
+        await ...
+        ...
+    }
+}
+```
+
+```csharp
+builder.RegisterEntryPoint<FooController>();
+```
+
+- くわしくは:
+  - [VContainer + UniTask](/integrations/unitask)
+
+## Getting Started
+
+- [Installation](../getting-started/installation)
+- [Hello World](../getting-started/hello-world)
+- [Comparing to Zenject](../comparing/comparing-to-zenject)

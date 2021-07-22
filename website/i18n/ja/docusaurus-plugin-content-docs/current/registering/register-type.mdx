@@ -1,0 +1,241 @@
+---
+title: Register Plain C# Type
+---
+
+There are various ways to use Register.
+Let's take the following complex type as an example.
+
+```csharp
+class ServiceA : IServiceA, IInputPort, IDisposable { /* ... */ }
+```
+
+## Register Concrete Type
+
+```cs
+builder.Register<ServiceA>(Lifetime.Singleton);
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(ServiceA serviceA) { /* ... */ }
+}
+```
+
+## Register as Interface
+
+```csharp
+builder.Register<IServiceA, ServiceA>();
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
+```
+
+## Register as multiple Interface
+
+```csharp
+builder.Register<ServiceA>(Lifetime.Singleton)
+    .As<IServiceA, IInputPort>();
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
+
+class ClassB
+{
+    public ClassB(IInputPort inputPort) { /* ... */ }
+}
+```
+
+## Register all implemented interfaces automatically
+
+```csharp
+builder.Register<ServiceA>(Lifetime.Singleton)
+    .AsImplementedInterfaces();
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
+
+class ClassB
+{
+    public ClassB(IInputPort inputPort) { /* ... */ }
+}
+```
+
+## Register all implemented interfaces and concrete type
+
+```csharp
+builder.Register<ServiceA>(Lifetime.Singleton)
+    .AsImplementedInterfaces()
+    .AsSelf();
+```
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(IServiceA serviceA) { /* ... */ }
+}
+
+class ClassB
+{
+    public ClassB(IInputPort inputPort) { /* ... */ }
+}
+
+class ClassB
+{
+    public ClassB(ServiceA serviceA) { /* ... */ }
+}
+```
+
+## Register lifecycle marker interfaces
+
+```csharp
+class GameController : IStartable, ITickable, IDisposable { /* ... */ }
+```
+
+```csharp
+builder.RegisterEntryPoint<GameController>();
+```
+
+:::note
+This is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
+:::
+
+If you want to customize the exception handling for entry points, you can register a callback with the following.
+
+```csharp
+builder.RegisterEntryPointExceptionHandler(ex =>
+{
+    UnityEngine.Debug.LogException(ex);
+    // Additional process ...
+});
+```
+
+If you have multiple EntryPoints, you have the option to use the following declaration as grouping.
+
+```csharp
+builder.UseEntryPoints(entryPoints =>
+{
+   entryPoints.Add<ScopedEntryPointA>();
+   entryPoints.Add<ScopedEntryPointB>();
+   entryPoints.Add<ScopedEntryPointC>().AsSelf();
+   entryPoints.OnException(ex => ...)
+});
+```
+
+This is the same as:
+
+```csharp
+builder.RegisterEntryPoint<ScopedEntryPointA>();
+builder.RegisterEntryPoint<ScopedEntryPointB>();
+builder.RegisterEntryPoint<ScopedEntryPointC>().AsSelf();
+builder.RegisterEntryPointExceptionHandler(ex => ...);
+```
+
+See the [Plain C# Entry point](../integrations/entrypoint) section for more information.
+
+## Register instance
+
+```csharp
+// ...
+var obj = new ServiceA();
+// ...
+
+builder.RegisterInstance(obj);
+```
+
+:::note
+`RegisterIntance` always has a `Singleton` lifetime, so it has no arguments.
+:::
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(ServiceA serviceA) { /* ... */ }
+}
+```
+
+:::note
+Instances registered with RegisterInstance are not managed by the container.
+
+- Dispose will not be executed automatically.
+- Method Injection will not be executed automatically
+
+If you want the container to manage the created instances, consider using the following instead
+
+- [Register(_ => instance, ...)](./register-using-delegate)
+- [RegisterComponent(...)](./register-monobehaviour)
+:::
+
+##  Register instance as interface
+
+Use `As*` declarations.
+
+```csharp
+builder.RegisterInstance<IInputPort>(serviceA);
+
+builder.RegisterInstance(serviceA)
+    .As<IServiceA, IInputPort>();
+
+builder.RegisterInstance()
+    .AsImplementedInterfaces();
+```
+
+## Register type-specific parameters
+
+If the types are not unique, but you have a dependency you want to inject at startup, you can use the following:
+
+```csharp
+builder.Register<SomeService>(Lifetime.Singleton)
+    .WithParameter<string>("http://example.com");
+```
+
+Or, you can name a paramter with a key.
+
+```csharp
+builder.Register<SomeService>(Lifetime.Singleton)
+    .WithParameter("url", "http://example.com");
+```
+
+It can resolve like this:
+
+
+```csharp
+class SomeService
+{
+    public SomeService(string url) { /* ... */ }
+}
+```
+
+This Register only works when being injected into `SomeService`.
+
+```csharp
+class OtherClass
+{
+    // ! Error
+    public OtherClass(string hogehoge) { /* ... */ }
+}
+```

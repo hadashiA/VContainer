@@ -105,7 +105,7 @@ namespace VContainer.Internal
                 {
                     if (++annotatedConstructorCount > 1)
                     {
-                        throw new VContainerException(type, "Type found multiple [Inject] marked constructors, type:" + type.Name);
+                        throw new VContainerException(type, $"Type found multiple [Inject] marked constructors, type: {type.Name}");
                     }
                     injectConstructor = new InjectConstructorInfo(constructorInfo);
                 }
