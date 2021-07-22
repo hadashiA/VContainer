@@ -9,6 +9,7 @@ namespace VContainer.Unity
         public Type ImplementationType { get; }
         public IReadOnlyList<Type> InterfaceTypes { get; }
         public Lifetime Lifetime { get; }
+        public int ExecutionOrder { get; }
 
         readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> parameters;
@@ -20,6 +21,7 @@ namespace VContainer.Unity
             Lifetime lifetime,
             IReadOnlyList<Type> interfaceTypes,
             IReadOnlyList<IInjectParameter> parameters,
+            int executionOrder,
             IInjector injector,
             in ComponentDestination destination,
             string newGameObjectName = null)
@@ -27,6 +29,7 @@ namespace VContainer.Unity
             ImplementationType = implementationType;
             Lifetime = lifetime;
             InterfaceTypes = interfaceTypes;
+            ExecutionOrder = executionOrder;
 
             this.parameters = parameters;
             this.injector = injector;

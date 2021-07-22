@@ -70,6 +70,7 @@ namespace VContainer.Unity
                     ImplementationType,
                     InterfaceTypes,
                     Parameters,
+                    ExecutionOrder,
                     injector);
             }
             if (scene.IsValid())
@@ -90,6 +91,7 @@ namespace VContainer.Unity
                     Lifetime,
                     InterfaceTypes,
                     Parameters,
+                    ExecutionOrder,
                     injector,
                     destination);
             }
@@ -99,6 +101,7 @@ namespace VContainer.Unity
                 Lifetime,
                 InterfaceTypes,
                 Parameters,
+                ExecutionOrder,
                 injector,
                 destination,
                 gameObjectName);

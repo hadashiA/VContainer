@@ -1,4 +1,5 @@
 ﻿using System;
+using VContainer.Unity;
 
 namespace VContainer.Tests
 {
@@ -246,6 +247,52 @@ namespace VContainer.Tests
         public GenericsArgumentService(GenericsService<I2> genericsService)
         {
             GenericsService = genericsService;
+        }
+    }
+
+    abstract class TrackedLifecycleBase : IInitializable, IDisposable
+    {
+        private readonly Action _onInitialized;
+        private readonly Action _onDisposed;
+
+        protected TrackedLifecycleBase(Action onInitialized, Action onDisposed)
+        {
+            _onInitialized = onInitialized;
+            _onDisposed = onDisposed;
+        }
+
+        public void Initialize()
+        {
+            _onInitialized?.Invoke();
+        }
+
+        public void Dispose()
+        {
+            _onDisposed?.Invoke();
+        }
+    }
+
+    class EarlyInitializedService : TrackedLifecycleBase
+    {
+        public EarlyInitializedService(Action onInitialized, Action onDisposed) :
+            base(onInitialized, onDisposed)
+        {
+        }
+    }
+
+    class DefaultService : TrackedLifecycleBase
+    {
+        public DefaultService(Action onInitialized, Action onDisposed) :
+            base(onInitialized, onDisposed)
+        {
+        }
+    }
+
+    class LateInitializedService : TrackedLifecycleBase
+    {
+        public LateInitializedService(Action onInitialized, Action onDisposed) :
+            base(onInitialized, onDisposed)
+        {
         }
     }
 }

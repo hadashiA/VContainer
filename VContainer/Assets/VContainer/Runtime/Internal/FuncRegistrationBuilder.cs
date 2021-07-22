@@ -18,6 +18,7 @@ namespace VContainer.Internal
             implementationConfiguration,
             ImplementationType,
             Lifetime,
-            InterfaceTypes);
+            InterfaceTypes,
+            ExecutionOrder);
     }
 }

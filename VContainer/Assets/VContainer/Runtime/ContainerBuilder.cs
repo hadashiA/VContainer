@@ -112,6 +112,9 @@ namespace VContainer
                 TypeAnalyzer.CheckCircularDependency(x.ImplementationType);
             }
 #endif
+
+            Array.Sort(registrations, (r1, r2) => r1.ExecutionOrder.CompareTo(r2.ExecutionOrder));
+
             return registrations;
         }
 

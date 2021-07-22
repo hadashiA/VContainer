@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -383,6 +384,56 @@ namespace VContainer.Tests.Unity
             Assert.That(component.ServiceA, Is.InstanceOf<ServiceA>());
             Assert.That(component.StartCalled, Is.True);
             Assert.That(component.UpdateCalls, Is.GreaterThanOrEqualTo(1));
+        }
+
+        [UnityTest]
+        public IEnumerator ExecutionOrder()
+        {
+            var executionOrder = new List<Type>();
+            var disposalOrder = new List<Type>();
+            var builder = new ContainerBuilder();
+
+            static Action LogEvent<T>(ICollection<Type> list) => () => list.Add(typeof(T));
+
+            builder.RegisterEntryPoint<EarlyInitializedService>()
+                .WithParameter("onInitialized", LogEvent<EarlyInitializedService>(executionOrder))
+                .WithParameter("onDisposed", LogEvent<EarlyInitializedService>(disposalOrder))
+                .WithExecutionOrder(-5)
+                .AsSelf();
+
+            builder.RegisterEntryPoint<LateInitializedService>()
+                .WithParameter("onInitialized", LogEvent<EarlyInitializedService>(executionOrder))
+                .WithParameter("onDisposed", LogEvent<EarlyInitializedService>(disposalOrder))
+                .WithExecutionOrder(5)
+                .AsSelf();
+
+            builder.RegisterEntryPoint<DefaultService>()
+                .WithParameter("onInitialized", LogEvent<EarlyInitializedService>(executionOrder))
+                .WithParameter("onDisposed", LogEvent<EarlyInitializedService>(disposalOrder))
+                .AsSelf();
+            
+            var container = builder.Build();
+            var obj1 = container.Resolve<EarlyInitializedService>();
+            var obj2 = container.Resolve<DefaultService>();
+            var obj3 = container.Resolve<LateInitializedService>();
+
+            yield return new WaitForFixedUpdate();
+            
+            Assert.That(obj1, Is.Not.Null);
+            Assert.That(obj2, Is.Not.Null);
+            Assert.That(obj3, Is.Not.Null);
+
+            Assert.That(executionOrder.Count, Is.EqualTo(3));
+            Assert.That(executionOrder[0], Is.EqualTo(typeof(EarlyInitializedService)));
+            Assert.That(executionOrder[1], Is.EqualTo(typeof(DefaultService)));
+            Assert.That(executionOrder[2], Is.EqualTo(typeof(LateInitializedService)));
+
+            container.Dispose();
+
+            Assert.That(disposalOrder.Count, Is.EqualTo(3));
+            Assert.That(disposalOrder[0], Is.EqualTo(typeof(LateInitializedService)));
+            Assert.That(disposalOrder[1], Is.EqualTo(typeof(DefaultService)));
+            Assert.That(disposalOrder[2], Is.EqualTo(typeof(EarlyInitializedService)));
         }
     }
 }

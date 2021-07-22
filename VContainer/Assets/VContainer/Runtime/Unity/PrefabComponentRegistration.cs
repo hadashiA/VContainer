@@ -9,6 +9,7 @@ namespace VContainer.Unity
         public Type ImplementationType { get; }
         public IReadOnlyList<Type> InterfaceTypes { get; }
         public Lifetime Lifetime { get; }
+        public int ExecutionOrder { get; }
 
         readonly IReadOnlyList<IInjectParameter> parameters;
         readonly IInjector injector;
@@ -21,12 +22,14 @@ namespace VContainer.Unity
             Lifetime lifetime,
             IReadOnlyList<Type> interfaceTypes,
             IReadOnlyList<IInjectParameter> parameters,
+            int executionOrder,
             IInjector injector,
             in ComponentDestination destination)
         {
             ImplementationType = implementationType;
             InterfaceTypes = interfaceTypes;
             Lifetime = lifetime;
+            ExecutionOrder = executionOrder;
 
             this.parameters = parameters;
             this.injector = injector;

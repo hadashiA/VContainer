@@ -8,6 +8,7 @@ namespace VContainer.Internal
         public Type ImplementationType { get; }
         public IReadOnlyList<Type> InterfaceTypes { get; }
         public Lifetime Lifetime { get; }
+        public int ExecutionOrder { get; }
 
         readonly Func<IObjectResolver, object> implementationProvider;
 
@@ -15,11 +16,13 @@ namespace VContainer.Internal
             Func<IObjectResolver, object> implementationProvider,
             Type implementationType,
             Lifetime lifetime,
-            IReadOnlyList<Type> interfaceTypes)
+            IReadOnlyList<Type> interfaceTypes,
+            int executionOrder)
         {
             ImplementationType = implementationType;
             Lifetime = lifetime;
             InterfaceTypes = interfaceTypes;
+            ExecutionOrder = executionOrder;
 
             this.implementationProvider = implementationProvider;
         }

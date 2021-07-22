@@ -9,6 +9,7 @@ namespace VContainer.Internal
         public Type ImplementationType { get; }
         public IReadOnlyList<Type> InterfaceTypes { get; }
         public Lifetime Lifetime { get; }
+        public int ExecutionOrder { get; }
 
         readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> parameters;
@@ -18,11 +19,13 @@ namespace VContainer.Internal
             Lifetime lifetime,
             IReadOnlyList<Type> interfaceTypes,
             IReadOnlyList<IInjectParameter> parameters,
+            int executionOrder,
             IInjector injector)
         {
             ImplementationType = implementationType;
             InterfaceTypes = interfaceTypes;
             Lifetime = lifetime;
+            ExecutionOrder = executionOrder;
 
             this.injector = injector;
             this.parameters = parameters;
@@ -39,6 +42,7 @@ namespace VContainer.Internal
         public Type ImplementationType { get; }
         public IReadOnlyList<Type> InterfaceTypes => interfaceTypes;
         public Lifetime Lifetime => Lifetime.Transient; // Collection refernce is transient. Members can have each lifetimes.
+        public int ExecutionOrder => 0;
 
         readonly Type elementType;
 
@@ -105,6 +109,7 @@ namespace VContainer.Internal
         public Type ImplementationType => typeof(IObjectResolver);
         public IReadOnlyList<Type> InterfaceTypes => null;
         public Lifetime Lifetime => Lifetime.Transient;
+        public int ExecutionOrder => 0;
 
         public object SpawnInstance(IObjectResolver resolver) => resolver;
     }

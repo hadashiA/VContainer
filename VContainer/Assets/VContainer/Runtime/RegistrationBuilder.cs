@@ -11,6 +11,7 @@ namespace VContainer
 
         internal List<Type> InterfaceTypes;
         internal List<IInjectParameter> Parameters;
+        internal int ExecutionOrder;
 
         public RegistrationBuilder(Type implementationType, Lifetime lifetime)
         {
@@ -27,6 +28,7 @@ namespace VContainer
                 Lifetime,
                 InterfaceTypes,
                 Parameters,
+                ExecutionOrder,
                 injector);
         }
 
@@ -102,6 +104,12 @@ namespace VContainer
         public RegistrationBuilder WithParameter<TParam>(TParam value)
         {
             return WithParameter(typeof(TParam), value);
+        }
+
+        public RegistrationBuilder WithExecutionOrder(int executionOrder)
+        {
+            ExecutionOrder = executionOrder;
+            return this;
         }
 
         void AddInterfaceType(Type interfaceType)
