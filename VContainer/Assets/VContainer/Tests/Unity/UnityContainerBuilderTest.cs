@@ -402,14 +402,14 @@ namespace VContainer.Tests.Unity
                 .AsSelf();
 
             builder.RegisterEntryPoint<LateInitializedService>()
-                .WithParameter("onInitialized", LogEvent<EarlyInitializedService>(executionOrder))
-                .WithParameter("onDisposed", LogEvent<EarlyInitializedService>(disposalOrder))
+                .WithParameter("onInitialized", LogEvent<LateInitializedService>(executionOrder))
+                .WithParameter("onDisposed", LogEvent<LateInitializedService>(disposalOrder))
                 .WithExecutionOrder(5)
                 .AsSelf();
 
             builder.RegisterEntryPoint<DefaultService>()
-                .WithParameter("onInitialized", LogEvent<EarlyInitializedService>(executionOrder))
-                .WithParameter("onDisposed", LogEvent<EarlyInitializedService>(disposalOrder))
+                .WithParameter("onInitialized", LogEvent<DefaultService>(executionOrder))
+                .WithParameter("onDisposed", LogEvent<DefaultService>(disposalOrder))
                 .AsSelf();
             
             var container = builder.Build();
