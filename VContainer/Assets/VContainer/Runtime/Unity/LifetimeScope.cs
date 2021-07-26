@@ -130,7 +130,7 @@ namespace VContainer.Unity
                     Build();
                 }
             }
-            catch (VContainerParentTypeReferenceNotFound)
+            catch (VContainerParentTypeReferenceNotFound) when(!IsRoot)
             {
                 if (WaitingList.Contains(this))
                 {
@@ -151,6 +151,13 @@ namespace VContainer.Unity
         {
             DisposeCore();
             if (this != null) Destroy(gameObject);
+        }
+
+        public void DisposeCore()
+        {
+            Container?.Dispose();
+            Container = null;
+            CancelAwake(this);
         }
 
         public void Build()
@@ -265,9 +272,9 @@ namespace VContainer.Unity
                 return nextParent;
 
             // Find root from settings
-            if (VContainerSettings.Instance is VContainerSettings settings)
+            if (VContainerSettings.Instance != null)
             {
-                var rootLifetimeScope = settings.RootLifetimeScope;
+                var rootLifetimeScope = VContainerSettings.Instance.RootLifetimeScope;
                 if (rootLifetimeScope != null)
                 {
                     if (rootLifetimeScope.Container == null)
@@ -278,13 +285,6 @@ namespace VContainer.Unity
                 }
             }
             return null;
-        }
-
-        void DisposeCore()
-        {
-            Container?.Dispose();
-            Container = null;
-            CancelAwake(this);
         }
 
         void AutoInjectAll()
