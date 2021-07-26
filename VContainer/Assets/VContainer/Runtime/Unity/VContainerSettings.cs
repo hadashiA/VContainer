@@ -44,13 +44,30 @@ namespace VContainer.Unity
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void RuntimeInitialize()
         {
+            // For editor, we need to load the Preload asset manually.
             LoadInstanceFromPreloadAssets();
         }
 
         [UnityEditor.InitializeOnLoadMethod]
         static void EditorInitialize()
         {
-            LoadInstanceFromPreloadAssets();
+            // RootLifetimeScope must be disposed before it can be resumed.
+            UnityEditor.EditorApplication.playModeStateChanged += state =>
+            {
+                switch (state)
+                {
+                    case UnityEditor.PlayModeStateChange.ExitingPlayMode:
+                        if (Instance != null)
+                        {
+                            if (Instance.RootLifetimeScope != null)
+                            {
+                                Instance.RootLifetimeScope.DisposeCore();
+                            }
+                            Instance = null;
+                        }
+                        break;
+                }
+            };
         }
 #endif
 
