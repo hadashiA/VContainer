@@ -131,6 +131,37 @@ Using a lambda function for a `Func<>` registration is shorthand for a common ca
 
 # Registering factory methods
 
-Although the name "factory" suggests that a new object is constructed with each invocation, that's not a requirement.
+Factories can be registered as any delegate that can be converted to a `Func<>`, including methods. This way, all factories can be used as `Func<>`s no matter how complicated the underlying implementation is. Here's how you would do that.
 
-Object methods can be registered as factories
+Suppose we have this class...
+
+```csharp
+class FooFactory
+{
+    public FooFactory(DependencyA dependencyA)
+    {
+        this.dependencyA = dependencyA;
+    }
+
+    public Foo Create(int b) => new Foo(b, dependencyA);
+}
+```
+
+To use this factory as a `Func<>` without knowing or caring about the `FooFactory` class, this is what you can do.
+
+```csharp
+builder.Register<FooFactory>(Lifetime.Singleton);
+builder.RegisterFactory(container => container.Resolve<FooFactory>().Create, Lifetime.Singleton);
+
+// ...
+
+var factory = container.Resolve<Func<int, Foo>>(); // Dependency resolution occurs
+
+var foo1 = factory.Create(1);
+var foo2 = factory.Create(2);
+var foo3 = factory.Create(3);
+
+
+var originalFactoryObject = container.Resolve<FooFactory>(); // The factory object is there if you need it
+// If FooFactory implements IDisposable, it'll be called when the IObjectResolver is disposed.
+```
