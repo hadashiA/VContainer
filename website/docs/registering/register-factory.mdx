@@ -1,5 +1,7 @@
 ---
-title: Register Factory
+id: register-factory
+title: Registering Factories
+sidebar_label: Factories
 ---
 
 VContainer generally constructs registered dependencies the first time they're resolved (except for [registered instances](../register-type#register-instance)). If you need finer control over when a dependency is created, you can register and use a factory function.
@@ -75,7 +77,7 @@ class ClassA
 
 ## Register `Func<>` Factory that requires container dependencies and runtime parameters
 
-If your factory method *does* need other dependencies, you'll need to provide it with an `IObjectResolver`. You can do so by registering a *factory factory*, i.e. a `Func<>` that accepts an `IObjectResolver` and returns some other `Func<>`.
+If your factory method *does* need other dependencies, you'll need to provide it with an `IObjectResolver`. You can do so by registering a `Func<>` that accepts an `IObjectResolver` and returns the `Func<>` that you actually want to use.
 
 ```csharp
 builder.RegisterFactory<int, Foo>(container => // container is an IObjectResolver
@@ -85,12 +87,9 @@ builder.RegisterFactory<int, Foo>(container => // container is an IObjectResolve
 }, Lifetime.Scoped);
 ```
 
-This method required 2 params
+This version requires a [`Lifetime`](../scoping/lifetime-overview) that specifies how often the inner `Func<>` is generated, i.e. how often the outer `Func<>` is called.
 
-- `Func<>` : Receives Container and returns Factory.
-- `Lifetime` : Determines how often the Factory is generated. (that is, how often the outer Func is executed.)
-
-We can resolve like below:
+Factories with dependencies are resolved in exactly the same way, as shown below.
 
 ```csharp
 class ClassA
@@ -110,7 +109,7 @@ class ClassA
 }
 ```
 
-In this case, container.Instantiate etc. are also useful.
+You might find `IObjectResolver`'s various extension methods useful within a factory.
 
 ```csharp
 builder.RegisterFactory<CharacterType, CharacterActor>(container =>
@@ -123,10 +122,10 @@ builder.RegisterFactory<CharacterType, CharacterActor>(container =>
 }, Lifetime.Scoped);
 ```
 
-See [Use Container directory](../resolving/container-api) more information.
+See the [Container API page](../resolving/container-api) for more information.
 
 :::note
-Using a lambda function for a `Func<>` registration is shorthand for a common case. In complex scenarios, consider defining and registering your own factory class. In fact, you can register object methods as factories
+Using a lambda function for a `Func<>` registration is shorthand for a common case. In complex scenarios, consider defining and registering your own factory class.
 :::
 
 # Registering factory methods
@@ -147,21 +146,20 @@ class FooFactory
 }
 ```
 
-To use this factory as a `Func<>` without knowing or caring about the `FooFactory` class, this is what you can do.
+Here's how you can use `FooFactory` as a `Func<>` without knowing or caring about the full class.
 
 ```csharp
-builder.Register<FooFactory>(Lifetime.Singleton);
+builder.Register<FooFactory>(Lifetime.Singleton); // If the factory implements IDisposable, add ".As<IDisposable>()" at the end.
 builder.RegisterFactory(container => container.Resolve<FooFactory>().Create, Lifetime.Singleton);
 
 // ...
 
-var factory = container.Resolve<Func<int, Foo>>(); // Dependency resolution occurs
+var factory = container.Resolve<Func<int, Foo>>();
 
 var foo1 = factory.Create(1);
 var foo2 = factory.Create(2);
 var foo3 = factory.Create(3);
 
-
-var originalFactoryObject = container.Resolve<FooFactory>(); // The factory object is there if you need it
+var originalFactoryObject = container.Resolve<FooFactory>(); // The factory object is there if you need it.
 // If FooFactory implements IDisposable, it'll be called when the IObjectResolver is disposed.
 ```
