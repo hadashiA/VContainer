@@ -43,7 +43,7 @@ var foo3 = factory.Create(3); // No resolution needed here
 
 Although it's useful to create a factory class as above, simple factories can be registered as [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/lambda-expressions) as well.
 
-:::warning
+:::caution
 VContainer does not automatically manage the lifetime of objects returned by factories. If your factory returns disposable objects, you will need to clean them up yourself. This is an ideal case for a factory class, because the factory itself will be managed by VContainer and will therefore be cleaned up if it implements [`IDisposable`](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable).
 :::
 
