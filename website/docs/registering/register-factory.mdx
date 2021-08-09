@@ -2,10 +2,16 @@
 title: Register Factory
 ---
 
-VContainer generally constructs registered dependencies the first time they're resolved (with the exception of [registered instances](../register-type#register-instance)). If you need finer control over when a dependency is created, you can register and use a factory function.
+VContainer generally constructs registered dependencies the first time they're resolved (except for [registered instances](../register-type#register-instance)). If you need finer control over when a dependency is created, you can register and use a factory function.
 
-In the following example, if you create a factory like the following, dependency resolution will happen only once. Dependency resolution will not occur during instance creation.
-VContainer allows to register a `Func<>` delegate for the creation of an instance. This is especially useful in scenarios where the instance is created at any time during execution, or multiple instances are created at any time.
+Factory functions are [`Func<>`](https://docs.microsoft.com/en-us/dotnet/api/system.func-1) delegates that are resolved like any other dependency. They can be used to create one or more other dependencies at any time.
+
+:::note
+Despite what the name "factory" might suggest, factories can return existing objects instead of creating new ones. This can be useful for mapping multiple dependencies of the same type to different keys, such as a unique controller service for each player in a local multiplayer game.
+:::
+
+In the following example, dependency resolution will happen only once. Dependency resolution will not occur in this particular `Create()` method (that's what the constructor is for), although you can explicitly use the [`IObjectResolver` API](../resolving/container-api) within a factory if you'd like.
+
 
 ```csharp
 class FooFactory
@@ -15,31 +21,39 @@ class FooFactory
         this.dependencyA = dependencyA;
     }
 
-    public Foo Create() => new Foo(dependencyA);
+    public Foo Create(int b) => new Foo(b, dependencyA);
 }
 ```
 
 ```csharp
-var factory = new FooFactory(dependencyA); // Resolve required
+builder.Register<FooFactory>(Lifetime.Singleton); // Registered
 
 // ...
 
-var foo1 = factory.Create(); // No Resolve
-var foo2 = factory.Create(); // No Resolve
-var foo3 = factory.Create(); // No Resolve
+var factory = container.Resolve<FooFactory>(); // Dependency resolution occurs
+
+// ...
+
+var foo1 = factory.Create(1); // No resolution needed here
+var foo2 = factory.Create(2); // No resolution needed here
+var foo3 = factory.Create(3); // No resolution needed here
 ```
 
-It is useful to create your own Factory class like the one above.
-If your Facotry class is simple enough, you can also use the `Func<>` injection feature of VContainer.
+Although it's useful to create a factory class as above, simple factories can be registered as [lambda expressions](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/lambda-expressions) as well.
 
+:::warning
+VContainer does not automatically manage the lifetime of objects returned by factories. If your factory returns disposable objects, you will need to clean them up yourself. This is an ideal case for a factory class, because the factory itself will be managed by VContainer and will therefore be cleaned up if it implements [`IDisposable`](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable).
+:::
 
 ## Register `Func<>` Factory that requires only runtime parameters
+
+If your factory doesn't need other dependencies, you can register it like so:
 
 ```csharp
 builder.RegisterFactory<int, Foo>(x => new Foo(x));
 ```
 
-We can resolve like below:
+Here's how you use it:
 
 ```csharp
 class ClassA
@@ -61,8 +75,10 @@ class ClassA
 
 ## Register `Func<>` Factory that requires container dependencies and runtime parameters
 
+If your factory method *does* need other dependencies, you'll need to provide it with an `IObjectResolver`. You can do so by registering a *factory factory*, i.e. a `Func<>` that accepts an `IObjectResolver` and returns some other `Func<>`.
+
 ```csharp
-builder.RegisterFactory<int, Foo>(container =>
+builder.RegisterFactory<int, Foo>(container => // container is an IObjectResolver
 {
     var dependency = container.Resolve<Dependency>(); // Resolve per scope
     return x => new Foo(x, dependency); // Execute per factory invocation
@@ -113,7 +129,7 @@ See [Use Container directory](../resolving/container-api) more information.
 Using a lambda function for a `Func<>` registration is shorthand for a common case. In complex scenarios, consider defining and registering your own factory class. In fact, you can register object methods as factories
 :::
 
-# Stateful Factories
+# Registering factory methods
 
 Although the name "factory" suggests that a new object is constructed with each invocation, that's not a requirement.
 
