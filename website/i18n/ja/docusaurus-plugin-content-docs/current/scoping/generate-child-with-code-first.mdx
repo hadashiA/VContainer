@@ -1,0 +1,67 @@
+---
+title: 子スコープの生成(コードファースト)
+---
+
+Child can also be generated from your C# code.
+
+```csharp
+class LevelLoader
+{
+    readonly LifetimeScope currentScope;
+
+    LifetimeScope instantScope;
+
+    public LevelLoader(LifetimeScope lifetimeScope)
+    {
+        currentScope = lifetimeScope;
+    }
+
+    public void Load()
+    {
+        // ... Loading some assets with any async way you like
+        //
+        // await Addressables.LoadAssetAsync...
+        //
+
+        // Create a child scope for the container that contains this LevelLoader instance.
+        instantScope = currentScope.CreateChild();
+
+        // Create with LifetimeScope prefab
+        instantScope = currentScope.CreateChildFromPrefab(
+            lifetimeScopePrefab);
+
+        // Create with LifetimeScope prefab and extra registrations
+        instantScope = currentScope.CreateChildFromPrefab(
+            lifetimeScopePrefab, builder =>
+            {
+                builder.RegisterInstance(someExtraAsset);
+                builder.RegisterEntryPoint<ExtraEntryPoint>();
+                // ...
+            });
+
+        // Create a child scope with extra registrations
+        instantScope = currentScope.CreateChild(builder =>
+        {
+            // ...
+        });
+
+        // Create a child scope with extra registrations via `IInstaller`
+        instantScope = currentScope.CreateChild(extraInstaller);
+
+
+        // The additionally registered entry point runs immediately after the scope is created...
+
+        // Or you can use scoped instance directly.
+        var foo = instantScope.Container.Resolve<Foo>();
+    }
+
+    public void Unload()
+    {
+        // Note that the scope implicitly create `LifetimeScope`.
+        // Use `Dispose` to safely destroying the scope.
+        instantScope.Dispose();
+
+        // ... Unloading some assets
+    }
+}
+```

@@ -1,0 +1,63 @@
+---
+title: VContainer + UniRx
+sidebar_label: UniRx
+---
+
+[UniRx](https://github.com/neuecc/UniRx) is an Rx (Reactive Extension) library optimized for Unity.
+
+Here is an example of combining VContainer entry points with UniRx.
+
+```csharp
+public class FooController : IStartable, IDisposable
+{
+    readonly CompositeDisposable disposable = new CompositeDisposable;
+
+    void IStartable.Start()
+    {
+       fooObservable
+           .Subscribe(_ => /* Do something */)
+           .AddTo(disposable)
+    }
+
+    void IDisposable.Dispose() => disposable.Dispose();
+}
+```
+
+If you want to create a short hand like `AddTo(this)`, you can create an extension method like this:
+```csharp
+public class ControllerBase : IDisposable
+{
+    readonly CompositeDisposable disposable = new CompositeDisposable;
+
+    void IDisposable.Dispose() => disposable.Dispose();
+
+    public void AddDisposable(IDisposable item)
+    {
+        disposable.Add(item);
+    }
+}
+
+public static class DisposableExtensions
+{
+    public static T AddTo<T>(this T disposable, ControllerBase controller)
+        where T: IDisposable
+    {
+        controller.AddDisposable(disposable);
+        return disposable;
+    }
+}
+```
+
+This can be used as follows:
+
+```csharp
+public class FooController : ControllerBase, IStartable
+{
+    void IStartable.Start()
+    {
+        someObservable
+            .Subscribe(...)
+            .AddTo(this);
+    }
+}
+```

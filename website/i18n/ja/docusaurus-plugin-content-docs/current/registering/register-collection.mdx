@@ -1,0 +1,32 @@
+---
+title: Register Collection
+---
+
+VContainer supports automatically resolving particular types implicitly to support special relationships.
+
+Duplicate registered interfaces can be resolved together with `IEnumerable<T>` or `IReadOnlyList<T>`.
+
+```csharp
+builder.Register<IDisposable, A>(Lifetime.Scoped);
+builder.Register<IDisposable, B>(Lifetime.Scoped);
+```
+
+```csharp
+class ClassA
+{
+    public ClassA(IEnumerable<IDisposable> disposables) { /* ... */ }
+}
+```
+
+OR
+
+```csharp
+class ClassA
+{
+    public ClassA(IReadOnlyList<IDisposable> disposables) { /* ... */ }
+}
+```
+
+:::note
+This is mainly used by internal functions such as the `ITickable` marker, etc.
+:::

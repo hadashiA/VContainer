@@ -8,6 +8,10 @@ module.exports = {
   favicon: 'img/favicon.png',
   organizationName: 'hadashiA', // Usually your GitHub org/user name.
   projectName: 'VContainer', // Usually your repo name.
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'ja']
+  },
   themeConfig: {
     sidebarCollapsible: false,
     metadatas: [
@@ -57,6 +61,10 @@ module.exports = {
       // },
       items: [
         {
+          type: 'localeDropdown',
+          position: 'left',
+        },
+        {
           to: 'getting-started/installation',
           activeBasePath: 'none',
           label: 'Getting Started',
@@ -64,7 +72,7 @@ module.exports = {
         },
         {
           href: 'https://github.com/hadashiA/VContainer/releases',
-          label: 'v1.8.4',
+          label: 'v1.8.6',
           position: 'right',
         },
         {
@@ -74,38 +82,25 @@ module.exports = {
         },
       ],
     },
-    // footer: {
-    //   style: 'dark',
-    //   links: [
-    //     {
-    //       title: 'Docs',
-    //       items: [
-    //         {
-    //           label: 'Getting Started',
-    //           to: 'docs/getting-started',
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       title: 'Community',
-    //       items: [
-    //         {
-    //           label: 'Twitter',
-    //           href: 'https://twitter.com/hadashiA',
-    //         },
-    //       ],
-    //     },
-    //     {
-    //       title: 'More',
-    //       items: [
-    //         {
-    //           label: 'GitHub',
-    //           href: 'https://github.com/hadashiA/VContainer',
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // },
+    footer: {
+      copyright: `Copyright © ${new Date().getFullYear()} <a href="https://twitter.com/hadashiA">hadashiA</a>`,
+      // logo: {
+      //   alt: 'VContainer',
+      //   src: 'img/favicon.png',
+      //   href: 'https://github.com/hadashiA/VContainer',
+      // },
+      // links: [
+      //   {
+      //     title: 'Author',
+      //     items: [
+      //       {
+      //         label: '@hadashiA',
+      //         href: 'https://twitter.com/hadashiA',
+      //       },
+      //     ],
+      //   }
+      // ]
+    },
     algolia: {
       appId: process.env.ALGOLIA_APP_ID,
       apiKey: process.env.ALGOLIA_API_KEY,

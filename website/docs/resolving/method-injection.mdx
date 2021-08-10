@@ -3,9 +3,7 @@ id: method-injection
 title: Method Injection
 ---
 
-If constructor injection is not available, use method injection.
-
-Typically this is for MonoBehaviour.
+If you need to inject dependencies into a type but can't do so with constructors, consider using method injection instead. This is most useful for `MonoBehaviour`s but can be done with any class, including test cases within the [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest).
 
 ```csharp
 public class SomeBehaviour : MonoBehaviour
@@ -20,14 +18,6 @@ public class SomeBehaviour : MonoBehaviour
 }
 ```
 
-:::tip Recommendation
-Consider whether injection to MonoBehaviour is necessary.
-In a code base where domain logic and presentation are well decoupled, MonoBehaviour should act as a View component.
+The `[Inject]`-annotated method can have any name and any accessibility level.
 
-In my opinion, View components should only be responsible for rendering and should be flexible.
-
-Of course, In order for the View component to work, it needs to pass state at runtime.
-But the "state" of an object and its dependency of functionality of other objects are different.
-
-It's enough to pass the state as arguments instead of `[Inject]`.
-:::
+For more information about managing `MonoBehaviour` and `GameObjects`, see [Injection into MonoBehaviour](gameobject-injection).
