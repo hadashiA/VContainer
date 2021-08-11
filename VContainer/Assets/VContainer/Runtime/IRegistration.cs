@@ -59,9 +59,9 @@ namespace VContainer
         /// and injects it with all dependencies it requires.
         /// </summary>
         /// <remarks>
-        /// When we say "spawn" an object, we <i>do</i> mean "spawn", regardless
-        /// of the value of <see cref="Lifetime"/>. Implementations of <see cref="IObjectResolver"/>
-        /// are responsible for managing the lifetime of returned objects.
+        /// Implementations of <see cref="IObjectResolver"/> are responsible for
+        /// managing the lifetime of returned objects. Therefore, the value of <see cref="Lifetime"/>
+        /// should not affect the logic of this method.
         /// </remarks>
         /// <param name="resolver">
         /// The container that will be used to inject the spawned object's dependencies.
