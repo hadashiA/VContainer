@@ -20,10 +20,56 @@ namespace VContainer
         bool TryGetRegistration(Type type, out IRegistration registration);
     }
 
+    /// <summary>
+    /// Describes the rules that determine when a dependency is constructed.
+    /// </summary>
     public enum Lifetime
     {
+        /// <summary>
+        /// <c>Transient</c> dependencies are instantiated each time they're resolved.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// We don't recommend registering an <see cref="IDisposable"/>-implementing
+        /// dependency as <c>Transient</c>. VContainer will <b>not</b> dispose of
+        /// disposable <c>Transient</c> dependencies. Although you can do so manually
+        /// in your own code, refactoring the dependency's <see cref="Lifetime"/>
+        /// may lead to non-obvious bugs.
+        /// </para>
+        /// </remarks>
         Transient,
+
+        /// <summary>
+        /// <c>Singleton</c> dependencies are instantiated exactly once within a
+        /// tree of <see cref="IObjectResolver"/>s.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// It is an error to register more than one <c>Singleton</c> dependency
+        /// with the same type. Doing so will throw a <see cref="VContainerException"/>.
+        /// </para>
+        /// <para>
+        /// When an <see cref="IObjectResolver"/> is disposed of, <c>Singleton</c>
+        /// dependencies that are <see cref="IDisposable"/> will be disposed of
+        /// as well, <i>except</i> for registered instances.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="ContainerBuilderExtensions.RegisterInstance{T}"/>
         Singleton,
+
+        /// <summary>
+        /// <c>Scoped</c> dependencies are instantiated once, but can be overridden in child scopes
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When an <see cref="IObjectResolver"/> is disposed of, <c>Scoped</c>
+        /// dependencies that are <see cref="IDisposable"/> will be disposed of as well.
+        /// </para>
+        /// <para>
+        /// If your game only has one <see cref="Unity.LifetimeScope"/>, then this
+        /// is equivalent to <see cref="Singleton"/>.
+        /// </para>
+        /// </remarks>
         Scoped
     }
 
