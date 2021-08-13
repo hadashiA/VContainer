@@ -5,11 +5,87 @@ using VContainer.Internal;
 
 namespace VContainer
 {
+    /// <summary>
+    /// A container from which dependencies can be retrieved.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This documentation uses "container" and "resolver" interchangeably.
+    /// </para>
+    /// <para>
+    /// When disposed of with <see cref="IDisposable.Dispose"/>, all registered
+    /// dependencies that implement <see cref="IDisposable"/> will be disposed
+    /// of except for registered instances and <see cref="Lifetime.Transient"/>
+    /// dependencies.
+    /// </para>
+    /// </remarks>
     public interface IObjectResolver : IDisposable
     {
+        /// <summary>
+        /// Retrieves the dependency mapped to the given <paramref name="type"/>.
+        /// </summary>
+        /// <remarks>
+        /// Most dependencies will be constructed the first time they're resolved.
+        /// The main exceptions are <see cref="Lifetime.Transient"/> dependencies
+        /// and registered instances.
+        /// </remarks>
+        /// <param name="type">
+        /// The type of the dependency to resolve. Note that multiple types can
+        /// map to the same dependency.
+        /// </param>
+        /// <exception cref="VContainerException">
+        /// No dependency is registered to <paramref name="type"/>.
+        /// </exception>
+        /// <returns>The dependency that is mapped to <paramref name="type"/>.</returns>
+        /// <seealso cref="IObjectResolverExtensions.Resolve{T}"/>
         object Resolve(Type type);
+
+        /// <summary>
+        /// Resolves a dependency from the given <paramref name="registration"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method is mostly used internally. Application code should prefer using
+        /// <see cref="IObjectResolverExtensions.Resolve{T}"/> instead.
+        /// </remarks>
+        /// <param name="registration">
+        /// The registration used to resolve the requested dependency. Doesn't technically
+        /// need to be a part of this <see cref="IObjectResolver"/>.
+        /// </param>
+        /// <returns>The dependency that <paramref name="registration"/> resolved.</returns>
+        /// <seealso cref="IObjectResolverExtensions.Resolve{T}"/>
+        /// <seealso cref="Resolve(System.Type)"/>
         object Resolve(IRegistration registration);
+
+        /// <summary>
+        /// Creates a child <see cref="IScopedObjectResolver"/> that can resolve this
+        /// container's dependencies or register its own.
+        /// </summary>
+        /// <param name="installation">
+        /// A delegate used to configure the newly-created container. Defaults to
+        /// <see langword="null"/>, which does not register any new dependencies.
+        /// </param>
+        /// <returns>
+        /// A new container that will use this one to resolve any dependencies that
+        /// it hasn't registered itself.
+        /// </returns>
+        /// <seealso cref="Lifetime"/>
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
+
+        /// <summary>
+        /// Provides an existing object with the dependencies it needs to function.
+        /// </summary>
+        /// <remarks>
+        /// This method will call all methods annotated with <see cref="InjectAttribute"/>.
+        /// It will also populate all properties and fields annotated with <see cref="InjectAttribute"/>.
+        /// </remarks>
+        /// <param name="instance">
+        /// The object that will be injected with its requested dependencies.
+        /// </param>
+        /// <exception cref="VContainerException">
+        /// A dependency that <paramref name="instance"/> requires couldn't be resolved.
+        /// </exception>
+        /// <seealso cref="InjectAttribute"/>
+        /// <seealso cref="Unity.ObjectResolverUnityExtensions"/>
         void Inject(object instance);
     }
 
