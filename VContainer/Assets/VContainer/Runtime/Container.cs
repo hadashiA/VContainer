@@ -134,7 +134,8 @@ namespace VContainer
         Singleton,
 
         /// <summary>
-        /// <c>Scoped</c> dependencies are instantiated once, but can be overridden in child scopes
+        /// <c>Scoped</c> dependencies are instantiated once, but can be overridden
+        /// in child scopes.
         /// </summary>
         /// <remarks>
         /// <para>
