@@ -1,0 +1,47 @@
+---
+title: Async Container Build
+---
+
+VContainer executes pre-processing such as reflection when building a container.
+To reduce main thread blocking time for your game:
+
+1. Set `false` to `LifetimeScope.autoRun`
+2. After scene loading, Call `LifetimeScope.Build` manually.
+
+For example:
+
+```csharp
+var nextScene = await LoadSceneAsync(...);
+
+var lifetimeScope = LifetimeScope.Find<MyLifetimeScope>(nextScene.Scene);
+
+// Your async solution here.
+await UniTask.Run(() => lifetimeScope.Build());
+```
+
+:warning: Unity dependent features such as `builder.RegisterComponentInHierarchy()` do not work on background threads.
+
+If this causes an error, use Awake instead.
+
+For example:
+
+```csharp
+class GameLifetimeScope : LifetimeScope
+{
+    Ground groundInScene;
+
+    protected override void Awake()
+    {
+        // Run main thread.
+        groundInScene = FindObjectOfType<Ground>();
+
+        base.Awake();
+    }
+
+    protected override void Configure(IContainerBuilder builder)
+    {
+        // This can run on a background thread now.
+        builder.RegisterInstance(groundInScene);
+    }
+}
+```

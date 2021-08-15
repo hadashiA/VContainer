@@ -1,0 +1,23 @@
+---
+id: method-injection
+title: メソッドインジェクション
+---
+
+コンストラクタが利用できない場合は、メソッドインジェクションが使用できます。
+
+Unityでの主な利用例は `MonoBehaviour` です。
+
+```csharp
+public class SomeBehaviour : MonoBehaviour
+{
+    float speed;
+
+    [Inject]
+    public void Construct(GameSettings settings)
+    {
+        speed = settings.speed;
+    }
+}
+```
+
+`MonoBehaviour` や `GameObject` の管理について詳しくは [MonoBehaviourへのインジェクション](gameobject-injection) を参照して下さい。

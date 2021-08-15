@@ -1,0 +1,67 @@
+---
+id: constructor-injection
+title: コンストラクタインジェクション
+---
+
+コンテナに登録されたクラスは、コンストラクタ定義が走査され、必要に応じて自動的にインスタンスが生成されます。
+
+:::note
+- コンストラクタの引数もコンテナに登録されている必要があります。
+- 依存関係を構築できない場合、コンテナのビルド時に例外 (`VContainerException`) が投げられます。
+:::
+
+以下は、コンストラクタを使ったDIの基本的なイディオムです。
+
+```csharp
+class ClassA
+{
+    readonly IServiceA serviceA;
+    readonly IServiceB serviceB;
+    readonly SomeUnityComponent component;
+
+    public ClassA(
+        IServiceA serviceA,
+        IServiceB serviceB,
+        SomeUnityComponent component)
+    {
+        this.serviceA = serviceA;
+        this.serviceB = serviceB;
+        this.component = component;
+    }
+}
+```
+
+:::caution
+IL2CPP環境下では、直接参照のないコンストラクタがビルドから削除されてしまう場合があります。
+これを防ぐには、`[Inject]` アトリビュートをつけて下さい。
+
+```csharp
+    [Inject]
+    public ClassA(
+        IServiceA serviceA,
+        IServiceB serviceB,
+        SomeUnityComponent component)
+    {
+        // ...
+    }
+```
+:::
+
+:::note
+コンストラクタが複数定義されている場合、 `[Inject]` アトリビュートがついたものが優先されます。
+:::
+
+:::tip Recommendation
+可能な場合は常にコンストラクタインジェクションを使おう。
+
+コンストラクタとreadonlyフィールドのイディオムには以下のような利点があります。
+
+- インスタンス化されたならば、その時点で依存オブジェクトが揃っていることがコンパイラレベルで保証されます。
+- クラスのコードが魔法のない何の変哲もないものになります。DIコンテナなしで手動でインスタンスをつくることも簡単です。(e.g. Unit testing)
+- 依存関係を知りたいならコンストラクタ定義だけを見れば良いため、見通しが良くなります。
+  - もしもコンストラクタの引数が多すぎるなら、クラスの責務が多すぎると判断することができそうです。
+:::
+
+## MonoBehaviour
+
+`MonoBehaviour` はコンストラクタを直接使うことができません。代わりに [Method Injection](/resolving/method-injection) が使えます。

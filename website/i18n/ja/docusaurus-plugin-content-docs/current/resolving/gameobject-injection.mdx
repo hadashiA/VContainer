@@ -1,0 +1,29 @@
+---
+id: gameobject-injection
+title: MonoBehaviourへのインジェクション
+sidebar_label: MonoBehaviour
+---
+
+`MonoBehaviour` は コンストラクタを直接呼び出すことは [できません](https://docs.unity3d.com/ScriptReference/MonoBehaviour.Awake)。
+代わりに[メソッドインジェクション](/resolving/method-injection)が利用できます。
+
+但し、`MonoBehaviour` のメソッドに `[Inject]` アトリビュートがあっても、それだけでメソッドが自動的に呼び出されるわけではありません。次の3つの方法のいずれかの設定が必要です。
+
+1. シーン上の特定の `MonoBehaviour` **への** インジェクションのみが必要な場合は、`LifetimeScope` のインスペクタからGameObjectを設定します。
+    - 指定された全ての`GameObject`（とそのヒエラルキ配下も含む）の`MonoBehaviour` は、`LifetimeScope` が初期化される際に自動的に`Inject` が実行されます。![](./assets/screenshot_auto_inject_gameobjects.png)
+2. `RegisterComponent*` メソッドによって `MonoBehaviour` をコンテナへ登録する。
+    - この場合、登録された `MonoBehaviour` へのインジェクションが行われると共に、他のオブジェクトからインジェクションされる側になることができます。
+    - See [Register MonoBehaviour](../registering/register-monobehaviour)
+3. 実行時に動的に生成される `MonoBehaviour` (e.g. Prefabを使用する場合など)は、[`UnityEngine.Object.Instantiate`](https://docs.unity3d.com/ScriptReference/Object.Instantiate) の 代わりに `IObjectResolver.Instantiate` を使用することで、インジェクトを実行しつつインスタンスを生成することができます。(ファクトリパターン、あるいはオブジェクト生成のラムダ式を登録する方法が提供されています)
+    - See [Register Callbacks](../registering/register-callbacks)
+    - See [Register Factory](../registering/register-factory)
+
+## あらゆる `MonoBehaviour` へ自動的にインジェクトが行われないのはなぜ ?
+
+- Unityでは、全ての `GameObject` や `MonoBehaviour` の生成時に確実に何かの処理を挟む良い方法がありません。そのため、暗黙のうちに自動的にインジェクトされるケース/そうでないケースが混在するよりも、必要に応じて明示するスタイルをとっています。
+- `MonoBehaviour` へロジックへの参照をインジェクトするよりは、`MonoBehaviour` を参照をインジェクト **される側** とすることをどちらかというと推奨しています。
+    - `MonoBehaviour` はコードをなんでも書けるC#クラスであると同時に、実行時の不特定のタイミングで生成/破棄が発生します。同じスコープ内での不安定な寿命のオブジェクトへのインジェクションは参照の管理がやや複雑になります。
+    - VContainerやDIの目的のひとつは、オブジェクト同士の所有関係を自由に構築し、MonoBehaviourのような末端ではない場所へ制御を反転(IoC) することにもあります。
+        - Viewコンポーネントはしばしばイベントや出来事を検知する起点になりますが、自身で検知したイベントを所有権を持つ外部へ通知するようにすると、常に参照される側でいられます。
+    - `Inject` が実行されなければ動作しない `MonoBehaviour` は、UnityのPrefabの強力なポータビリティを損なってしまう面があります。
+    - もちろん、Viewコンポーネントが動作するには、画面に表示したいデータ/状態を知る必要がありますが、実行時にめまぐるしく変化するデータは、`[Inject]` による注入の対象とせず、単なる「値」として引数などで扱うことが適しています。

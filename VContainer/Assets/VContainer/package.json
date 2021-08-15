@@ -1,11 +1,14 @@
 {
   "name": "jp.hadashikick.vcontainer",
   "displayName": "VContainer",
-  "version": "1.8.4",
+  "version": "1.8.6",
   "unity": "2018.4",
   "description": "The extra fast DI (Dependency Injection) for Unity",
   "keywords": ["DI", "Dependency Injection", "DI Container"],
   "license": "MIT",
+  "documentationUrl": "https://vcontainer.hadashikick.jp/",
+  "changelogUrl": "https://github.com/hadashiA/VContainer/releases",
+  "licensesUrl": "https://github.com/hadashiA/VContainer/blob/master/LICENSE",
   "dependencies": {
     "com.unity.nuget.mono-cecil": "1.10.1"
   }
