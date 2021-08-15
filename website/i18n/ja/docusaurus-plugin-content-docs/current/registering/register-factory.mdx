@@ -1,0 +1,115 @@
+---
+title: Register Factory
+---
+
+Typically, in a DI container, the Factory pattern can be used to stabilize the dependency resolution.
+
+For example, if you create a factory like the following, dependency resolution will happen only once. Dependency resolution will not occur during instance creation.
+VContainer allows to register a `Func<>` delegate for the creation of an instance. This is especially useful in scenarios where the instance is created at any time during execution, or multiple instances are created at any time.
+
+```csharp
+class FooFactory
+{
+    public FooFactory(DependencyA dependencyA)
+    {
+        this.dependencyA = dependencyA;
+    }
+
+    public Foo Create() => new Foo(dependencyA);
+}
+```
+
+```csharp
+var factory = new FooFactory(dependencyA); // Resolve required
+
+// ...
+
+var foo1 = factory.Create(); // No Resolve
+var foo2 = factory.Create(); // No Resolve
+var foo3 = factory.Create(); // No Resolve
+```
+
+It is useful to create your own Factory class like the one above.
+If your Facotry class is simple enough, you can also use the `Func<>` injection feature of VContainer.
+
+
+## Register `Func<>` Factory that requires only runtime parameters
+
+```csharp
+builder.RegisterFactory<int, Foo>(x => new Foo(x));
+```
+
+We can resolve like below:
+
+```csharp
+class ClassA
+{
+    readonly Func<int, Foo> factory;
+
+    public ClassA(Func<int, Foo> factory)
+    {
+        this.factory = factory;
+    }
+
+    public void DoSomething()
+    {
+        var foo = factory.Invoke(100);
+        // ...
+    }
+}
+```
+
+## Register `Func<>` Factory that requires container dependencies and runtime parameters
+
+```csharp
+builder.RegisterFactory<int, Foo>(container =>
+{
+    var dependency = container.Resolve<Dependency>(); // Resolve per scope
+    return x => new Foo(x, dependency); // Execute per factory invocation
+}, Lifetime.Scoped);
+```
+
+This method required 2 params
+
+- `Func<>` : Receives Container and returns Factory.
+- `Lifetime` : Determines how often the Factory is generated. (that is, how often the outer Func is executed.)
+
+We can resolve like below:
+
+```csharp
+class ClassA
+{
+    readonly Func<int, Foo> factory;
+
+    public ClassA(Func<int, Foo> factory)
+    {
+        this.factory = factory;
+    }
+
+    public void DoSomething()
+    {
+        var foo = factory.Invoke(100);
+        // ...
+    }
+}
+```
+
+In this case, container.Instantiate etc. are also useful.
+
+```csharp
+builder.RegisterFactory<CharacterType, CharacterActor>(container =>
+{
+    return characterType =>
+    {
+        var characterPrefab = ...
+        return container.Instantiate(characterPrefab, parentTransform);
+    }
+}, Lifetime.Scoped);
+```
+
+See [Use Container directory](../resolving/container-api) more information.
+
+:::note
+`Func <>` factory is like a short hand.
+In complex cases, consider defining and registering your own factory class。
+:::

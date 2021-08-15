@@ -1,0 +1,74 @@
+---
+title: VContainer + UniTask
+sidebar_label: UniTask
+---
+
+[UniTask](https://github.com/Cysharp/UniTask) is a library that brings fast and powerful [`async`](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/async)/[`await`](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/await) support to Unity. Its API is nearly identical to that of .NET's standard [Task-based asynchronous pattern](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap), but optimized for Unity's player loop. It also adds `async`/`await` support for Unity's built-in asynchronous operations such as [`UnityWebRequest`](https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest).
+
+If you have the `com.cysharp.unitask` package installed in your project, the following features will automatically be enabled.
+
+## `IAsyncStartable`
+
+Entry points can use the `IAsyncStartable` phase, which returns a `UniTask`.
+
+```csharp
+public class FooController : IAsyncStartable
+{
+    public async UniTask StartAsync(CancellationToken cancellation)
+    {
+        await LoadSomethingAsync(cancellation);
+        await ...
+        ...
+    }
+}
+```
+
+Once a class that implements `IAsyncStartable` is registered its `StartAsync` method will be executed automatically, similarly to `IStartable`.
+
+```csharp
+builder.RegisterEntryPoint<FooController>();
+```
+
+For more information about `RegisterEntryPoint`, see [here](../integrations/entrypoint).
+
+### `StartAsync()` timing
+
+Currently, the only `async` interface provided by VContainer is `IAsyncStartable`. If you need to execute `async` code in different `PlayerLoop` phases, UniTask itself provides ways to control the execution timing within the method.
+
+If you want to schedule the process at different times, you can use UniTask's `PlayerLoopTiming`.
+
+```csharp
+await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
+```
+
+Note that all `StartAsync` calls will be scheduled for simultaneous execution on the main thread (unless otherwise specified within each implementation), and future `PlayerLoop` phases will *not* wait for them to complete.
+
+See [UniTask's `PlayerLoop` documentation](https://github.com/Cysharp/UniTask#playerloop) for more information.
+
+### Exception Handling
+
+- [Unlike `IEnumerator`-backed coroutines](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/yield#exception-handling), `async` methods fully support `try`/`catch`/`finally` statements.
+- You can use the `UniTaskScheduler.UnobservedTaskException` event.
+- Alternatively, if you want to register a separate error handler for each LifetimeScope, use `builder.RegisterEntryPointExceptionHandler(ex => ..)`
+ 
+See the [Entry point](./entrypoint) section for more information.
+
+### `CancellationToken`
+
+`StartAsync` is provided with a [`CancellationToken`](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken) that is canceled when the `LifetimeScope` that registered it is destroyed.
+
+### Async Asset Loading
+
+UniTask offers the ability to load assets and scenes asynchronously. This is helpful when used with one of VContainer's `LifetimeScope.Enqueue*` methods.
+
+```csharp
+var extraAsset = await Addressables.LoadAssetAsync<ExtraAsset>(key);
+
+using (LifetimeScope.EnqueueParent(parentScope))
+using (LifetimeScope.Enqueue(builder => builder.RegisterInstance(extraAsset))
+{
+    await SceneManager.LoadSceneAsync("AdditiveScene");
+}
+```
+
+See the [Scoping](../scoping/generate-child-via-scene) section for more information.

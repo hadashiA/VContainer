@@ -32,19 +32,35 @@ namespace VContainer.Unity
             }
 
             var initializables = container.Resolve<IReadOnlyList<IInitializable>>();
-            if (initializables.Count > 0)
+            for (var i = 0; i < initializables.Count; i++)
             {
-                var loopItem = new InitializationLoopItem(initializables, exceptionHandler);
-                disposable.Add(loopItem);
-                PlayerLoopHelper.Dispatch(PlayerLoopTiming.Initialization, loopItem);
+                try
+                {
+                    initializables[i].Initialize();
+                }
+                catch (Exception ex)
+                {
+                    if (exceptionHandler != null)
+                        exceptionHandler.Publish(ex);
+                    else
+                        UnityEngine.Debug.LogException(ex);
+                }
             }
 
             var postInitializables = container.Resolve<IReadOnlyList<IPostInitializable>>();
-            if (postInitializables.Count > 0)
+            for (var i = 0; i < postInitializables.Count; i++)
             {
-                var loopItem = new PostInitializationLoopItem(postInitializables, exceptionHandler);
-                disposable.Add(loopItem);
-                PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostInitialization, loopItem);
+                try
+                {
+                    postInitializables[i].PostInitialize();
+                }
+                catch (Exception ex)
+                {
+                    if (exceptionHandler != null)
+                        exceptionHandler.Publish(ex);
+                    else
+                        UnityEngine.Debug.LogException(ex);
+                }
             }
 
             var startables = container.Resolve<IReadOnlyList<IStartable>>();
@@ -130,7 +146,7 @@ namespace VContainer.Unity
                 x.SortSystems();
             }
 #endif
-       }
+        }
 
         public void Dispose() => disposable.Dispose();
     }
