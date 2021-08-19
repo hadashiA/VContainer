@@ -4,6 +4,22 @@ using VContainer.Internal;
 
 namespace VContainer
 {
+    /// <summary>
+    /// A fluent interface for configuring the dependencies that will be managed
+    /// by an <see cref="IObjectResolver"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// You likely won't create these objects explicitly; instead you'll use instances
+    /// returned by <see cref="IContainerBuilder"/> and its extension methods.
+    /// </para>
+    /// <para>
+    /// Does not construct dependencies. That occurs later on when they're resolved
+    /// after the container is built.
+    /// </para>
+    /// </remarks>
+    /// <seealso cref="IContainerBuilder"/>
+    /// <seealso cref="ContainerBuilderExtensions"/>
     public class RegistrationBuilder
     {
         internal readonly Type ImplementationType;
@@ -30,12 +46,41 @@ namespace VContainer
                 injector);
         }
 
+        /// <remarks>
+        /// Despite the names of the type parameters, <typeparamref name="TInterface"/>
+        /// can be an <see langword="interface"/> or a base class (<see langword="abstract"/> or not).
+        /// </remarks>
+        /// <returns>Itself.</returns>
+        /// <exception cref="VContainerException">
+        /// The implementation type can't be assigned to <typeparamref name="TInterface"/>.
+        /// </exception>
+        /// <seealso cref="As(System.Type)"/>
         public RegistrationBuilder As<TInterface>()
             => As(typeof(TInterface));
 
+        /// <remarks>
+        /// Despite the names of the type parameters, they can be <see langword="interface"/>s
+        /// or base classes (<see langword="abstract"/> or not).
+        /// </remarks>
+        /// <returns>Itself.</returns>
+        /// <exception cref="VContainerException">
+        /// The implementation type can't be assigned to <typeparamref name="TInterface1"/>
+        /// or <typeparamref name="TInterface2"/>.
+        /// </exception>
+        /// <seealso cref="As(System.Type,System.Type)"/>
         public RegistrationBuilder As<TInterface1, TInterface2>()
             => As(typeof(TInterface1), typeof(TInterface2));
 
+        /// <remarks>
+        /// Despite the names of the type parameters, they can be <see langword="interface"/>s
+        /// or base classes (<see langword="abstract"/> or not).
+        /// </remarks>
+        /// <returns>Itself.</returns>
+        /// <exception cref="VContainerException">
+        /// The implementation type can't be assigned to <typeparamref name="TInterface1"/>,
+        /// <typeparamref name="TInterface2"/>, or <typeparamref name="TInterface3"/>.
+        /// </exception>
+        /// <seealso cref="As(System.Type,System.Type,System.Type)"/>
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3>()
             => As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
 
