@@ -10,6 +10,7 @@ namespace VContainer
     /// Most uses of <see cref="IObjectResolver"/> will be through extension methods
     /// such as these.
     /// </remarks>
+    /// <seealso cref="Unity.ObjectResolverUnityExtensions"/>
     public static class IObjectResolverExtensions
     {
         /// <summary>
