@@ -89,6 +89,12 @@ namespace VContainer
         void Inject(object instance);
     }
 
+    /// <summary>
+    /// A container from which dependencies can be retrieved.
+    /// </summary>
+    /// <remarks>
+    /// "container" and "resolver" are often used interchangeably.
+    /// </remarks>
     public interface IScopedObjectResolver : IObjectResolver
     {
         IObjectResolver Root { get; }
