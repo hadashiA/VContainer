@@ -75,8 +75,17 @@ namespace VContainer
         /// Provides an existing object with the dependencies it needs to function.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// This method will call all methods annotated with <see cref="InjectAttribute"/>.
         /// It will also populate all properties and fields annotated with <see cref="InjectAttribute"/>.
+        /// </para>
+        /// <para>
+        /// Although it is unlikely that you will need to inject the same object
+        /// multiple times, doing so will work as expected even if using a different
+        /// container as long as the registrations are valid; all <see cref="InjectAttribute"/>-annotated
+        /// methods will be called and properties/fields populated the same way
+        /// they were the first time.
+        /// </para>
         /// </remarks>
         /// <param name="instance">
         /// The object that will be injected with its requested dependencies.
