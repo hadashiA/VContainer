@@ -18,6 +18,12 @@ namespace VContainer
     /// of except for registered instances and <see cref="Lifetime.Transient"/>
     /// dependencies.
     /// </para>
+    /// <para>
+    /// Types must generally be registered with the interfaces you'll use to
+    /// resolve them, but <see cref="IDisposable"/> is an exception to the rule;
+    /// if an object implements it, VContainer will detect it and clean it up regardless
+    /// of how it's resolved.
+    /// </para>
     /// </remarks>
     public interface IObjectResolver : IDisposable
     {
