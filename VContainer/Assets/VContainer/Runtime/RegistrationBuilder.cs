@@ -28,12 +28,38 @@ namespace VContainer
         internal List<Type> InterfaceTypes;
         internal List<IInjectParameter> Parameters;
 
+        /// <summary>
+        /// Constructs the registration builder that will in turn be used to
+        /// construct a dependency registration.
+        /// </summary>
+        /// <remarks>
+        /// You will not likely need to use this constructor; instead you'll use instances
+        /// returned by <see cref="IContainerBuilder"/> and its extension methods.
+        /// </remarks>
+        /// <param name="implementationType">
+        /// The type of the dependency that will be constructed or registered. The
+        /// final registration might not necessarily be resolvable with this type,
+        /// depending on how this builder is configured.
+        /// </param>
+        /// <param name="lifetime">
+        /// The rules governing how and when this dependency will be instantiated
+        /// and cleaned up.
+        /// </param>
+        /// <seealso cref="IContainerBuilder.Register{T}"/>
+        /// <seealso cref="VContainer.Lifetime"/>
         public RegistrationBuilder(Type implementationType, Lifetime lifetime)
         {
             ImplementationType = implementationType;
             Lifetime = lifetime;
         }
 
+        /// <summary>
+        /// Builds the registration that will be used to resolve a dependency
+        /// when it's needed later.
+        /// </summary>
+        /// <returns>
+        /// A new <see cref="IRegistration"/> that will be used to populate an <see cref="IContainerBuilder"/>.
+        /// </returns>
         public virtual IRegistration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
