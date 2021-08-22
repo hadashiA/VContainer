@@ -72,11 +72,24 @@ namespace VContainer
                 injector);
         }
 
+        /// <summary>
+        /// Enables this dependency to be resolved as a <typeparamref name="TInterface"/>.
+        /// </summary>
         /// <remarks>
+        /// <para>
         /// Despite the names of the type parameters, <typeparamref name="TInterface"/>
         /// can be an <see langword="interface"/> or a base class (<see langword="abstract"/> or not).
+        /// </para>
+        /// <para>
+        /// If <typeparamref name="TInterface"/> is already registered, this method
+        /// has no effect.
+        /// </para>
         /// </remarks>
-        /// <returns>Itself.</returns>
+        /// <typeparam name="TInterface">
+        /// The type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class.
+        /// </typeparam>
+        /// <returns>Itself. Can be chained as a fluent interface.</returns>
         /// <exception cref="VContainerException">
         /// The implementation type can't be assigned to <typeparamref name="TInterface"/>.
         /// </exception>
@@ -84,11 +97,31 @@ namespace VContainer
         public RegistrationBuilder As<TInterface>()
             => As(typeof(TInterface));
 
+        /// <summary>
+        /// Enables this dependency to be resolved as a <typeparamref name="TInterface1"/>
+        /// or a <typeparamref name="TInterface2"/>.
+        /// </summary>
         /// <remarks>
+        /// <para>
+        /// Equivalent to <c>.As&lt;TInterface1&gt;().As&lt;TInterface2&gt;()</c>.
+        /// </para>
+        /// <para>
         /// Despite the names of the type parameters, they can be <see langword="interface"/>s
         /// or base classes (<see langword="abstract"/> or not).
+        /// </para>
+        /// <para>
+        /// Type parameters that are already registered will not be duplicated.
+        /// </para>
         /// </remarks>
-        /// <returns>Itself.</returns>
+        /// <typeparam name="TInterface1">
+        /// The first type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to <typeparamref name="TInterface2"/>.
+        /// </typeparam>
+        /// <typeparam name="TInterface2">
+        /// The second type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to <typeparamref name="TInterface1"/>.
+        /// </typeparam>
+        /// <returns>Itself. Can be chained as a fluent interface.</returns>
         /// <exception cref="VContainerException">
         /// The implementation type can't be assigned to <typeparamref name="TInterface1"/>
         /// or <typeparamref name="TInterface2"/>.
@@ -97,11 +130,35 @@ namespace VContainer
         public RegistrationBuilder As<TInterface1, TInterface2>()
             => As(typeof(TInterface1), typeof(TInterface2));
 
+        /// <summary>
+        /// Enables this dependency to be resolved as a <typeparamref name="TInterface1"/>,
+        /// a <typeparamref name="TInterface2"/>, or a <typeparamref name="TInterface3"/>.
+        /// </summary>
         /// <remarks>
+        /// <para>
+        /// Equivalent to <c>.As&lt;TInterface1&gt;().As&lt;TInterface2&gt;().As&lt;TInterface3&gt;()</c>.
+        /// </para>
+        /// <para>
         /// Despite the names of the type parameters, they can be <see langword="interface"/>s
         /// or base classes (<see langword="abstract"/> or not).
+        /// </para>
+        /// <para>
+        /// Type parameters that are already registered will not be duplicated.
+        /// </para>
         /// </remarks>
-        /// <returns>Itself.</returns>
+        /// <typeparam name="TInterface1">
+        /// The first type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to the other type parameters.
+        /// </typeparam>
+        /// <typeparam name="TInterface2">
+        /// The second type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to the other type parameters.
+        /// </typeparam>
+        /// <typeparam name="TInterface3">
+        /// The third type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to the other type parameters.
+        /// </typeparam>
+        /// <returns>Itself. Can be chained as a fluent interface.</returns>
         /// <exception cref="VContainerException">
         /// The implementation type can't be assigned to <typeparamref name="TInterface1"/>,
         /// <typeparamref name="TInterface2"/>, or <typeparamref name="TInterface3"/>.
@@ -110,6 +167,37 @@ namespace VContainer
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3>()
             => As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
 
+        /// <summary>
+        /// Enables this dependency to be resolved as a <typeparamref name="TInterface1"/>,
+        /// a <typeparamref name="TInterface2"/>, a <typeparamref name="TInterface3"/>, or
+        /// a <typeparamref name="TInterface4"/>.
+        /// </summary>
+        /// <remarks>
+        /// Despite the names of the type parameters, they can be <see langword="interface"/>s
+        /// or base classes (<see langword="abstract"/> or not).
+        /// </remarks>
+        /// <typeparam name="TInterface1">
+        /// The first type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to the other type parameters.
+        /// </typeparam>
+        /// <typeparam name="TInterface2">
+        /// The second type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to the other type parameters.
+        /// </typeparam>
+        /// <typeparam name="TInterface3">
+        /// The third type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to the other type parameters.
+        /// </typeparam>
+        /// <typeparam name="TInterface4">
+        /// The fourth type to add to this dependency's registration. Must be an implemented
+        /// interface or a base class, but can be unrelated to the other type parameters.
+        /// </typeparam>
+        /// <returns>Itself. Can be chained as a fluent interface.</returns>
+        /// <exception cref="VContainerException">
+        /// The implementation type can't be assigned to any of the given type parameters.
+        /// </exception>
+        /// <returns>Itself. Can be chained as a fluent interface.</returns>
+        /// <seealso cref="As(System.Type[])"/>
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3, TInterface4>()
             => As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3), typeof(TInterface4));
 
