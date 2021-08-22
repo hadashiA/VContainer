@@ -201,12 +201,51 @@ namespace VContainer
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3, TInterface4>()
             => As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3), typeof(TInterface4));
 
+        /// <summary>
+        /// Adds the dependency's implementation type to the registration, allowing
+        /// it to be resolved with its own type.
+        /// </summary>
+        /// <remarks>
+        /// If this registration is already resolvable as the implementation type,
+        /// then this method has no effect.
+        /// </remarks>
+        /// <returns>Itself. Can be chained as a fluent interface.</returns>
         public RegistrationBuilder AsSelf()
         {
             AddInterfaceType(ImplementationType);
             return this;
         }
 
+        /// <summary>
+        /// Adds all implemented interfaces (but <b>not</b> base classes) to the
+        /// registration, allowing this dependency to be resolved with any of its
+        /// interfaces.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Be careful if refactoring a class that's registered with this method;
+        /// if one of the implementation type's interfaces or base classes is
+        /// separately registered as a  <see cref="VContainer.Lifetime.Singleton"/>
+        /// dependency, VContainer will throw a <see cref="VContainerException"/>
+        /// when building the container.
+        /// </para>
+        /// <para>
+        /// This method does not add duplicate types; types that are already
+        /// included in this registration will not be added again.
+        /// </para>
+        /// <para>
+        /// This method does not register the implementation type's base class;
+        /// you can do so manually with a call to <see cref="As{TInterface}"/>.
+        /// </para>
+        /// <para>
+        /// This method is fine if you don't want to think too hard about how
+        /// this dependency will be resolved, such as when prototyping. If you
+        /// need finer control, use one of the other <c>As</c> methods.
+        /// </para>
+        /// </remarks>
+        /// <returns>Itself. Can be chained as a fluent interface.</returns>
+        /// <seealso cref="AsSelf"/>
+        /// <seealso cref="As{TInterface}"/>
         public RegistrationBuilder AsImplementedInterfaces()
         {
             InterfaceTypes = InterfaceTypes ?? new List<Type>();
