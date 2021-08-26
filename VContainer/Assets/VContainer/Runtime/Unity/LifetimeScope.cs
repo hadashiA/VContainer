@@ -23,9 +23,33 @@ namespace VContainer.Unity
         [SerializeField]
         public ParentReference parentReference;
 
+        /// <summary>
+        /// If <see langword="true"/>, automatically calls <see cref="Build"/> in
+        /// <see cref="Awake"/>.
+        /// </summary>
+        /// <remarks>
+        /// If you intend to load dependencies asynchronously (e.g. with Addressables),
+        /// set this to <see langword="false"/> and manually call <see cref="Build"/>
+        /// when they're ready.
+        /// </remarks>
         [SerializeField]
+        [Tooltip(
+            "If true, automatically calls Build() in Awake(). If you intend to load " +
+            "dependencies asynchronously, set this to false and manually call Build() " +
+            "when they're ready."
+        )]
         bool autoRun = true;
 
+        /// <summary>
+        /// A list of <see cref="GameObject"/>s to inject dependencies into when
+        /// this scope is built.
+        /// </summary>
+        /// <remarks>
+        /// Can be used to inject <see cref="GameObject"/>s in a newly-loaded <see cref="Scene"/>.
+        /// However, this list can be modified within <see cref="Configure"/>, so
+        /// dependencies that are loaded as prefabs can be injected as well.
+        /// </remarks>
+        /// <seealso cref="ObjectResolverUnityExtensions.InjectGameObject"/>
         [SerializeField]
         protected List<GameObject> autoInjectGameObjects;
 
@@ -137,6 +161,15 @@ namespace VContainer.Unity
 
         protected virtual void Configure(IContainerBuilder builder) { }
 
+        /// <summary>
+        /// Disposes of <see cref="Container"/> and its disposable dependencies,
+        /// then destroys the <see cref="GameObject"/> that this component is
+        /// attached to.
+        /// </summary>
+        /// <remarks>
+        /// It's not strictly necessary to call this method, as <see cref="OnDestroy"/>
+        /// do so. However, it's a convenient way to group this with other <see cref="IDisposable"/>s.
+        /// </remarks>
         public void Dispose()
         {
             DisposeCore();

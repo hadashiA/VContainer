@@ -5,14 +5,111 @@ using VContainer.Internal;
 
 namespace VContainer
 {
+    /// <summary>
+    /// A container from which dependencies can be retrieved.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This documentation uses "container" and "resolver" interchangeably.
+    /// </para>
+    /// <para>
+    /// When disposed of with <see cref="IDisposable.Dispose"/>, all registered
+    /// dependencies that implement <see cref="IDisposable"/> will be disposed
+    /// of except for registered instances and <see cref="Lifetime.Transient"/>
+    /// dependencies.
+    /// </para>
+    /// <para>
+    /// Types must generally be registered with the interfaces you'll use to
+    /// resolve them, but <see cref="IDisposable"/> is an exception to the rule;
+    /// if an object implements it, VContainer will detect it and clean it up regardless
+    /// of how it's resolved.
+    /// </para>
+    /// </remarks>
     public interface IObjectResolver : IDisposable
     {
+        /// <summary>
+        /// Retrieves the dependency mapped to the given <paramref name="type"/>.
+        /// </summary>
+        /// <remarks>
+        /// Most dependencies will be constructed the first time they're resolved.
+        /// The main exceptions are <see cref="Lifetime.Transient"/> dependencies
+        /// and registered instances.
+        /// </remarks>
+        /// <param name="type">
+        /// The type of the dependency to resolve. Note that multiple types can
+        /// map to the same dependency.
+        /// </param>
+        /// <exception cref="VContainerException">
+        /// No dependency is registered to <paramref name="type"/>.
+        /// </exception>
+        /// <returns>The dependency that is mapped to <paramref name="type"/>.</returns>
+        /// <seealso cref="IObjectResolverExtensions.Resolve{T}"/>
         object Resolve(Type type);
+
+        /// <summary>
+        /// Resolves a dependency from the given <paramref name="registration"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method is mostly used internally. Application code should prefer using
+        /// <see cref="IObjectResolverExtensions.Resolve{T}"/> instead.
+        /// </remarks>
+        /// <param name="registration">
+        /// The registration used to resolve the requested dependency. Doesn't technically
+        /// need to be a part of this <see cref="IObjectResolver"/>.
+        /// </param>
+        /// <returns>The dependency that <paramref name="registration"/> resolved.</returns>
+        /// <seealso cref="IObjectResolverExtensions.Resolve{T}"/>
+        /// <seealso cref="Resolve(System.Type)"/>
         object Resolve(IRegistration registration);
+
+        /// <summary>
+        /// Creates a child <see cref="IScopedObjectResolver"/> that can resolve this
+        /// container's dependencies or register its own.
+        /// </summary>
+        /// <param name="installation">
+        /// A delegate used to configure the newly-created container. Defaults to
+        /// <see langword="null"/>, which does not register any new dependencies.
+        /// </param>
+        /// <returns>
+        /// A new container that will use this one to resolve any dependencies that
+        /// it hasn't registered itself.
+        /// </returns>
+        /// <seealso cref="Lifetime"/>
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
+
+        /// <summary>
+        /// Provides an existing object with the dependencies it needs to function.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This method will call all methods annotated with <see cref="InjectAttribute"/>.
+        /// It will also populate all properties and fields annotated with <see cref="InjectAttribute"/>.
+        /// </para>
+        /// <para>
+        /// Although it is unlikely that you will need to inject the same object
+        /// multiple times, doing so will work as expected even if using a different
+        /// container as long as the registrations are valid; all <see cref="InjectAttribute"/>-annotated
+        /// methods will be called and properties/fields populated the same way
+        /// they were the first time.
+        /// </para>
+        /// </remarks>
+        /// <param name="instance">
+        /// The object that will be injected with its requested dependencies.
+        /// </param>
+        /// <exception cref="VContainerException">
+        /// A dependency that <paramref name="instance"/> requires couldn't be resolved.
+        /// </exception>
+        /// <seealso cref="InjectAttribute"/>
+        /// <seealso cref="Unity.ObjectResolverUnityExtensions"/>
         void Inject(object instance);
     }
 
+    /// <summary>
+    /// A container from which dependencies can be retrieved.
+    /// </summary>
+    /// <remarks>
+    /// "container" and "resolver" are often used interchangeably.
+    /// </remarks>
     public interface IScopedObjectResolver : IObjectResolver
     {
         IObjectResolver Root { get; }
@@ -20,10 +117,57 @@ namespace VContainer
         bool TryGetRegistration(Type type, out IRegistration registration);
     }
 
+    /// <summary>
+    /// Describes the rules that determine when a dependency is constructed.
+    /// </summary>
     public enum Lifetime
     {
+        /// <summary>
+        /// <c>Transient</c> dependencies are instantiated each time they're resolved.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// We don't recommend registering an <see cref="IDisposable"/>-implementing
+        /// dependency as <c>Transient</c>. VContainer will <b>not</b> dispose of
+        /// disposable <c>Transient</c> dependencies. Although you can do so manually
+        /// in your own code, refactoring the dependency's <see cref="Lifetime"/>
+        /// may lead to non-obvious bugs.
+        /// </para>
+        /// </remarks>
         Transient,
+
+        /// <summary>
+        /// <c>Singleton</c> dependencies are instantiated exactly once within a
+        /// tree of <see cref="IObjectResolver"/>s.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// It is an error to register more than one <c>Singleton</c> dependency
+        /// with the same type. Doing so will throw a <see cref="VContainerException"/>.
+        /// </para>
+        /// <para>
+        /// When an <see cref="IObjectResolver"/> is disposed of, <c>Singleton</c>
+        /// dependencies that are <see cref="IDisposable"/> will be disposed of
+        /// as well, <i>except</i> for registered instances.
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="ContainerBuilderExtensions.RegisterInstance{T}"/>
         Singleton,
+
+        /// <summary>
+        /// <c>Scoped</c> dependencies are instantiated once, but can be overridden
+        /// in child scopes.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When an <see cref="IObjectResolver"/> is disposed of, <c>Scoped</c>
+        /// dependencies that are <see cref="IDisposable"/> will be disposed of as well.
+        /// </para>
+        /// <para>
+        /// If your game only has one <see cref="Unity.LifetimeScope"/>, then this
+        /// is equivalent to <see cref="Singleton"/>.
+        /// </para>
+        /// </remarks>
         Scoped
     }
 
