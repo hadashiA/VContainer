@@ -85,17 +85,7 @@ namespace VContainer.Unity
 
         static LifetimeScope Find(Type type)
         {
-            for (var i = 0; i < SceneManager.sceneCount; i++)
-            {
-                var scene = SceneManager.GetSceneAt(i);
-                if (scene.isLoaded)
-                {
-                    var result = Find(type, scene);
-                    if (result != null)
-                        return result;
-                }
-            }
-            return null;
+           return (LifetimeScope)FindObjectOfType(type);
         }
 
         static void EnqueueExtra(IInstaller installer)

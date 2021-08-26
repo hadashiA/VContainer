@@ -395,3 +395,7 @@ VContainer.Benchmark/*.booproj
 VContainer.Benchmark/*.svd
 VContainer.Benchmark/bin/*
 VContainer.Benchmark/obj/*
+
+# Rider
+**/.idea/*
+**/.idea.meta
