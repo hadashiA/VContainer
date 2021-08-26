@@ -4,12 +4,11 @@ title: Installation
 
 Here's how you can get started with using VContainer.
 
-### Install via OpenUPM
-
 :::note
-*Installing via OpenUPM requires Unity 2018.4 or later.*
+*VContainer requires Unity 2018.4 or later.*
 :::
 
+### Install via OpenUPM
 
 VContainer is available on the [OpenUPM](https://openupm.com/packages/jp.hadashikick.vcontainer) package registry. This is the preferred method of installation, as you can easily receive updates as they're released.
 
@@ -40,13 +39,8 @@ If you don't want to use `openupm-cli` (or if you're hosting VContainer on an al
 
 ### Install via UPM (using Git URL)
 
-:::note
-*Installing via UPM requires Unity 2018.4 or later.*
-:::
-
 Navigate to your project's `Packages` folder and open the `manifest.json` file. Then add this package somewhere in the `dependencies` block:
 
- 
 ```json title="Packages/manifest.json"
       "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.8.6",
 ```
@@ -58,7 +52,6 @@ UPM should now install the package. This is useful if you're maintaining a fork 
 There's little reason to use `.unitypackage`s as all supported versions of Unity offer UPM. However, we provide one anyway just in case.
 
 Navigate to your project's `Packages` folder and open the `manifest.json` file. Then add this package somewhere in the `dependencies` block:
-
 
 ```json title="Packages/manifest.json"
       "com.unity.nuget.mono-cecil": "1.10.1",
