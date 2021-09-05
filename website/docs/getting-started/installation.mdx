@@ -2,32 +2,59 @@
 title: Installation
 ---
 
-*Requires Unity 2018.4+*
+Here's how you can get started with using VContainer.
 
-### Install via UPM (using Git URL)
-
-1. Navigate to your project's Packages folder and open the manifest.json file.
-2. Add this line below the "dependencies": { line
-    - ```json title="Packages/manifest.json"
-      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.8.6",
-      ```
-3. UPM should now install the package.
+:::note
+*VContainer requires Unity 2018.4 or later.*
+:::
 
 ### Install via OpenUPM
 
-1. The package is available on the [openupm registry](https://openupm.com). It's recommended to install it via [openupm-cli](https://github.com/openupm/openupm-cli).
-2. Execute the openum command.
-    - ```
-      openupm add jp.hadashikick.vcontainer
-      ```
+VContainer is available on the [OpenUPM](https://openupm.com/packages/jp.hadashikick.vcontainer) package registry. This is the preferred method of installation, as you can easily receive updates as they're released.
+
+If you have [openupm-cli](https://github.com/openupm/openupm-cli) installed, then run the following command in your project's directory:
+
+```
+openupm add jp.hadashikick.vcontainer
+```
+
+If you don't want to use `openupm-cli` (or if you're hosting VContainer on an alternative registry), you can manually add it to your project's `manifest.json` by modifying the `scopedRegistries` and `dependencies` fields:
+
+```json title="Packages/manifest.json"
+{
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "jp.hadashikick.vcontainer"
+      ]
+    }
+  ],
+  "dependencies": {
+    "jp.hadashikick.vcontainer": "1.8.6"
+  }
+}
+```
+
+### Install via UPM (using Git URL)
+
+Navigate to your project's `Packages` folder and open the `manifest.json` file. Then add this package somewhere in the `dependencies` block:
+
+```json title="Packages/manifest.json"
+      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.8.6",
+```
+
+UPM should now install the package. This is useful if you're maintaining a fork of VContainer for your own project but don't want to set up a private registry.
 
 ### Install manually (using .unitypackage)
 
-1. Navigate to your project's Packages folder and open the manifest.json file.
-2. Add this line below the "dependencies": { line
-    - ```json title="Packages/manifest.json"
-      "com.unity.nuget.mono-cecil": "1.10.1",    
-      ```
-3. Download the .unitypackage from [releases](https://github.com/hadashiA/VContainer/releases) page.
-4. Open VContainer.x.x.x.unitypackage
+There's little reason to use `.unitypackage`s as all supported versions of Unity offer UPM. However, we provide one anyway just in case.
 
+Navigate to your project's `Packages` folder and open the `manifest.json` file. Then add this package somewhere in the `dependencies` block:
+
+```json title="Packages/manifest.json"
+      "com.unity.nuget.mono-cecil": "1.10.1",
+```
+
+Download the latest `.unitypackage` from the [releases](https://github.com/hadashiA/VContainer/releases) page and open it within your project. Install it as you would for any other package.
