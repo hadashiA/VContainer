@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using VContainer.Diagnostics;
 using VContainer.Internal;
+using VContainer.Unity;
 
 namespace VContainer
 {
@@ -37,7 +39,10 @@ namespace VContainer
         public DiagnosticsCollector Diagnostics { get; set; }
 
         readonly IRegistry registry;
-        readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
+
+        readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances =
+            new ConcurrentDictionary<IRegistration, Lazy<object>>();
+
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<IRegistration, Lazy<object>> createInstance;
 
@@ -135,13 +140,57 @@ namespace VContainer
         IRegistration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
+            
+            CollectionRegistration collectionRegistration = null;
+            if (type.IsGenericType &&
+                (type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>) ||
+                 type.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+            {
+                var elementType = type.GetGenericArguments()[0];
+                collectionRegistration = new CollectionRegistration(elementType);
+            }
+
+            bool isCollection = false;
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
                 {
-                    return registration;
+                    if (registration is CollectionRegistration collection)
+                    {
+                        var elementType = type.GetGenericArguments()[0];
+                        if (elementType == typeof(IInitializable) ||
+                            elementType == typeof(IPostInitializable) ||
+                            elementType == typeof(IStartable) ||
+                            elementType == typeof(IPostStartable) ||
+                            elementType == typeof(IFixedTickable) ||
+                            elementType == typeof(IPostFixedTickable) ||
+                            elementType == typeof(ITickable) ||
+                            elementType == typeof(IPostTickable) ||
+                            elementType == typeof(ILateTickable) ||
+                            elementType == typeof(IPostLateTickable)
+                        )
+                        {
+                            return registration;
+                        }
+                        
+                        isCollection = true;
+                        foreach (var registration1 in collection)
+                        {
+                            collectionRegistration?.Add(registration1);
+                        }
+                    }
+                    else
+                    {
+                        return registration;
+                    }
                 }
+
                 scope = scope.Parent;
+            }
+
+            if (isCollection)
+            {
+                return collectionRegistration;
             }
             throw new VContainerException(type, $"No such registration of type: {type}");
         }
