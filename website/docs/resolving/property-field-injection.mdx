@@ -3,25 +3,21 @@ id: property-field-injection
 title: Property/Field Injection
 ---
 
-If the object has a local default and Inject is optional,
-Property/Field Injection can be used.
+Dependencies can be injected into properties or fields as well. To do so, annotate each property or field that represents a dependency with `[Inject]`.
 
 ```csharp
 class ClassA
 {
     [Inject]
-    IServiceA serviceA { get; set; } // Will be overwritten if something is registered.
+    IServiceA serviceA { get; set; }
+    
+    [Inject]
+    IServiceB serviceB;
 
     public ClassA()
     {
-        serviceA = ServiceA.GoodLocalDefault;
     }
 }
 ```
 
-It can resolve like this:
-
-```csharp
-    [Inject]
-    IServiceA serviceA;
-```
+Injection via properties or fields is a helpful alternative to [method injection](./method-injection).
