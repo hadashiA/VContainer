@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 
 namespace VContainer.Tests
@@ -190,6 +192,51 @@ namespace VContainer.Tests
             var scopedService = childContainer.Resolve<ServiceB>();
             //Assert.That(singletonService, Is.InstanceOf<ServiceA>());
             Assert.That(scopedService, Is.InstanceOf<ServiceB>());
+        }
+        
+        [Test]
+        public void ResolveCollectionFromParent()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Scoped);
+            builder.Register<I1, MultipleInterfaceServiceB>(Lifetime.Scoped);
+            var parentContainer = builder.Build();
+
+            var childContainer = parentContainer.CreateScope(childBuilder =>
+            {
+                childBuilder.Register<I1CollectionService>(Lifetime.Scoped);
+            });
+            
+            var scopedService = childContainer.Resolve<I1CollectionService>();
+            Assert.That(scopedService.enumerable.Count(), Is.EqualTo(2));
+        }
+        
+        [Test]
+        public void ResolveCollectionByLazyInstance()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Scoped);
+            builder.Register<I1, MultipleInterfaceServiceB>(Lifetime.Scoped);
+            builder.Register<I1CollectionService>(Lifetime.Scoped);
+            
+            var parentContainer = builder.Build();
+
+            var childContainer = parentContainer.CreateScope(childBuilder =>
+            {
+            });
+            
+            var scopedService = childContainer.Resolve<I1CollectionService>();
+            Assert.That(scopedService.enumerable.Count(), Is.EqualTo(2));
+        }
+        
+        public class I1CollectionService
+        {
+            public readonly IReadOnlyList<I1> enumerable;
+
+            public I1CollectionService(IReadOnlyList<I1> enumerable)
+            {
+                this.enumerable = enumerable;
+            }
         }
 
         [Test]
