@@ -149,7 +149,7 @@ class FooFactory
 Here's how you can use `FooFactory` as a `Func<>` without knowing or caring about the full class.
 
 ```csharp
-builder.Register<FooFactory>(Lifetime.Singleton); // If the factory implements IDisposable, add ".As<IDisposable>()" at the end.
+builder.Register<FooFactory>(Lifetime.Singleton);
 builder.RegisterFactory(container => container.Resolve<FooFactory>().Create, Lifetime.Singleton);
 
 // ...
