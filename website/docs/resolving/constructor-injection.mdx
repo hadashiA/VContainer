@@ -3,7 +3,7 @@ id: constructor-injection
 title: Constructor Injection
 ---
 
-In general, dependencies are constructed and injected when they're resolved for the first time (with [../registering/register-factory](some) [../registering/register-type#register-instance](exceptions)).
+In general, dependencies are constructed and injected when they're resolved for the first time (with [some](../registering/register-factory) [exceptions](../registering/register-type#register-instance)).
 
 When registering a class that needs dependencies, provide a constructor that takes them as arguments. VContainer will take care of the rest.
 
@@ -35,7 +35,7 @@ class ClassA
 The above code sample does not use VContainer APIs, because it doesn't need any. You can still manually create instances of `ClassA` with the same constructor if you'd like.
 
 :::caution
-[Unity strips unused code from builds](https://docs.unity3d.com/Manual/ManagedCodeStripping), but it often makes mistakes when reflection or IL code generation are involved (as is the case with VContainer). To ensure your constructor is not removed, use a [`link.xml`](https://docs.unity3d.com/Manual/ManagedCodeStripping#LinkXML) file or add the `[Inject]` attribute to **one** constructor. This also applies to [./method-injection](methods).
+[Unity strips unused code from builds](https://docs.unity3d.com/Manual/ManagedCodeStripping), but it often makes mistakes when reflection or IL code generation are involved (as is the case with VContainer). To ensure your constructor is not removed, use a [`link.xml`](https://docs.unity3d.com/Manual/ManagedCodeStripping#LinkXML) file or add the `[Inject]` attribute to **one** constructor. This also applies to [methods](./method-injection).
 :::
 
 ```csharp
