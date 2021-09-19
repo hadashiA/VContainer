@@ -32,7 +32,7 @@ namespace VContainer
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             TypeAnalyzer.CheckCircularDependency(registrations, registry);
 
-            var container = new ScopedContainer(registry, root, parent);
+            var container = new ScopedContainer(registry, root, parent, ApplicationOrigin);
             EmitCallbacks(container);
             return container;
         }
@@ -44,7 +44,7 @@ namespace VContainer
     {
         public object ApplicationOrigin { get; set; }
 
-        readonly IList<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
+        readonly List<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
 
         public T Register<T>(T registrationBuilder) where T : RegistrationBuilder
@@ -79,7 +79,7 @@ namespace VContainer
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             TypeAnalyzer.CheckCircularDependency(registrations, registry);
 
-            var container = new Container(registry);
+            var container = new Container(registry, ApplicationOrigin);
             EmitCallbacks(container);
             return container;
         }
