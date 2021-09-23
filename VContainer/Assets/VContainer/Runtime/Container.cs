@@ -137,14 +137,20 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        bool IsCollectionType(Type type)
+        {
+            return type.IsGenericType &&
+                   (type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>) ||
+                    type.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         IRegistration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
             
             CollectionRegistration collectionRegistration = null;
-            if (type.IsGenericType &&
-                (type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>) ||
-                 type.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+            if (IsCollectionType(type))
             {
                 var elementType = type.GetGenericArguments()[0];
                 collectionRegistration = new CollectionRegistration(elementType);
@@ -158,17 +164,7 @@ namespace VContainer
                     if (registration is CollectionRegistration collection)
                     {
                         var elementType = type.GetGenericArguments()[0];
-                        if (elementType == typeof(IInitializable) ||
-                            elementType == typeof(IPostInitializable) ||
-                            elementType == typeof(IStartable) ||
-                            elementType == typeof(IPostStartable) ||
-                            elementType == typeof(IFixedTickable) ||
-                            elementType == typeof(IPostFixedTickable) ||
-                            elementType == typeof(ITickable) ||
-                            elementType == typeof(IPostTickable) ||
-                            elementType == typeof(ILateTickable) ||
-                            elementType == typeof(IPostLateTickable)
-                        )
+                        if (AnnotationUtility.IsLifecycleAnnotation(elementType))
                         {
                             return registration;
                         }
