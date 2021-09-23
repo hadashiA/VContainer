@@ -150,13 +150,6 @@ namespace VContainer
             IScopedObjectResolver scope = this;
             
             CollectionRegistration collectionRegistration = null;
-            if (IsCollectionType(type))
-            {
-                var elementType = type.GetGenericArguments()[0];
-                collectionRegistration = new CollectionRegistration(elementType);
-            }
-
-            bool isCollection = false;
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
@@ -164,12 +157,15 @@ namespace VContainer
                     if (registration is CollectionRegistration collection)
                     {
                         var elementType = type.GetGenericArguments()[0];
+                        if (collectionRegistration == null)
+                        {
+                            collectionRegistration = new CollectionRegistration(elementType);
+                        }
                         if (AnnotationUtility.IsLifecycleAnnotation(elementType))
                         {
                             return registration;
                         }
                         
-                        isCollection = true;
                         foreach (var registration1 in collection)
                         {
                             collectionRegistration?.Add(registration1);
@@ -184,7 +180,7 @@ namespace VContainer
                 scope = scope.Parent;
             }
 
-            if (isCollection)
+            if (collectionRegistration != null)
             {
                 return collectionRegistration;
             }
