@@ -117,13 +117,6 @@ namespace VContainer
             return lazy.Value;
         }
 
-        bool IsCollectionType(Type type)
-        {
-            return type.IsGenericType &&
-                   (type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>) ||
-                    type.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-        }
-
         IRegistration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
