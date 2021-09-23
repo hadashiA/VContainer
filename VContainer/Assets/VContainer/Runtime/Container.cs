@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using VContainer.Internal;
+using VContainer.Unity;
 
 namespace VContainer
 {
@@ -117,13 +118,41 @@ namespace VContainer
         IRegistration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
+            
+            CollectionRegistration collectionRegistration = null;
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
                 {
-                    return registration;
+                    if (registration is CollectionRegistration collection)
+                    {
+                        var elementType = type.GetGenericArguments()[0];
+                        if (collectionRegistration == null)
+                        {
+                            collectionRegistration = new CollectionRegistration(elementType);
+                        }
+                        if (AnnotationUtility.IsLifecycleAnnotation(elementType))
+                        {
+                            return registration;
+                        }
+                        
+                        foreach (var registration1 in collection)
+                        {
+                            collectionRegistration?.Add(registration1);
+                        }
+                    }
+                    else
+                    {
+                        return registration;
+                    }
                 }
+
                 scope = scope.Parent;
+            }
+
+            if (collectionRegistration != null)
+            {
+                return collectionRegistration;
             }
             throw new VContainerException(type, $"No such registration of type: {type}");
         }

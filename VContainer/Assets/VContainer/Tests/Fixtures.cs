@@ -2,7 +2,7 @@
 
 namespace VContainer.Tests
 {
-    interface I1
+    public interface I1
     {
     }
 
