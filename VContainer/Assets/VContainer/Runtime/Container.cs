@@ -34,9 +34,7 @@ namespace VContainer
         public IScopedObjectResolver Parent { get; }
 
         readonly IRegistry registry;
-
         readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
-
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<IRegistration, Lazy<object>> createInstance;
 
@@ -114,7 +112,6 @@ namespace VContainer
             {
                 disposables.Add(disposable);
             }
-
             return lazy.Value;
         }
 
