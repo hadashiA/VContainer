@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using VContainer.Diagnostics;
 using VContainer.Internal;
@@ -40,8 +39,7 @@ namespace VContainer
 
         readonly IRegistry registry;
 
-        readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances =
-            new ConcurrentDictionary<IRegistration, Lazy<object>>();
+        readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
 
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<IRegistration, Lazy<object>> createInstance;
@@ -54,7 +52,6 @@ namespace VContainer
             Root = root;
             Parent = parent;
             this.registry = registry;
-
             createInstance = registration =>
             {
                 return new Lazy<object>(() => registration.SpawnInstance(this));
