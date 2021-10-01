@@ -69,7 +69,7 @@ class ClassA
 
     public void DoSomething()
     {
-        var foo = factory.Invoke(100);
+        var foo = factory(100);
         // ...
     }
 }
@@ -156,9 +156,9 @@ builder.RegisterFactory(container => container.Resolve<FooFactory>().Create, Lif
 
 var factory = container.Resolve<Func<int, Foo>>();
 
-var foo1 = factory.Create(1);
-var foo2 = factory.Create(2);
-var foo3 = factory.Create(3);
+var foo1 = factory(1);
+var foo2 = factory(2);
+var foo3 = factory(3);
 
 var originalFactoryObject = container.Resolve<FooFactory>(); // The factory object is there if you need it.
 // If FooFactory implements IDisposable, it'll be called when the IObjectResolver is disposed.
