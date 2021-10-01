@@ -30,6 +30,8 @@ namespace VContainer
         {
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
+            TypeAnalyzer.CheckCircularDependency(registrations, registry);
+
             var container = new ScopedContainer(registry, root, parent);
             EmitCallbacks(container);
             return container;
@@ -75,6 +77,8 @@ namespace VContainer
         {
             var registrations = BuildRegistrations();
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
+            TypeAnalyzer.CheckCircularDependency(registrations, registry);
+
             var container = new Container(registry);
             EmitCallbacks(container);
             return container;
@@ -100,18 +104,6 @@ namespace VContainer
             }
 #endif
             registrations[registrations.Length - 1] = ContainerRegistration.Default;
-
-#if VCONTAINER_PARALLEL_CONTAINER_BUILD
-            Parallel.For(0, registrations.Count, i =>
-            {
-                TypeAnalyzer.CheckCircularDependency(registrations[i].ImplementationType);
-            });
-#else
-            foreach (var x in registrations)
-            {
-                TypeAnalyzer.CheckCircularDependency(x.ImplementationType);
-            }
-#endif
             return registrations;
         }
 

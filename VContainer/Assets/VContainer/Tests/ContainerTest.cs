@@ -453,9 +453,23 @@ namespace VContainer.Tests
             // Only reflection mode can detect circular dependency errors at runtime.
             if (injector is ReflectionInjector)
             {
-                // Assert.Throws<AggregateException>(() => builder.Build());
-                Assert.Throws<VContainerException>(() => builder.Build(),
-                    "Circular dependency detected! type: VContainer.Tests.HasCircularDependency1");
+                Assert.Throws<VContainerException>(() => builder.Build());
+            }
+        }
+
+        [Test]
+        public void CircularDependencyWithAbstract()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<HasAbstractCircularDependency1>(Lifetime.Transient);
+            builder.Register<HasAbstractCircularDependency2>(Lifetime.Transient).As<I2>();
+
+            var injector = InjectorCache.GetOrBuild(typeof(HasCircularDependency1));
+
+            // Only reflection mode can detect circular dependency errors at runtime.
+            if (injector is ReflectionInjector)
+            {
+                Assert.Throws<VContainerException>(() => builder.Build());
             }
         }
 

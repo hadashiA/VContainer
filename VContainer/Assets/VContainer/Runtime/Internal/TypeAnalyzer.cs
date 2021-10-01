@@ -84,12 +84,14 @@ namespace VContainer.Internal
 
     static class TypeAnalyzer
     {
-        public static InjectTypeInfo AnalyzeWithCache(Type type) => Cache.GetOrAdd(type, Analyze);
+        public static InjectTypeInfo AnalyzeWithCache(Type type) => Cache.GetOrAdd(type, AnalyzeFunc);
 
         static readonly ConcurrentDictionary<Type, InjectTypeInfo> Cache = new ConcurrentDictionary<Type, InjectTypeInfo>();
 
         [ThreadStatic]
-        static Stack<Type> circularDependencyChecker = new Stack<Type>(128);
+        static Stack<IRegistration> circularDependencyChecker;
+
+        static Func<Type, InjectTypeInfo> AnalyzeFunc = Analyze;
 
         public static InjectTypeInfo Analyze(Type type)
         {
@@ -175,29 +177,42 @@ namespace VContainer.Internal
                 injectProperties);
         }
 
-        public static void CheckCircularDependency(Type type)
+        public static void CheckCircularDependency(IReadOnlyList<IRegistration> registrations, IRegistry registry)
         {
             // ThreadStatic
             if (circularDependencyChecker == null)
-                circularDependencyChecker = new Stack<Type>(128);
-            circularDependencyChecker.Clear();
-            CheckCircularDependencyRecursive(type, circularDependencyChecker);
+                circularDependencyChecker = new Stack<IRegistration>();
+
+            for (var i = 0; i < registrations.Count; i++)
+            {
+                circularDependencyChecker.Clear();
+                CheckCircularDependencyRecursive(registrations[i], registry, circularDependencyChecker);
+            }
         }
 
-        static void CheckCircularDependencyRecursive(Type type, Stack<Type> stack)
+        static void CheckCircularDependencyRecursive(IRegistration registration, IRegistry registry, Stack<IRegistration> stack)
         {
-            if (stack.Contains(type))
+            foreach (var x in stack)
             {
-                throw new VContainerException(type, $"Circular dependency detected! type: {type.FullName}");
+                if (registration.ImplementationType == x.ImplementationType)
+                {
+                    throw new VContainerException(registration.ImplementationType,
+                        $"Circular dependency detected! {registration}");
+                }
             }
-            stack.Push(type);
-            if (Cache.TryGetValue(type, out var injectTypeInfo))
+
+            stack.Push(registration);
+
+            if (Cache.TryGetValue(registration.ImplementationType, out var injectTypeInfo))
             {
                 if (injectTypeInfo.InjectConstructor != null)
                 {
                     foreach (var x in injectTypeInfo.InjectConstructor.ParameterInfos)
                     {
-                        CheckCircularDependencyRecursive(x.ParameterType, stack);
+                        if (registry.TryGet(x.ParameterType, out var parameterRegistration))
+                        {
+                            CheckCircularDependencyRecursive(parameterRegistration, registry, stack);
+                        }
                     }
                 }
 
@@ -207,7 +222,10 @@ namespace VContainer.Internal
                     {
                         foreach (var x in methodInfo.ParameterInfos)
                         {
-                            CheckCircularDependencyRecursive(x.ParameterType, stack);
+                            if (registry.TryGet(x.ParameterType, out var parameterRegistration))
+                            {
+                                CheckCircularDependencyRecursive(parameterRegistration, registry, stack);
+                            }
                         }
                     }
                 }
@@ -216,7 +234,10 @@ namespace VContainer.Internal
                 {
                     foreach (var x in injectTypeInfo.InjectFields)
                     {
-                        CheckCircularDependencyRecursive(x.FieldType, stack);
+                        if (registry.TryGet(x.FieldType, out var fieldRegistration))
+                        {
+                            CheckCircularDependencyRecursive(fieldRegistration, registry, stack);
+                        }
                     }
                 }
 
@@ -224,10 +245,14 @@ namespace VContainer.Internal
                 {
                     foreach (var x in injectTypeInfo.InjectProperties)
                     {
-                        CheckCircularDependencyRecursive(x.PropertyType, stack);
+                        if (registry.TryGet(x.PropertyType, out var propertyRegistration))
+                        {
+                            CheckCircularDependencyRecursive(propertyRegistration, registry, stack);
+                        }
                     }
                 }
             }
+
             stack.Pop();
         }
     }
