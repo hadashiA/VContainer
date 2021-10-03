@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using UnityEditor.IMGUI.Controls;
 using VContainer.Diagnostics;
 using VContainer.Unity;
@@ -10,23 +11,20 @@ namespace VContainer.Editor.Diagnostics
 {
     public sealed class DiagnosticsInfoTreeViewItem : TreeViewItem
     {
-        public string ScopeName { get; set; }
-        public Type ConcureteType { get; set; }
-        public IReadOnlyList<Type> ContractTypes { get; set; }
-        public IReadOnlyList<ResolveInfo> Resolves { get; set; }
+        public string ScopeName;
+        public IRegistration Registration;
+        public IReadOnlyList<ResolveInfo> Resolves;
 
-        public string ContractTypesSummary => string.Join(", ", ContractTypes);
+        public string RegistrationSummary => Registration != null
+            ? Registration.GetType().Name
+            : "";
 
-        public DiagnosticsInfoTreeViewItem(int id, IObjectResolver scope) : base(id)
+        public string ContractTypesSummary => Registration?.InterfaceTypes != null
+            ? string.Join(", ", Registration.InterfaceTypes.Select(x => x.Name))
+            : "";
+
+        public DiagnosticsInfoTreeViewItem(int id) : base(id)
         {
-            if (scope.ApplicationOrigin is LifetimeScope lifetimeScope)
-            {
-                ScopeName = lifetimeScope.name;
-            }
-            else
-            {
-                ScopeName = scope.GetType().Name;
-            }
         }
     }
 
@@ -39,15 +37,16 @@ namespace VContainer.Editor.Diagnostics
 
         public IReadOnlyList<TreeViewItem> CurrentBindingItems;
         readonly Dictionary<IObjectResolver, int> usedTrackIds = new Dictionary<IObjectResolver, int>();
-        int trackId = -10000; // 0~ is used in StackTraceInfo
 
         public VContainerDiagnosticsInfoTreeView()
             : this(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(new[]
             {
-                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope")},
-                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type")},
+                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope"), width = 60f },
+                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
                 new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes") },
-                new MultiColumnHeaderState.Column { headerContent = new GUIContent("ResolveCount") },
+                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime") },
+                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Registration") },
+                new MultiColumnHeaderState.Column { headerContent = new GUIContent("ResolveCount"), width = 5f },
             })))
         {
         }
@@ -56,7 +55,9 @@ namespace VContainer.Editor.Diagnostics
             : base(state, header)
         {
             rowHeight = 20;
+            columnIndexForTreeFoldouts = 0;
             showAlternatingRowBackgrounds = true;
+            extraSpaceBeforeIconAndLabel = 20;
             showBorder = true;
             header.sortingChanged += OnSortedChanged;
 
@@ -114,15 +115,20 @@ namespace VContainer.Editor.Diagnostics
                     var grouped = LifetimeScope.DiagnosticsCollector.GetGroupedDiagnosticsInfos();
                     foreach (var scope in grouped)
                     {
-                        var parentItem = new DiagnosticsInfoTreeViewItem(NextId(), scope.Key);
+                        var parentItem = new DiagnosticsInfoTreeViewItem(NextId())
+                        {
+                            displayName = scope.Key,
+                            ScopeName = scope.Key
+                        };
                         children.Add(parentItem);
+                        SetExpanded(parentItem.id, true);
 
                         foreach (var info in scope)
                         {
-                            parentItem.AddChild(new DiagnosticsInfoTreeViewItem(NextId(), scope.Key)
+                            parentItem.AddChild(new DiagnosticsInfoTreeViewItem(NextId())
                             {
-                                ConcureteType = info.Registration.ImplementationType,
-                                ContractTypes = info.Registration.InterfaceTypes,
+                                ScopeName = scope.Key,
+                                Registration = info.Registration,
                                 Resolves = info.Resolves
                             });
                         }
@@ -136,6 +142,7 @@ namespace VContainer.Editor.Diagnostics
 
             CurrentBindingItems = children;
             root.children = CurrentBindingItems as List<TreeViewItem>;
+
             return root;
         }
 
@@ -155,16 +162,23 @@ namespace VContainer.Editor.Diagnostics
                 switch (columnIndex)
                 {
                     case 0:
-                        EditorGUI.LabelField(rect, item.ScopeName, labelStyle);
+                        // EditorGUI.LabelField(rect, item.ScopeName, labelStyle);
+                        base.RowGUI(args);
                         break;
                     case 1:
-                        EditorGUI.LabelField(rect, item.ConcureteType.GetType().Name, labelStyle);
+                        EditorGUI.LabelField(rect, item.Registration?.ImplementationType?.Name ?? "", labelStyle);
                         break;
                     case 2:
                         EditorGUI.LabelField(rect, item.ContractTypesSummary, labelStyle);
                         break;
                     case 3:
-                        EditorGUI.LabelField(rect, item.Resolves.Count.ToString(), labelStyle);
+                        EditorGUI.LabelField(rect, item.Registration?.Lifetime.ToString(), labelStyle);
+                        break;
+                    case 4:
+                        EditorGUI.LabelField(rect, item.RegistrationSummary, labelStyle);
+                        break;
+                    case 5:
+                        EditorGUI.LabelField(rect, item.Resolves?.Count.ToString(), labelStyle);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);

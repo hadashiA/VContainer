@@ -8,7 +8,12 @@ namespace VContainer.Unity
         public static VContainerSettings Instance { get; private set; }
 
         [SerializeField]
+        [Tooltip("Set the Prefab to be the parent of the entire Project.")]
         public LifetimeScope RootLifetimeScope;
+
+        [SerializeField]
+        [Tooltip("Enables the collection of information that can be viewed in the VContainerDiagnosticsWindow. Note: Performance degradation")]
+        public bool EnableDiagnostics;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Create/VContainer/VContainer Settings")]

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using VContainer.Diagnostics;
 using VContainer.Internal;
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
 using System.Threading.Tasks;
@@ -10,6 +12,8 @@ namespace VContainer
     public interface IContainerBuilder
     {
         object ApplicationOrigin { get; set; }
+        IDiagnosticsCollector DiagnosticsCollector { get; set; }
+
         T Register<T>(T registrationBuilder) where T : RegistrationBuilder;
         void RegisterBuildCallback(Action<IObjectResolver> container);
         bool Exists(Type type, bool includeInterfaceTypes = false);
@@ -26,33 +30,36 @@ namespace VContainer
             this.parent = parent;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IScopedObjectResolver BuildScope()
         {
-            var registrations = BuildRegistrations();
-            var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
-            TypeAnalyzer.CheckCircularDependency(registrations, registry);
-
+            var (registry, registrations) = BuildRegistry();
             var container = new ScopedContainer(registry, root, parent, ApplicationOrigin);
             EmitCallbacks(container);
+            DiagnosticsCollector?.Collect(container, registrations);
             return container;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override IObjectResolver Build() => BuildScope();
     }
 
     public class ContainerBuilder : IContainerBuilder
     {
         public object ApplicationOrigin { get; set; }
+        public IDiagnosticsCollector DiagnosticsCollector { get; set; }
 
         readonly List<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Register<T>(T registrationBuilder) where T : RegistrationBuilder
         {
             registrationBuilders.Add(registrationBuilder);
             return registrationBuilder;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RegisterBuildCallback(Action<IObjectResolver> callback)
         {
             if (buildCallbacks == null)
@@ -60,6 +67,7 @@ namespace VContainer
             buildCallbacks.Add(callback);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Exists(Type type, bool includeInterfaceTypes = false)
         {
             foreach (var registrationBuilder in registrationBuilders)
@@ -73,18 +81,19 @@ namespace VContainer
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual IObjectResolver Build()
         {
-            var registrations = BuildRegistrations();
-            var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
-            TypeAnalyzer.CheckCircularDependency(registrations, registry);
-
+            var (registry, registrations) = BuildRegistry();
             var container = new Container(registry, ApplicationOrigin);
             EmitCallbacks(container);
+            DiagnosticsCollector?.Collect(container, registrations);
+
             return container;
         }
 
-        protected IReadOnlyList<IRegistration> BuildRegistrations()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected (IRegistry, IRegistration[]) BuildRegistry()
         {
             var registrations = new IRegistration[registrationBuilders.Count + 1];
 
@@ -104,9 +113,14 @@ namespace VContainer
             }
 #endif
             registrations[registrations.Length - 1] = ContainerRegistration.Default;
-            return registrations;
+
+            var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
+            TypeAnalyzer.CheckCircularDependency(registrations, registry);
+
+            return (registry, registrations);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void EmitCallbacks(IObjectResolver container)
         {
             if (buildCallbacks == null) return;

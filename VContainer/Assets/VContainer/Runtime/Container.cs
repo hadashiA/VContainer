@@ -57,12 +57,14 @@ namespace VContainer
             };
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(Type type)
         {
             var registration = FindRegistration(type);
             return Resolve(registration);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(IRegistration registration)
         {
             switch (registration.Lifetime)
@@ -87,6 +89,7 @@ namespace VContainer
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
         {
             var containerBuilder = new ScopedContainerBuilder(Root, this);
@@ -161,6 +164,7 @@ namespace VContainer
             };
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(Type type)
         {
             if (registry.TryGet(type, out var registration))
@@ -170,6 +174,7 @@ namespace VContainer
             throw new VContainerException(type, $"No such registration of type: {type}");
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(IRegistration registration)
         {
             switch (registration.Lifetime)
@@ -193,15 +198,18 @@ namespace VContainer
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
             => rootScope.CreateScope(installation);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Inject(object instance)
         {
             var injector = InjectorCache.GetOrBuild(instance.GetType());
             injector.Inject(instance, this, null);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             rootScope.Dispose();

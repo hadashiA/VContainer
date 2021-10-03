@@ -160,12 +160,17 @@ namespace VContainer.Unity
                 Container = Parent.Container.CreateScope(builder =>
                 {
                     builder.ApplicationOrigin = this;
+                    builder.DiagnosticsCollector = DiagnosticsEnabled ? DiagnosticsCollector : null;
                     InstallTo(builder);
                 });
             }
             else
             {
-                var builder = new ContainerBuilder { ApplicationOrigin = this };
+                var builder = new ContainerBuilder
+                {
+                    ApplicationOrigin = this,
+                    DiagnosticsCollector = DiagnosticsEnabled ? DiagnosticsCollector : null
+                };
                 InstallTo(builder);
                 Container = builder.Build();
             }

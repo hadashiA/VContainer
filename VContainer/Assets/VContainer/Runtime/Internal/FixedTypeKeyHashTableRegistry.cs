@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace VContainer.Internal
 {
-    public sealed class FixedTypeKeyHashTableRegistry : IRegistry
+    sealed class FixedTypeKeyHashTableRegistry : IRegistry
     {
         [ThreadStatic]
         static IDictionary<Type, IRegistration> buildBuffer = new Dictionary<Type, IRegistration>(128);
 
         readonly FixedTypeKeyHashtable<IRegistration> hashTable;
 
-        public static FixedTypeKeyHashTableRegistry Build(IReadOnlyList<IRegistration> registrations)
+        public static FixedTypeKeyHashTableRegistry Build(IRegistration[] registrations)
         {
             // ThreadStatic
             if (buildBuffer == null)

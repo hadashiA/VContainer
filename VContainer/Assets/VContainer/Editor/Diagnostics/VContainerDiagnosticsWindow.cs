@@ -1,7 +1,7 @@
 using System;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using VContainer.Diagnostics;
 using VContainer.Unity;
 
 namespace VContainer.Editor.Diagnostics
@@ -104,11 +104,9 @@ namespace VContainer.Editor.Diagnostics
         void RenderTable()
         {
             using (new EditorGUILayout.VerticalScope(TableListStyle))
-            using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(tableScrollPosition, new []
-            {
+            using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(tableScrollPosition,
                 GUILayout.ExpandWidth(true),
-                GUILayout.MaxWidth(2000f)
-            }))
+                GUILayout.MaxWidth(2000f)))
             {
                 tableScrollPosition = scrollViewScope.scrollPosition;
 
@@ -116,36 +114,34 @@ namespace VContainer.Editor.Diagnostics
                     GUILayout.ExpandHeight(true),
                     GUILayout.ExpandWidth(true));
 
-                treeView?.OnGUI(controlRect);
+                treeView?.OnGUI(new Rect(0, 0, position.width, position.height));
             }
         }
 
         void RenderDetailsPanel()
         {
-            string message;
-            if (LifetimeScope.DiagnosticsCollector is IDiagnosticsCollector collector)
+            var message = "";
+            if (LifetimeScope.DiagnosticsEnabled)
             {
-                throw new NotImplementedException();
+                var selected = treeView.state.selectedIDs;
+                if (selected.Count > 0)
+                {
+                    var first = selected[0];
+                    if (treeView.CurrentBindingItems.FirstOrDefault(x => x.id == first) is DiagnosticsInfoTreeViewItem item)
+                    {
+                        message = "AAAAAA";
+                        // message = string.Join(Splitter, item.StackTraces
+                        //     .Select(x =>
+                        //         "Subscribe at " + x.Timestamp.ToLocalTime().ToString("HH:mm:ss.ff") // + ", Elapsed: " + (now - x.Timestamp).TotalSeconds.ToString("00.00")
+                        //                         + Environment.NewLine
+                        //                         + (x.formattedStackTrace ?? (x.formattedStackTrace = x.StackTrace.CleanupAsyncStackTrace()))));
+                    }
+                }
             }
             else
             {
                 message = "VContainer Diagnostics collector is disabled. To enable, please check VContainerSettings.";
             }
-            // var message = "";
-            // var selected = treeView.state.selectedIDs;
-            // if (selected.Count > 0)
-            // {
-            //     var first = selected[0];
-            //     if (treeView.CurrentBindingItems.FirstOrDefault(x => x.id == first) is DiagnosticsInfoTreeViewItem item)
-            //     {
-            //         message = string.Join(Splitter, item.StackTraces
-            //             .Select(x =>
-            //                 "Subscribe at " + x.Timestamp.ToLocalTime().ToString("HH:mm:ss.ff") // + ", Elapsed: " + (now - x.Timestamp).TotalSeconds.ToString("00.00")
-            //                                 + Environment.NewLine
-            //                                 + (x.formattedStackTrace ?? (x.formattedStackTrace = x.StackTrace.CleanupAsyncStackTrace()))));
-            //     }
-            // }
-            //
             using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(detailsScrollPosition))
             {
                 detailsScrollPosition = scrollViewScope.scrollPosition;

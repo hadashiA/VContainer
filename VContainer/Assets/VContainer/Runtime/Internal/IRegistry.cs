@@ -2,7 +2,7 @@ using System;
 
 namespace VContainer.Internal
 {
-    interface IRegistry
+    public interface IRegistry
     {
         // void Add(Registration registration);
         bool TryGet(Type interfaceType, out IRegistration registration);
