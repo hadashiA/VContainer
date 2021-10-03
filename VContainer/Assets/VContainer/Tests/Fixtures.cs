@@ -218,6 +218,28 @@ namespace VContainer.Tests
         }
     }
 
+    class HasAbstractCircularDependency1
+    {
+        public HasAbstractCircularDependency1(I2 dependency2)
+        {
+            if (dependency2 == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class HasAbstractCircularDependency2 : I2
+    {
+        public HasAbstractCircularDependency2(HasAbstractCircularDependency1 dependency1)
+        {
+            if (dependency1 == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
     class HasMethodInjection : I1
     {
         public I2 Service2;
