@@ -11,9 +11,10 @@ namespace VContainer.Editor.Diagnostics
 {
     public sealed class DiagnosticsInfoTreeViewItem : TreeViewItem
     {
-        public string ScopeName;
-        public IRegistration Registration;
-        public IReadOnlyList<ResolveInfo> Resolves;
+        public string ScopeName { get; set; }
+        public RegisterInfo RegisterInfo { get; set; }
+        public IRegistration Registration { get; set; }
+        public IReadOnlyList<ResolveInfo> Resolves { get; set; }
 
         public string RegistrationSummary => Registration != null
             ? Registration.GetType().Name
@@ -22,6 +23,34 @@ namespace VContainer.Editor.Diagnostics
         public string ContractTypesSummary => Registration?.InterfaceTypes != null
             ? string.Join(", ", Registration.InterfaceTypes.Select(x => x.Name))
             : "";
+
+        public string RegisterSummary
+        {
+            get
+            {
+                if (RegisterInfo == null)
+                    return "";
+
+                var type = RegisterInfo.RegistrationBuilder.GetType();
+                if (type == typeof(RegistrationBuilder))
+                {
+                    return "";
+                }
+
+                var typeName = type.Name;
+                var suffixIndex = typeName.IndexOf("Builder");
+                if (suffixIndex > 0)
+                {
+                    typeName = typeName.Substring(0, suffixIndex);
+                }
+                suffixIndex = typeName.IndexOf("Registration");
+                if (suffixIndex > 0)
+                {
+                    typeName = typeName.Substring(0, suffixIndex);
+                }
+                return typeName;
+            }
+        }
 
         public DiagnosticsInfoTreeViewItem(int id) : base(id)
         {
@@ -67,6 +96,14 @@ namespace VContainer.Editor.Diagnostics
             header.sortedColumnIndex = SessionState.GetInt(SortedColumnIndexStateKey, 1);
         }
 
+        public DiagnosticsInfoTreeViewItem GetSelectedItem()
+        {
+            if (state.selectedIDs.Count <= 0) return null;
+
+            var selectedId = state.selectedIDs[0];
+            return GetRows().FirstOrDefault(x => x.id == selectedId) as DiagnosticsInfoTreeViewItem;
+        }
+
         public void ReloadAndSort()
         {
             var currentSelected = state.selectedIDs;
@@ -108,7 +145,7 @@ namespace VContainer.Editor.Diagnostics
             var root = new TreeViewItem { depth = -1 };
             var children = new List<TreeViewItem>();
 
-            if (LifetimeScope.DiagnosticsCollector != null)
+            if (LifetimeScope.DiagnosticsEnabled)
             {
                 if (VContainerDiagnosticsWindow.EnableCollapse)
                 {
@@ -128,6 +165,7 @@ namespace VContainer.Editor.Diagnostics
                             parentItem.AddChild(new DiagnosticsInfoTreeViewItem(NextId())
                             {
                                 ScopeName = scope.Key,
+                                RegisterInfo = info.RegisterInfo,
                                 Registration = info.Registration,
                                 Resolves = info.Resolves
                             });
@@ -175,7 +213,7 @@ namespace VContainer.Editor.Diagnostics
                         EditorGUI.LabelField(rect, item.Registration?.Lifetime.ToString(), labelStyle);
                         break;
                     case 4:
-                        EditorGUI.LabelField(rect, item.RegistrationSummary, labelStyle);
+                        EditorGUI.LabelField(rect, item.RegisterSummary, labelStyle);
                         break;
                     case 5:
                         EditorGUI.LabelField(rect, item.Resolves?.Count.ToString(), labelStyle);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using VContainer.Diagnostics;
 using VContainer.Internal;
@@ -23,6 +24,7 @@ namespace VContainer
     {
         readonly IObjectResolver root;
         readonly IScopedObjectResolver parent;
+        IDiagnosticsCollector diagnosticsCollector;
 
         internal ScopedContainerBuilder(IObjectResolver root, IScopedObjectResolver parent)
         {
@@ -33,10 +35,9 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IScopedObjectResolver BuildScope()
         {
-            var (registry, registrations) = BuildRegistry();
+            var registry = BuildRegistry();
             var container = new ScopedContainer(registry, root, parent, ApplicationOrigin);
             EmitCallbacks(container);
-            DiagnosticsCollector?.Collect(container, registrations);
             return container;
         }
 
@@ -47,15 +48,26 @@ namespace VContainer
     public class ContainerBuilder : IContainerBuilder
     {
         public object ApplicationOrigin { get; set; }
-        public IDiagnosticsCollector DiagnosticsCollector { get; set; }
+
+        public IDiagnosticsCollector DiagnosticsCollector
+        {
+            get => diagnosticsCollector;
+            set
+            {
+                diagnosticsCollector = value;
+                diagnosticsCollector?.Clear(this);
+            }
+        }
 
         readonly List<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
+        IDiagnosticsCollector diagnosticsCollector;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Register<T>(T registrationBuilder) where T : RegistrationBuilder
         {
             registrationBuilders.Add(registrationBuilder);
+            DiagnosticsCollector?.TraceRegister(this, registrationBuilder, new StackTrace(true));
             return registrationBuilder;
         }
 
@@ -84,16 +96,15 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual IObjectResolver Build()
         {
-            var (registry, registrations) = BuildRegistry();
+            var registry = BuildRegistry();
             var container = new Container(registry, ApplicationOrigin);
             EmitCallbacks(container);
-            DiagnosticsCollector?.Collect(container, registrations);
 
             return container;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected (IRegistry, IRegistration[]) BuildRegistry()
+        protected IRegistry BuildRegistry()
         {
             var registrations = new IRegistration[registrationBuilders.Count + 1];
 
@@ -102,6 +113,7 @@ namespace VContainer
             {
                 var registrationBuilder = registrationBuilders[i];
                 var registration = registrationBuilder.Build();
+                DiagnosticsCollector?.TraceBuild(this, registrationBuilder, registration);
                 registrations[i] = registration;
             });
 #else
@@ -109,6 +121,7 @@ namespace VContainer
             {
                 var registrationBuilder = registrationBuilders[i];
                 var registration = registrationBuilder.Build();
+                DiagnosticsCollector?.TraceBuild(this, registrationBuilder, registration);
                 registrations[i] = registration;
             }
 #endif
@@ -117,7 +130,7 @@ namespace VContainer
             var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
             TypeAnalyzer.CheckCircularDependency(registrations, registry);
 
-            return (registry, registrations);
+            return registry;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

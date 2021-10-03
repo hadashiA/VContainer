@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VContainer.Unity;
@@ -123,19 +122,14 @@ namespace VContainer.Editor.Diagnostics
             var message = "";
             if (LifetimeScope.DiagnosticsEnabled)
             {
-                var selected = treeView.state.selectedIDs;
-                if (selected.Count > 0)
+                var selectedItem = treeView.GetSelectedItem();
+                if (selectedItem != null)
                 {
-                    var first = selected[0];
-                    if (treeView.CurrentBindingItems.FirstOrDefault(x => x.id == first) is DiagnosticsInfoTreeViewItem item)
-                    {
-                        message = "AAAAAA";
-                        // message = string.Join(Splitter, item.StackTraces
-                        //     .Select(x =>
-                        //         "Subscribe at " + x.Timestamp.ToLocalTime().ToString("HH:mm:ss.ff") // + ", Elapsed: " + (now - x.Timestamp).TotalSeconds.ToString("00.00")
-                        //                         + Environment.NewLine
-                        //                         + (x.formattedStackTrace ?? (x.formattedStackTrace = x.StackTrace.CleanupAsyncStackTrace()))));
-                    }
+                    var registerInfo = selectedItem.RegisterInfo;
+                    message = $"<a href=\"{registerInfo.GetScriptAssetPath()}\">Register at {registerInfo.GetHeadline()}</a>" +
+                              Environment.NewLine +
+                              Environment.NewLine +
+                              selectedItem.RegisterInfo.StackTrace;
                 }
             }
             else

@@ -7,8 +7,6 @@ namespace VContainer
 {
     public interface IObjectResolver : IDisposable
     {
-        object ApplicationOrigin { get; }
-
         object Resolve(Type type);
         object Resolve(IRegistration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
@@ -31,7 +29,6 @@ namespace VContainer
 
     public sealed class ScopedContainer : IScopedObjectResolver
     {
-        public object ApplicationOrigin { get; }
         public IObjectResolver Root { get; }
         public IScopedObjectResolver Parent { get; }
 
@@ -49,7 +46,6 @@ namespace VContainer
             this.registry = registry;
             Root = root;
             Parent = parent;
-            ApplicationOrigin = applicationOrigin;
 
             createInstance = registration =>
             {
@@ -144,8 +140,6 @@ namespace VContainer
 
     public sealed class Container : IObjectResolver
     {
-        public object ApplicationOrigin { get; }
-
         readonly IRegistry registry;
         readonly IScopedObjectResolver rootScope;
         readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
@@ -156,7 +150,6 @@ namespace VContainer
         {
             this.registry = registry;
             rootScope = new ScopedContainer(registry, this);
-            ApplicationOrigin = applicationOrigin;
 
             createInstance = registration =>
             {

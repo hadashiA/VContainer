@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace VContainer.Diagnostics
@@ -8,68 +9,108 @@ namespace VContainer.Diagnostics
     {
         ILookup<string, DiagnosticsInfo> GetDiagnosticsInfos();
         ILookup<string, DiagnosticsInfo> GetGroupedDiagnosticsInfos();
-        void Collect(IObjectResolver container, IRegistration[] registrations);
+
+        void Clear(IContainerBuilder containerBuilder);
+
+        void TraceRegister(
+            IContainerBuilder containerBuilder,
+            RegistrationBuilder registrationBuilder,
+            StackTrace stackTrace);
+
+        void TraceBuild(
+            IContainerBuilder containerBuilder,
+            RegistrationBuilder registrationBuilder,
+            IRegistration registration);
     }
 
     public sealed class DiagnosticsInfo
     {
-        public readonly string ScopeName;
-        public readonly IRegistration Registration;
-        public readonly ResolveInfo ResolveInfo;
-        public List<ResolveInfo> Resolves = new List<ResolveInfo>();
+        public string ScopeName { get; }
+        public RegisterInfo RegisterInfo { get; }
+        public IRegistration Registration { get; set; }
+        public readonly List<ResolveInfo> Resolves = new List<ResolveInfo>();
 
-        public DiagnosticsInfo(string scopeName, IRegistration registration)
+        public DiagnosticsInfo(string scopeName, RegisterInfo registerInfo)
         {
             ScopeName = scopeName;
-            Registration = registration;
+            RegisterInfo = registerInfo;
         }
     }
 
     public sealed class DiagnosticsCollector : IDiagnosticsCollector
     {
-        static string GetScopeName(IObjectResolver container)
+        static string GetScopeName(IContainerBuilder containerBuilder)
         {
-            if (container.ApplicationOrigin is UnityEngine.Object obj)
+            if (containerBuilder.ApplicationOrigin is UnityEngine.Object obj)
             {
                 return obj.name;
             }
 
-            return container.GetType().Name;
+            var typeName = containerBuilder.GetType().Name;
+            var suffixIndex = typeName.IndexOf("Builder");
+            return suffixIndex > 0 ? typeName.Substring(0, suffixIndex) : typeName;
         }
 
-        readonly Dictionary<string, Dictionary<IRegistration, DiagnosticsInfo>> diagnosticsInfos =
-            new Dictionary<string, Dictionary<IRegistration, DiagnosticsInfo>>();
+        readonly Dictionary<string, Dictionary<RegistrationBuilder, DiagnosticsInfo>> diagnosticsInfos =
+            new Dictionary<string, Dictionary<RegistrationBuilder, DiagnosticsInfo>>();
 
         readonly object syncRoot = new object();
 
-        public void AddInstance(IObjectResolver container, IRegistration registration, object instance)
+        public void Clear(IContainerBuilder containerBuilder)
         {
-            lock (syncRoot)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public void Collect(IObjectResolver container, IRegistration[] registrations)
-        {
-            var scopeName = GetScopeName(container);
-
+            var scopeName = GetScopeName(containerBuilder);
             lock (syncRoot)
             {
                 if (diagnosticsInfos.TryGetValue(scopeName, out var entry))
                 {
                     entry.Clear();
                 }
-                else
+            }
+        }
+
+        public void TraceRegister(
+            IContainerBuilder containerBuilder,
+            RegistrationBuilder registrationBuilder,
+            StackTrace stackTrace)
+        {
+            var scopeName = GetScopeName(containerBuilder);
+            lock (syncRoot)
+            {
+                if (!diagnosticsInfos.TryGetValue(scopeName, out var entry))
                 {
-                    entry = new Dictionary<IRegistration, DiagnosticsInfo>();
+                    entry = new Dictionary<RegistrationBuilder, DiagnosticsInfo>();
+                    diagnosticsInfos.Add(scopeName, entry);
+                }
+                entry.Add(registrationBuilder, new DiagnosticsInfo(scopeName, new RegisterInfo(registrationBuilder, stackTrace)));
+            }
+        }
+
+        public void TraceBuild(
+            IContainerBuilder containerBuilder,
+            RegistrationBuilder registrationBuilder,
+            IRegistration registration)
+        {
+            var scopeName = GetScopeName(containerBuilder);
+            lock (syncRoot)
+            {
+                if (!diagnosticsInfos.TryGetValue(scopeName, out var entry))
+                {
+                    entry = new Dictionary<RegistrationBuilder, DiagnosticsInfo>();
                     diagnosticsInfos.Add(scopeName, entry);
                 }
 
-                foreach (var registration in registrations)
+                if (entry.TryGetValue(registrationBuilder, out var info))
                 {
-                    entry.Add(registration, new DiagnosticsInfo(scopeName, registration));
+                    info.Registration = registration;
                 }
+            }
+        }
+
+        public void TraceResolve(IObjectResolver container, IRegistration registration, object instance)
+        {
+            lock (syncRoot)
+            {
+                throw new NotImplementedException();
             }
         }
 
