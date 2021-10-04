@@ -10,7 +10,6 @@ namespace VContainer.Editor.Diagnostics
         static VContainerDiagnosticsWindow window;
 
         static readonly GUIContent EnableAutoReloadHeadContent = EditorGUIUtility.TrTextContent("Enable AutoReload", "Reload view automatically.");
-        static readonly GUIContent EnableCaptureStackTraceHeadContent = EditorGUIUtility.TrTextContent("Enable CaptureStackTrace", "CaptureStackTrace on Subscribe.");
         static readonly GUIContent EnableCollapseHeadContent = EditorGUIUtility.TrTextContent("Collapse", "Collapse StackTraces.");
         static readonly GUIContent ReloadHeadContent = EditorGUIUtility.TrTextContent("Reload", "Reload View.");
 
@@ -126,7 +125,7 @@ namespace VContainer.Editor.Diagnostics
                 if (selectedItem != null)
                 {
                     var registerInfo = selectedItem.RegisterInfo;
-                    message = $"<a href=\"{registerInfo.GetScriptAssetPath()}\">Register at {registerInfo.GetHeadline()}</a>" +
+                    message = $"<a href=\"{registerInfo.GetScriptAssetPath()}\" line=\"{registerInfo.GetFileLineNumber()}\">Register at {registerInfo.GetHeadline()}</a>" +
                               Environment.NewLine +
                               Environment.NewLine +
                               selectedItem.RegisterInfo.StackTrace;
