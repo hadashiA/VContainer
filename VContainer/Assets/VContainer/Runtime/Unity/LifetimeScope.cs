@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using VContainer.Diagnostics;
 
 namespace VContainer.Unity
 {
@@ -160,7 +161,7 @@ namespace VContainer.Unity
                 Container = Parent.Container.CreateScope(builder =>
                 {
                     builder.ApplicationOrigin = this;
-                    builder.DiagnosticsCollector = DiagnosticsEnabled ? DiagnosticsCollector : null;
+                    builder.Diagnostics = DiagnosticsEnabled ? DiagnositcsContext.GetCurrentCollector(name, GetInstanceID()) : null;
                     InstallTo(builder);
                 });
             }
@@ -169,7 +170,7 @@ namespace VContainer.Unity
                 var builder = new ContainerBuilder
                 {
                     ApplicationOrigin = this,
-                    DiagnosticsCollector = DiagnosticsEnabled ? DiagnosticsCollector : null
+                    Diagnostics = DiagnosticsEnabled ? DiagnositcsContext.GetCurrentCollector(name, GetInstanceID()) : null,
                 };
                 InstallTo(builder);
                 Container = builder.Build();

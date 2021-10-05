@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using VContainer.Diagnostics;
 using VContainer.Internal;
 
 namespace VContainer
 {
     public interface IObjectResolver : IDisposable
     {
+        DiagnosticsCollector Diagnostics { get; set; }
+
         object Resolve(Type type);
         object Resolve(IRegistration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
@@ -31,6 +34,7 @@ namespace VContainer
     {
         public IObjectResolver Root { get; }
         public IScopedObjectResolver Parent { get; }
+        public DiagnosticsCollector Diagnostics { get; set; }
 
         readonly IRegistry registry;
         readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
@@ -40,12 +44,11 @@ namespace VContainer
         internal ScopedContainer(
             IRegistry registry,
             IObjectResolver root,
-            IScopedObjectResolver parent = null,
-            object applicationOrigin = null)
+            IScopedObjectResolver parent = null)
         {
-            this.registry = registry;
             Root = root;
             Parent = parent;
+            this.registry = registry;
 
             createInstance = registration =>
             {
@@ -63,25 +66,25 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(IRegistration registration)
         {
-            switch (registration.Lifetime)
+            using (Diagnostics?.StartResolveTracing(registration))
             {
-                case Lifetime.Transient:
-                    return registration.SpawnInstance(this);
+                switch (registration.Lifetime)
+                {
+                    case Lifetime.Singleton:
+                        if (Parent is null)
+                            return Root.Resolve(registration);
 
-                case Lifetime.Singleton:
-                    if (Parent is null)
-                        return Root.Resolve(registration);
+                        if (!registry.Exists(registration.ImplementationType))
+                            return Parent.Resolve(registration);
 
-                    if (!registry.Exists(registration.ImplementationType))
-                        return Parent.Resolve(registration);
+                        return CreateTrackedInstance(registration);
 
-                    return CreateTrackedInstance(registration);
+                    case Lifetime.Scoped:
+                        return CreateTrackedInstance(registration);
 
-                case Lifetime.Scoped:
-                    return CreateTrackedInstance(registration);
-
-                default:
-                    throw new ArgumentOutOfRangeException();
+                    default:
+                        return registration.SpawnInstance(this);
+                }
             }
         }
 
@@ -115,11 +118,13 @@ namespace VContainer
         object CreateTrackedInstance(IRegistration registration)
         {
             var lazy = sharedInstances.GetOrAdd(registration, createInstance);
-            if (!lazy.IsValueCreated && lazy.Value is IDisposable disposable && !(registration is InstanceRegistration))
+            var created = lazy.IsValueCreated;
+            var instance = lazy.Value;
+            if (!created && instance is IDisposable disposable && !(registration is InstanceRegistration))
             {
                 disposables.Add(disposable);
             }
-            return lazy.Value;
+            return instance;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -140,13 +145,15 @@ namespace VContainer
 
     public sealed class Container : IObjectResolver
     {
+        public DiagnosticsCollector Diagnostics { get; set; }
+
         readonly IRegistry registry;
         readonly IScopedObjectResolver rootScope;
         readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<IRegistration, Lazy<object>> createInstance;
 
-        internal Container(IRegistry registry, object applicationOrigin = null)
+        internal Container(IRegistry registry)
         {
             this.registry = registry;
             rootScope = new ScopedContainer(registry, this);
@@ -170,24 +177,24 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(IRegistration registration)
         {
-            switch (registration.Lifetime)
+            using (Diagnostics?.StartResolveTracing(registration))
             {
-                case Lifetime.Transient:
-                    return registration.SpawnInstance(this);
+                switch (registration.Lifetime)
+                {
+                    case Lifetime.Singleton:
+                        var singleton = sharedInstances.GetOrAdd(registration, createInstance);
+                        if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration is InstanceRegistration))
+                        {
+                            disposables.Add(disposable);
+                        }
+                        return singleton.Value;
 
-                case Lifetime.Singleton:
-                    var singleton = sharedInstances.GetOrAdd(registration, createInstance);
-                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration is InstanceRegistration))
-                    {
-                        disposables.Add(disposable);
-                    }
-                    return singleton.Value;
+                    case Lifetime.Scoped:
+                        return rootScope.Resolve(registration);
 
-                case Lifetime.Scoped:
-                    return rootScope.Resolve(registration);
-
-                default:
-                    throw new ArgumentOutOfRangeException();
+                    default:
+                        return registration.SpawnInstance(this);
+                }
             }
         }
 

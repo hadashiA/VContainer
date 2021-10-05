@@ -13,16 +13,19 @@ namespace VContainer.Editor.Diagnostics
     {
         public string ScopeName { get; set; }
         public RegisterInfo RegisterInfo { get; set; }
-        public IRegistration Registration { get; set; }
-        public IReadOnlyList<ResolveInfo> Resolves { get; set; }
+        public ResolveInfo ResolveInfo { get; set; }
 
-        public string RegistrationSummary => Registration != null
-            ? Registration.GetType().Name
-            : "";
-
-        public string ContractTypesSummary => Registration?.InterfaceTypes != null
-            ? string.Join(", ", Registration.InterfaceTypes.Select(x => x.Name))
-            : "";
+        public string ContractTypesSummary
+        {
+            get
+            {
+                if (ResolveInfo?.Registration.InterfaceTypes != null)
+                {
+                    string.Join(", ", ResolveInfo?.Registration.InterfaceTypes.Select(x => x.Name));
+                }
+                return "";
+            }
+        }
 
         public string RegisterSummary
         {
@@ -74,7 +77,7 @@ namespace VContainer.Editor.Diagnostics
                 new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
                 new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes") },
                 new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime") },
-                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Registration") },
+                new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register") },
                 new MultiColumnHeaderState.Column { headerContent = new GUIContent("ResolveCount"), width = 5f },
             })))
         {
@@ -149,13 +152,14 @@ namespace VContainer.Editor.Diagnostics
             {
                 if (VContainerDiagnosticsWindow.EnableCollapse)
                 {
-                    var grouped = LifetimeScope.DiagnosticsCollector.GetGroupedDiagnosticsInfos();
+                    var grouped = DiagnositcsContext.GetGroupedDiagnosticsInfos();
                     foreach (var scope in grouped)
                     {
+                        var scopeName = scope.Key.ToString();
                         var parentItem = new DiagnosticsInfoTreeViewItem(NextId())
                         {
-                            displayName = scope.Key,
-                            ScopeName = scope.Key
+                            displayName = scopeName,
+                            ScopeName = scopeName,
                         };
                         children.Add(parentItem);
                         SetExpanded(parentItem.id, true);
@@ -164,10 +168,9 @@ namespace VContainer.Editor.Diagnostics
                         {
                             parentItem.AddChild(new DiagnosticsInfoTreeViewItem(NextId())
                             {
-                                ScopeName = scope.Key,
+                                ScopeName = scopeName,
                                 RegisterInfo = info.RegisterInfo,
-                                Registration = info.Registration,
-                                Resolves = info.Resolves
+                                ResolveInfo = info.ResolveInfo,
                             });
                         }
                     }
@@ -204,19 +207,19 @@ namespace VContainer.Editor.Diagnostics
                         base.RowGUI(args);
                         break;
                     case 1:
-                        EditorGUI.LabelField(rect, item.Registration?.ImplementationType?.Name ?? "", labelStyle);
+                        EditorGUI.LabelField(rect, item.ResolveInfo?.Registration?.ImplementationType?.Name ?? "", labelStyle);
                         break;
                     case 2:
                         EditorGUI.LabelField(rect, item.ContractTypesSummary, labelStyle);
                         break;
                     case 3:
-                        EditorGUI.LabelField(rect, item.Registration?.Lifetime.ToString(), labelStyle);
+                        EditorGUI.LabelField(rect, item.ResolveInfo?.Registration?.Lifetime.ToString(), labelStyle);
                         break;
                     case 4:
                         EditorGUI.LabelField(rect, item.RegisterSummary, labelStyle);
                         break;
                     case 5:
-                        EditorGUI.LabelField(rect, item.Resolves?.Count.ToString(), labelStyle);
+                        EditorGUI.LabelField(rect, item.ResolveInfo?.ResolveCount.ToString(), labelStyle);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);

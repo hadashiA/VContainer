@@ -1,136 +1,113 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace VContainer.Diagnostics
 {
-    public interface IDiagnosticsCollector
+    public readonly struct ResolveTracingScope : IDisposable
     {
-        ILookup<string, DiagnosticsInfo> GetDiagnosticsInfos();
-        ILookup<string, DiagnosticsInfo> GetGroupedDiagnosticsInfos();
+        [ThreadStatic]
+        static int callStackCount;
 
-        void Clear(IContainerBuilder containerBuilder);
+        [ThreadStatic]
+        static DiagnosticsInfo owner;
 
-        void TraceRegister(
-            IContainerBuilder containerBuilder,
-            RegistrationBuilder registrationBuilder,
-            StackTrace stackTrace);
+        public readonly DiagnosticsCollector Collector;
+        public readonly IRegistration Registration;
 
-        void TraceBuild(
-            IContainerBuilder containerBuilder,
-            RegistrationBuilder registrationBuilder,
-            IRegistration registration);
+        public ResolveTracingScope(DiagnosticsCollector collector, IRegistration registration)
+        {
+            Collector = collector;
+            Registration = registration;
+
+            callStackCount++;
+
+            var current = collector.FindByRegistration(registration);
+            if (current == null) return;
+
+            current.ResolveInfo.ResolveCount += 1;
+
+            if (callStackCount > 1)
+            {
+                owner?.Dependencies.Add(current);
+            }
+            owner = current;
+        }
+
+        public void Dispose()
+        {
+            if (--callStackCount <= 0)
+            {
+                callStackCount = 0;
+                owner = null;
+            }
+        }
     }
 
-    public sealed class DiagnosticsInfo
+    public sealed class DiagnosticsCollector
     {
-        public string ScopeName { get; }
-        public RegisterInfo RegisterInfo { get; }
-        public IRegistration Registration { get; set; }
-        public readonly List<ResolveInfo> Resolves = new List<ResolveInfo>();
+        public ScopeKey ScopeKey { get; }
 
-        public DiagnosticsInfo(string scopeName, RegisterInfo registerInfo)
+        readonly List<DiagnosticsInfo> diagnosticsInfos = new List<DiagnosticsInfo>();
+
+        public DiagnosticsCollector(ScopeKey scopeKey)
         {
-            ScopeName = scopeName;
-            RegisterInfo = registerInfo;
+            ScopeKey = scopeKey;
         }
-    }
 
-    public sealed class DiagnosticsCollector : IDiagnosticsCollector
-    {
-        static string GetScopeName(IContainerBuilder containerBuilder)
+        public IReadOnlyList<DiagnosticsInfo> GetDiagnosticsInfos()
         {
-            if (containerBuilder.ApplicationOrigin is UnityEngine.Object obj)
+            return diagnosticsInfos;
+        }
+
+        public void Clear()
+        {
+            lock (diagnosticsInfos)
             {
-                return obj.name;
+                diagnosticsInfos.Clear();
             }
-
-            var typeName = containerBuilder.GetType().Name;
-            var suffixIndex = typeName.IndexOf("Builder");
-            return suffixIndex > 0 ? typeName.Substring(0, suffixIndex) : typeName;
         }
 
-        readonly Dictionary<string, Dictionary<RegistrationBuilder, DiagnosticsInfo>> diagnosticsInfos =
-            new Dictionary<string, Dictionary<RegistrationBuilder, DiagnosticsInfo>>();
-
-        readonly object syncRoot = new object();
-
-        public void Clear(IContainerBuilder containerBuilder)
+        public void TraceRegister(RegisterInfo registerInfo)
         {
-            var scopeName = GetScopeName(containerBuilder);
-            lock (syncRoot)
+            lock (diagnosticsInfos)
             {
-                if (diagnosticsInfos.TryGetValue(scopeName, out var entry))
+                diagnosticsInfos.Add(new DiagnosticsInfo(ScopeKey, registerInfo));
+            }
+        }
+
+        public void TraceBuild(RegistrationBuilder registrationBuilder, IRegistration registration)
+        {
+            lock (diagnosticsInfos)
+            {
+                foreach (var x in diagnosticsInfos)
                 {
-                    entry.Clear();
+                    if (x.RegisterInfo.RegistrationBuilder == registrationBuilder)
+                    {
+                        x.ResolveInfo = new ResolveInfo(registration);
+                        return;
+                    }
                 }
             }
         }
 
-        public void TraceRegister(
-            IContainerBuilder containerBuilder,
-            RegistrationBuilder registrationBuilder,
-            StackTrace stackTrace)
+        public ResolveTracingScope StartResolveTracing(IRegistration registration)
         {
-            var scopeName = GetScopeName(containerBuilder);
-            lock (syncRoot)
-            {
-                if (!diagnosticsInfos.TryGetValue(scopeName, out var entry))
-                {
-                    entry = new Dictionary<RegistrationBuilder, DiagnosticsInfo>();
-                    diagnosticsInfos.Add(scopeName, entry);
-                }
-                entry.Add(registrationBuilder, new DiagnosticsInfo(scopeName, new RegisterInfo(registrationBuilder, stackTrace)));
-            }
+            return new ResolveTracingScope(this, registration);
         }
 
-        public void TraceBuild(
-            IContainerBuilder containerBuilder,
-            RegistrationBuilder registrationBuilder,
-            IRegistration registration)
+        internal DiagnosticsInfo FindByRegistration(IRegistration registration)
         {
-            var scopeName = GetScopeName(containerBuilder);
-            lock (syncRoot)
+            lock (diagnosticsInfos)
             {
-                if (!diagnosticsInfos.TryGetValue(scopeName, out var entry))
+                foreach (var x in diagnosticsInfos)
                 {
-                    entry = new Dictionary<RegistrationBuilder, DiagnosticsInfo>();
-                    diagnosticsInfos.Add(scopeName, entry);
-                }
-
-                if (entry.TryGetValue(registrationBuilder, out var info))
-                {
-                    info.Registration = registration;
+                    if (x.ResolveInfo.Registration == registration)
+                    {
+                        return x;
+                    }
                 }
             }
-        }
-
-        public void TraceResolve(IObjectResolver container, IRegistration registration, object instance)
-        {
-            lock (syncRoot)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public ILookup<string, DiagnosticsInfo> GetDiagnosticsInfos()
-        {
-            lock (syncRoot)
-            {
-                throw new NotImplementedException();
-                // return diagnosticsInfos.SelectMany(x => x.Value.Values).ToArray();
-            }
-        }
-
-        public ILookup<string, DiagnosticsInfo> GetGroupedDiagnosticsInfos()
-        {
-            lock (syncRoot)
-            {
-                return diagnosticsInfos
-                    .SelectMany(x => x.Value.Values)
-                    .ToLookup(x => x.ScopeName);
-            }
+            return null;
         }
     }
 }

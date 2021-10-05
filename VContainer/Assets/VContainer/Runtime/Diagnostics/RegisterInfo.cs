@@ -19,12 +19,12 @@ namespace VContainer.Diagnostics
 
         internal string formattedStackTrace = default; // cache field for internal use(Unity Editor, etc...)
 
-        public RegisterInfo(RegistrationBuilder registrationBuilder, StackTrace stackTrace)
+        public RegisterInfo(RegistrationBuilder registrationBuilder)
         {
             Id = Interlocked.Increment(ref idSeed);
             RegistrationBuilder = registrationBuilder;
-            StackTrace = stackTrace;
-            headLineStackFrame = GetHeadlineFrame(stackTrace);
+            StackTrace = new StackTrace(true);
+            headLineStackFrame = GetHeadlineFrame(StackTrace);
         }
 
         public string GetFilename()

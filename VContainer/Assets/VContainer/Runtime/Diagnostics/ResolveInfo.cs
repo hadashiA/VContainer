@@ -1,23 +1,16 @@
-using System.Diagnostics;
-using System.Threading;
+using System.Collections.Generic;
 
 namespace VContainer.Diagnostics
 {
     public sealed class ResolveInfo
     {
-        static int idSeed;
+        public IRegistration Registration { get; }
+        public List<object> Instances { get; } = new List<object>();
+        public int ResolveCount { get; set; }
 
-        public readonly int Id;
-        public readonly object Instance;
-        public readonly StackTrace StackTrace;
-
-        internal string FormattedStackTrace = ""; // cache field for internal use(Unity Editor, etc...)
-
-        public ResolveInfo(object instance, StackTrace stackTrace)
+        public ResolveInfo(IRegistration registration)
         {
-            Id = Interlocked.Increment(ref idSeed);
-            Instance = instance;
-            StackTrace = stackTrace;
+            Registration = registration;
         }
-   }
+    }
 }
