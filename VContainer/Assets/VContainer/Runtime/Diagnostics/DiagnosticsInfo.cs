@@ -4,14 +4,14 @@ namespace VContainer.Diagnostics
 {
     public sealed class DiagnosticsInfo
     {
-        public ScopeKey ScopeKey { get; }
+        public string ScopeName { get; }
         public RegisterInfo RegisterInfo { get; }
         public ResolveInfo ResolveInfo { get; set; }
         public List<DiagnosticsInfo> Dependencies { get; } = new List<DiagnosticsInfo>();
 
-        public DiagnosticsInfo(ScopeKey scopeKey, RegisterInfo registerInfo)
+        public DiagnosticsInfo(string scopeName, RegisterInfo registerInfo)
         {
-            ScopeKey = scopeKey;
+            ScopeName = scopeName;
             RegisterInfo = registerInfo;
         }
     }

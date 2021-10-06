@@ -6,7 +6,8 @@ namespace VContainer.Diagnostics
     {
         public IRegistration Registration { get; }
         public List<object> Instances { get; } = new List<object>();
-        public int ResolveCount { get; set; }
+        public int MaxDepth { get; set; } = -1;
+        public int RefCount { get; set; }
 
         public ResolveInfo(IRegistration registration)
         {

@@ -1,57 +1,62 @@
 using System;
 using System.Collections.Generic;
+using VContainer.Internal;
 
 namespace VContainer.Diagnostics
 {
     public readonly struct ResolveTracingScope : IDisposable
     {
         [ThreadStatic]
-        static int callStackCount;
-
-        [ThreadStatic]
-        static DiagnosticsInfo owner;
+        static Stack<DiagnosticsInfo> dependencyStack;
 
         public readonly DiagnosticsCollector Collector;
         public readonly IRegistration Registration;
+        public readonly bool Traced;
 
         public ResolveTracingScope(DiagnosticsCollector collector, IRegistration registration)
         {
             Collector = collector;
             Registration = registration;
+            Traced = !(registration is CollectionRegistration);
 
-            callStackCount++;
+            if (!Traced)
+                return;
+
+            if (dependencyStack == null)
+                dependencyStack = new Stack<DiagnosticsInfo>();
+
+            dependencyStack.TryPeek(out var owner);
 
             var current = collector.FindByRegistration(registration);
-            if (current == null) return;
+            dependencyStack.Push(current);
 
-            current.ResolveInfo.ResolveCount += 1;
+            if (current == null || owner == current)
+                return;
+            current.ResolveInfo.RefCount += 1;
 
-            if (callStackCount > 1)
-            {
-                owner?.Dependencies.Add(current);
-            }
-            owner = current;
+            current.ResolveInfo.MaxDepth = current.ResolveInfo.MaxDepth < 0
+                ? dependencyStack.Count
+                : Math.Max(current.ResolveInfo.MaxDepth, dependencyStack.Count);
+
+            owner?.Dependencies.Add(current);
         }
 
         public void Dispose()
         {
-            if (--callStackCount <= 0)
-            {
-                callStackCount = 0;
-                owner = null;
-            }
+            if (dependencyStack.Count > 0 && Traced)
+                dependencyStack.Pop();
         }
     }
 
     public sealed class DiagnosticsCollector
     {
-        public ScopeKey ScopeKey { get; }
+        public string ScopeName { get; }
 
         readonly List<DiagnosticsInfo> diagnosticsInfos = new List<DiagnosticsInfo>();
 
-        public DiagnosticsCollector(ScopeKey scopeKey)
+        public DiagnosticsCollector(string scopeName)
         {
-            ScopeKey = scopeKey;
+            ScopeName = scopeName;
         }
 
         public IReadOnlyList<DiagnosticsInfo> GetDiagnosticsInfos()
@@ -71,7 +76,7 @@ namespace VContainer.Diagnostics
         {
             lock (diagnosticsInfos)
             {
-                diagnosticsInfos.Add(new DiagnosticsInfo(ScopeKey, registerInfo));
+                diagnosticsInfos.Add(new DiagnosticsInfo(ScopeName, registerInfo));
             }
         }
 

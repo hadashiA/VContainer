@@ -15,7 +15,6 @@ namespace VContainer.Editor.Diagnostics
 
         internal static bool EnableAutoReload;
         internal static bool EnableCaptureStackTrace;
-        internal static bool EnableCollapse = true;
 
         [MenuItem("Window/VContainer Diagnostics")]
         public static void OpenWindow()
@@ -82,9 +81,9 @@ namespace VContainer.Editor.Diagnostics
             using (new EditorGUILayout.VerticalScope())
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                if (GUILayout.Toggle(EnableCollapse, EnableCollapseHeadContent, EditorStyles.toolbarButton) != EnableCollapse)
+                if (GUILayout.Toggle(treeView.EnableCollapsed, EnableCollapseHeadContent, EditorStyles.toolbarButton) != treeView.EnableCollapsed)
                 {
-                    EnableCollapse = !EnableCollapse;
+                    treeView.EnableCollapsed = !treeView.EnableCollapsed;
                     treeView.ReloadAndSort();
                     Repaint();
                 }

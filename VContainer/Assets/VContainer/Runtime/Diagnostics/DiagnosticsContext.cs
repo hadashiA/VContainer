@@ -4,50 +4,32 @@ using System.Linq;
 
 namespace VContainer.Diagnostics
 {
-    public readonly struct ScopeKey : IEquatable<ScopeKey>
-    {
-        public readonly string Name;
-        public readonly int InstanceId;
-
-        public ScopeKey(string name, int instanceId)
-        {
-            Name = name;
-            InstanceId = instanceId;
-        }
-
-        public bool Equals(ScopeKey other) => Name == other.Name && InstanceId == other.InstanceId;
-        public override bool Equals(object obj) => obj is ScopeKey other && Equals(other);
-        public override int GetHashCode() => HashCode.Combine(Name, InstanceId);
-
-        public override string ToString() => $"{Name} {InstanceId}";
-    }
-
     public static class DiagnositcsContext
     {
-        static readonly Dictionary<ScopeKey, DiagnosticsCollector> collectors
-            = new Dictionary<ScopeKey, DiagnosticsCollector>();
+        static readonly Dictionary<string, DiagnosticsCollector> collectors
+            = new Dictionary<string, DiagnosticsCollector>();
 
-        public static DiagnosticsCollector GetCurrentCollector(string name, int instanceId)
+        public static DiagnosticsCollector GetCollector(string name)
         {
-            var scopeKey = new ScopeKey(name, instanceId);
             lock (collectors)
             {
-                if (!collectors.TryGetValue(scopeKey, out var collector))
+                if (!collectors.TryGetValue(name, out var collector))
                 {
-                    collector = new DiagnosticsCollector(scopeKey);
-                    collectors.Add(scopeKey, collector);
+                    collector = new DiagnosticsCollector(name);
+                    collectors.Add(name, collector);
                 }
                 return collector;
             }
         }
 
-        public static ILookup<ScopeKey, DiagnosticsInfo> GetGroupedDiagnosticsInfos()
+        public static ILookup<string, DiagnosticsInfo> GetGroupedDiagnosticsInfos()
         {
             lock (collectors)
             {
                 return collectors
                     .SelectMany(x => x.Value.GetDiagnosticsInfos())
-                    .ToLookup(x => x.ScopeKey);
+                    .Where(x => x.ResolveInfo.MaxDepth <= 1)
+                    .ToLookup(x => x.ScopeName);
             }
         }
 
