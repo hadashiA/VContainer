@@ -4,55 +4,12 @@ using VContainer.Internal;
 
 namespace VContainer.Diagnostics
 {
-    public readonly struct ResolveTracingScope : IDisposable
-    {
-        [ThreadStatic]
-        static Stack<DiagnosticsInfo> dependencyStack;
-
-        public readonly DiagnosticsCollector Collector;
-        public readonly IRegistration Registration;
-        public readonly bool Traced;
-
-        public ResolveTracingScope(DiagnosticsCollector collector, IRegistration registration)
-        {
-            Collector = collector;
-            Registration = registration;
-            Traced = !(registration is CollectionRegistration);
-
-            if (!Traced)
-                return;
-
-            if (dependencyStack == null)
-                dependencyStack = new Stack<DiagnosticsInfo>();
-
-            dependencyStack.TryPeek(out var owner);
-
-            var current = collector.FindByRegistration(registration);
-            dependencyStack.Push(current);
-
-            if (current == null || owner == current)
-                return;
-            current.ResolveInfo.RefCount += 1;
-
-            current.ResolveInfo.MaxDepth = current.ResolveInfo.MaxDepth < 0
-                ? dependencyStack.Count
-                : Math.Max(current.ResolveInfo.MaxDepth, dependencyStack.Count);
-
-            owner?.Dependencies.Add(current);
-        }
-
-        public void Dispose()
-        {
-            if (dependencyStack.Count > 0 && Traced)
-                dependencyStack.Pop();
-        }
-    }
-
     public sealed class DiagnosticsCollector
     {
         public string ScopeName { get; }
 
         readonly List<DiagnosticsInfo> diagnosticsInfos = new List<DiagnosticsInfo>();
+        readonly Stack<DiagnosticsInfo> resolveCallStack = new Stack<DiagnosticsInfo>();
 
         public DiagnosticsCollector(string scopeName)
         {
@@ -95,12 +52,35 @@ namespace VContainer.Diagnostics
             }
         }
 
-        public ResolveTracingScope StartResolveTracing(IRegistration registration)
+        public object TraceResolve(IRegistration registration, Func<IRegistration, object> resolving)
         {
-            return new ResolveTracingScope(this, registration);
+            var current = FindByRegistration(registration);
+            resolveCallStack.TryPeek(out var owner);
+
+            if (!(registration is CollectionRegistration) && current != null && current != owner)
+            {
+                current.ResolveInfo.RefCount += 1;
+                current.ResolveInfo.MaxDepth = current.ResolveInfo.MaxDepth < 0
+                    ? resolveCallStack.Count
+                    : Math.Max(current.ResolveInfo.MaxDepth, resolveCallStack.Count);
+
+                owner?.Dependencies.Add(current);
+
+                resolveCallStack.Push(current);
+                var instance = resolving(registration);
+                resolveCallStack.Pop();
+
+                if (!current.ResolveInfo.Instances.Contains(instance))
+                {
+                    current.ResolveInfo.Instances.Add(instance);
+                }
+
+                return instance;
+            }
+            return resolving(registration);
         }
 
-        internal DiagnosticsInfo FindByRegistration(IRegistration registration)
+        DiagnosticsInfo FindByRegistration(IRegistration registration)
         {
             lock (diagnosticsInfos)
             {

@@ -1,6 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using VContainer.Diagnostics;
 using VContainer.Unity;
 
 namespace VContainer.Editor.Diagnostics
@@ -50,27 +51,37 @@ namespace VContainer.Editor.Diagnostics
         }
 
         VContainerDiagnosticsInfoTreeView treeView;
+        VContainerInstanceTreeView instanceTreeView;
 
-        object splitterState;
+        object verticalSplitterState;
+        object horizontalSplitterState;
         Vector2 tableScrollPosition;
         Vector2 detailsScrollPosition;
+        Vector2 instanceScrollPosition;
 
         void OnEnable()
         {
             window = this; // set singleton.
-            splitterState = SplitterGUILayout.CreateSplitterState(new [] { 75f, 25f }, new [] { 32, 32 }, null);
+            verticalSplitterState = SplitterGUILayout.CreateSplitterState(new [] { 75f, 25f }, new [] { 32, 32 }, null);
+            horizontalSplitterState = SplitterGUILayout.CreateSplitterState(new[] { 75, 25f }, new[] { 32, 32 }, null);
             treeView = new VContainerDiagnosticsInfoTreeView();
+            instanceTreeView = new VContainerInstanceTreeView();
         }
 
         void OnGUI()
         {
             RenderHeadPanel();
 
-            // Splittable
-            SplitterGUILayout.BeginVerticalSplit(splitterState, Array.Empty<GUILayoutOption>());
+            SplitterGUILayout.BeginVerticalSplit(verticalSplitterState, Array.Empty<GUILayoutOption>());
             {
-                RenderTable();
-                RenderDetailsPanel();
+                SplitterGUILayout.BeginHorizontalSplit(horizontalSplitterState);
+                {
+                    RenderBuildPanel();
+                    RenderInstancePanel();
+                }
+                SplitterGUILayout.EndHorizontalSplit();
+
+                RenderStackTracePanel();
             }
             SplitterGUILayout.EndVerticalSplit();
         }
@@ -98,10 +109,12 @@ namespace VContainer.Editor.Diagnostics
             }
         }
 
-        void RenderTable()
+        void RenderBuildPanel()
         {
             using (new EditorGUILayout.VerticalScope(TableListStyle))
             using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(tableScrollPosition,
+                true,
+                true,
                 GUILayout.ExpandWidth(true),
                 GUILayout.MaxWidth(2000f)))
             {
@@ -110,24 +123,47 @@ namespace VContainer.Editor.Diagnostics
                 var controlRect = EditorGUILayout.GetControlRect(
                     GUILayout.ExpandHeight(true),
                     GUILayout.ExpandWidth(true));
-
-                treeView?.OnGUI(new Rect(0, 0, position.width, position.height));
+                treeView?.OnGUI(controlRect);
             }
         }
 
-        void RenderDetailsPanel()
+        void RenderInstancePanel()
+        {
+            if (!VContainerSettings.DiagnosticsEnabled)
+            {
+                return;
+            }
+
+            var selectedItem = treeView.GetSelectedItem();
+            if (selectedItem?.DiagnosticsInfo?.ResolveInfo is ResolveInfo resolveInfo &&
+                resolveInfo.Instances.Count > 0)
+            {
+                instanceTreeView.CurrentDiagnosticsInfo = selectedItem.DiagnosticsInfo;
+                instanceTreeView.Reload();
+
+                using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(instanceScrollPosition, GUILayout.ExpandHeight(true)))
+                {
+                    instanceScrollPosition = scrollViewScope.scrollPosition;
+                    var controlRect = EditorGUILayout.GetControlRect(
+                        GUILayout.ExpandHeight(true),
+                        GUILayout.ExpandWidth(true));
+                    instanceTreeView?.OnGUI(controlRect);
+                }
+            }
+        }
+
+        void RenderStackTracePanel()
         {
             var message = "";
-            if (LifetimeScope.DiagnosticsEnabled)
+            if (VContainerSettings.DiagnosticsEnabled)
             {
                 var selectedItem = treeView.GetSelectedItem();
-                if (selectedItem != null)
+                if (selectedItem?.DiagnosticsInfo.RegisterInfo is RegisterInfo registerInfo)
                 {
-                    var registerInfo = selectedItem.RegisterInfo;
-                    message = $"<a href=\"{registerInfo.GetScriptAssetPath()}\" line=\"{registerInfo.GetFileLineNumber()}\">Register at {registerInfo.GetHeadline()}</a>" +
+                    message = $"Register at <a href=\"{registerInfo.GetScriptAssetPath()}\" line=\"{registerInfo.GetFileLineNumber()}\">{registerInfo.GetHeadline()}</a>" +
                               Environment.NewLine +
                               Environment.NewLine +
-                              selectedItem.RegisterInfo.StackTrace;
+                              selectedItem.DiagnosticsInfo.RegisterInfo.StackTrace;
                 }
             }
             else

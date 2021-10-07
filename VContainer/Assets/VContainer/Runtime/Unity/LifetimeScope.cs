@@ -161,7 +161,7 @@ namespace VContainer.Unity
                 Container = Parent.Container.CreateScope(builder =>
                 {
                     builder.ApplicationOrigin = this;
-                    builder.Diagnostics = DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null;
+                    builder.Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null;
                     InstallTo(builder);
                 });
             }
@@ -170,7 +170,7 @@ namespace VContainer.Unity
                 var builder = new ContainerBuilder
                 {
                     ApplicationOrigin = this,
-                    Diagnostics = DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null,
+                    Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null,
                 };
                 InstallTo(builder);
                 Container = builder.Build();

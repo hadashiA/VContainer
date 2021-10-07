@@ -6,6 +6,7 @@ namespace VContainer.Unity
     public sealed class VContainerSettings : ScriptableObject
     {
         public static VContainerSettings Instance { get; private set; }
+        public static bool DiagnosticsEnabled => true;
 
         [SerializeField]
         [Tooltip("Set the Prefab to be the parent of the entire Project.")]

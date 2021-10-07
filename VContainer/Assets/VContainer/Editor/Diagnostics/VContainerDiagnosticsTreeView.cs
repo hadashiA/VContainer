@@ -12,16 +12,19 @@ namespace VContainer.Editor.Diagnostics
     public sealed class DiagnosticsInfoTreeViewItem : TreeViewItem
     {
         public string ScopeName { get; set; }
-        public RegisterInfo RegisterInfo { get; set; }
-        public ResolveInfo ResolveInfo { get; set; }
+        public DiagnosticsInfo DiagnosticsInfo { get; }
+
+        public RegistrationBuilder RegistrationBuilder => DiagnosticsInfo?.RegisterInfo.RegistrationBuilder;
+        public IRegistration Registration => DiagnosticsInfo?.ResolveInfo.Registration;
+        public int? RefCount => DiagnosticsInfo?.ResolveInfo.RefCount;
 
         public string ContractTypesSummary
         {
             get
             {
-                if (ResolveInfo?.Registration.InterfaceTypes != null)
+                if (Registration?.InterfaceTypes != null)
                 {
-                    return string.Join(", ", ResolveInfo.Registration.InterfaceTypes.Select(x => x.Name));
+                    return string.Join(", ", Registration.InterfaceTypes.Select(x => x.Name));
                 }
                 return "";
             }
@@ -31,10 +34,10 @@ namespace VContainer.Editor.Diagnostics
         {
             get
             {
-                if (RegisterInfo == null)
+                if (RegistrationBuilder == null)
                     return "";
 
-                var type = RegisterInfo.RegistrationBuilder.GetType();
+                var type = RegistrationBuilder.GetType();
                 if (type == typeof(RegistrationBuilder))
                 {
                     return "";
@@ -55,15 +58,20 @@ namespace VContainer.Editor.Diagnostics
             }
         }
 
-        public DiagnosticsInfoTreeViewItem(int id) : base(id)
+        public DiagnosticsInfoTreeViewItem(string scopeName)
         {
+            ScopeName = scopeName;
+        }
+
+        public DiagnosticsInfoTreeViewItem(DiagnosticsInfo info)
+        {
+            ScopeName = info.ScopeName;
+            DiagnosticsInfo = info;
         }
     }
 
     public sealed class VContainerDiagnosticsInfoTreeView : TreeView
     {
-        const string SortedColumnIndexStateKey = "VContainer.Editor.DiagnosticsInfoTreeView_sortedColumnIndex";
-
         static readonly MultiColumnHeaderState.Column[] CollapsedColumns = new[]
         {
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
@@ -95,6 +103,7 @@ namespace VContainer.Editor.Diagnostics
                 multiColumnHeader.state = enableCollapsed
                     ? new MultiColumnHeaderState(CollapsedColumns)
                     : new MultiColumnHeaderState(ExpandedColumns);
+                multiColumnHeader.Repaint();
             }
         }
 
@@ -110,14 +119,13 @@ namespace VContainer.Editor.Diagnostics
         {
             rowHeight = 20;
             showAlternatingRowBackgrounds = true;
-            extraSpaceBeforeIconAndLabel = 20;
             showBorder = true;
             header.sortingChanged += OnSortedChanged;
 
             header.ResizeToFit();
             Reload();
 
-            header.sortedColumnIndex = SessionState.GetInt(SortedColumnIndexStateKey, 1);
+            header.sortedColumnIndex = SessionState.GetInt("VContainer.Editor.DiagnosticsInfoTreeView:sortedColumnIndex", 0);
         }
 
         public DiagnosticsInfoTreeViewItem GetSelectedItem()
@@ -169,18 +177,18 @@ namespace VContainer.Editor.Diagnostics
             var root = new TreeViewItem { depth = -1 };
             var children = new List<TreeViewItem>();
 
-            if (LifetimeScope.DiagnosticsEnabled)
+            if (VContainerSettings.DiagnosticsEnabled)
             {
                 if (EnableCollapsed)
                 {
                     var grouped = DiagnositcsContext.GetGroupedDiagnosticsInfos();
                     foreach (var scope in grouped)
                     {
-                        var scopeItem = new DiagnosticsInfoTreeViewItem(NextId())
+                        var scopeItem = new DiagnosticsInfoTreeViewItem(scope.Key)
                         {
+                            id = NextId(),
                             depth = 0,
-                            displayName = scope.Key,
-                            ScopeName = scope.Key,
+                            displayName = scope.Key
                         };
                         children.Add(scopeItem);
                         SetExpanded(scopeItem.id, true);
@@ -196,13 +204,12 @@ namespace VContainer.Editor.Diagnostics
                     var infos = DiagnositcsContext.GetDiagnosticsInfos();
                     foreach (var info in infos)
                     {
-                        children.Add(new DiagnosticsInfoTreeViewItem(NextId())
+                        children.Add(new DiagnosticsInfoTreeViewItem(info)
                         {
+                            id = NextId(),
                             depth = 0,
                             displayName = info.ScopeName,
                             ScopeName = info.ScopeName,
-                            RegisterInfo = info.RegisterInfo,
-                            ResolveInfo = info.ResolveInfo
                         });
                     }
                 }
@@ -239,13 +246,13 @@ namespace VContainer.Editor.Diagnostics
                             EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
                             break;
                         case 2:
-                            EditorGUI.LabelField(cellRect, item.ResolveInfo?.Registration?.Lifetime.ToString(), labelStyle);
+                            EditorGUI.LabelField(cellRect, item.Registration?.Lifetime.ToString(), labelStyle);
                             break;
                         case 3:
                             EditorGUI.LabelField(cellRect, item.RegisterSummary, labelStyle);
                             break;
                         case 4:
-                            EditorGUI.LabelField(cellRect, item.ResolveInfo?.RefCount.ToString(), labelStyle);
+                            EditorGUI.LabelField(cellRect, item.RefCount.ToString(), labelStyle);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
@@ -261,19 +268,19 @@ namespace VContainer.Editor.Diagnostics
                             base.RowGUI(args);
                             break;
                         case 1:
-                            EditorGUI.LabelField(cellRect, item.RegisterInfo?.RegistrationBuilder.ImplementationType.Name, labelStyle);
+                            EditorGUI.LabelField(cellRect, item.RegistrationBuilder?.ImplementationType.Name, labelStyle);
                             break;
                         case 2:
                             EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
                             break;
                         case 3:
-                            EditorGUI.LabelField(cellRect, item.ResolveInfo?.Registration?.Lifetime.ToString(), labelStyle);
+                            EditorGUI.LabelField(cellRect, item.Registration?.Lifetime.ToString(), labelStyle);
                             break;
                         case 4:
                             EditorGUI.LabelField(cellRect, item.RegisterSummary, labelStyle);
                             break;
                         case 5:
-                            EditorGUI.LabelField(cellRect, item.ResolveInfo?.RefCount.ToString(), labelStyle);
+                            EditorGUI.LabelField(cellRect, item.RefCount.ToString(), labelStyle);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
@@ -284,13 +291,11 @@ namespace VContainer.Editor.Diagnostics
 
         void AddChildItemRecursive(DiagnosticsInfo info, DiagnosticsInfoTreeViewItem parent)
         {
-            var item = new DiagnosticsInfoTreeViewItem(NextId())
+            var item = new DiagnosticsInfoTreeViewItem(info)
             {
+                id = NextId(),
                 depth = parent.depth + 1,
                 displayName = info.RegisterInfo?.RegistrationBuilder.ImplementationType.Name,
-                ScopeName = parent.ScopeName,
-                RegisterInfo = info.RegisterInfo,
-                ResolveInfo = info.ResolveInfo,
             };
             parent.AddChild(item);
 

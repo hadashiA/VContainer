@@ -57,35 +57,16 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(Type type)
-        {
-            var registration = FindRegistration(type);
-            return Resolve(registration);
-        }
+        public object Resolve(Type type) => Resolve(FindRegistration(type));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(IRegistration registration)
         {
-            using (Diagnostics?.StartResolveTracing(registration))
+            if (Diagnostics != null)
             {
-                switch (registration.Lifetime)
-                {
-                    case Lifetime.Singleton:
-                        if (Parent is null)
-                            return Root.Resolve(registration);
-
-                        if (!registry.Exists(registration.ImplementationType))
-                            return Parent.Resolve(registration);
-
-                        return CreateTrackedInstance(registration);
-
-                    case Lifetime.Scoped:
-                        return CreateTrackedInstance(registration);
-
-                    default:
-                        return registration.SpawnInstance(this);
-                }
+                return Diagnostics.TraceResolve(registration, ResolveCore);
             }
+            return ResolveCore(registration);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -112,6 +93,29 @@ namespace VContainer
         {
             disposables.Dispose();
             sharedInstances.Clear();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        object ResolveCore(IRegistration registration)
+        {
+            switch (registration.Lifetime)
+            {
+                case Lifetime.Singleton:
+                    if (Parent is null)
+                        return Root.Resolve(registration);
+
+                    if (!registry.Exists(registration.ImplementationType))
+                        return Parent.Resolve(registration);
+
+                    return CreateTrackedInstance(registration);
+
+                case Lifetime.Scoped:
+                    return CreateTrackedInstance(registration);
+
+                default:
+                    return registration.SpawnInstance(this);
+            }
+
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -177,25 +181,11 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(IRegistration registration)
         {
-            using (Diagnostics?.StartResolveTracing(registration))
+            if (Diagnostics != null)
             {
-                switch (registration.Lifetime)
-                {
-                    case Lifetime.Singleton:
-                        var singleton = sharedInstances.GetOrAdd(registration, createInstance);
-                        if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration is InstanceRegistration))
-                        {
-                            disposables.Add(disposable);
-                        }
-                        return singleton.Value;
-
-                    case Lifetime.Scoped:
-                        return rootScope.Resolve(registration);
-
-                    default:
-                        return registration.SpawnInstance(this);
-                }
+                return Diagnostics.TraceResolve(registration, ResolveCore);
             }
+            return ResolveCore(registration);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -215,6 +205,27 @@ namespace VContainer
             rootScope.Dispose();
             disposables.Dispose();
             sharedInstances.Clear();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        object ResolveCore(IRegistration registration)
+        {
+            switch (registration.Lifetime)
+            {
+                case Lifetime.Singleton:
+                    var singleton = sharedInstances.GetOrAdd(registration, createInstance);
+                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration is InstanceRegistration))
+                    {
+                        disposables.Add(disposable);
+                    }
+                    return singleton.Value;
+
+                case Lifetime.Scoped:
+                    return rootScope.Resolve(registration);
+
+                default:
+                    return registration.SpawnInstance(this);
+            }
         }
     }
 }

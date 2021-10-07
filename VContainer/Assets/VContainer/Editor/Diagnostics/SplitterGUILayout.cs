@@ -41,6 +41,18 @@ namespace VContainer.Editor.Diagnostics
             return type.GetMethod("EndVerticalSplit", flags, null, Type.EmptyTypes, null);
         });
 
+        static readonly Lazy<MethodInfo> BeginHorizontalSplitInfo = new Lazy<MethodInfo>(() =>
+        {
+            var type = SplitterGUILayoutType.Value;
+            return type.GetMethod("BeginHorizontalSplit", flags, null, new Type[] { SplitterStateType.Value, typeof(GUILayoutOption[]) }, null);
+        });
+
+        static readonly Lazy<MethodInfo> EndHorizontalSplitInfo = new Lazy<MethodInfo>(() =>
+        {
+            var type = SplitterGUILayoutType.Value;
+            return type.GetMethod("EndHorizontalSplit", flags, null, Type.EmptyTypes, null);
+        });
+
         public static object CreateSplitterState(float[] relativeSizes, int[] minSizes, int[] maxSizes)
         {
             return SplitterStateCtor.Value.Invoke(new object[] { relativeSizes, minSizes, maxSizes });
@@ -53,7 +65,17 @@ namespace VContainer.Editor.Diagnostics
 
         public static void EndVerticalSplit()
         {
-            EndVerticalSplitInfo.Value.Invoke(null, Type.EmptyTypes);
+            EndVerticalSplitInfo.Value.Invoke(null, Array.Empty<object>());
+        }
+
+        public static void BeginHorizontalSplit(object splitterState, params GUILayoutOption[] options)
+        {
+            BeginHorizontalSplitInfo.Value.Invoke(null, new object[] { splitterState, options });
+        }
+
+        public static void EndHorizontalSplit()
+        {
+            EndHorizontalSplitInfo.Value.Invoke(null, Array.Empty<object>());
         }
     }
 }
