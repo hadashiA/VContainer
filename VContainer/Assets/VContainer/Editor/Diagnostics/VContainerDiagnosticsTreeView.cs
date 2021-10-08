@@ -18,13 +18,27 @@ namespace VContainer.Editor.Diagnostics
         public IRegistration Registration => DiagnosticsInfo?.ResolveInfo.Registration;
         public int? RefCount => DiagnosticsInfo?.ResolveInfo.RefCount;
 
+        public string TypeSummary
+        {
+            get
+            {
+                if (Registration?.ImplementationType != null)
+                {
+                    return TypeNameHelper.GetTypeAlias(Registration.ImplementationType);
+                }
+
+                return "";
+            }
+        }
+
         public string ContractTypesSummary
         {
             get
             {
                 if (Registration?.InterfaceTypes != null)
                 {
-                    return string.Join(", ", Registration.InterfaceTypes.Select(x => x.Name));
+                    var values = Registration.InterfaceTypes.Select(TypeNameHelper.GetTypeAlias);
+                    return string.Join(", ", values);
                 }
                 return "";
             }
@@ -72,20 +86,20 @@ namespace VContainer.Editor.Diagnostics
 
     public sealed class VContainerDiagnosticsInfoTreeView : TreeView
     {
-        static readonly MultiColumnHeaderState.Column[] CollapsedColumns = new[]
+        static readonly MultiColumnHeaderState.Column[] Columns = new[]
         {
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes") },
+            new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes"), canSort = false },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("RefCount"), width = 5f },
         };
 
-        static readonly MultiColumnHeaderState.Column[] ExpandedColumns = new[]
+        static readonly MultiColumnHeaderState.Column[] FlattenColumns = new[]
         {
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes") },
+            new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes"), canSort = false },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("RefCount"), width = 5f },
@@ -94,23 +108,25 @@ namespace VContainer.Editor.Diagnostics
         static int idSeed;
         static int NextId() => ++idSeed;
 
-        public bool EnableCollapsed
+        const string SessionStateKeySortedColumnIndex = "VContainer.Editor.DiagnosticsInfoTreeView:sortedColumnIndex";
+
+        public bool Flatten
         {
-            get => enableCollapsed;
+            get => flatten;
             set
             {
-                enableCollapsed = value;
-                multiColumnHeader.state = enableCollapsed
-                    ? new MultiColumnHeaderState(CollapsedColumns)
-                    : new MultiColumnHeaderState(ExpandedColumns);
-                multiColumnHeader.Repaint();
+                flatten = value;
+                multiColumnHeader.state = flatten
+                    ? new MultiColumnHeaderState(FlattenColumns)
+                    : new MultiColumnHeaderState(Columns);
+                multiColumnHeader.ResizeToFit();
             }
         }
 
-        bool enableCollapsed = true;
+        bool flatten;
 
         public VContainerDiagnosticsInfoTreeView()
-            : this(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(CollapsedColumns)))
+            : this(new TreeViewState(), new MultiColumnHeader(new MultiColumnHeaderState(Columns)))
         {
         }
 
@@ -125,7 +141,7 @@ namespace VContainer.Editor.Diagnostics
             header.ResizeToFit();
             Reload();
 
-            header.sortedColumnIndex = SessionState.GetInt("VContainer.Editor.DiagnosticsInfoTreeView:sortedColumnIndex", 0);
+            header.sortedColumnIndex = SessionState.GetInt(SessionStateKeySortedColumnIndex, 0);
         }
 
         public DiagnosticsInfoTreeViewItem GetSelectedItem()
@@ -146,29 +162,76 @@ namespace VContainer.Editor.Diagnostics
 
         void OnSortedChanged(MultiColumnHeader multiColumnHeader)
         {
-            // SessionState.SetInt(SortedColumnIndexStateKey, multiColumnHeader.sortedColumnIndex);
-            // var index = multiColumnHeader.sortedColumnIndex;
-            // var ascending = multiColumnHeader.IsSortedAscending(multiColumnHeader.sortedColumnIndex);
-            //
-            // var items = rootItem.children.Cast<DiagnosticsInfoTreeViewItem>();
-            //
-            // IOrderedEnumerable<DiagnosticsInfoTreeViewItem> orderedEnumerable;
-            // switch (index)
-            // {
-            //     case 0:
-            //         orderedEnumerable = ascending ? items.OrderBy(item => item.Head) : items.OrderByDescending(item => item.Head);
-            //         break;
-            //     case 1:
-            //         orderedEnumerable = ascending ? items.OrderBy(item => item.Elapsed) : items.OrderByDescending(item => item.Elapsed);
-            //         break;
-            //     case 2:
-            //         orderedEnumerable = ascending ? items.OrderBy(item => item.Count) : items.OrderByDescending(item => item.Count);
-            //         break;
-            //     default:
-            //         throw new ArgumentOutOfRangeException(nameof(index), index, null);
-            // }
-            //
-            // CurrentBindingItems = rootItem.children = orderedEnumerable.Cast<TreeViewItem>().ToList();
+            var columnIndex = multiColumnHeader.sortedColumnIndex;
+            if (columnIndex < 0) return;
+
+            SessionState.SetInt(SessionStateKeySortedColumnIndex, columnIndex);
+            var ascending = multiColumnHeader.IsSortedAscending(columnIndex);
+
+            if (Flatten)
+            {
+                var items = rootItem.children.Cast<DiagnosticsInfoTreeViewItem>();
+                switch (columnIndex)
+                {
+                    case 0:
+                        items = ascending
+                            ? items.OrderBy(x => x.ScopeName)
+                            : items.OrderByDescending(x => x.ScopeName);
+                        break;
+                    case 1:
+                        items = ascending
+                            ? items.OrderBy(x => x.TypeSummary)
+                            : items.OrderByDescending(x => x.TypeSummary);
+                        break;
+                    case 3:
+                        items = ascending
+                            ? items.OrderBy(x => x.Registration.Lifetime)
+                            : items.OrderByDescending(x => x.Registration.Lifetime);
+                        break;
+                    case 4:
+                        items = ascending
+                            ? items.OrderBy(x => x.RegisterSummary)
+                            : items.OrderByDescending(x => x.RegisterSummary);
+                        break;
+                    case 5:
+                        items = ascending
+                            ? items.OrderBy(x => x.RefCount)
+                            : items.OrderByDescending(x => x.RefCount);
+                        break;
+                }
+                rootItem.children = new List<TreeViewItem>(items);
+            }
+            else
+            {
+                foreach (var child in rootItem.children)
+                {
+                    var items = child.children.Cast<DiagnosticsInfoTreeViewItem>();
+                    switch (columnIndex)
+                    {
+                        case 0:
+                            items = ascending
+                                ? items.OrderBy(x => x.TypeSummary)
+                                : items.OrderByDescending(x => x.TypeSummary);
+                            break;
+                        case 2:
+                            items = ascending
+                                ? items.OrderBy(x => x.Registration.Lifetime)
+                                : items.OrderByDescending(x => x.Registration.Lifetime);
+                            break;
+                        case 3:
+                            items = ascending
+                                ? items.OrderBy(x => x.RegisterSummary)
+                                : items.OrderByDescending(x => x.RegisterSummary);
+                            break;
+                        case 4:
+                            items = ascending
+                                ? items.OrderBy(x => x.RefCount)
+                                : items.OrderByDescending(x => x.RefCount);
+                            break;
+                    }
+                    child.children = new List<TreeViewItem>(items);
+                }
+            }
             BuildRows(rootItem);
         }
 
@@ -179,7 +242,21 @@ namespace VContainer.Editor.Diagnostics
 
             if (VContainerSettings.DiagnosticsEnabled)
             {
-                if (EnableCollapsed)
+                if (Flatten)
+                {
+                    var infos = DiagnositcsContext.GetDiagnosticsInfos();
+                    foreach (var info in infos)
+                    {
+                        children.Add(new DiagnosticsInfoTreeViewItem(info)
+                        {
+                            id = NextId(),
+                            depth = 0,
+                            displayName = info.ScopeName,
+                            ScopeName = info.ScopeName,
+                        });
+                    }
+                }
+                else
                 {
                     var grouped = DiagnositcsContext.GetGroupedDiagnosticsInfos();
                     foreach (var scope in grouped)
@@ -197,20 +274,6 @@ namespace VContainer.Editor.Diagnostics
                         {
                             AddChildItemRecursive(info, scopeItem);
                         }
-                    }
-                }
-                else
-                {
-                    var infos = DiagnositcsContext.GetDiagnosticsInfos();
-                    foreach (var info in infos)
-                    {
-                        children.Add(new DiagnosticsInfoTreeViewItem(info)
-                        {
-                            id = NextId(),
-                            depth = 0,
-                            displayName = info.ScopeName,
-                            ScopeName = info.ScopeName,
-                        });
                     }
                 }
             }
@@ -234,57 +297,33 @@ namespace VContainer.Editor.Diagnostics
                 var labelStyle = args.selected ? EditorStyles.whiteLabel : EditorStyles.label;
                 labelStyle.alignment = TextAnchor.MiddleLeft;
 
-                if (EnableCollapsed)
+                if (columnIndex == 0)
                 {
-                    // Columns of collapsed
-                    switch (columnIndex)
-                    {
-                        case 0:
-                            base.RowGUI(args);
-                            break;
-                        case 1:
-                            EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
-                            break;
-                        case 2:
-                            EditorGUI.LabelField(cellRect, item.Registration?.Lifetime.ToString(), labelStyle);
-                            break;
-                        case 3:
-                            EditorGUI.LabelField(cellRect, item.RegisterSummary, labelStyle);
-                            break;
-                        case 4:
-                            EditorGUI.LabelField(cellRect, item.RefCount.ToString(), labelStyle);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
-                    }
+                    base.RowGUI(args);
+                }
+                else if (Flatten && columnIndex == 1)
+                {
+                    EditorGUI.LabelField(cellRect, item.TypeSummary, labelStyle);
+                }
+                else if (Flatten && columnIndex == 2 || columnIndex == 1)
+                {
+                    EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
+                }
+                else if (Flatten && columnIndex == 3 || columnIndex == 2)
+                {
+                    EditorGUI.LabelField(cellRect, item.Registration?.Lifetime.ToString(), labelStyle);
+                }
+                else if (Flatten && columnIndex == 4 || columnIndex == 3)
+                {
+                    EditorGUI.LabelField(cellRect, item.RegisterSummary, labelStyle);
+                }
+                else if (Flatten && columnIndex == 5 || columnIndex == 4)
+                {
+                    EditorGUI.LabelField(cellRect, item.RefCount.ToString(), labelStyle);
                 }
                 else
                 {
-                    // Columns of expanded
-                    switch (columnIndex)
-                    {
-                        case 0:
-                            // EditorGUI.LabelField(rect, item.ScopeName, labelStyle);
-                            base.RowGUI(args);
-                            break;
-                        case 1:
-                            EditorGUI.LabelField(cellRect, item.RegistrationBuilder?.ImplementationType.Name, labelStyle);
-                            break;
-                        case 2:
-                            EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
-                            break;
-                        case 3:
-                            EditorGUI.LabelField(cellRect, item.Registration?.Lifetime.ToString(), labelStyle);
-                            break;
-                        case 4:
-                            EditorGUI.LabelField(cellRect, item.RegisterSummary, labelStyle);
-                            break;
-                        case 5:
-                            EditorGUI.LabelField(cellRect, item.RefCount.ToString(), labelStyle);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
-                    }
+                    throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
                 }
             }
         }
@@ -295,7 +334,7 @@ namespace VContainer.Editor.Diagnostics
             {
                 id = NextId(),
                 depth = parent.depth + 1,
-                displayName = info.RegisterInfo?.RegistrationBuilder.ImplementationType.Name,
+                displayName = TypeNameHelper.GetTypeAlias(info.ResolveInfo.Registration.ImplementationType),
             };
             parent.AddChild(item);
 

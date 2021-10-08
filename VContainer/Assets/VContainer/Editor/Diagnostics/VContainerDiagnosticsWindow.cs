@@ -10,9 +10,9 @@ namespace VContainer.Editor.Diagnostics
     {
         static VContainerDiagnosticsWindow window;
 
-        static readonly GUIContent EnableAutoReloadHeadContent = EditorGUIUtility.TrTextContent("Enable AutoReload", "Reload view automatically.");
-        static readonly GUIContent EnableCollapseHeadContent = EditorGUIUtility.TrTextContent("Collapse", "Collapse StackTraces.");
-        static readonly GUIContent ReloadHeadContent = EditorGUIUtility.TrTextContent("Reload", "Reload View.");
+        static readonly GUIContent EnableAutoReloadHeadContent = EditorGUIUtility.TrTextContent("Enable AutoReload", "Reload view automatically");
+        static readonly GUIContent FlattenHeadContent = EditorGUIUtility.TrTextContent("Flatten", "Flatten dependencies");
+        static readonly GUIContent ReloadHeadContent = EditorGUIUtility.TrTextContent("Reload", "Reload View");
 
         internal static bool EnableAutoReload;
         internal static bool EnableCaptureStackTrace;
@@ -92,9 +92,9 @@ namespace VContainer.Editor.Diagnostics
             using (new EditorGUILayout.VerticalScope())
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                if (GUILayout.Toggle(treeView.EnableCollapsed, EnableCollapseHeadContent, EditorStyles.toolbarButton) != treeView.EnableCollapsed)
+                if (GUILayout.Toggle(treeView.Flatten, FlattenHeadContent, EditorStyles.toolbarButton) != treeView.Flatten)
                 {
-                    treeView.EnableCollapsed = !treeView.EnableCollapsed;
+                    treeView.Flatten = !treeView.Flatten;
                     treeView.ReloadAndSort();
                     Repaint();
                 }
@@ -158,9 +158,9 @@ namespace VContainer.Editor.Diagnostics
             if (VContainerSettings.DiagnosticsEnabled)
             {
                 var selectedItem = treeView.GetSelectedItem();
-                if (selectedItem?.DiagnosticsInfo.RegisterInfo is RegisterInfo registerInfo)
+                if (selectedItem?.DiagnosticsInfo?.RegisterInfo is RegisterInfo registerInfo)
                 {
-                    message = $"Register at <a href=\"{registerInfo.GetScriptAssetPath()}\" line=\"{registerInfo.GetFileLineNumber()}\">{registerInfo.GetHeadline()}</a>" +
+                    message = $"<a href=\"{registerInfo.GetScriptAssetPath()}\" line=\"{registerInfo.GetFileLineNumber()}\">Register at {registerInfo.GetHeadline()}</a>" +
                               Environment.NewLine +
                               Environment.NewLine +
                               selectedItem.DiagnosticsInfo.RegisterInfo.StackTrace;
