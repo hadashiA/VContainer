@@ -7,7 +7,7 @@ namespace VContainer.Unity
     {
         public static VContainerSettings Instance { get; private set; }
 
-        public static bool DiagnosticsEnabled => true;
+        public static bool DiagnosticsEnabled => Instance != null && Instance.EnableDiagnostics;
 
         [SerializeField]
         [Tooltip("Set the Prefab to be the parent of the entire Project.")]
