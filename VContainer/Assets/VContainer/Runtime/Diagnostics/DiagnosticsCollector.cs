@@ -55,7 +55,7 @@ namespace VContainer.Diagnostics
         public object TraceResolve(IRegistration registration, Func<IRegistration, object> resolving)
         {
             var current = DiagnositcsContext.FindByRegistration(registration);
-            resolveCallStack.TryPeek(out var owner);
+            var owner = resolveCallStack.Count > 0 ? resolveCallStack.Peek() : null;
 
             if (!(registration is CollectionRegistration) && current != null && current != owner)
             {

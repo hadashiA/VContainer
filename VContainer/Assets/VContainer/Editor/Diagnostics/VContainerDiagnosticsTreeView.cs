@@ -77,9 +77,9 @@ namespace VContainer.Editor.Diagnostics
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes"), canSort = false },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime"), width = 15f },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope"), width = 20f },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register"), width = 15f },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("RefCount"), width = 5f },
+            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope"), width = 20f },
         };
 
         static int idSeed;
@@ -234,13 +234,13 @@ namespace VContainer.Editor.Diagnostics
                         EditorGUI.LabelField(cellRect, item.Registration.Lifetime.ToString(), labelStyle);
                         break;
                     case 3:
-                        EditorGUI.LabelField(cellRect, item.ScopeName, labelStyle);
-                        break;
-                    case 4:
                         EditorGUI.LabelField(cellRect, item.RegisterSummary, labelStyle);
                         break;
-                    case 5:
+                    case 4:
                         EditorGUI.LabelField(cellRect, item.RefCount.ToString(), labelStyle);
+                        break;
+                    case 5:
+                        EditorGUI.LabelField(cellRect, item.ScopeName, labelStyle);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
@@ -280,16 +280,16 @@ namespace VContainer.Editor.Diagnostics
                         : items.OrderByDescending(x => x.Registration.Lifetime);
                 case 3:
                     return ascending
-                        ? items.OrderBy(x => x.ScopeName)
-                        : items.OrderByDescending(x => x.ScopeName);
-                case 4:
-                    return ascending
                         ? items.OrderBy(x => x.RegisterSummary)
                         : items.OrderByDescending(x => x.RegisterSummary);
-                case 5:
+                case 4:
                     return ascending
                         ? items.OrderBy(x => x.RefCount)
                         : items.OrderByDescending(x => x.RefCount);
+                case 5:
+                    return ascending
+                        ? items.OrderBy(x => x.ScopeName)
+                        : items.OrderByDescending(x => x.ScopeName);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sortedColumnIndex), sortedColumnIndex, null);
             }

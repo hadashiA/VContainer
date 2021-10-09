@@ -80,8 +80,8 @@ namespace VContainer.Editor.Diagnostics
 
             foreach (var field in fields)
             {
-                if (field.FieldType.IsSubclassOf(typeof(UnityEngine.Object)) &&
-                    field.IsDefined(typeof(ObsoleteAttribute), true) &&
+                if ((field.FieldType.IsSubclassOf(typeof(UnityEngine.Object)) &&
+                    field.IsDefined(typeof(ObsoleteAttribute), true)) ||
                     field.IsDefined(typeof(CompilerGeneratedAttribute), true))
                 {
                     continue;
