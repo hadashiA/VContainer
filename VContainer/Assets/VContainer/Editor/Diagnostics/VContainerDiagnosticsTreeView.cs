@@ -58,6 +58,11 @@ namespace VContainer.Editor.Diagnostics
                     typeName = typeName.Substring(0, suffixIndex);
                 }
 
+                if (typeName.StartsWith("Instance") && TypeSummary.StartsWith("Func<"))
+                {
+                    return "FuncFactory";
+                }
+
                 return typeName;
             }
         }
@@ -176,7 +181,6 @@ namespace VContainer.Editor.Diagnostics
                         {
                             id = NextId(),
                             depth = 0,
-                            displayName = info.ScopeName,
                             ScopeName = info.ScopeName,
                         });
                     }
@@ -256,6 +260,7 @@ namespace VContainer.Editor.Diagnostics
                 depth = parent.depth + 1
             };
             parent.AddChild(item);
+            SetExpanded(item.id, item.depth <= 1);
 
             foreach (var dependency in info.Dependencies)
             {

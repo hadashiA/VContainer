@@ -79,5 +79,8 @@ namespace VContainer.Diagnostics
             }
             return resolving(registration);
         }
+
+        public void NotifyContainerBuilt(IObjectResolver container)
+            => DiagnositcsContext.NotifyContainerBuilt(container);
     }
 }

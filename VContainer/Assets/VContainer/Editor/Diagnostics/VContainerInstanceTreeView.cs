@@ -13,6 +13,15 @@ namespace VContainer.Editor.Diagnostics
         static int idSeed;
         static int NextId() => ++idSeed;
 
+        static string Stringify(object instance)
+        {
+            if (ReferenceEquals(instance, null))
+                return "null";
+            if (instance is UnityEngine.Object obj && obj == null)
+                return "null (or destroyed, missing reference...)";
+            return instance.ToString();
+        }
+
         public DiagnosticsInfo CurrentDiagnosticsInfo { get; set; }
 
         public VContainerInstanceTreeView() : base(new TreeViewState())
@@ -22,19 +31,15 @@ namespace VContainer.Editor.Diagnostics
 
         protected override TreeViewItem BuildRoot()
         {
-            var root = new TreeViewItem { id = NextId(), depth = -1, displayName = "Root" };
+            var root = new TreeViewItem(NextId(), -1, "Root");
             var children = new List<TreeViewItem>();
             if (CurrentDiagnosticsInfo is DiagnosticsInfo info)
             {
                 for (var i = 0; i < info.ResolveInfo.Instances.Count; i++)
                 {
                     var instance = info.ResolveInfo.Instances[i];
-
-                    var displayName = TypeNameHelper.IsNullOrDestroyed(instance)
-                        ? "null or destroyed"
-                        : $"({TypeNameHelper.GetTypeAlias(instance.GetType())}) {instance}";
-
-                    var item = new TreeViewItem(NextId(), 0, displayName);
+                    var item = new TreeViewItem(NextId(), 0,
+                        $"({TypeNameHelper.GetTypeAlias(instance.GetType())}) {Stringify(instance)}");
                     AddProperties(instance, item);
                     children.Add(item);
                     SetExpanded(item.id, true);
@@ -47,8 +52,7 @@ namespace VContainer.Editor.Diagnostics
 
         void AddProperties(object instance, TreeViewItem parent)
         {
-            if (TypeNameHelper.IsNullOrDestroyed(instance))
-                return;
+            if (instance == null) return;
 
             var type = instance.GetType();
             var props = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -65,9 +69,7 @@ namespace VContainer.Editor.Diagnostics
                 try
                 {
                     var value = prop.GetValue(instance);
-                    var displayName = TypeNameHelper.IsNullOrDestroyed(value)
-                        ? "null or destroyed"
-                        : $"{prop.Name} = ({TypeNameHelper.GetTypeAlias(prop.PropertyType)}) {value}";
+                    var displayName = $"{prop.Name} = ({TypeNameHelper.GetTypeAlias(prop.PropertyType)}) {Stringify(value)}";
                     parent.AddChild(new TreeViewItem(NextId(), parent.depth + 1, displayName));
                 }
                 catch (MissingReferenceException)
@@ -90,9 +92,7 @@ namespace VContainer.Editor.Diagnostics
                 try
                 {
                     var value = field.GetValue(instance);
-                    var displayName = TypeNameHelper.IsNullOrDestroyed(value)
-                        ? "null or destroyed"
-                        : $"{field.Name} = ({TypeNameHelper.GetTypeAlias(field.FieldType)}) {value}";
+                    var displayName = $"{field.Name} = ({TypeNameHelper.GetTypeAlias(field.FieldType)}) {Stringify(value)}";
                     parent.AddChild(new TreeViewItem(NextId(), parent.depth + 1, displayName));
                 }
                 catch (MissingReferenceException)

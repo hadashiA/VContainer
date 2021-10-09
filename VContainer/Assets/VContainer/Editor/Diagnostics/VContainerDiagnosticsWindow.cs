@@ -152,19 +152,25 @@ namespace VContainer.Editor.Diagnostics
             }
 
             var selectedItem = treeView.GetSelectedItem();
-            if (selectedItem?.DiagnosticsInfo?.ResolveInfo is ResolveInfo resolveInfo &&
-                resolveInfo.Instances.Count > 0)
+            if (selectedItem?.DiagnosticsInfo.ResolveInfo is ResolveInfo resolveInfo)
             {
-                instanceTreeView.CurrentDiagnosticsInfo = selectedItem.DiagnosticsInfo;
-                instanceTreeView.Reload();
-
-                using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(instanceScrollPosition, GUILayout.ExpandHeight(true)))
+                if (resolveInfo.Instances.Count > 0)
                 {
-                    instanceScrollPosition = scrollViewScope.scrollPosition;
-                    var controlRect = EditorGUILayout.GetControlRect(
-                        GUILayout.ExpandHeight(true),
-                        GUILayout.ExpandWidth(true));
-                    instanceTreeView?.OnGUI(controlRect);
+                    instanceTreeView.CurrentDiagnosticsInfo = selectedItem.DiagnosticsInfo;
+                    instanceTreeView.Reload();
+
+                    using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(instanceScrollPosition, GUILayout.ExpandHeight(true)))
+                    {
+                        instanceScrollPosition = scrollViewScope.scrollPosition;
+                        var controlRect = EditorGUILayout.GetControlRect(
+                            GUILayout.ExpandHeight(true),
+                            GUILayout.ExpandWidth(true));
+                        instanceTreeView?.OnGUI(controlRect);
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.SelectableLabel("No instance reference");
                 }
             }
         }

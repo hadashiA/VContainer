@@ -142,8 +142,7 @@ namespace VContainer
                 callback.Invoke(container);
             }
 
-            if (Diagnostics != null)
-                DiagnositcsContext.NotifyContainerBuilt(container);
+            Diagnostics?.NotifyContainerBuilt(container);
         }
     }
 }
