@@ -60,7 +60,7 @@ namespace VContainer.Editor.Diagnostics
         Vector2 detailsScrollPosition;
         Vector2 instanceScrollPosition;
 
-        public void Reload()
+        public void Reload(IObjectResolver resolver)
         {
             treeView.ReloadAndSort();
             Repaint();
@@ -74,6 +74,13 @@ namespace VContainer.Editor.Diagnostics
             treeView = new VContainerDiagnosticsInfoTreeView();
             instanceTreeView = new VContainerInstanceTreeView();
             searchField = new SearchField();
+
+            DiagnositcsContext.OnContainerBuilt += Reload;
+        }
+
+        void OnDisable()
+        {
+            DiagnositcsContext.OnContainerBuilt -= Reload;
         }
 
         void OnGUI()

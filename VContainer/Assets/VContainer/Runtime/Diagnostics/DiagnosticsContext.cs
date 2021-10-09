@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,6 +8,8 @@ namespace VContainer.Diagnostics
     {
         static readonly Dictionary<string, DiagnosticsCollector> collectors
             = new Dictionary<string, DiagnosticsCollector>();
+
+        public static event Action<IObjectResolver> OnContainerBuilt;
 
         public static DiagnosticsCollector GetCollector(string name)
         {
@@ -38,6 +41,11 @@ namespace VContainer.Diagnostics
             {
                 return collectors.SelectMany(x => x.Value.GetDiagnosticsInfos());
             }
+        }
+
+        public static void NotifyContainerBuilt(IObjectResolver container)
+        {
+            OnContainerBuilt?.Invoke(container);
         }
 
         internal static DiagnosticsInfo FindByRegistration(IRegistration registration)

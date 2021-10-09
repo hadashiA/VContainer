@@ -143,8 +143,7 @@ namespace VContainer
             }
 
             if (Diagnostics != null)
-            {
-            }
+                DiagnositcsContext.NotifyContainerBuilt(container);
         }
     }
 }

@@ -79,20 +79,5 @@ namespace VContainer.Diagnostics
             }
             return resolving(registration);
         }
-
-        DiagnosticsInfo FindByRegistration(IRegistration registration)
-        {
-            lock (diagnosticsInfos)
-            {
-                foreach (var x in diagnosticsInfos)
-                {
-                    if (x.ResolveInfo.Registration == registration)
-                    {
-                        return x;
-                    }
-                }
-            }
-            return null;
-        }
     }
 }
