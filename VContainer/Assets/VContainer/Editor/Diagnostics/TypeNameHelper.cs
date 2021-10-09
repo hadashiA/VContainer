@@ -39,5 +39,15 @@ namespace VContainer.Editor.Diagnostics
             }
             return type.Name;
         }
+
+        public static bool IsNullOrDestroyed(object instance) {
+
+            if (ReferenceEquals(instance, null)) return true;
+
+            if (instance is UnityEngine.Object obj)
+                return obj == null;
+ 
+            return false;
+        }
     }
 }

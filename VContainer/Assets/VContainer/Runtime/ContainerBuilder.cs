@@ -50,17 +50,17 @@ namespace VContainer
 
         public DiagnosticsCollector Diagnostics
         {
-            get => diagnosticsCollector;
+            get => diagnostics;
             set
             {
-                diagnosticsCollector = value;
-                diagnosticsCollector?.Clear();
+                diagnostics = value;
+                diagnostics?.Clear();
             }
         }
 
         readonly List<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
-        DiagnosticsCollector diagnosticsCollector;
+        DiagnosticsCollector diagnostics;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Register<T>(T registrationBuilder) where T : RegistrationBuilder
@@ -140,6 +140,10 @@ namespace VContainer
             foreach (var callback in buildCallbacks)
             {
                 callback.Invoke(container);
+            }
+
+            if (Diagnostics != null)
+            {
             }
         }
     }

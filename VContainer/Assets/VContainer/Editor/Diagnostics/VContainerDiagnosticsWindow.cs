@@ -1,5 +1,6 @@
 using System;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using VContainer.Diagnostics;
 using VContainer.Unity;
@@ -10,7 +11,6 @@ namespace VContainer.Editor.Diagnostics
     {
         static VContainerDiagnosticsWindow window;
 
-        static readonly GUIContent EnableAutoReloadHeadContent = EditorGUIUtility.TrTextContent("Enable AutoReload", "Reload view automatically");
         static readonly GUIContent FlattenHeadContent = EditorGUIUtility.TrTextContent("Flatten", "Flatten dependencies");
         static readonly GUIContent ReloadHeadContent = EditorGUIUtility.TrTextContent("Reload", "Reload View");
 
@@ -52,12 +52,19 @@ namespace VContainer.Editor.Diagnostics
 
         VContainerDiagnosticsInfoTreeView treeView;
         VContainerInstanceTreeView instanceTreeView;
+        SearchField searchField;
 
         object verticalSplitterState;
         object horizontalSplitterState;
         Vector2 tableScrollPosition;
         Vector2 detailsScrollPosition;
         Vector2 instanceScrollPosition;
+
+        public void Reload()
+        {
+            treeView.ReloadAndSort();
+            Repaint();
+        }
 
         void OnEnable()
         {
@@ -66,6 +73,7 @@ namespace VContainer.Editor.Diagnostics
             horizontalSplitterState = SplitterGUILayout.CreateSplitterState(new[] { 75, 25f }, new[] { 32, 32 }, null);
             treeView = new VContainerDiagnosticsInfoTreeView();
             instanceTreeView = new VContainerInstanceTreeView();
+            searchField = new SearchField();
         }
 
         void OnGUI()
@@ -86,20 +94,22 @@ namespace VContainer.Editor.Diagnostics
             SplitterGUILayout.EndVerticalSplit();
         }
 
-        // [Enable CaptureStackTrace] | [Enable AutoReload] | .... | Reload
         void RenderHeadPanel()
         {
             using (new EditorGUILayout.VerticalScope())
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
-                if (GUILayout.Toggle(treeView.Flatten, FlattenHeadContent, EditorStyles.toolbarButton) != treeView.Flatten)
+                var flattenOn = GUILayout.Toggle(treeView.Flatten, FlattenHeadContent, EditorStyles.toolbarButton);
+                if (flattenOn != treeView.Flatten)
                 {
-                    treeView.Flatten = !treeView.Flatten;
+                    treeView.Flatten = flattenOn;
                     treeView.ReloadAndSort();
                     Repaint();
                 }
 
                 GUILayout.FlexibleSpace();
+
+                treeView.searchString = searchField.OnToolbarGUI(treeView.searchString);
 
                 if (GUILayout.Button(ReloadHeadContent, EditorStyles.toolbarButton))
                 {

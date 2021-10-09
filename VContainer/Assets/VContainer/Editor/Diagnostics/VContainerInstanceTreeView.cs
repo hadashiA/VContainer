@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEditor.IMGUI.Controls;
+using UnityEngine;
 using VContainer.Diagnostics;
 
 namespace VContainer.Editor.Diagnostics
@@ -28,10 +29,15 @@ namespace VContainer.Editor.Diagnostics
                 for (var i = 0; i < info.ResolveInfo.Instances.Count; i++)
                 {
                     var instance = info.ResolveInfo.Instances[i];
-                    var item = new TreeViewItem(NextId(), 0, $"({TypeNameHelper.GetTypeAlias(instance.GetType())}) {instance}");
+
+                    var displayName = TypeNameHelper.IsNullOrDestroyed(instance)
+                        ? "null or destroyed"
+                        : $"({TypeNameHelper.GetTypeAlias(instance.GetType())}) {instance}";
+
+                    var item = new TreeViewItem(NextId(), 0, displayName);
+                    AddProperties(instance, item);
                     children.Add(item);
                     SetExpanded(item.id, true);
-                    AddProperties(instance, item);
                 }
             }
 
@@ -41,6 +47,9 @@ namespace VContainer.Editor.Diagnostics
 
         void AddProperties(object instance, TreeViewItem parent)
         {
+            if (TypeNameHelper.IsNullOrDestroyed(instance))
+                return;
+
             var type = instance.GetType();
             var props = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -50,10 +59,13 @@ namespace VContainer.Editor.Diagnostics
                 try
                 {
                     var value = prop.GetValue(instance);
-                    parent.AddChild(new TreeViewItem(
-                        NextId(),
-                        parent.depth + 1,
-                        $"{prop.Name} = ({TypeNameHelper.GetTypeAlias(prop.PropertyType)}) {value}"));
+                    var displayName = TypeNameHelper.IsNullOrDestroyed(value)
+                        ? "null or destroyed"
+                        : $"{prop.Name} = ({TypeNameHelper.GetTypeAlias(prop.PropertyType)}) {value}";
+                    parent.AddChild(new TreeViewItem(NextId(), parent.depth + 1, displayName));
+                }
+                catch (MissingReferenceException)
+                {
                 }
                 catch (NotSupportedException)
                 {
@@ -66,14 +78,16 @@ namespace VContainer.Editor.Diagnostics
                 {
                     continue;
                 }
-
                 try
                 {
                     var value = field.GetValue(instance);
-                    parent.AddChild(new TreeViewItem(
-                        NextId(),
-                        parent.depth + 1,
-                        $"{field.Name} = ({TypeNameHelper.GetTypeAlias(field.FieldType)}) {value}"));
+                    var displayName = TypeNameHelper.IsNullOrDestroyed(value)
+                        ? "null or destroyed"
+                        : $"{field.Name} = ({TypeNameHelper.GetTypeAlias(field.FieldType)}) {value}";
+                    parent.AddChild(new TreeViewItem(NextId(), parent.depth + 1, displayName));
+                }
+                catch (MissingReferenceException)
+                {
                 }
                 catch (NotSupportedException)
                 {

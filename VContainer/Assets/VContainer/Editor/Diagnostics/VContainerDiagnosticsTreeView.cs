@@ -14,28 +14,17 @@ namespace VContainer.Editor.Diagnostics
         public string ScopeName { get; set; }
         public DiagnosticsInfo DiagnosticsInfo { get; }
 
-        public RegistrationBuilder RegistrationBuilder => DiagnosticsInfo?.RegisterInfo.RegistrationBuilder;
-        public IRegistration Registration => DiagnosticsInfo?.ResolveInfo.Registration;
-        public int? RefCount => DiagnosticsInfo?.ResolveInfo.RefCount;
+        public RegistrationBuilder RegistrationBuilder => DiagnosticsInfo.RegisterInfo.RegistrationBuilder;
+        public IRegistration Registration => DiagnosticsInfo.ResolveInfo.Registration;
+        public int? RefCount => DiagnosticsInfo.ResolveInfo.RefCount;
 
-        public string TypeSummary
-        {
-            get
-            {
-                if (Registration?.ImplementationType != null)
-                {
-                    return TypeNameHelper.GetTypeAlias(Registration.ImplementationType);
-                }
-
-                return "";
-            }
-        }
+        public string TypeSummary => TypeNameHelper.GetTypeAlias(Registration.ImplementationType);
 
         public string ContractTypesSummary
         {
             get
             {
-                if (Registration?.InterfaceTypes != null)
+                if (Registration.InterfaceTypes != null)
                 {
                     var values = Registration.InterfaceTypes.Select(TypeNameHelper.GetTypeAlias);
                     return string.Join(", ", values);
@@ -68,39 +57,27 @@ namespace VContainer.Editor.Diagnostics
                 {
                     typeName = typeName.Substring(0, suffixIndex);
                 }
+
                 return typeName;
             }
-        }
-
-        public DiagnosticsInfoTreeViewItem(string scopeName)
-        {
-            ScopeName = scopeName;
         }
 
         public DiagnosticsInfoTreeViewItem(DiagnosticsInfo info)
         {
             ScopeName = info.ScopeName;
             DiagnosticsInfo = info;
+            displayName = TypeSummary;
         }
     }
 
     public sealed class VContainerDiagnosticsInfoTreeView : TreeView
     {
-        static readonly MultiColumnHeaderState.Column[] Columns = new[]
+        static readonly MultiColumnHeaderState.Column[] Columns =
         {
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes"), canSort = false },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime") },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register") },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("RefCount"), width = 5f },
-        };
-
-        static readonly MultiColumnHeaderState.Column[] FlattenColumns = new[]
-        {
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope") },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes"), canSort = false },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("RefCount"), width = 5f },
         };
@@ -116,9 +93,6 @@ namespace VContainer.Editor.Diagnostics
             set
             {
                 flatten = value;
-                multiColumnHeader.state = flatten
-                    ? new MultiColumnHeaderState(FlattenColumns)
-                    : new MultiColumnHeaderState(Columns);
                 multiColumnHeader.ResizeToFit();
             }
         }
@@ -141,7 +115,9 @@ namespace VContainer.Editor.Diagnostics
             header.ResizeToFit();
             Reload();
 
-            header.sortedColumnIndex = SessionState.GetInt(SessionStateKeySortedColumnIndex, 0);
+            header.sortedColumnIndex = Math.Min(
+                header.state.columns.Length - 1,
+                SessionState.GetInt(SessionStateKeySortedColumnIndex, 0));
         }
 
         public DiagnosticsInfoTreeViewItem GetSelectedItem()
@@ -171,65 +147,14 @@ namespace VContainer.Editor.Diagnostics
             if (Flatten)
             {
                 var items = rootItem.children.Cast<DiagnosticsInfoTreeViewItem>();
-                switch (columnIndex)
-                {
-                    case 0:
-                        items = ascending
-                            ? items.OrderBy(x => x.ScopeName)
-                            : items.OrderByDescending(x => x.ScopeName);
-                        break;
-                    case 1:
-                        items = ascending
-                            ? items.OrderBy(x => x.TypeSummary)
-                            : items.OrderByDescending(x => x.TypeSummary);
-                        break;
-                    case 3:
-                        items = ascending
-                            ? items.OrderBy(x => x.Registration.Lifetime)
-                            : items.OrderByDescending(x => x.Registration.Lifetime);
-                        break;
-                    case 4:
-                        items = ascending
-                            ? items.OrderBy(x => x.RegisterSummary)
-                            : items.OrderByDescending(x => x.RegisterSummary);
-                        break;
-                    case 5:
-                        items = ascending
-                            ? items.OrderBy(x => x.RefCount)
-                            : items.OrderByDescending(x => x.RefCount);
-                        break;
-                }
-                rootItem.children = new List<TreeViewItem>(items);
+                rootItem.children = new List<TreeViewItem>(Sort(items, columnIndex, ascending));
             }
             else
             {
-                foreach (var child in rootItem.children)
+                foreach (var sectionHeaderItem in rootItem.children)
                 {
-                    var items = child.children.Cast<DiagnosticsInfoTreeViewItem>();
-                    switch (columnIndex)
-                    {
-                        case 0:
-                            items = ascending
-                                ? items.OrderBy(x => x.TypeSummary)
-                                : items.OrderByDescending(x => x.TypeSummary);
-                            break;
-                        case 2:
-                            items = ascending
-                                ? items.OrderBy(x => x.Registration.Lifetime)
-                                : items.OrderByDescending(x => x.Registration.Lifetime);
-                            break;
-                        case 3:
-                            items = ascending
-                                ? items.OrderBy(x => x.RegisterSummary)
-                                : items.OrderByDescending(x => x.RegisterSummary);
-                            break;
-                        case 4:
-                            items = ascending
-                                ? items.OrderBy(x => x.RefCount)
-                                : items.OrderByDescending(x => x.RefCount);
-                            break;
-                    }
-                    child.children = new List<TreeViewItem>(items);
+                    var items = sectionHeaderItem.children.Cast<DiagnosticsInfoTreeViewItem>();
+                    sectionHeaderItem.children = new List<TreeViewItem>(Sort(items, columnIndex, ascending));
                 }
             }
             BuildRows(rootItem);
@@ -261,18 +186,13 @@ namespace VContainer.Editor.Diagnostics
                     var grouped = DiagnositcsContext.GetGroupedDiagnosticsInfos();
                     foreach (var scope in grouped)
                     {
-                        var scopeItem = new DiagnosticsInfoTreeViewItem(scope.Key)
-                        {
-                            id = NextId(),
-                            depth = 0,
-                            displayName = scope.Key
-                        };
-                        children.Add(scopeItem);
-                        SetExpanded(scopeItem.id, true);
+                        var sectionHeaderItem = new TreeViewItem(NextId(), 0, scope.Key);
+                        children.Add(sectionHeaderItem);
+                        SetExpanded(sectionHeaderItem.id, true);
 
                         foreach (var info in scope)
                         {
-                            AddChildItemRecursive(info, scopeItem);
+                            AddDependencyItemsRecursive(info, sectionHeaderItem);
                         }
                     }
                 }
@@ -287,60 +207,91 @@ namespace VContainer.Editor.Diagnostics
         protected override void RowGUI(RowGUIArgs args)
         {
             var item = args.item as DiagnosticsInfoTreeViewItem;
+            if (item is null)
+            {
+                base.RowGUI(args);
+                return;
+            }
 
             for (var visibleColumnIndex = 0; visibleColumnIndex < args.GetNumVisibleColumns(); visibleColumnIndex++)
             {
                 var cellRect = args.GetCellRect(visibleColumnIndex);
-                CenterRectUsingSingleLineHeight(ref cellRect);
+                // CenterRectUsingSingleLineHeight(ref cellRect);
                 var columnIndex = args.GetColumn(visibleColumnIndex);
 
                 var labelStyle = args.selected ? EditorStyles.whiteLabel : EditorStyles.label;
                 labelStyle.alignment = TextAnchor.MiddleLeft;
 
-                if (columnIndex == 0)
+                switch (columnIndex)
                 {
-                    base.RowGUI(args);
-                }
-                else if (Flatten && columnIndex == 1)
-                {
-                    EditorGUI.LabelField(cellRect, item.TypeSummary, labelStyle);
-                }
-                else if (Flatten && columnIndex == 2 || columnIndex == 1)
-                {
-                    EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
-                }
-                else if (Flatten && columnIndex == 3 || columnIndex == 2)
-                {
-                    EditorGUI.LabelField(cellRect, item.Registration?.Lifetime.ToString(), labelStyle);
-                }
-                else if (Flatten && columnIndex == 4 || columnIndex == 3)
-                {
-                    EditorGUI.LabelField(cellRect, item.RegisterSummary, labelStyle);
-                }
-                else if (Flatten && columnIndex == 5 || columnIndex == 4)
-                {
-                    EditorGUI.LabelField(cellRect, item.RefCount.ToString(), labelStyle);
-                }
-                else
-                {
-                    throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
+                    case 0:
+                        base.RowGUI(args);
+                        break;
+                    case 1:
+                        EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
+                        break;
+                    case 2:
+                        EditorGUI.LabelField(cellRect, item.Registration.Lifetime.ToString(), labelStyle);
+                        break;
+                    case 3:
+                        EditorGUI.LabelField(cellRect, item.ScopeName, labelStyle);
+                        break;
+                    case 4:
+                        EditorGUI.LabelField(cellRect, item.RegisterSummary, labelStyle);
+                        break;
+                    case 5:
+                        EditorGUI.LabelField(cellRect, item.RefCount.ToString(), labelStyle);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
                 }
             }
         }
 
-        void AddChildItemRecursive(DiagnosticsInfo info, DiagnosticsInfoTreeViewItem parent)
+        void AddDependencyItemsRecursive(DiagnosticsInfo info, TreeViewItem parent)
         {
             var item = new DiagnosticsInfoTreeViewItem(info)
             {
                 id = NextId(),
-                depth = parent.depth + 1,
-                displayName = TypeNameHelper.GetTypeAlias(info.ResolveInfo.Registration.ImplementationType),
+                depth = parent.depth + 1
             };
             parent.AddChild(item);
 
             foreach (var dependency in info.Dependencies)
             {
-                AddChildItemRecursive(dependency, item);
+                AddDependencyItemsRecursive(dependency, item);
+            }
+        }
+
+        IEnumerable<DiagnosticsInfoTreeViewItem> Sort(
+            IEnumerable<DiagnosticsInfoTreeViewItem> items,
+            int sortedColumnIndex,
+            bool ascending)
+        {
+            switch (sortedColumnIndex)
+            {
+                case 0:
+                    return ascending
+                        ? items.OrderBy(x => x.TypeSummary)
+                        : items.OrderByDescending(x => x.TypeSummary);
+                case 2:
+                    return ascending
+                        ? items.OrderBy(x => x.Registration.Lifetime)
+                        : items.OrderByDescending(x => x.Registration.Lifetime);
+                case 3:
+                    return ascending
+                        ? items.OrderBy(x => x.ScopeName)
+                        : items.OrderByDescending(x => x.ScopeName);
+                case 4:
+                    return ascending
+                        ? items.OrderBy(x => x.RegisterSummary)
+                        : items.OrderByDescending(x => x.RegisterSummary);
+                case 5:
+                    return ascending
+                        ? items.OrderBy(x => x.RefCount)
+                        : items.OrderByDescending(x => x.RefCount);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sortedColumnIndex), sortedColumnIndex, null);
             }
         }
     }
