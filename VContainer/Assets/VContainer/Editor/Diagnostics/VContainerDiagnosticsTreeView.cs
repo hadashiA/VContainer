@@ -76,9 +76,9 @@ namespace VContainer.Editor.Diagnostics
         {
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Type") },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("ContractTypes"), canSort = false },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime") },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope") },
-            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register") },
+            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Lifetime"), width = 15f },
+            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope"), width = 20f },
+            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register"), width = 15f },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("RefCount"), width = 5f },
         };
 

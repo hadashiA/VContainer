@@ -123,8 +123,8 @@ namespace VContainer.Editor.Diagnostics
         {
             using (new EditorGUILayout.VerticalScope(TableListStyle))
             using (var scrollViewScope = new EditorGUILayout.ScrollViewScope(tableScrollPosition,
-                true,
-                true,
+                // true,
+                // true,
                 GUILayout.ExpandWidth(true),
                 GUILayout.MaxWidth(2000f)))
             {

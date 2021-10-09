@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,6 +38,11 @@ namespace VContainer.Diagnostics
             {
                 return collectors.SelectMany(x => x.Value.GetDiagnosticsInfos());
             }
+        }
+
+        internal static DiagnosticsInfo FindByRegistration(IRegistration registration)
+        {
+            return GetDiagnosticsInfos().FirstOrDefault(x => x.ResolveInfo.Registration == registration);
         }
     }
 }

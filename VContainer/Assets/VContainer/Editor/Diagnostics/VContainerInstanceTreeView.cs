@@ -56,6 +56,12 @@ namespace VContainer.Editor.Diagnostics
 
             foreach (var prop in props)
             {
+                if (prop.PropertyType.IsSubclassOf(typeof(UnityEngine.Object)) &&
+                    prop.IsDefined(typeof(ObsoleteAttribute), true))
+                {
+                    continue;
+                }
+
                 try
                 {
                     var value = prop.GetValue(instance);
@@ -74,10 +80,13 @@ namespace VContainer.Editor.Diagnostics
 
             foreach (var field in fields)
             {
-                if (field.IsDefined(typeof(CompilerGeneratedAttribute)))
+                if (field.FieldType.IsSubclassOf(typeof(UnityEngine.Object)) &&
+                    field.IsDefined(typeof(ObsoleteAttribute), true) &&
+                    field.IsDefined(typeof(CompilerGeneratedAttribute), true))
                 {
                     continue;
                 }
+
                 try
                 {
                     var value = field.GetValue(instance);
