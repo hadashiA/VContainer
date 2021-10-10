@@ -18,7 +18,7 @@ namespace VContainer.Editor.Diagnostics
             if (ReferenceEquals(instance, null))
                 return "null";
             if (instance is UnityEngine.Object obj && obj == null)
-                return "null (or destroyed, missing reference...)";
+                return "null or destroyed";
             return instance.ToString();
         }
 

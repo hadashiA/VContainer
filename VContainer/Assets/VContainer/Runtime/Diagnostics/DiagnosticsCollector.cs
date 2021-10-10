@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using VContainer.Internal;
 
 namespace VContainer.Diagnostics
@@ -9,7 +10,8 @@ namespace VContainer.Diagnostics
         public string ScopeName { get; }
 
         readonly List<DiagnosticsInfo> diagnosticsInfos = new List<DiagnosticsInfo>();
-        readonly Stack<DiagnosticsInfo> resolveCallStack = new Stack<DiagnosticsInfo>();
+        readonly ThreadLocal<Stack<DiagnosticsInfo>> resolveCallStack
+            = new ThreadLocal<Stack<DiagnosticsInfo>>(() => new Stack<DiagnosticsInfo>());
 
         public DiagnosticsCollector(string scopeName)
         {
@@ -55,20 +57,20 @@ namespace VContainer.Diagnostics
         public object TraceResolve(IRegistration registration, Func<IRegistration, object> resolving)
         {
             var current = DiagnositcsContext.FindByRegistration(registration);
-            var owner = resolveCallStack.Count > 0 ? resolveCallStack.Peek() : null;
+            var owner = resolveCallStack.Value.Count > 0 ? resolveCallStack.Value.Peek() : null;
 
             if (!(registration is CollectionRegistration) && current != null && current != owner)
             {
                 current.ResolveInfo.RefCount += 1;
                 current.ResolveInfo.MaxDepth = current.ResolveInfo.MaxDepth < 0
-                    ? resolveCallStack.Count
-                    : Math.Max(current.ResolveInfo.MaxDepth, resolveCallStack.Count);
+                    ? resolveCallStack.Value.Count
+                    : Math.Max(current.ResolveInfo.MaxDepth, resolveCallStack.Value.Count);
 
                 owner?.Dependencies.Add(current);
 
-                resolveCallStack.Push(current);
+                resolveCallStack.Value.Push(current);
                 var instance = resolving(registration);
-                resolveCallStack.Pop();
+                resolveCallStack.Value.Pop();
 
                 if (!current.ResolveInfo.Instances.Contains(instance))
                 {

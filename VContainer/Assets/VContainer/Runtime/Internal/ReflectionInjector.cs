@@ -46,6 +46,10 @@ namespace VContainer.Internal
                 Inject(instance, resolver, parameters);
                 return instance;
             }
+            catch (VContainerException ex)
+            {
+                throw new VContainerException(ex.InvalidType, $"Failed to resolve {injectTypeInfo.Type} : {ex.Message}");
+            }
             finally
             {
                 CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
@@ -96,6 +100,10 @@ namespace VContainer.Internal
                             parameters);
                     }
                     method.MethodInfo.Invoke(obj, parameterValues);
+                }
+                catch (VContainerException ex)
+                {
+                    throw new VContainerException(ex.InvalidType, $"Failed to resolve {injectTypeInfo.Type} : {ex.Message}");
                 }
                 finally
                 {
