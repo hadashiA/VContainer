@@ -37,6 +37,9 @@ module.exports = {
       'scoping/generate-child-with-code-first',
       'scoping/project-root-lifetimescope',
     ],
+    'Diagnostics (Debugging)': [
+      'diagnostics/diagnostics-window'
+    ],
     'Optimization': [
       'optimization/codegen',
       'optimization/async-container-build',

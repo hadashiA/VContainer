@@ -22,8 +22,13 @@ The extra fast DI (Dependency Injection) library running on Unity Game Engine.
 - Flexible scoping
   - Application can freely create nested Lifetime Scope with any async way for you like.
 - Pre IL Code generation optimization mode
+- Diagnositcs window on unity editor
 - UniTask Integration
 - ECS Integration *beta*
+
+## Documentation
+
+Visit [vcontainer.hadashikick.jp](https://vcontainer.hadashikick.jp) to view the full documentation.
 
 ## Performance
 
@@ -36,7 +41,6 @@ The extra fast DI (Dependency Injection) library running on Unity Game Engine.
 ![](./website/static/img/screenshot_profiler_vcontainer.png)
 
 ![](./website/static/img/screenshot_profiler_zenject.png)
-
 
 
 ## Installation
@@ -231,6 +235,8 @@ using (LifetimeScope.Enqueue(builder =>
 }
 ```
 
+See [scoping](https://vcontainer.hadashikick.jp/scoping/lifetime-overview) for more information.
+
 ## UniTask
 
 ```csharp
@@ -249,13 +255,14 @@ public class FooController : IAsyncStartable
 builder.RegisterEntryPoint<FooController>();
 ```
 
-## Documentation
+See [integrations](https://vcontainer.hadashikick.jp/scoping/lifetime-overview) for more information.
 
-Visit [vcontainer.hadashikick.jp](https://vcontainer.hadashikick.jp) to view the full documentation.
 
-## Getting Started
+## Diagnostics Window
 
-Visit [vcontainer.hadashikick.jp/getting-started](https://vcontainer.hadashikick.jp/getting-started/installation) to get started.
+![](./website/static/img/screenshot_diagnostics_window.png)
+
+See [diagnostics](https://vcontainer.hadashikick.jp/scoping/lifetime-overview) for more information.
 
 ## Credits
 
