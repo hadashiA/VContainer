@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace VContainer.Internal
 {
     sealed class ReflectionInjector : IInjector
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReflectionInjector Build(Type type)
         {
             var injectTypeInfo = TypeAnalyzer.AnalyzeWithCache(type);
@@ -18,6 +20,7 @@ namespace VContainer.Internal
             this.injectTypeInfo = injectTypeInfo;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
             InjectFields(instance, resolver);
@@ -34,21 +37,18 @@ namespace VContainer.Internal
                 for (var i = 0; i < parameterInfos.Length; i++)
                 {
                     var parameterInfo = parameterInfos[i];
-                    try
-                    {
-                        parameterValues[i] = resolver.ResolveOrParameter(
-                            parameterInfo.ParameterType,
-                            parameterInfo.Name,
-                            parameters);
-                    }
-                    catch (VContainerException ex)
-                    {
-                        throw new VContainerException(parameterInfo.ParameterType, $"Failed to resolve {injectTypeInfo.Type} : {ex.Message}");
-                    }
+                    parameterValues[i] = resolver.ResolveOrParameter(
+                        parameterInfo.ParameterType,
+                        parameterInfo.Name,
+                        parameters);
                 }
                 var instance = injectTypeInfo.InjectConstructor.ConstructorInfo.Invoke(parameterValues);
                 Inject(instance, resolver, parameters);
                 return instance;
+            }
+            catch (VContainerException ex)
+            {
+                throw new VContainerException(ex.InvalidType, $"Failed to resolve {injectTypeInfo.Type} : {ex.Message}");
             }
             finally
             {
@@ -94,19 +94,16 @@ namespace VContainer.Internal
                     for (var i = 0; i < parameterInfos.Length; i++)
                     {
                         var parameterInfo = parameterInfos[i];
-                        try
-                        {
-                            parameterValues[i] = resolver.ResolveOrParameter(
-                                parameterInfo.ParameterType,
-                                parameterInfo.Name,
-                                parameters);
-                        }
-                        catch (VContainerException ex)
-                        {
-                            throw new VContainerException(parameterInfo.ParameterType, $"Failed to resolve {injectTypeInfo.Type} : {ex.Message}");
-                        }
+                        parameterValues[i] = resolver.ResolveOrParameter(
+                            parameterInfo.ParameterType,
+                            parameterInfo.Name,
+                            parameters);
                     }
                     method.MethodInfo.Invoke(obj, parameterValues);
+                }
+                catch (VContainerException ex)
+                {
+                    throw new VContainerException(ex.InvalidType, $"Failed to resolve {injectTypeInfo.Type} : {ex.Message}");
                 }
                 finally
                 {
