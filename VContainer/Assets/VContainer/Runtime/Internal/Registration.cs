@@ -86,22 +86,12 @@ namespace VContainer.Internal
 
         public object SpawnInstance(IObjectResolver resolver)
         {
-            var genericType = typeof(List<>).MakeGenericType(elementType);
-            var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(1);
-            parameterValues[0] = registrations.Count;
-            var list = (IList)Activator.CreateInstance(genericType, parameterValues);
-            try
+            var array = Array.CreateInstance(elementType, registrations.Count);
+            for (var i = 0; i < registrations.Count; i++)
             {
-                foreach (var registration in registrations)
-                {
-                    list.Add(resolver.Resolve(registration));
-                }
+                array.SetValue(resolver.Resolve(registrations[i]), i);
             }
-            finally
-            {
-                CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
-            }
-            return list;
+            return array;
         }
 
         public IEnumerator<IRegistration> GetEnumerator() => registrations.GetEnumerator();
