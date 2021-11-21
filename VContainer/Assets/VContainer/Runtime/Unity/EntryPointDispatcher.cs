@@ -138,7 +138,7 @@ namespace VContainer.Unity
 #endif
 
 #if VCONTAINER_ECS_INTEGRATION
-            container.Resolve<ContainerLocal<ContainerLocal<IEnumerable<ComponentSystemBase>>>().Value;
+            container.Resolve<ContainerLocal<IEnumerable<ComponentSystemBase>>>();
 
             var worldHelpers = container.Resolve<ContainerLocal<IReadOnlyList<WorldConfigurationHelper>>>().Value;
             for (var i = 0; i < worldHelpers.Count; i++)
