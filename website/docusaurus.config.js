@@ -13,7 +13,6 @@ module.exports = {
     locales: ['en', 'ja']
   },
   themeConfig: {
-    sidebarCollapsible: false,
     metadatas: [
       { name: 'google-site-verification', content: 'ldYnOkZTq5AfzmJzEbsFzWXAYp9tyO5IhmYQv45MMDY' },
     ],
@@ -118,6 +117,8 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.ts'),
+          sidebarCollapsed: false,
+          sidebarCollapsible: false,
           routeBasePath: '/',
           // Please change this to your repo.
           editUrl: 'https://github.com/hadashiA/VContainer/edit/master/website/',
