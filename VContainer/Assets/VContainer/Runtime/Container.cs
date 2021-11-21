@@ -10,7 +10,20 @@ namespace VContainer
     {
         DiagnosticsCollector Diagnostics { get; set; }
 
+        /// <summary>
+        /// Resolve from type
+        /// </summary>
+        /// <remarks>
+        /// This version of resolve looks for all of scopes
+        /// </remarks>
         object Resolve(Type type);
+
+        /// <summary>
+        /// Resolve from meta with registration
+        /// </summary>
+        /// <remarks>
+        /// This version of resolve will look for instances from only the registration information already founds.
+        /// </remarks>
         object Resolve(IRegistration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
         void Inject(object instance);
@@ -49,7 +62,6 @@ namespace VContainer
             Root = root;
             Parent = parent;
             this.registry = registry;
-
             createInstance = registration =>
             {
                 return new Lazy<object>(() => registration.SpawnInstance(this));
@@ -135,13 +147,30 @@ namespace VContainer
         IRegistration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
+            CollectionRegistration entirelyCollection = null;
+
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
                 {
-                    return registration;
+                    switch (registration)
+                    {
+                        case CollectionRegistration localCollection:
+                            if (entirelyCollection == null)
+                                entirelyCollection = localCollection;
+                            else
+                                entirelyCollection.Merge(localCollection);
+                            break;
+                        default:
+                            return registration;
+                    }
                 }
                 scope = scope.Parent;
+            }
+
+            if (entirelyCollection != null)
+            {
+                return entirelyCollection;
             }
             throw new VContainerException(type, $"No such registration of type: {type}");
         }
