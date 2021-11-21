@@ -48,15 +48,14 @@ namespace VContainer.Internal
         {
             if (buf.TryGetValue(service, out var exists))
             {
-                var collectionService = typeof(IEnumerable<>).MakeGenericType(service);
                 CollectionRegistration collection;
-                if (buf.TryGetValue(collectionService, out var found))
+                if (buf.TryGetValue(RuntimeTypeCache.EnumerableTypeOf(service), out var found))
                 {
                     collection = (CollectionRegistration)found;
                 }
                 else
                 {
-                    collection = new CollectionRegistration(collectionService, service) { exists };
+                    collection = new CollectionRegistration(service) { exists };
                     AddCollectionToBuildBuffer(buf, collection);
                 }
                 collection.Add(registration);
@@ -99,30 +98,54 @@ namespace VContainer.Internal
 
             if (interfaceType.IsConstructedGenericType)
             {
-                var genericType = interfaceType.GetGenericTypeDefinition();
-                return TryFallbackSingleCollection(interfaceType, genericType, out registration);
+                var openGenericType = RuntimeTypeCache.OpenGenericTypeOf(interfaceType);
+                var typeParameters = RuntimeTypeCache.GenericTypeParametersOf(interfaceType);
+                return TryFallbackToSingleElementCollection(interfaceType, openGenericType, typeParameters, out registration) ||
+                       TryFallbackToContainerLocal(interfaceType, openGenericType, typeParameters, out registration);
             }
             return false;
         }
 
         public bool Exists(Type type) => hashTable.TryGet(type, out _);
 
-        bool TryFallbackSingleCollection(Type interfaceType, Type genericType, out IRegistration registration)
+        bool TryFallbackToContainerLocal(
+            Type closedGenericType,
+            Type openGenericType,
+            IReadOnlyList<Type> typeParameters,
+            out IRegistration newRegistration)
         {
-            if (genericType == typeof(IEnumerable<>) ||
-                genericType == typeof(IReadOnlyList<>))
+            if (openGenericType == typeof(ContainerLocal<>))
             {
-                var elementType = interfaceType.GetGenericArguments()[0];
+                var valueType = typeParameters[0];
+                if (TryGet(valueType, out var valueRegistration))
+                {
+                    newRegistration = new ContainerLocalRegistration(closedGenericType, valueRegistration);
+                    return true;
+                }
+            }
+            newRegistration = null;
+            return false;
+        }
+
+        bool TryFallbackToSingleElementCollection(
+            Type closedGenericType,
+            Type openGenericType,
+            IReadOnlyList<Type> typeParameters,
+            out IRegistration newRegistration)
+        {
+            if (CollectionRegistration.Match(openGenericType))
+            {
+                var elementType = typeParameters[0];
                 var collectionRegistration = new CollectionRegistration(elementType);
                 // ReSharper disable once InconsistentlySynchronizedField
                 if (hashTable.TryGet(elementType, out var elementRegistration) && elementRegistration != null)
                 {
                     collectionRegistration.Add(elementRegistration);
                 }
-                registration = collectionRegistration;
+                newRegistration = collectionRegistration;
                 return true;
             }
-            registration = null;
+            newRegistration = null;
             return false;
         }
     }

@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using VContainer.Diagnostics;
 using VContainer.Internal;
-using VContainer.Unity;
 
 namespace VContainer
 {
@@ -11,7 +10,20 @@ namespace VContainer
     {
         DiagnosticsCollector Diagnostics { get; set; }
 
+        /// <summary>
+        /// Resolve from type
+        /// </summary>
+        /// <remarks>
+        /// This version of resolve looks for all of scopes
+        /// </remarks>
         object Resolve(Type type);
+
+        /// <summary>
+        /// Resolve from meta with registration
+        /// </summary>
+        /// <remarks>
+        /// This version of resolve will look for instances from only the registration information already founds.
+        /// </remarks>
         object Resolve(IRegistration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
         void Inject(object instance);
@@ -132,52 +144,33 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool IsCollectionType(Type type)
-        {
-            return type.IsGenericType &&
-                   (type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>) ||
-                    type.GetGenericTypeDefinition() == typeof(IEnumerable<>));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         IRegistration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
-            
-            CollectionRegistration collectionRegistration = null;
+            CollectionRegistration entirelyCollection = null;
+
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
                 {
-                    if (registration is CollectionRegistration collection)
+                    switch (registration)
                     {
-                        var elementType = type.GetGenericArguments()[0];
-                        if (collectionRegistration == null)
-                        {
-                            collectionRegistration = new CollectionRegistration(elementType);
-                        }
-                        if (AnnotationUtility.IsLifecycleAnnotation(elementType))
-                        {
+                        case CollectionRegistration localCollection:
+                            if (entirelyCollection == null)
+                                entirelyCollection = localCollection;
+                            else
+                                entirelyCollection.Merge(localCollection);
+                            break;
+                        default:
                             return registration;
-                        }
-                        
-                        foreach (var registration1 in collection)
-                        {
-                            collectionRegistration?.Add(registration1);
-                        }
-                    }
-                    else
-                    {
-                        return registration;
                     }
                 }
-
                 scope = scope.Parent;
             }
 
-            if (collectionRegistration != null)
+            if (entirelyCollection != null)
             {
-                return collectionRegistration;
+                return entirelyCollection;
             }
             throw new VContainerException(type, $"No such registration of type: {type}");
         }

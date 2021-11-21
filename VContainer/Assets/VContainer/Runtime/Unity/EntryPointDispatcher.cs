@@ -31,7 +31,7 @@ namespace VContainer.Unity
             {
             }
 
-            var initializables = container.Resolve<IReadOnlyList<IInitializable>>();
+            var initializables = container.Resolve<ContainerLocal<IReadOnlyList<IInitializable>>>().Value;
             for (var i = 0; i < initializables.Count; i++)
             {
                 try
@@ -47,7 +47,7 @@ namespace VContainer.Unity
                 }
             }
 
-            var postInitializables = container.Resolve<IReadOnlyList<IPostInitializable>>();
+            var postInitializables = container.Resolve<ContainerLocal<IReadOnlyList<IPostInitializable>>>().Value;
             for (var i = 0; i < postInitializables.Count; i++)
             {
                 try
@@ -63,7 +63,7 @@ namespace VContainer.Unity
                 }
             }
 
-            var startables = container.Resolve<IReadOnlyList<IStartable>>();
+            var startables = container.Resolve<ContainerLocal<IReadOnlyList<IStartable>>>().Value;
             if (startables.Count > 0)
             {
                 var loopItem = new StartableLoopItem(startables, exceptionHandler);
@@ -71,7 +71,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Startup, loopItem);
             }
 
-            var postStartables = container.Resolve<IReadOnlyList<IPostStartable>>();
+            var postStartables = container.Resolve<ContainerLocal<IReadOnlyList<IPostStartable>>>().Value;
             if (postStartables.Count > 0)
             {
                 var loopItem = new PostStartableLoopItem(postStartables, exceptionHandler);
@@ -79,7 +79,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostStartup, loopItem);
             }
 
-            var fixedTickables = container.Resolve<IReadOnlyList<IFixedTickable>>();
+            var fixedTickables = container.Resolve<ContainerLocal<IReadOnlyList<IFixedTickable>>>().Value;
             if (fixedTickables.Count > 0)
             {
                 var loopItem = new FixedTickableLoopItem(fixedTickables, exceptionHandler);
@@ -87,7 +87,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.FixedUpdate, loopItem);
             }
 
-            var postFixedTickables = container.Resolve<IReadOnlyList<IPostFixedTickable>>();
+            var postFixedTickables = container.Resolve<ContainerLocal<IReadOnlyList<IPostFixedTickable>>>().Value;
             if (postFixedTickables.Count > 0)
             {
                 var loopItem = new PostFixedTickableLoopItem(postFixedTickables, exceptionHandler);
@@ -95,7 +95,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostFixedUpdate, loopItem);
             }
 
-            var tickables = container.Resolve<IReadOnlyList<ITickable>>();
+            var tickables = container.Resolve<ContainerLocal<IReadOnlyList<ITickable>>>().Value;
             if (tickables.Count > 0)
             {
                 var loopItem = new TickableLoopItem(tickables, exceptionHandler);
@@ -103,7 +103,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.Update, loopItem);
             }
 
-            var postTickables = container.Resolve<IReadOnlyList<IPostTickable>>();
+            var postTickables = container.Resolve<ContainerLocal<IReadOnlyList<IPostTickable>>>().Value;
             if (postTickables.Count > 0)
             {
                 var loopItem = new PostTickableLoopItem(postTickables, exceptionHandler);
@@ -111,7 +111,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostUpdate, loopItem);
             }
 
-            var lateTickables = container.Resolve<IReadOnlyList<ILateTickable>>();
+            var lateTickables = container.Resolve<ContainerLocal<IReadOnlyList<ILateTickable>>>().Value;
             if (lateTickables.Count > 0)
             {
                 var loopItem = new LateTickableLoopItem(lateTickables, exceptionHandler);
@@ -119,7 +119,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, loopItem);
             }
 
-            var postLateTickables = container.Resolve<IReadOnlyList<IPostLateTickable>>();
+            var postLateTickables = container.Resolve<ContainerLocal<IReadOnlyList<IPostLateTickable>>>().Value;
             if (postLateTickables.Count > 0)
             {
                 var loopItem = new PostLateTickableLoopItem(postLateTickables, exceptionHandler);
@@ -128,7 +128,7 @@ namespace VContainer.Unity
             }
 
 #if VCONTAINER_UNITASK_INTEGRATION
-            var asyncStartables = container.Resolve<IReadOnlyList<IAsyncStartable>>();
+            var asyncStartables = container.Resolve<ContainerLocal<IReadOnlyList<IAsyncStartable>>>().Value;
             if (asyncStartables.Count > 0)
             {
                 var loopItem = new AsyncStartableLoopItem(asyncStartables, exceptionHandler);
@@ -138,12 +138,12 @@ namespace VContainer.Unity
 #endif
 
 #if VCONTAINER_ECS_INTEGRATION
-            container.Resolve<IEnumerable<ComponentSystemBase>>();
+            container.Resolve<ContainerLocal<ContainerLocal<IEnumerable<ComponentSystemBase>>>().Value;
 
-            var worldHelpers = container.Resolve<IEnumerable<WorldConfigurationHelper>>();
-            foreach (var x in worldHelpers)
+            var worldHelpers = container.Resolve<ContainerLocal<IReadOnlyList<WorldConfigurationHelper>>>().Value;
+            for (var i = 0; i < worldHelpers.Count; i++)
             {
-                x.SortSystems();
+                worldHelpers[i].SortSystems();
             }
 #endif
         }
