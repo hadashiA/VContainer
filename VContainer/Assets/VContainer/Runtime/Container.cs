@@ -49,13 +49,13 @@ namespace VContainer
         public IScopedObjectResolver Parent { get; }
         public DiagnosticsCollector Diagnostics { get; set; }
 
-        readonly IRegistry registry;
+        readonly Registry registry;
         readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<IRegistration, Lazy<object>> createInstance;
 
         internal ScopedContainer(
-            IRegistry registry,
+            Registry registry,
             IObjectResolver root,
             IScopedObjectResolver parent = null)
         {
@@ -180,13 +180,13 @@ namespace VContainer
     {
         public DiagnosticsCollector Diagnostics { get; set; }
 
-        readonly IRegistry registry;
+        readonly Registry registry;
         readonly IScopedObjectResolver rootScope;
         readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<IRegistration, Lazy<object>> createInstance;
 
-        internal Container(IRegistry registry)
+        internal Container(Registry registry)
         {
             this.registry = registry;
             rootScope = new ScopedContainer(registry, this);

@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace VContainer.Internal
 {
-    sealed class FixedTypeKeyHashTableRegistry : IRegistry
+    public sealed class Registry
     {
         [ThreadStatic]
         static IDictionary<Type, IRegistration> buildBuffer = new Dictionary<Type, IRegistration>(128);
 
         readonly FixedTypeKeyHashtable<IRegistration> hashTable;
 
-        public static FixedTypeKeyHashTableRegistry Build(IRegistration[] registrations)
+        public static Registry Build(IRegistration[] registrations)
         {
             // ThreadStatic
             if (buildBuffer == null)
@@ -41,7 +41,7 @@ namespace VContainer.Internal
             }
 
             var hashTable = new FixedTypeKeyHashtable<IRegistration>(buildBuffer.ToArray());
-            return new FixedTypeKeyHashTableRegistry(hashTable);
+            return new Registry(hashTable);
         }
 
         static void AddToBuildBuffer(IDictionary<Type, IRegistration> buf, Type service, IRegistration registration)
@@ -86,7 +86,7 @@ namespace VContainer.Internal
             }
         }
 
-        FixedTypeKeyHashTableRegistry(FixedTypeKeyHashtable<IRegistration> hashTable)
+        Registry(FixedTypeKeyHashtable<IRegistration> hashTable)
         {
             this.hashTable = hashTable;
         }

@@ -10,16 +10,15 @@ namespace VContainer.Internal
 
         public static IInjector GetOrBuild(Type type)
         {
-            return Injectors.GetOrAdd(type, type1 =>
+            return Injectors.GetOrAdd(type, (_, arg) =>
             {
-                var getter = type.GetMethod("__GetGeneratedInjector", BindingFlags.Static | BindingFlags.Public);
+                var getter = arg.GetMethod("__GetGeneratedInjector", BindingFlags.Static | BindingFlags.Public);
                 if (getter != null)
                 {
                     return (IInjector)getter.Invoke(null, null);
                 }
-
-                return ReflectionInjector.Build(type);
-            });
+                return ReflectionInjector.Build(arg);
+            }, type);
         }
     }
 }

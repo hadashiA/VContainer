@@ -6,7 +6,6 @@ namespace VContainer.Internal
     {
         internal const int InitialBucketSize = 4;
 
-        public static readonly T[] EmptyArray = new T[0];
         public static readonly CappedArrayPool<T> Shared8Limit = new CappedArrayPool<T>(8);
 
         readonly T[][][] buckets;
@@ -32,7 +31,7 @@ namespace VContainer.Internal
         public T[] Rent(int length)
         {
             if (length <= 0)
-                return EmptyArray;
+                return Array.Empty<T>();
 
             if (length > buckets.Length)
                 return new T[length]; // Not supported

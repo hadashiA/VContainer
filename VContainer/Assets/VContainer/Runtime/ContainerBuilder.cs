@@ -103,7 +103,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected IRegistry BuildRegistry()
+        protected Registry BuildRegistry()
         {
             var registrations = new IRegistration[registrationBuilders.Count + 1];
 
@@ -126,7 +126,7 @@ namespace VContainer
 #endif
             registrations[registrations.Length - 1] = ContainerRegistration.Default;
 
-            var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
+            var registry = Registry.Build(registrations);
             TypeAnalyzer.CheckCircularDependency(registrations, registry);
 
             return registry;

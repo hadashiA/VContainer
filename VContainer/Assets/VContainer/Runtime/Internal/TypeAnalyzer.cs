@@ -177,7 +177,7 @@ namespace VContainer.Internal
                 injectProperties);
         }
 
-        public static void CheckCircularDependency(IReadOnlyList<IRegistration> registrations, IRegistry registry)
+        public static void CheckCircularDependency(IReadOnlyList<IRegistration> registrations, Registry registry)
         {
             // ThreadStatic
             if (circularDependencyChecker == null)
@@ -190,7 +190,7 @@ namespace VContainer.Internal
             }
         }
 
-        static void CheckCircularDependencyRecursive(IRegistration registration, IRegistry registry, Stack<IRegistration> stack)
+        static void CheckCircularDependencyRecursive(IRegistration registration, Registry registry, Stack<IRegistration> stack)
         {
             foreach (var x in stack)
             {
