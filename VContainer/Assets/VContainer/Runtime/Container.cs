@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using VContainer.Diagnostics;
 using VContainer.Internal;
+using Unity.IL2CPP.CompilerServices;
 
 namespace VContainer
 {
@@ -43,6 +44,7 @@ namespace VContainer
         Scoped
     }
 
+    [Il2CppSetOptionAttribute(Option.NullChecks, false)]
     public sealed class ScopedContainer : IScopedObjectResolver
     {
         public IObjectResolver Root { get; }
@@ -176,6 +178,7 @@ namespace VContainer
         }
     }
 
+    [Il2CppSetOptionAttribute(Option.NullChecks, false)]
     public sealed class Container : IObjectResolver
     {
         public DiagnosticsCollector Diagnostics { get; set; }

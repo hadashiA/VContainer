@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.IL2CPP.CompilerServices;
 
 namespace VContainer.Internal
 {
+    [Il2CppSetOptionAttribute(Option.NullChecks, false)]
     sealed class ReflectionInjector : IInjector
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

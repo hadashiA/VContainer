@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.IL2CPP.CompilerServices;
 
 namespace VContainer.Internal
 {
+    [Il2CppSetOptionAttribute(Option.NullChecks, false)]
     public sealed class Registry
     {
         [ThreadStatic]

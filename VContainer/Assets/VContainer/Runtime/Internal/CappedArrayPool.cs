@@ -1,7 +1,9 @@
 using System;
+using Unity.IL2CPP.CompilerServices;
 
 namespace VContainer.Internal
 {
+    [Il2CppSetOptionAttribute(Option.NullChecks, false)]
     sealed class CappedArrayPool<T>
     {
         internal const int InitialBucketSize = 4;
