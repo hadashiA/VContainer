@@ -59,49 +59,28 @@ namespace VContainer.Unity
             this.gameObjectName = gameObjectName;
         }
 
-        public override IRegistration Build()
+        public override Registration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
+            IInstanceSpawner spawner;
 
             if (instance != null)
             {
-                return new InstanceComponentRegistration(
-                    instance,
-                    ImplementationType,
-                    InterfaceTypes,
-                    Parameters,
-                    injector);
+                spawner = new ExistingComponentSpawner(instance, injector, Parameters);
             }
-            if (scene.IsValid())
+            else if (scene.IsValid())
             {
-                return new FindComponentRegistration(
-                    ImplementationType,
-                    InterfaceTypes,
-                    Parameters,
-                    injector,
-                    scene,
-                    destination);
+                spawner = new FindComponentSpawner(ImplementationType, injector, Parameters, in scene, in destination);
             }
-            if (prefab != null)
+            else if (prefab != null)
             {
-                return new PrefabComponentRegistration(
-                    prefab,
-                    ImplementationType,
-                    Lifetime,
-                    InterfaceTypes,
-                    Parameters,
-                    injector,
-                    destination);
+                spawner = new PrefabComponentSpawner(prefab, injector, Parameters, in destination);
             }
-
-            return new NewGameObjectComponentRegistration(
-                ImplementationType,
-                Lifetime,
-                InterfaceTypes,
-                Parameters,
-                injector,
-                destination,
-                gameObjectName);
+            else
+            {
+                spawner = new NewGameObjectSpawner(ImplementationType, injector, Parameters, in destination, gameObjectName);
+            }
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner);
         }
 
         public ComponentRegistrationBuilder UnderTransform(Transform parent)

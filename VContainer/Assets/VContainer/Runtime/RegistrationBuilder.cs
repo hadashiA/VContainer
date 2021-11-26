@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using VContainer.Internal;
+using VContainer.Internal.Spawners;
 
 namespace VContainer
 {
@@ -18,16 +19,15 @@ namespace VContainer
             Lifetime = lifetime;
         }
 
-        public virtual IRegistration Build()
+        public virtual Registration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
-
+            var spawner = new InstanceSpawner(injector, Parameters);
             return new Registration(
                 ImplementationType,
                 Lifetime,
                 InterfaceTypes,
-                Parameters,
-                injector);
+                spawner);
         }
 
         public RegistrationBuilder As<TInterface>()

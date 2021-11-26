@@ -15,7 +15,7 @@ namespace VContainer.Editor.Diagnostics
         public DiagnosticsInfo DiagnosticsInfo { get; }
 
         public RegistrationBuilder RegistrationBuilder => DiagnosticsInfo.RegisterInfo.RegistrationBuilder;
-        public IRegistration Registration => DiagnosticsInfo.ResolveInfo.Registration;
+        public Registration Registration => DiagnosticsInfo.ResolveInfo.Registration;
         public int? RefCount => DiagnosticsInfo.ResolveInfo.RefCount;
 
         public string TypeSummary => TypeNameHelper.GetTypeAlias(Registration.ImplementationType);

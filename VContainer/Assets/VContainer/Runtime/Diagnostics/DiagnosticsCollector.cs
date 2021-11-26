@@ -39,7 +39,7 @@ namespace VContainer.Diagnostics
             }
         }
 
-        public void TraceBuild(RegistrationBuilder registrationBuilder, IRegistration registration)
+        public void TraceBuild(RegistrationBuilder registrationBuilder, Registration registration)
         {
             lock (diagnosticsInfos)
             {
@@ -54,12 +54,12 @@ namespace VContainer.Diagnostics
             }
         }
 
-        public object TraceResolve(IRegistration registration, Func<IRegistration, object> resolving)
+        public object TraceResolve(Registration registration, Func<Registration, object> resolving)
         {
             var current = DiagnositcsContext.FindByRegistration(registration);
             var owner = resolveCallStack.Value.Count > 0 ? resolveCallStack.Value.Peek() : null;
 
-            if (!(registration is CollectionRegistration) && current != null && current != owner)
+            if (!(registration.Spawner is CollectionInstanceSpawner) && current != null && current != owner)
             {
                 current.ResolveInfo.RefCount += 1;
                 current.ResolveInfo.MaxDepth = current.ResolveInfo.MaxDepth < 0

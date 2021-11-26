@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace VContainer.Internal
 {
     sealed class InstanceRegistrationBuilder : RegistrationBuilder
@@ -10,13 +12,11 @@ namespace VContainer.Internal
             this.implementationInstance = implementationInstance;
         }
 
-        public override IRegistration Build()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override Registration Build()
         {
-            return new InstanceRegistration(
-                implementationInstance,
-                ImplementationType,
-                Lifetime,
-                InterfaceTypes);
+            var spawner = new ExistingInstanceSpawner(implementationInstance);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner);
         }
     }
 }

@@ -1,0 +1,49 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace VContainer.Unity
+{
+    sealed class PrefabComponentSpawner : IInstanceSpawner
+    {
+        readonly IInjector injector;
+        readonly IReadOnlyList<IInjectParameter> customParameters;
+        readonly Component prefab;
+        ComponentDestination destination;
+
+        public PrefabComponentSpawner(
+            Component prefab,
+            IInjector injector,
+            IReadOnlyList<IInjectParameter> customParameters,
+            in ComponentDestination destination)
+        {
+            this.injector = injector;
+            this.customParameters = customParameters;
+            this.prefab = prefab;
+            this.destination = destination;
+        }
+
+        public object Spawn(IObjectResolver resolver)
+        {
+            var wasActive = prefab.gameObject.activeSelf;
+            if (wasActive)
+            {
+                prefab.gameObject.SetActive(false);
+            }
+
+            var parent = destination.GetParent();
+            var component = parent != null
+                ? UnityEngine.Object.Instantiate(prefab, parent)
+                : UnityEngine.Object.Instantiate(prefab);
+
+            injector.Inject(component, resolver, customParameters);
+
+            if (wasActive)
+            {
+                prefab.gameObject.SetActive(true);
+                component.gameObject.SetActive(true);
+            }
+            return component;
+        }
+    }
+}

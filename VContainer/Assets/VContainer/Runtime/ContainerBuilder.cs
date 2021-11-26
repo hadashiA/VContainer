@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using VContainer.Diagnostics;
 using VContainer.Internal;
+using VContainer.Internal.Spawners;
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
 using System.Threading.Tasks;
 #endif
@@ -105,7 +106,7 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected Registry BuildRegistry()
         {
-            var registrations = new IRegistration[registrationBuilders.Count + 1];
+            var registrations = new Registration[registrationBuilders.Count + 1];
 
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
             Parallel.For(0, registrationBuilders.Count, i =>
@@ -124,7 +125,11 @@ namespace VContainer
                 registrations[i] = registration;
             }
 #endif
-            registrations[registrations.Length - 1] = ContainerRegistration.Default;
+            registrations[registrations.Length - 1] = new Registration(
+                typeof(IObjectResolver),
+                Lifetime.Transient,
+                null,
+                ContainerInstanceSpawner.Default);
 
             var registry = Registry.Build(registrations);
             TypeAnalyzer.CheckCircularDependency(registrations, registry);

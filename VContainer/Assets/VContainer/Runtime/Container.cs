@@ -25,7 +25,7 @@ namespace VContainer
         /// <remarks>
         /// This version of resolve will look for instances from only the registration information already founds.
         /// </remarks>
-        object Resolve(IRegistration registration);
+        object Resolve(Registration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
         void Inject(object instance);
     }
@@ -34,7 +34,7 @@ namespace VContainer
     {
         IObjectResolver Root { get; }
         IScopedObjectResolver Parent { get; }
-        bool TryGetRegistration(Type type, out IRegistration registration);
+        bool TryGetRegistration(Type type, out Registration registration);
     }
 
     public enum Lifetime
@@ -52,9 +52,9 @@ namespace VContainer
         public DiagnosticsCollector Diagnostics { get; set; }
 
         readonly Registry registry;
-        readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
+        readonly ConcurrentDictionary<Registration, Lazy<object>> sharedInstances = new ConcurrentDictionary<Registration, Lazy<object>>();
         readonly CompositeDisposable disposables = new CompositeDisposable();
-        readonly Func<IRegistration, Lazy<object>> createInstance;
+        readonly Func<Registration, Lazy<object>> createInstance;
 
         internal ScopedContainer(
             Registry registry,
@@ -74,7 +74,7 @@ namespace VContainer
         public object Resolve(Type type) => Resolve(FindRegistration(type));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(IRegistration registration)
+        public object Resolve(Registration registration)
         {
             if (Diagnostics != null)
             {
@@ -99,7 +99,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetRegistration(Type type, out IRegistration registration)
+        public bool TryGetRegistration(Type type, out Registration registration)
             => registry.TryGet(type, out registration);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -110,7 +110,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        object ResolveCore(IRegistration registration)
+        object ResolveCore(Registration registration)
         {
             switch (registration.Lifetime)
             {
@@ -133,12 +133,12 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        object CreateTrackedInstance(IRegistration registration)
+        object CreateTrackedInstance(Registration registration)
         {
             var lazy = sharedInstances.GetOrAdd(registration, createInstance);
             var created = lazy.IsValueCreated;
             var instance = lazy.Value;
-            if (!created && instance is IDisposable disposable && !(registration is InstanceRegistration))
+            if (!created && instance is IDisposable disposable && !(registration.Spawner is ExistingInstanceSpawner))
             {
                 disposables.Add(disposable);
             }
@@ -146,22 +146,22 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        IRegistration FindRegistration(Type type)
+        Registration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
-            CollectionRegistration entirelyCollection = null;
+            Registration entirelyCollection = null;
 
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
                 {
-                    switch (registration)
+                    switch (registration.Spawner)
                     {
-                        case CollectionRegistration localCollection:
+                        case CollectionInstanceSpawner localCollection:
                             if (entirelyCollection == null)
-                                entirelyCollection = localCollection;
+                                entirelyCollection = registration;
                             else
-                                entirelyCollection.Merge(localCollection);
+                                ((CollectionInstanceSpawner)entirelyCollection.Spawner).Merge(localCollection);
                             break;
                         default:
                             return registration;
@@ -185,9 +185,9 @@ namespace VContainer
 
         readonly Registry registry;
         readonly IScopedObjectResolver rootScope;
-        readonly ConcurrentDictionary<IRegistration, Lazy<object>> sharedInstances = new ConcurrentDictionary<IRegistration, Lazy<object>>();
+        readonly ConcurrentDictionary<Registration, Lazy<object>> sharedInstances = new ConcurrentDictionary<Registration, Lazy<object>>();
         readonly CompositeDisposable disposables = new CompositeDisposable();
-        readonly Func<IRegistration, Lazy<object>> createInstance;
+        readonly Func<Registration, Lazy<object>> createInstance;
 
         internal Container(Registry registry)
         {
@@ -211,7 +211,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(IRegistration registration)
+        public object Resolve(Registration registration)
         {
             if (Diagnostics != null)
             {
@@ -240,13 +240,13 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        object ResolveCore(IRegistration registration)
+        object ResolveCore(Registration registration)
         {
             switch (registration.Lifetime)
             {
                 case Lifetime.Singleton:
                     var singleton = sharedInstances.GetOrAdd(registration, createInstance);
-                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration is InstanceRegistration))
+                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration.Spawner is ExistingInstanceSpawner))
                     {
                         disposables.Add(disposable);
                     }
