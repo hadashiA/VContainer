@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using VContainer.Diagnostics;
 using VContainer.Internal;
-using VContainer.Internal.Spawners;
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
 using System.Threading.Tasks;
 #endif
@@ -129,7 +128,7 @@ namespace VContainer
                 typeof(IObjectResolver),
                 Lifetime.Transient,
                 null,
-                ContainerInstanceSpawner.Default);
+                ContainerInstanceProvider.Default);
 
             var registry = Registry.Build(registrations);
             TypeAnalyzer.CheckCircularDependency(registrations, registry);

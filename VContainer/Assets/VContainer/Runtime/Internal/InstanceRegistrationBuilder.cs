@@ -15,7 +15,7 @@ namespace VContainer.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override Registration Build()
         {
-            var spawner = new ExistingInstanceSpawner(implementationInstance);
+            var spawner = new ExistingInstanceProvider(implementationInstance);
             return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner);
         }
     }

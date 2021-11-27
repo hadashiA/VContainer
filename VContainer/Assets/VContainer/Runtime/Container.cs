@@ -138,7 +138,7 @@ namespace VContainer
             var lazy = sharedInstances.GetOrAdd(registration, createInstance);
             var created = lazy.IsValueCreated;
             var instance = lazy.Value;
-            if (!created && instance is IDisposable disposable && !(registration.Spawner is ExistingInstanceSpawner))
+            if (!created && instance is IDisposable disposable && !(registration.Provider is ExistingInstanceProvider))
             {
                 disposables.Add(disposable);
             }
@@ -155,13 +155,13 @@ namespace VContainer
             {
                 if (scope.TryGetRegistration(type, out var registration))
                 {
-                    switch (registration.Spawner)
+                    switch (registration.Provider)
                     {
-                        case CollectionInstanceSpawner localCollection:
+                        case CollectionInstanceProvider localCollection:
                             if (entirelyCollection == null)
                                 entirelyCollection = registration;
                             else
-                                ((CollectionInstanceSpawner)entirelyCollection.Spawner).Merge(localCollection);
+                                ((CollectionInstanceProvider)entirelyCollection.Provider).Merge(localCollection);
                             break;
                         default:
                             return registration;
@@ -246,7 +246,7 @@ namespace VContainer
             {
                 case Lifetime.Singleton:
                     var singleton = sharedInstances.GetOrAdd(registration, createInstance);
-                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration.Spawner is ExistingInstanceSpawner))
+                    if (!singleton.IsValueCreated && singleton.Value is IDisposable disposable && !(registration.Provider is ExistingInstanceProvider))
                     {
                         disposables.Add(disposable);
                     }

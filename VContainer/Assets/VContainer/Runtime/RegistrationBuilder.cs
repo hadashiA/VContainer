@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using VContainer.Internal;
-using VContainer.Internal.Spawners;
 
 namespace VContainer
 {
@@ -22,7 +21,7 @@ namespace VContainer
         public virtual Registration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
-            var spawner = new InstanceSpawner(injector, Parameters);
+            var spawner = new InstanceProvider(injector, Parameters);
             return new Registration(
                 ImplementationType,
                 Lifetime,

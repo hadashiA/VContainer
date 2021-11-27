@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace VContainer.Internal.Spawners
+namespace VContainer.Internal
 {
-    public sealed class InstanceSpawner : IInstanceSpawner
+    public sealed class InstanceProvider : IInstanceProvider
     {
         readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> customParameters;
 
-        public InstanceSpawner(
+        public InstanceProvider(
             IInjector injector,
             IReadOnlyList<IInjectParameter> customParameters = null)
         {
@@ -17,7 +17,7 @@ namespace VContainer.Internal.Spawners
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Spawn(IObjectResolver resolver)
+        public object SpawnInstance(IObjectResolver resolver)
             => injector.CreateInstance(resolver, customParameters);
     }
 }

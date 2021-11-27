@@ -2,18 +2,18 @@ using System;
 
 namespace VContainer.Internal
 {
-    public sealed class ContainerLocalInstanceSpawner : IInstanceSpawner
+    public sealed class ContainerLocalInstanceProvider : IInstanceProvider
     {
         readonly Type wrappedType;
         readonly Registration valueRegistration;
 
-        public ContainerLocalInstanceSpawner(Type wrappedType, Registration valueRegistration)
+        public ContainerLocalInstanceProvider(Type wrappedType, Registration valueRegistration)
         {
             this.wrappedType = wrappedType;
             this.valueRegistration = valueRegistration;
         }
 
-        public object Spawn(IObjectResolver resolver)
+        public object SpawnInstance(IObjectResolver resolver)
         {
             var value = resolver.Resolve(valueRegistration);
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(1);

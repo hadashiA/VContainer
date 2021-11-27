@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace VContainer.Internal
 {
-    sealed class CollectionInstanceSpawner : IInstanceSpawner, IEnumerable<Registration>
+    sealed class CollectionInstanceProvider : IInstanceProvider, IEnumerable<Registration>
     {
         public struct Enumerator : IEnumerator<Registration>
         {
@@ -14,7 +14,7 @@ namespace VContainer.Internal
 
             List<Registration>.Enumerator listEnumerator;
 
-            public Enumerator(CollectionInstanceSpawner owner)
+            public Enumerator(CollectionInstanceProvider owner)
             {
                 listEnumerator = owner.registrations.GetEnumerator();
             }
@@ -40,7 +40,7 @@ namespace VContainer.Internal
         readonly List<Type> interfaceTypes;
         readonly List<Registration> registrations = new List<Registration>();
 
-        public CollectionInstanceSpawner(Type elementType)
+        public CollectionInstanceProvider(Type elementType)
         {
             this.elementType = elementType;
             ImplementationType = elementType.MakeArrayType();
@@ -69,7 +69,7 @@ namespace VContainer.Internal
             registrations.Add(registration);
         }
 
-        public void Merge(CollectionInstanceSpawner other)
+        public void Merge(CollectionInstanceProvider other)
         {
             foreach (var x in other.registrations)
             {
@@ -78,7 +78,7 @@ namespace VContainer.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Spawn(IObjectResolver resolver)
+        public object SpawnInstance(IObjectResolver resolver)
         {
             var array = Array.CreateInstance(elementType, registrations.Count);
             for (var i = 0; i < registrations.Count; i++)

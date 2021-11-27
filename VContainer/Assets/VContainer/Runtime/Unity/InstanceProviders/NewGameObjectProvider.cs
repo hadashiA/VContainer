@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace VContainer.Unity
 {
-    sealed class NewGameObjectSpawner : IInstanceSpawner
+    sealed class NewGameObjectProvider : IInstanceProvider
     {
         readonly Type componentType;
         readonly IInjector injector;
@@ -12,7 +12,7 @@ namespace VContainer.Unity
         readonly string newGameObjectName;
         ComponentDestination destination;
 
-        public NewGameObjectSpawner(
+        public NewGameObjectProvider(
             Type componentType,
             IInjector injector,
             IReadOnlyList<IInjectParameter> customParameters,
@@ -26,7 +26,7 @@ namespace VContainer.Unity
             this.newGameObjectName = newGameObjectName;
         }
 
-        public object Spawn(IObjectResolver resolver)
+        public object SpawnInstance(IObjectResolver resolver)
         {
             var name = string.IsNullOrEmpty(newGameObjectName)
                 ? componentType.Name

@@ -6,7 +6,19 @@ namespace VContainer.Internal
     // http://neue.cc/2017/07/11_555.html
     sealed class FixedTypeKeyHashtable<TValue>
     {
-        readonly HashTuple[][] table;
+        readonly struct HashEntry
+        {
+            public readonly Type Type;
+            public readonly TValue Value;
+
+            public HashEntry(Type key, TValue value)
+            {
+                Type = key;
+                Value = value;
+            }
+        }
+
+        readonly HashEntry[][] table;
         readonly int indexFor;
 
         public FixedTypeKeyHashtable(KeyValuePair<Type, TValue>[] values, float loadFactor = 0.75f)
@@ -21,7 +33,7 @@ namespace VContainer.Internal
                 capacity <<= 1;
             }
 
-            table = new HashTuple[(int)capacity][];
+            table = new HashEntry[(int)capacity][];
             indexFor = table.Length - 1;
 
             foreach (var item in values)
@@ -30,15 +42,15 @@ namespace VContainer.Internal
                 var array = table[hash & indexFor];
                 if (array == null)
                 {
-                    array = new HashTuple[1];
-                    array[0] = new HashTuple() { type = item.Key, value = item.Value };
+                    array = new HashEntry[1];
+                    array[0] = new HashEntry(item.Key, item.Value);
                 }
                 else
                 {
-                    var newArray = new HashTuple[array.Length + 1];
+                    var newArray = new HashEntry[array.Length + 1];
                     Array.Copy(array, newArray, array.Length);
                     array = newArray;
-                    array[array.Length - 1] = new HashTuple() { type = item.Key, value = item.Value };
+                    array[array.Length - 1] = new HashEntry(item.Key, item.Value);
                 }
 
                 table[hash & indexFor] = array;
@@ -52,16 +64,16 @@ namespace VContainer.Internal
 
             if (buckets == null) goto ERROR;
 
-            if (buckets[0].type == type)
+            if (buckets[0].Type == type)
             {
-                return buckets[0].value;
+                return buckets[0].Value;
             }
 
             for (int i = 1; i < buckets.Length; i++)
             {
-                if (buckets[i].type == type)
+                if (buckets[i].Type == type)
                 {
-                    return buckets[i].value;
+                    return buckets[i].Value;
                 }
             }
 
@@ -76,35 +88,24 @@ namespace VContainer.Internal
 
             if (buckets == null) goto END;
 
-            if (buckets[0].type == type)
+            if (buckets[0].Type == type)
             {
-                value = buckets[0].value;
+                value = buckets[0].Value;
                 return true;
             }
 
             for (int i = 1; i < buckets.Length; i++)
             {
-                if (buckets[i].type == type)
+                if (buckets[i].Type == type)
                 {
-                    value = buckets[i].value;
+                    value = buckets[i].Value;
                     return true;
                 }
             }
 
             END:
-            value = default(TValue);
+            value = default;
             return false;
         }
-
-        internal struct HashTuple
-        {
-            public Type type;
-            public TValue value;
-
-            public override string ToString()
-            {
-                return (type == null) ? "null" : type.FullName;
-            }
-        }
-    }
+   }
 }

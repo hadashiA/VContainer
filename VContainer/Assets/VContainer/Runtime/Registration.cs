@@ -9,27 +9,27 @@ namespace VContainer
         public readonly Type ImplementationType;
         public readonly IReadOnlyList<Type> InterfaceTypes;
         public readonly Lifetime Lifetime;
-        public readonly IInstanceSpawner Spawner;
+        public readonly IInstanceProvider Provider;
 
         internal Registration(
             Type implementationType,
             Lifetime lifetime,
             IReadOnlyList<Type> interfaceTypes,
-            IInstanceSpawner spawner)
+            IInstanceProvider provider)
         {
             ImplementationType = implementationType;
             InterfaceTypes = interfaceTypes;
             Lifetime = lifetime;
-            Spawner = spawner;
+            Provider = provider;
         }
 
         public override string ToString()
         {
             var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
-            return $"Registration {ImplementationType.Name} ContractTypes=[{contractTypes}] {Lifetime} {Spawner}";
+            return $"Registration {ImplementationType.Name} ContractTypes=[{contractTypes}] {Lifetime} {Provider}";
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object SpawnInstance(IObjectResolver resolver) => Spawner.Spawn(resolver);
+        public object SpawnInstance(IObjectResolver resolver) => Provider.SpawnInstance(resolver);
     }
 }

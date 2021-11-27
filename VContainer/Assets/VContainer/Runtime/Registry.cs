@@ -50,17 +50,17 @@ namespace VContainer.Internal
         {
             if (buf.TryGetValue(service, out var exists))
             {
-                CollectionInstanceSpawner collection;
+                CollectionInstanceProvider collection;
                 if (buf.TryGetValue(RuntimeTypeCache.EnumerableTypeOf(service), out var found) &&
-                    found.Spawner is CollectionInstanceSpawner foundCollection)
+                    found.Provider is CollectionInstanceProvider foundCollection)
                 {
                     collection = foundCollection;
                 }
                 else
                 {
-                    collection = new CollectionInstanceSpawner(service) { exists };
+                    collection = new CollectionInstanceProvider(service) { exists };
                     var newRegistration = new Registration(
-                        service.MakeArrayType(),
+                        RuntimeTypeCache.ArrayTypeOf(service),
                         Lifetime.Transient,
                         new List<Type>
                         {
@@ -130,7 +130,7 @@ namespace VContainer.Internal
                 var valueType = typeParameters[0];
                 if (TryGet(valueType, out var valueRegistration))
                 {
-                    var spawner = new ContainerLocalInstanceSpawner(closedGenericType, valueRegistration);
+                    var spawner = new ContainerLocalInstanceProvider(closedGenericType, valueRegistration);
                     newRegistration = new Registration(closedGenericType, Lifetime.Scoped, null, spawner);
                     return true;
                 }
@@ -145,17 +145,17 @@ namespace VContainer.Internal
             IReadOnlyList<Type> typeParameters,
             out Registration newRegistration)
         {
-            if (CollectionInstanceSpawner.Match(openGenericType))
+            if (CollectionInstanceProvider.Match(openGenericType))
             {
                 var elementType = typeParameters[0];
-                var collection = new CollectionInstanceSpawner(elementType);
+                var collection = new CollectionInstanceProvider(elementType);
                 // ReSharper disable once InconsistentlySynchronizedField
                 if (hashTable.TryGet(elementType, out var elementRegistration) && elementRegistration != null)
                 {
                     collection.Add(elementRegistration);
                 }
                 newRegistration = new Registration(
-                    elementType.MakeArrayType(),
+                    RuntimeTypeCache.ArrayTypeOf(elementType),
                     Lifetime.Transient,
                     new List<Type>
                     {

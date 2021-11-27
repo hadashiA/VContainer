@@ -59,7 +59,7 @@ namespace VContainer.Diagnostics
             var current = DiagnositcsContext.FindByRegistration(registration);
             var owner = resolveCallStack.Value.Count > 0 ? resolveCallStack.Value.Peek() : null;
 
-            if (!(registration.Spawner is CollectionInstanceSpawner) && current != null && current != owner)
+            if (!(registration.Provider is CollectionInstanceProvider) && current != null && current != owner)
             {
                 current.ResolveInfo.RefCount += 1;
                 current.ResolveInfo.MaxDepth = current.ResolveInfo.MaxDepth < 0

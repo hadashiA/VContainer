@@ -4,14 +4,14 @@ using UnityEngine;
 
 namespace VContainer.Unity
 {
-    sealed class PrefabComponentSpawner : IInstanceSpawner
+    sealed class PrefabComponentProvider : IInstanceProvider
     {
         readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> customParameters;
         readonly Component prefab;
         ComponentDestination destination;
 
-        public PrefabComponentSpawner(
+        public PrefabComponentProvider(
             Component prefab,
             IInjector injector,
             IReadOnlyList<IInjectParameter> customParameters,
@@ -23,7 +23,7 @@ namespace VContainer.Unity
             this.destination = destination;
         }
 
-        public object Spawn(IObjectResolver resolver)
+        public object SpawnInstance(IObjectResolver resolver)
         {
             var wasActive = prefab.gameObject.activeSelf;
             if (wasActive)

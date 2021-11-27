@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 namespace VContainer.Unity
 {
-    sealed class FindComponentSpawner : IInstanceSpawner
+    sealed class FindComponentProvider : IInstanceProvider
     {
         readonly Type componentType;
         readonly IInjector injector;
@@ -13,7 +13,7 @@ namespace VContainer.Unity
         ComponentDestination destination;
         Scene scene;
 
-        public FindComponentSpawner(
+        public FindComponentProvider(
             Type componentType,
             IInjector injector,
             IReadOnlyList<IInjectParameter> customParameters,
@@ -27,7 +27,7 @@ namespace VContainer.Unity
             this.destination = destination;
         }
 
-        public object Spawn(IObjectResolver resolver)
+        public object SpawnInstance(IObjectResolver resolver)
         {
             var component = default(Component);
 

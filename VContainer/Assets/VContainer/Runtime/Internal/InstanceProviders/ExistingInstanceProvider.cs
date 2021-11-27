@@ -2,16 +2,16 @@ using System.Runtime.CompilerServices;
 
 namespace VContainer.Internal
 {
-    sealed class ExistingInstanceSpawner : IInstanceSpawner
+    sealed class ExistingInstanceProvider : IInstanceProvider
     {
         readonly object implementationInstance;
 
-        public ExistingInstanceSpawner(object implementationInstance)
+        public ExistingInstanceProvider(object implementationInstance)
         {
             this.implementationInstance = implementationInstance;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Spawn(IObjectResolver resolver) => implementationInstance;
+        public object SpawnInstance(IObjectResolver resolver) => implementationInstance;
     }
 }

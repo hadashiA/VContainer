@@ -1,14 +1,15 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace VContainer.Unity
 {
-    sealed class ExistingComponentSpawner : IInstanceSpawner
+    sealed class ExistingComponentProvider : IInstanceProvider
     {
         readonly object instance;
         readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> customParameters;
 
-        public ExistingComponentSpawner(
+        public ExistingComponentProvider(
             object instance,
             IInjector injector,
             IReadOnlyList<IInjectParameter> customParameters)
@@ -18,7 +19,8 @@ namespace VContainer.Unity
             this.injector = injector;
         }
 
-        public object Spawn(IObjectResolver resolver)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public object SpawnInstance(IObjectResolver resolver)
         {
             injector.Inject(instance, resolver, customParameters);
             return instance;
