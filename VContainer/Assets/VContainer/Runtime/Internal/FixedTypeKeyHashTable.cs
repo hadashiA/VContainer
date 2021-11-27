@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace VContainer.Internal
 {
@@ -38,7 +39,7 @@ namespace VContainer.Internal
 
             foreach (var item in values)
             {
-                var hash = item.Key.GetHashCode();
+                var hash = RuntimeHelpers.GetHashCode(item.Key);
                 var array = table[hash & indexFor];
                 if (array == null)
                 {
@@ -59,7 +60,7 @@ namespace VContainer.Internal
 
         public TValue Get(Type type)
         {
-            var hashCode = type.GetHashCode();
+            var hashCode = RuntimeHelpers.GetHashCode(type);
             var buckets = table[hashCode & indexFor];
 
             if (buckets == null) goto ERROR;
@@ -83,7 +84,7 @@ namespace VContainer.Internal
 
         public bool TryGet(Type type, out TValue value)
         {
-            var hashCode = type.GetHashCode();
+            var hashCode = RuntimeHelpers.GetHashCode(type);
             var buckets = table[hashCode & indexFor];
 
             if (buckets == null) goto END;
