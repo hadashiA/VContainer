@@ -4,40 +4,23 @@ using UnityEngine;
 
 namespace VContainer.Unity
 {
-    sealed class PrefabComponentRegistration : IRegistration
+    sealed class PrefabComponentProvider : IInstanceProvider
     {
-        public Type ImplementationType { get; }
-        public IReadOnlyList<Type> InterfaceTypes { get; }
-        public Lifetime Lifetime { get; }
-
-        readonly IReadOnlyList<IInjectParameter> parameters;
         readonly IInjector injector;
+        readonly IReadOnlyList<IInjectParameter> customParameters;
         readonly Component prefab;
         ComponentDestination destination;
 
-        public PrefabComponentRegistration(
+        public PrefabComponentProvider(
             Component prefab,
-            Type implementationType,
-            Lifetime lifetime,
-            IReadOnlyList<Type> interfaceTypes,
-            IReadOnlyList<IInjectParameter> parameters,
             IInjector injector,
+            IReadOnlyList<IInjectParameter> customParameters,
             in ComponentDestination destination)
         {
-            ImplementationType = implementationType;
-            InterfaceTypes = interfaceTypes;
-            Lifetime = lifetime;
-
-            this.parameters = parameters;
             this.injector = injector;
+            this.customParameters = customParameters;
             this.prefab = prefab;
             this.destination = destination;
-        }
-        
-        public override string ToString()
-        {
-            var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
-            return $"PrefabComponentRegistration {ImplementationType} Prefab={prefab} ContractTypes=[{contractTypes}] {Lifetime} {injector.GetType().Name})";
         }
 
         public object SpawnInstance(IObjectResolver resolver)
@@ -53,7 +36,7 @@ namespace VContainer.Unity
                 ? UnityEngine.Object.Instantiate(prefab, parent)
                 : UnityEngine.Object.Instantiate(prefab);
 
-            injector.Inject(component, resolver, parameters);
+            injector.Inject(component, resolver, customParameters);
 
             if (wasActive)
             {

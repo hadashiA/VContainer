@@ -1,19 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace VContainer.Internal
 {
-    sealed class CollectionRegistration : IRegistration, IEnumerable<IRegistration>
+    sealed class CollectionInstanceProvider : IInstanceProvider, IEnumerable<Registration>
     {
-        public struct Enumerator : IEnumerator<IRegistration>
+        public struct Enumerator : IEnumerator<Registration>
         {
-            public IRegistration Current => listEnumerator.Current;
+            public Registration Current => listEnumerator.Current;
             object IEnumerator.Current => Current;
 
-            List<IRegistration>.Enumerator listEnumerator;
+            List<Registration>.Enumerator listEnumerator;
 
-            public Enumerator(CollectionRegistration owner)
+            public Enumerator(CollectionInstanceProvider owner)
             {
                 listEnumerator = owner.registrations.GetEnumerator();
             }
@@ -27,7 +28,7 @@ namespace VContainer.Internal
                                                           openGenericType == typeof(IReadOnlyList<>);
 
         public Enumerator GetEnumerator() => new Enumerator(this);
-        IEnumerator<IRegistration> IEnumerable<IRegistration>.GetEnumerator() => new Enumerator(this);
+        IEnumerator<Registration> IEnumerable<Registration>.GetEnumerator() => new Enumerator(this);
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public Type ImplementationType { get; }
@@ -37,9 +38,9 @@ namespace VContainer.Internal
         readonly Type elementType;
 
         readonly List<Type> interfaceTypes;
-        readonly List<IRegistration> registrations = new List<IRegistration>();
+        readonly List<Registration> registrations = new List<Registration>();
 
-        public CollectionRegistration(Type elementType)
+        public CollectionInstanceProvider(Type elementType)
         {
             this.elementType = elementType;
             ImplementationType = elementType.MakeArrayType();
@@ -56,7 +57,7 @@ namespace VContainer.Internal
             return $"CollectionRegistration {ImplementationType} ContractTypes=[{contractTypes}] {Lifetime}";
         }
 
-        public void Add(IRegistration registration)
+        public void Add(Registration registration)
         {
             foreach (var x in registrations)
             {
@@ -68,7 +69,7 @@ namespace VContainer.Internal
             registrations.Add(registration);
         }
 
-        public void Merge(CollectionRegistration other)
+        public void Merge(CollectionInstanceProvider other)
         {
             foreach (var x in other.registrations)
             {
@@ -76,6 +77,7 @@ namespace VContainer.Internal
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object SpawnInstance(IObjectResolver resolver)
         {
             var array = Array.CreateInstance(elementType, registrations.Count);

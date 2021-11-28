@@ -18,16 +18,15 @@ namespace VContainer
             Lifetime = lifetime;
         }
 
-        public virtual IRegistration Build()
+        public virtual Registration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
-
+            var spawner = new InstanceProvider(injector, Parameters);
             return new Registration(
                 ImplementationType,
                 Lifetime,
                 InterfaceTypes,
-                Parameters,
-                injector);
+                spawner);
         }
 
         public RegistrationBuilder As<TInterface>()

@@ -5,36 +5,29 @@ using Unity.Entities;
 
 namespace VContainer.Unity
 {
-    public sealed class SystemRegistration : IRegistration
+    public sealed class SystemInstanceProvider : IInstanceProvider
     {
-        public Type ImplementationType { get; }
-        public IReadOnlyList<Type> InterfaceTypes { get; }
-        public Lifetime Lifetime => Lifetime.Transient;
-
+        readonly Type systemType;
         readonly IInjector injector;
-        readonly IReadOnlyList<IInjectParameter> parameters;
-
+        readonly IReadOnlyList<IInjectParameter> customParameters;
         readonly string worldName;
         readonly Type systemGroupType;
 
         World world;
         ComponentSystemBase instance;
 
-        public SystemRegistration(
-            Type implementationType,
-            IReadOnlyList<Type> interfaceTypes,
-            IReadOnlyList<IInjectParameter> parameters,
-            IInjector injector,
+        public SystemInstanceProvider(
+            Type systemType,
             string worldName,
-            Type systemGroupType)
+            Type systemGroupType,
+            IInjector injector,
+            IReadOnlyList<IInjectParameter> customParameters)
         {
-            ImplementationType = implementationType;
-            InterfaceTypes = interfaceTypes;
-
-            this.injector = injector;
-            this.parameters = parameters;
+            this.systemType = systemType;
             this.worldName = worldName;
             this.systemGroupType = systemGroupType;
+            this.injector = injector;
+            this.customParameters = customParameters;
         }
 
         public object SpawnInstance(IObjectResolver resolver)
@@ -44,7 +37,7 @@ namespace VContainer.Unity
 
             if (instance is null)
             {
-                instance = (ComponentSystemBase)injector.CreateInstance(resolver, parameters);
+                instance = (ComponentSystemBase)injector.CreateInstance(resolver, customParameters);
                 world.AddSystem(instance);
 
                 if (systemGroupType != null)
@@ -55,7 +48,7 @@ namespace VContainer.Unity
 
                 return instance;
             }
-            return world.GetExistingSystem(ImplementationType);
+            return world.GetExistingSystem(systemType);
         }
 
         World GetWorld(IObjectResolver resolver)
@@ -69,7 +62,7 @@ namespace VContainer.Unity
                 if (world.Name == worldName)
                     return world;
             }
-            throw new VContainerException(ImplementationType, $"World `{worldName}` is not registered");
+            throw new VContainerException(systemType, $"World `{worldName}` is not registered");
         }
     }
 }

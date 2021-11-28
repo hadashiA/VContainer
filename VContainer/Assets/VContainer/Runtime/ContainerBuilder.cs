@@ -103,9 +103,9 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected IRegistry BuildRegistry()
+        protected Registry BuildRegistry()
         {
-            var registrations = new IRegistration[registrationBuilders.Count + 1];
+            var registrations = new Registration[registrationBuilders.Count + 1];
 
 #if VCONTAINER_PARALLEL_CONTAINER_BUILD
             Parallel.For(0, registrationBuilders.Count, i =>
@@ -124,9 +124,13 @@ namespace VContainer
                 registrations[i] = registration;
             }
 #endif
-            registrations[registrations.Length - 1] = ContainerRegistration.Default;
+            registrations[registrations.Length - 1] = new Registration(
+                typeof(IObjectResolver),
+                Lifetime.Transient,
+                null,
+                ContainerInstanceProvider.Default);
 
-            var registry = FixedTypeKeyHashTableRegistry.Build(registrations);
+            var registry = Registry.Build(registrations);
             TypeAnalyzer.CheckCircularDependency(registrations, registry);
 
             return registry;

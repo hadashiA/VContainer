@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace VContainer.Internal
 {
@@ -22,6 +23,7 @@ namespace VContainer.Internal
             } while (disposable != null);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(IDisposable disposable)
         {
             lock (disposables)

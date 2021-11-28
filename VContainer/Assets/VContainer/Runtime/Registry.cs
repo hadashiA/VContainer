@@ -4,18 +4,18 @@ using System.Linq;
 
 namespace VContainer.Internal
 {
-    sealed class FixedTypeKeyHashTableRegistry : IRegistry
+    public sealed class Registry
     {
         [ThreadStatic]
-        static IDictionary<Type, IRegistration> buildBuffer = new Dictionary<Type, IRegistration>(128);
+        static IDictionary<Type, Registration> buildBuffer = new Dictionary<Type, Registration>(128);
 
-        readonly FixedTypeKeyHashtable<IRegistration> hashTable;
+        readonly FixedTypeKeyHashtable<Registration> hashTable;
 
-        public static FixedTypeKeyHashTableRegistry Build(IRegistration[] registrations)
+        public static Registry Build(Registration[] registrations)
         {
             // ThreadStatic
             if (buildBuffer == null)
-                buildBuffer = new Dictionary<Type, IRegistration>(128);
+                buildBuffer = new Dictionary<Type, Registration>(128);
             buildBuffer.Clear();
 
             foreach (var registration in registrations)
@@ -40,23 +40,32 @@ namespace VContainer.Internal
                 }
             }
 
-            var hashTable = new FixedTypeKeyHashtable<IRegistration>(buildBuffer.ToArray());
-            return new FixedTypeKeyHashTableRegistry(hashTable);
+            var hashTable = new FixedTypeKeyHashtable<Registration>(buildBuffer.ToArray());
+            return new Registry(hashTable);
         }
 
-        static void AddToBuildBuffer(IDictionary<Type, IRegistration> buf, Type service, IRegistration registration)
+        static void AddToBuildBuffer(IDictionary<Type, Registration> buf, Type service, Registration registration)
         {
             if (buf.TryGetValue(service, out var exists))
             {
-                CollectionRegistration collection;
-                if (buf.TryGetValue(RuntimeTypeCache.EnumerableTypeOf(service), out var found))
+                CollectionInstanceProvider collection;
+                if (buf.TryGetValue(RuntimeTypeCache.EnumerableTypeOf(service), out var found) &&
+                    found.Provider is CollectionInstanceProvider foundCollection)
                 {
-                    collection = (CollectionRegistration)found;
+                    collection = foundCollection;
                 }
                 else
                 {
-                    collection = new CollectionRegistration(service) { exists };
-                    AddCollectionToBuildBuffer(buf, collection);
+                    collection = new CollectionInstanceProvider(service) { exists };
+                    var newRegistration = new Registration(
+                        RuntimeTypeCache.ArrayTypeOf(service),
+                        Lifetime.Transient,
+                        new List<Type>
+                        {
+                            RuntimeTypeCache.EnumerableTypeOf(service),
+                            RuntimeTypeCache.ReadOnlyListTypeOf(service),
+                        }, collection);
+                    AddCollectionToBuildBuffer(buf, newRegistration);
                 }
                 collection.Add(registration);
 
@@ -69,7 +78,7 @@ namespace VContainer.Internal
             }
         }
 
-        static void AddCollectionToBuildBuffer(IDictionary<Type, IRegistration> buf, CollectionRegistration collectionRegistration)
+        static void AddCollectionToBuildBuffer(IDictionary<Type, Registration> buf, Registration collectionRegistration)
         {
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var i = 0; i < collectionRegistration.InterfaceTypes.Count; i++)
@@ -86,12 +95,12 @@ namespace VContainer.Internal
             }
         }
 
-        FixedTypeKeyHashTableRegistry(FixedTypeKeyHashtable<IRegistration> hashTable)
+        Registry(FixedTypeKeyHashtable<Registration> hashTable)
         {
             this.hashTable = hashTable;
         }
 
-        public bool TryGet(Type interfaceType, out IRegistration registration)
+        public bool TryGet(Type interfaceType, out Registration registration)
         {
             if (hashTable.TryGet(interfaceType, out registration))
                 return registration != null;
@@ -112,14 +121,15 @@ namespace VContainer.Internal
             Type closedGenericType,
             Type openGenericType,
             IReadOnlyList<Type> typeParameters,
-            out IRegistration newRegistration)
+            out Registration newRegistration)
         {
             if (openGenericType == typeof(ContainerLocal<>))
             {
                 var valueType = typeParameters[0];
                 if (TryGet(valueType, out var valueRegistration))
                 {
-                    newRegistration = new ContainerLocalRegistration(closedGenericType, valueRegistration);
+                    var spawner = new ContainerLocalInstanceProvider(closedGenericType, valueRegistration);
+                    newRegistration = new Registration(closedGenericType, Lifetime.Scoped, null, spawner);
                     return true;
                 }
             }
@@ -131,18 +141,25 @@ namespace VContainer.Internal
             Type closedGenericType,
             Type openGenericType,
             IReadOnlyList<Type> typeParameters,
-            out IRegistration newRegistration)
+            out Registration newRegistration)
         {
-            if (CollectionRegistration.Match(openGenericType))
+            if (CollectionInstanceProvider.Match(openGenericType))
             {
                 var elementType = typeParameters[0];
-                var collectionRegistration = new CollectionRegistration(elementType);
+                var collection = new CollectionInstanceProvider(elementType);
                 // ReSharper disable once InconsistentlySynchronizedField
                 if (hashTable.TryGet(elementType, out var elementRegistration) && elementRegistration != null)
                 {
-                    collectionRegistration.Add(elementRegistration);
+                    collection.Add(elementRegistration);
                 }
-                newRegistration = collectionRegistration;
+                newRegistration = new Registration(
+                    RuntimeTypeCache.ArrayTypeOf(elementType),
+                    Lifetime.Transient,
+                    new List<Type>
+                    {
+                        RuntimeTypeCache.EnumerableTypeOf(elementType),
+                        RuntimeTypeCache.ReadOnlyListTypeOf(elementType),
+                    }, collection);
                 return true;
             }
             newRegistration = null;

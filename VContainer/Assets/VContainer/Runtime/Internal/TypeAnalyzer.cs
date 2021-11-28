@@ -89,7 +89,7 @@ namespace VContainer.Internal
         static readonly ConcurrentDictionary<Type, InjectTypeInfo> Cache = new ConcurrentDictionary<Type, InjectTypeInfo>();
 
         [ThreadStatic]
-        static Stack<IRegistration> circularDependencyChecker;
+        static Stack<Registration> circularDependencyChecker;
 
         static Func<Type, InjectTypeInfo> AnalyzeFunc = Analyze;
 
@@ -177,11 +177,11 @@ namespace VContainer.Internal
                 injectProperties);
         }
 
-        public static void CheckCircularDependency(IReadOnlyList<IRegistration> registrations, IRegistry registry)
+        public static void CheckCircularDependency(IReadOnlyList<Registration> registrations, Registry registry)
         {
             // ThreadStatic
             if (circularDependencyChecker == null)
-                circularDependencyChecker = new Stack<IRegistration>();
+                circularDependencyChecker = new Stack<Registration>();
 
             for (var i = 0; i < registrations.Count; i++)
             {
@@ -190,7 +190,7 @@ namespace VContainer.Internal
             }
         }
 
-        static void CheckCircularDependencyRecursive(IRegistration registration, IRegistry registry, Stack<IRegistration> stack)
+        static void CheckCircularDependencyRecursive(Registration registration, Registry registry, Stack<Registration> stack)
         {
             foreach (var x in stack)
             {
