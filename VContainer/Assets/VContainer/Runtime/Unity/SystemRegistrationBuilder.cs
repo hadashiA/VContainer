@@ -22,17 +22,16 @@ namespace VContainer.Unity
             };
         }
 
-        public override IRegistration Build()
+        public override Registration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
-
-            return new SystemRegistration(
+            var provider = new SystemInstanceProvider(
                 ImplementationType,
-                InterfaceTypes,
-                Parameters,
-                injector,
                 worldName,
-                systemGroupType);
+                systemGroupType,
+                injector,
+                Parameters);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
         }
 
         public SystemRegistrationBuilder IntoGroup<T>() where T : ComponentSystemGroup

@@ -16,9 +16,10 @@ namespace VContainer.Unity
             this.initialization = initialization;
         }
 
-        public override IRegistration Build()
+        public override Registration Build()
         {
-            return new WorldRegistration(name, Lifetime, initialization);
+            var provider = new WorldInstanceProvider(name, initialization);
+            return new Registration(typeof(World), Lifetime, null, provider);
         }
     }
 }
