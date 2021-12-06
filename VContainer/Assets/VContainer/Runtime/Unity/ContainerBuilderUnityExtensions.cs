@@ -128,7 +128,13 @@ namespace VContainer.Unity
 
             var registrationBuilder = new ComponentRegistrationBuilder(scene, typeof(T));
             // Force inject execution
-            builder.RegisterBuildCallback(container => container.Resolve<T>());
+            builder.RegisterBuildCallback(container =>
+            {
+                var type = registrationBuilder.InterfaceTypes != null
+                    ? registrationBuilder.InterfaceTypes[0]
+                    : registrationBuilder.ImplementationType;
+                container.Resolve(type);
+            });
             return builder.Register(registrationBuilder);
         }
 

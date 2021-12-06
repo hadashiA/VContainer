@@ -103,6 +103,25 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void RegisterComponentInHierarchyAsInterfaces()
+        {
+            var go = new GameObject("Parent");
+            go.AddComponent<SampleMonoBehaviour>();
+
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
+                    .AsImplementedInterfaces();
+            });
+
+            var resolved = lifetimeScope.Container.Resolve<IComponent>();
+
+            Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(((SampleMonoBehaviour)resolved).transform, Is.EqualTo(go.transform));
+        }
+
+        [Test]
         public void RegisterComponentInHierarchyUnderTransform()
         {
             var lifetimeScope = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
