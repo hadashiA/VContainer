@@ -347,6 +347,22 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void RegisterComponentInNewPrefabWithFailedResolve()
+        {
+            var prefab = new GameObject("Sample").AddComponent<SampleMonoBehaviour>();
+
+            var builder = new ContainerBuilder();
+            builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton);
+
+            var container = builder.Build();
+            Assert.Catch(() =>
+            {
+                container.Resolve<SampleMonoBehaviour>();
+            });
+            Assert.That(prefab.gameObject.activeSelf, Is.True);
+        }
+
+        [Test]
         public void UseComponentsWithParentTransform()
         {
             var go1 = new GameObject("Parent");
