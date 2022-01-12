@@ -36,13 +36,19 @@ namespace VContainer.Unity
                 ? UnityEngine.Object.Instantiate(prefab, parent)
                 : UnityEngine.Object.Instantiate(prefab);
 
-            injector.Inject(component, resolver, customParameters);
-
-            if (wasActive)
+            try
             {
-                prefab.gameObject.SetActive(true);
-                component.gameObject.SetActive(true);
+                injector.Inject(component, resolver, customParameters);
             }
+            finally
+            {
+                if (wasActive)
+                {
+                    prefab.gameObject.SetActive(true);
+                    component.gameObject.SetActive(true);
+                }
+            }
+
             return component;
         }
     }
