@@ -183,6 +183,14 @@ namespace VContainer.Tests
     class MultipleInterfaceServiceB : I1, I2, I3
     {
     }
+    
+    class MultipleInterfaceServiceC : I1, I2, I3
+    {
+    }
+    
+    class MultipleInterfaceServiceD : I1, I2, I3
+    {
+    }
 
     class HasDefaultValue
     {
