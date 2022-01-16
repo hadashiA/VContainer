@@ -35,6 +35,11 @@ namespace VContainer.Editor
 
         public static void OnWillCreateAsset(string metaPath)
         {
+            if (!VContainerEditorSettings.instance.EnableScriptModifier)
+            {
+                return;
+            }
+
             var suffixIndex = metaPath.LastIndexOf(".meta");
             if (suffixIndex < 0)
             {
