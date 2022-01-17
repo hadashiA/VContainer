@@ -212,6 +212,25 @@ namespace VContainer.Tests
         }
         
         [Test]
+        public void ResolveCollectionFromParentByContinuous()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Singleton);
+            builder.Register<I1, MultipleInterfaceServiceB>(Lifetime.Singleton);
+            var parentContainer = builder.Build();
+
+            var childContainer = parentContainer.CreateScope(childBuilder =>
+            {
+                childBuilder.Register<I1, MultipleInterfaceServiceC>(Lifetime.Singleton);
+                childBuilder.Register<I1, MultipleInterfaceServiceD>(Lifetime.Singleton);
+            });
+            
+            var scopedService = childContainer.Resolve<IReadOnlyList<I1>>();
+            var moreScopedService = childContainer.Resolve<IReadOnlyList<I1>>();
+            Assert.That(moreScopedService.Count(), Is.EqualTo(4));
+        }
+        
+        [Test]
         public void ResolveCollectionByLazyInstance()
         {
             var builder = new ContainerBuilder();
