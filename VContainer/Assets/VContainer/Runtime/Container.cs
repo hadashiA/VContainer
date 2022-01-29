@@ -158,10 +158,9 @@ namespace VContainer
                         case CollectionInstanceProvider localCollection:
                             if (entirelyCollection == null)
                             {
-                                var typeParameters = RuntimeTypeCache.GenericTypeParametersOf(type);
-                                var collection = new CollectionInstanceProvider(typeParameters[0]);
+                                var collection = new CollectionInstanceProvider(localCollection.ElementType);
                                 collection.Merge(localCollection);
-                                entirelyCollection = new Registration(registration.ImplementationType, registration.Lifetime, registration.InterfaceTypes, collection);;
+                                entirelyCollection = new Registration(registration.ImplementationType, registration.Lifetime, registration.InterfaceTypes, collection);
                             }
                             else
                             {
