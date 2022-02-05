@@ -11,7 +11,7 @@ namespace VContainer
         public readonly Lifetime Lifetime;
         public readonly IInstanceProvider Provider;
 
-        internal Registration(
+        public Registration(
             Type implementationType,
             Lifetime lifetime,
             IReadOnlyList<Type> interfaceTypes,

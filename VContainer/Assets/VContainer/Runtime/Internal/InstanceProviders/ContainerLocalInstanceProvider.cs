@@ -2,7 +2,7 @@ using System;
 
 namespace VContainer.Internal
 {
-    public sealed class ContainerLocalInstanceProvider : IInstanceProvider
+    sealed class ContainerLocalInstanceProvider : IInstanceProvider
     {
         readonly Type wrappedType;
         readonly Registration valueRegistration;
