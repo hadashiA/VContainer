@@ -255,14 +255,14 @@ public class FooController : IAsyncStartable
 builder.RegisterEntryPoint<FooController>();
 ```
 
-See [integrations](https://vcontainer.hadashikick.jp/scoping/lifetime-overview) for more information.
+See [integrations](https://vcontainer.hadashikick.jp/integrations/unitask) for more information.
 
 
 ## Diagnostics Window
 
 ![](./website/static/img/screenshot_diagnostics_window.png)
 
-See [diagnostics](https://vcontainer.hadashikick.jp/scoping/lifetime-overview) for more information.
+See [diagnostics](https://vcontainer.hadashikick.jp/diagnostics/diagnostics-window) for more information.
 
 ## Credits
 
