@@ -248,6 +248,41 @@ namespace VContainer.Tests
         }
     }
 
+    class HasCircularDependencyMsg1
+    {
+        public HasCircularDependencyMsg1(HasCircularDependencyMsg2 dependency2)
+        {
+            if (dependency2 == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class HasCircularDependencyMsg2
+    {
+        [Inject]
+        public void Method(HasCircularDependencyMsg3 dependency3)
+        {
+            if (dependency3 == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class HasCircularDependencyMsg3
+    {
+        [Inject]
+        public HasCircularDependencyMsg4 Field;
+    }
+
+    class HasCircularDependencyMsg4
+    {
+        [Inject]
+        public HasCircularDependencyMsg1 Prop { get; set; }
+    }
+
     class HasMethodInjection : I1
     {
         public I2 Service2;
