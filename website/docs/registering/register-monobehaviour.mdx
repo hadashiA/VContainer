@@ -121,6 +121,6 @@ builder.RegisterComponentInHierarchy<YourBehaviour>()
 
 builder.RegisterComponentFromNewPrefab(prefab, Lifetime.Scoped)
     .UnderTransform(parentTransform);
-builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
+builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name")
     .UnderTransform(parentTransform);
 ```
