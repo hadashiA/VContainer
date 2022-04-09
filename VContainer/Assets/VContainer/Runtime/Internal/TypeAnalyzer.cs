@@ -122,20 +122,20 @@ namespace VContainer.Internal
             if (this.method is InjectConstructorInfo ctor)
             {
                 var param = (ParameterInfo)this.param;
-                return $"{registration.ImplementationType.FullName}::.ctor({param.Name})";
+                return $"{registration.ImplementationType.FullName}..ctor({param.Name})";
             }
             else if (this.method is InjectMethodInfo method)
             {
                 var param = (ParameterInfo)this.param;
-                return $"{registration.ImplementationType.FullName}::{method.MethodInfo.Name}({param.Name})";
+                return $"{registration.ImplementationType.FullName}.{method.MethodInfo.Name}({param.Name})";
             }
             else if (this.param is FieldInfo field)
             {
-                return $"{registration.ImplementationType.FullName}::{field.Name}";
+                return $"{registration.ImplementationType.FullName}.{field.Name}";
             }
             else if (this.param is PropertyInfo prop)
             {
-                return $"{registration.ImplementationType.FullName}::{prop.Name}";
+                return $"{registration.ImplementationType.FullName}.{prop.Name}";
             }
             else
             {

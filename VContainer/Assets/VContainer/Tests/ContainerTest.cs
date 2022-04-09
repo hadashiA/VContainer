@@ -490,10 +490,10 @@ namespace VContainer.Tests
                 var ex = Assert.Throws<VContainerException>(() => builder.Build());
                 string expected =
                     "Circular dependency detected!\n" +
-                    "    [1] VContainer.Tests.HasCircularDependencyMsg1::.ctor(dependency2) --> VContainer.Tests.HasCircularDependencyMsg2\n" +
-                    "    [2] VContainer.Tests.HasCircularDependencyMsg2::Method(dependency3) --> VContainer.Tests.HasCircularDependencyMsg3\n" +
-                    "    [3] VContainer.Tests.HasCircularDependencyMsg3::Field --> VContainer.Tests.HasCircularDependencyMsg4\n" +
-                    "    [4] VContainer.Tests.HasCircularDependencyMsg4::Prop --> VContainer.Tests.HasCircularDependencyMsg1";
+                    "    [1] VContainer.Tests.HasCircularDependencyMsg1..ctor(dependency2) --> VContainer.Tests.HasCircularDependencyMsg2\n" +
+                    "    [2] VContainer.Tests.HasCircularDependencyMsg2.Method(dependency3) --> VContainer.Tests.HasCircularDependencyMsg3\n" +
+                    "    [3] VContainer.Tests.HasCircularDependencyMsg3.Field --> VContainer.Tests.HasCircularDependencyMsg4\n" +
+                    "    [4] VContainer.Tests.HasCircularDependencyMsg4.Prop --> VContainer.Tests.HasCircularDependencyMsg1";
                 Assert.That(ex.Message, Is.EqualTo(expected));
             }
         }
