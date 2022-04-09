@@ -254,18 +254,20 @@ namespace VContainer.Internal
 
         static void CheckCircularDependencyRecursive(DependencyNode node, Registration registration, Registry registry, Stack<(DependencyNode Node, Registration Registration)> stack)
         {
-            foreach (var (x, i) in stack.Select((x, i) => (x, i)))
+            var i = 0;
+            foreach (var x in stack)
             {
                 if (registration.ImplementationType == x.Registration.ImplementationType)
                 {
                     stack.Push((node, registration));
-                    string path = string.Join("\n",
+                    var path = string.Join("\n",
                         stack.Take(i + 1)
                             .Reverse()
                             .Select((x, i) => $"    [{i + 1}] {x.Node} --> {x.Registration.ImplementationType.FullName}"));
                     throw new VContainerException(registration.ImplementationType,
                         $"Circular dependency detected!\n{path}");
                 }
+                i++;
             }
 
             stack.Push((node, registration));
