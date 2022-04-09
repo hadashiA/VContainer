@@ -4,6 +4,7 @@ namespace VContainer.Internal
     {
         public readonly T Value;
 
+        [Inject]
         public ContainerLocal(T value)
         {
             Value = value;
