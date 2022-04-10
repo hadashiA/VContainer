@@ -263,7 +263,7 @@ namespace VContainer.Internal
                     var path = string.Join("\n",
                         stack.Take(i + 1)
                             .Reverse()
-                            .Select((x, i) => $"    [{i + 1}] {x.Node} --> {x.Registration.ImplementationType.FullName}"));
+                            .Select((item, itemIndex) => $"    [{itemIndex + 1}] {item.Node} --> {item.Registration.ImplementationType.FullName}"));
                     throw new VContainerException(registration.ImplementationType,
                         $"Circular dependency detected!\n{path}");
                 }
