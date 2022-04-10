@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace VContainer.Internal
@@ -82,6 +83,67 @@ namespace VContainer.Internal
         }
     }
 
+    readonly struct DependencyNode
+    {
+        readonly Registration registration;
+        readonly object method; // ctor or method
+        readonly object param; // param or field or prop
+
+        public DependencyNode(Registration registration, InjectConstructorInfo ctor, ParameterInfo param)
+        {
+            this.registration = registration;
+            this.method = ctor;
+            this.param = param;
+        }
+
+        public DependencyNode(Registration registration, InjectMethodInfo method, ParameterInfo param)
+        {
+            this.registration = registration;
+            this.method = method;
+            this.param = param;
+        }
+
+        public DependencyNode(Registration registration, FieldInfo field)
+        {
+            this.registration = registration;
+            this.method = null;
+            this.param = field;
+        }
+
+        public DependencyNode(Registration registration, PropertyInfo prop)
+        {
+            this.registration = registration;
+            this.method = null;
+            this.param = prop;
+        }
+
+        public override string ToString()
+        {
+            if (this.method is InjectConstructorInfo ctor)
+            {
+                var param = (ParameterInfo)this.param;
+                return $"{registration.ImplementationType.FullName}..ctor({param.Name})";
+            }
+            else if (this.method is InjectMethodInfo method)
+            {
+                var param = (ParameterInfo)this.param;
+                return $"{registration.ImplementationType.FullName}.{method.MethodInfo.Name}({param.Name})";
+            }
+            else if (this.param is FieldInfo field)
+            {
+                return $"{registration.ImplementationType.FullName}.{field.Name}";
+            }
+            else if (this.param is PropertyInfo prop)
+            {
+                return $"{registration.ImplementationType.FullName}.{prop.Name}";
+            }
+            else
+            {
+                return "";
+            }
+        }
+    }
+
     static class TypeAnalyzer
     {
         public static InjectTypeInfo AnalyzeWithCache(Type type) => Cache.GetOrAdd(type, AnalyzeFunc);
@@ -89,7 +151,7 @@ namespace VContainer.Internal
         static readonly ConcurrentDictionary<Type, InjectTypeInfo> Cache = new ConcurrentDictionary<Type, InjectTypeInfo>();
 
         [ThreadStatic]
-        static Stack<Registration> circularDependencyChecker;
+        static Stack<(DependencyNode Node, Registration Registration)> circularDependencyChecker;
 
         static Func<Type, InjectTypeInfo> AnalyzeFunc = Analyze;
 
@@ -181,27 +243,34 @@ namespace VContainer.Internal
         {
             // ThreadStatic
             if (circularDependencyChecker == null)
-                circularDependencyChecker = new Stack<Registration>();
+                circularDependencyChecker = new Stack<(DependencyNode Node, Registration Registration)>();
 
             for (var i = 0; i < registrations.Count; i++)
             {
                 circularDependencyChecker.Clear();
-                CheckCircularDependencyRecursive(registrations[i], registry, circularDependencyChecker);
+                CheckCircularDependencyRecursive(default, registrations[i], registry, circularDependencyChecker);
             }
         }
 
-        static void CheckCircularDependencyRecursive(Registration registration, Registry registry, Stack<Registration> stack)
+        static void CheckCircularDependencyRecursive(DependencyNode node, Registration registration, Registry registry, Stack<(DependencyNode Node, Registration Registration)> stack)
         {
+            var i = 0;
             foreach (var x in stack)
             {
-                if (registration.ImplementationType == x.ImplementationType)
+                if (registration.ImplementationType == x.Registration.ImplementationType)
                 {
+                    stack.Push((node, registration));
+                    var path = string.Join("\n",
+                        stack.Take(i + 1)
+                            .Reverse()
+                            .Select((item, itemIndex) => $"    [{itemIndex + 1}] {item.Node} --> {item.Registration.ImplementationType.FullName}"));
                     throw new VContainerException(registration.ImplementationType,
-                        $"Circular dependency detected! {registration}");
+                        $"Circular dependency detected!\n{path}");
                 }
+                i++;
             }
 
-            stack.Push(registration);
+            stack.Push((node, registration));
 
             if (Cache.TryGetValue(registration.ImplementationType, out var injectTypeInfo))
             {
@@ -211,7 +280,7 @@ namespace VContainer.Internal
                     {
                         if (registry.TryGet(x.ParameterType, out var parameterRegistration))
                         {
-                            CheckCircularDependencyRecursive(parameterRegistration, registry, stack);
+                            CheckCircularDependencyRecursive(new DependencyNode(registration, injectTypeInfo.InjectConstructor, x), parameterRegistration, registry, stack);
                         }
                     }
                 }
@@ -224,7 +293,7 @@ namespace VContainer.Internal
                         {
                             if (registry.TryGet(x.ParameterType, out var parameterRegistration))
                             {
-                                CheckCircularDependencyRecursive(parameterRegistration, registry, stack);
+                                CheckCircularDependencyRecursive(new DependencyNode(registration, methodInfo, x), parameterRegistration, registry, stack);
                             }
                         }
                     }
@@ -236,7 +305,7 @@ namespace VContainer.Internal
                     {
                         if (registry.TryGet(x.FieldType, out var fieldRegistration))
                         {
-                            CheckCircularDependencyRecursive(fieldRegistration, registry, stack);
+                            CheckCircularDependencyRecursive(new DependencyNode(registration, x),fieldRegistration, registry, stack);
                         }
                     }
                 }
@@ -247,7 +316,7 @@ namespace VContainer.Internal
                     {
                         if (registry.TryGet(x.PropertyType, out var propertyRegistration))
                         {
-                            CheckCircularDependencyRecursive(propertyRegistration, registry, stack);
+                            CheckCircularDependencyRecursive(new DependencyNode(registration, x), propertyRegistration, registry, stack);
                         }
                     }
                 }

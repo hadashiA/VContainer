@@ -474,6 +474,31 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void CircularDependencyMsg()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<HasCircularDependencyMsg1>(Lifetime.Transient);
+            builder.Register<HasCircularDependencyMsg2>(Lifetime.Transient);
+            builder.Register<HasCircularDependencyMsg3>(Lifetime.Transient);
+            builder.Register<HasCircularDependencyMsg4>(Lifetime.Transient);
+
+            var injector = InjectorCache.GetOrBuild(typeof(HasCircularDependencyMsg1));
+
+            // Only reflection mode can detect circular dependency errors at runtime.
+            if (injector is ReflectionInjector)
+            {
+                var ex = Assert.Throws<VContainerException>(() => builder.Build());
+                string expected =
+                    "Circular dependency detected!\n" +
+                    "    [1] VContainer.Tests.HasCircularDependencyMsg1..ctor(dependency2) --> VContainer.Tests.HasCircularDependencyMsg2\n" +
+                    "    [2] VContainer.Tests.HasCircularDependencyMsg2.Method(dependency3) --> VContainer.Tests.HasCircularDependencyMsg3\n" +
+                    "    [3] VContainer.Tests.HasCircularDependencyMsg3.Field --> VContainer.Tests.HasCircularDependencyMsg4\n" +
+                    "    [4] VContainer.Tests.HasCircularDependencyMsg4.Prop --> VContainer.Tests.HasCircularDependencyMsg1";
+                Assert.That(ex.Message, Is.EqualTo(expected));
+            }
+        }
+
+        [Test]
         public void Inject()
         {
             var builder = new ContainerBuilder();
