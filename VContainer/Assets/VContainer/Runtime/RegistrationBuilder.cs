@@ -103,7 +103,7 @@ namespace VContainer
             return WithParameter(typeof(TParam), value);
         }
 
-        void AddInterfaceType(Type interfaceType)
+        protected virtual void AddInterfaceType(Type interfaceType)
         {
             if (!interfaceType.IsAssignableFrom(ImplementationType))
             {

@@ -250,6 +250,31 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void ResolveOpenGeneric()
+        {
+            var builder = new ContainerBuilder();
+
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient);
+            builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Transient).As(typeof(IGenericService<>)).AsSelf();
+            builder.RegisterOpenGeneric(typeof(IGenericService<,>), typeof(GenericsService2<,>), Lifetime.Singleton);
+            builder.Register<HasGenericDependency>(Lifetime.Singleton);
+
+            var container = builder.Build();
+            var obj1 = container.Resolve<IGenericService<int>>();
+            var obj2 = container.Resolve<IGenericService<int, string>>();
+            var obj3 = container.Resolve<IGenericService<int, string>>();
+            var obj4 = container.Resolve<GenericsService<int>>();
+            var obj5 = container.Resolve<HasGenericDependency>();
+
+            Assert.That(obj1, Is.TypeOf<GenericsService<int>>());
+            Assert.That(obj2, Is.TypeOf<GenericsService2<int, string>>());
+            Assert.AreSame(obj2, obj3);
+            Assert.NotNull(obj4);
+            Assert.AreNotSame(obj4, obj1);
+            Assert.That(obj5.Service, Is.TypeOf<GenericsService<NoDependencyServiceA>>());
+        }
+
+        [Test]
         public void RegisterInstance()
         {
             var builder = new ContainerBuilder();
@@ -428,6 +453,25 @@ namespace VContainer.Tests
         {
             var builder = new ContainerBuilder();
             Assert.Throws<VContainerException>(() => builder.Register<NoDependencyServiceA>(Lifetime.Scoped).As<I1>());
+        }
+
+        [Test]
+        public void RegisterInvalidOpenGeneric()
+        {
+            var builder = new ContainerBuilder();
+            Assert.Throws<VContainerException>(() =>
+                builder.RegisterOpenGeneric(typeof(IGenericService<>), typeof(GenericsService<int>), Lifetime.Transient)
+            );
+            Assert.Throws<VContainerException>(() =>
+                builder.RegisterOpenGeneric(typeof(IGenericService<int>), typeof(GenericsService<>), Lifetime.Transient)
+            );
+            Assert.Throws<VContainerException>(() =>
+                builder.RegisterOpenGeneric(typeof(I2), typeof(NoDependencyServiceA), Lifetime.Transient)
+            );
+            Assert.Throws<VContainerException>(() =>
+                builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Transient)
+                    .As(typeof(IGenericService<int>))
+            );
         }
 
         [Test]

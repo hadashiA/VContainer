@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using VContainer.Internal;
+using VContainer.Runtime.Internal;
 
 namespace VContainer
 {
@@ -12,6 +13,21 @@ namespace VContainer
             Type type,
             Lifetime lifetime)
             => builder.Register(new RegistrationBuilder(type, lifetime));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterOpenGeneric(
+            this IContainerBuilder builder,
+            Type type,
+            Type implementationType,
+            Lifetime lifetime)
+            => builder.Register(new OpenGenericRegistrationBuilder(type, implementationType, lifetime));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterOpenGeneric(
+            this IContainerBuilder builder,
+            Type type,
+            Lifetime lifetime)
+            => builder.Register(new OpenGenericRegistrationBuilder(type, lifetime));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register<T>(
