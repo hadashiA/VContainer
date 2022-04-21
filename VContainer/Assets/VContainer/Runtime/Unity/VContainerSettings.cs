@@ -17,6 +17,10 @@ namespace VContainer.Unity
         [Tooltip("Enables the collection of information that can be viewed in the VContainerDiagnosticsWindow. Note: Performance degradation")]
         public bool EnableDiagnostics;
 
+        [SerializeField]
+        [Tooltip("Disables script modification for LifetimeScope scripts.")]
+        public bool DisableScriptModifier;
+
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Create/VContainer/VContainer Settings")]
         public static void CreateAsset()
