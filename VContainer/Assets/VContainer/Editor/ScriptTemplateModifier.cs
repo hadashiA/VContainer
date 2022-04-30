@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
+using VContainer.Unity;
 
 #if UNITY_2020_2_OR_NEWER
 using UnityEditor.Compilation;
@@ -35,6 +36,11 @@ namespace VContainer.Editor
 
         public static void OnWillCreateAsset(string metaPath)
         {
+            if (VContainerSettings.Instance != null && VContainerSettings.Instance.DisableScriptModifier)
+            {
+                return;
+            }
+
             var suffixIndex = metaPath.LastIndexOf(".meta");
             if (suffixIndex < 0)
             {
