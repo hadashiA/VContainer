@@ -13,6 +13,8 @@ namespace VContainer
     {
         object ApplicationOrigin { get; set; }
         DiagnosticsCollector Diagnostics { get; set; }
+        int Count { get; }
+        RegistrationBuilder this[int index] { get; set; }
 
         T Register<T>(T registrationBuilder) where T : RegistrationBuilder;
         void RegisterBuildCallback(Action<IObjectResolver> container);
@@ -47,6 +49,14 @@ namespace VContainer
     public class ContainerBuilder : IContainerBuilder
     {
         public object ApplicationOrigin { get; set; }
+
+        public int Count => registrationBuilders.Count;
+
+        public RegistrationBuilder this[int index]
+        {
+            get => registrationBuilders[index];
+            set => registrationBuilders[index] = value;
+        }
 
         public DiagnosticsCollector Diagnostics
         {
