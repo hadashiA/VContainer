@@ -15,14 +15,12 @@
     "@docusaurus/core": "2.0.0-beta.18",
     "@docusaurus/plugin-google-analytics": "^2.0.0-beta.18",
     "@docusaurus/preset-classic": "2.0.0-beta.18",
-    "@mdx-js/react": "^2.1.1",
+    "@mdx-js/react": "^1.6.22",
     "@nivo/bar": "^0.79.1",
     "@nivo/core": "^0.79.0",
     "clsx": "^1.1.1",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "remark-images": "^3.1.0",
-    "victory": "^36.3.2"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "browserslist": {
     "production": [

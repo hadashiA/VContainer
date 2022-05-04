@@ -135,7 +135,5 @@ export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
         }
       ]}
       animate={true}
-      motionStiffness={90}
-      motionDamping={15}
     />
   </div>
