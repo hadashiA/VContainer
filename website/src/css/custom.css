@@ -87,6 +87,10 @@ html[data-theme='dark'] {
   font-size: 0.85rem;
 }
 
+.menu__link.menu__link--sublist-caret {
+    padding-left: 0;
+}
+
 .menu__link.menu__link--sublist.menu__link--active {
   color: var(--ifm-font-color-base);
 }
