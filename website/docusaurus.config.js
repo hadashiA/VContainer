@@ -13,7 +13,7 @@ module.exports = {
     locales: ['en', 'ja']
   },
   themeConfig: {
-    metadatas: [
+    metadata: [
       { name: 'google-site-verification', content: 'ldYnOkZTq5AfzmJzEbsFzWXAYp9tyO5IhmYQv45MMDY' },
     ],
     image: 'img/vcontainer@2x.png',
@@ -25,27 +25,6 @@ module.exports = {
       // Should we use the prefers-color-scheme media-query,
       // using user system preferences, instead of the hardcoded defaultMode
       respectPrefersColorScheme: false,
-
-      // Dark/light switch icon options
-      switchConfig: {
-        // Icon for the switch while in dark mode
-        darkIcon: ' ',
-
-        // CSS to apply to dark icon,
-        // React inline style object
-        // see https://reactjs.org/docs/dom-elements.html#style
-        // darkIconStyle: {
-        //   marginLeft: '2px',
-        // },
-
-        // Unicode icons such as '\u2600' will work
-        // Unicode with 5 chars require brackets: '\u{1F602}'
-        lightIcon: ' ',
-
-        // lightIconStyle: {
-        //   marginLeft: '1px',
-        // },
-      },
     },
     prism: {
       additionalLanguages: ['csharp'],
@@ -105,11 +84,6 @@ module.exports = {
       apiKey: process.env.ALGOLIA_API_KEY,
       indexName: process.env.ALGOLIA_INDEX_NAME
     },
-    googleAnalytics: {
-      trackingID: process.env.GA_TRACKING_ID,
-      // Optional fields.
-      anonymizeIP: true, // Should IPs be anonymized?
-    },
   },
   presets: [
     [
@@ -125,6 +99,11 @@ module.exports = {
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        googleAnalytics: {
+          trackingID: process.env.GA_TRACKING_ID,
+          // Optional fields.
+          anonymizeIP: true, // Should IPs be anonymized?
         },
       },
     ],
