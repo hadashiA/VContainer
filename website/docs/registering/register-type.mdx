@@ -119,7 +119,8 @@ builder.RegisterEntryPoint<GameController>();
 ```
 
 :::note
-This is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()`
+This is similar to `Register<GameController>(Lifetime.Singleton).AsImplementedInterfaces()` .
+The key difference is whether it runs in PlayerLoopSystem or not.
 :::
 
 If you want to customize the exception handling for entry points, you can register a callback with the following.
