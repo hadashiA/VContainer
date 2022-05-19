@@ -1,5 +1,6 @@
 import * as React from "react"
 import { ResponsiveBar } from '@nivo/bar'
+import { useGraphTheme } from "./GraphThemeContext"
 
 const data = [
   {
@@ -34,9 +35,12 @@ const data = [
   },
 ]
 
-export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
-  <div style={{height, width: '100%'}}>
+export function BenchmarkGraph({ height }: { height: number }): JSX.Element {
+  const { theme } = useGraphTheme()
+
+  return <div style={{ height, width: '100%' }}>
     <ResponsiveBar
+      theme={theme}
       data={data}
       groupMode="grouped"
       layout="vertical"
@@ -137,3 +141,4 @@ export const BenchmarkGraph: React.FC<{ height: number }> = ({ height }) =>
       animate={true}
     />
   </div>
+}
