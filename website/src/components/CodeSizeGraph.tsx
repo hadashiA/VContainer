@@ -1,5 +1,6 @@
 import * as React from "react"
 import { ResponsiveBar } from '@nivo/bar'
+import { useGraphTheme } from "./GraphThemeContext"
 
 const data = [
   {
@@ -14,9 +15,12 @@ const data = [
   },
 ]
 
-export const CodeSizeGraph: React.FC<{ height: number }> = ({ height }) =>
-  <div style={{height, width: '100%'}}>
+export function CodeSizeGraph({ height }: { height: number }): JSX.Element {
+  const { theme } = useGraphTheme()
+
+  return <div style={{height, width: '100%'}}>
     <ResponsiveBar
+      theme={theme}
       data={data}
       groupMode="grouped"
       layout="vertical"
@@ -112,3 +116,4 @@ export const CodeSizeGraph: React.FC<{ height: number }> = ({ height }) =>
       motionDamping={15}
     />
   </div>
+}
