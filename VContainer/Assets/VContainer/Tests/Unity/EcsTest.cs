@@ -70,8 +70,9 @@ namespace VContainer.Tests.Unity
 
             Assert.That(worlds[0].Name, Is.EqualTo("My World 1"));
             Assert.That(worlds[1].Name, Is.EqualTo("My World 2"));
-            Assert.That(ScriptBehaviourUpdateOrder.IsWorldInPlayerLoop(worlds[0]), Is.True);
-            Assert.That(ScriptBehaviourUpdateOrder.IsWorldInPlayerLoop(worlds[1]), Is.True);
+            
+            Assert.That(ScriptBehaviourUpdateOrder.IsWorldInCurrentPlayerLoop(worlds[0]), Is.True);
+            Assert.That(ScriptBehaviourUpdateOrder.IsWorldInCurrentPlayerLoop(worlds[1]), Is.True);
 
             container.Dispose();
 
