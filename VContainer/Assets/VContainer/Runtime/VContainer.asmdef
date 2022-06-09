@@ -15,7 +15,7 @@
     "versionDefines": [
         {
             "name": "com.unity.entities",
-            "expression": "",
+            "expression": "0.17",
             "define": "VCONTAINER_ECS_INTEGRATION"
         },
         {
