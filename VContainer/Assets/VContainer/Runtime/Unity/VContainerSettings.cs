@@ -58,35 +58,32 @@ namespace VContainer.Unity
             // For editor, we need to load the Preload asset manually.
             LoadInstanceFromPreloadAssets();
         }
-
-        [UnityEditor.InitializeOnLoadMethod]
-        static void EditorInitialize()
-        {
-            // RootLifetimeScope must be disposed before it can be resumed.
-            UnityEditor.EditorApplication.playModeStateChanged += state =>
-            {
-                switch (state)
-                {
-                    case UnityEditor.PlayModeStateChange.ExitingPlayMode:
-                        if (Instance != null)
-                        {
-                            if (Instance.RootLifetimeScope != null)
-                            {
-                                Instance.RootLifetimeScope.DisposeCore();
-                            }
-                            Instance = null;
-                        }
-                        break;
-                }
-            };
-        }
 #endif
-
+        
         void OnEnable()
         {
             if (RootLifetimeScope != null)
+            {
                 RootLifetimeScope.IsRoot = true;
+            }
             Instance = this;
+            
+            Application.quitting -= OnApplicationQuit;
+            Application.quitting += OnApplicationQuit;
+        }
+
+        void OnApplicationQuit()
+        {
+            if (RootLifetimeScope != null)
+            {
+                var container = RootLifetimeScope.Container;
+                if (container != null)
+                {
+                    // Execute Dispose once at the slowest possible time.
+                    // However, the GameObject may be destroyed at that time.
+                    PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new DisposeLoopItem(container));
+                }
+            }
         }
     }
 }
