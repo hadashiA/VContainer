@@ -1,6 +1,5 @@
 #if VCONTAINER_ECS_INTEGRATION
 using System;
-using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine.LowLevel;
 
@@ -29,7 +28,9 @@ namespace VContainer.Unity
                 world.CreateSystem<InitializationSystemGroup>();
                 world.CreateSystem<SimulationSystemGroup>();
                 world.CreateSystem<PresentationSystemGroup>();
-                ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world, PlayerLoop.GetCurrentPlayerLoop());
+
+                ScriptBehaviourUpdateOrder.RemoveWorldFromCurrentPlayerLoop(world);
+                ScriptBehaviourUpdateOrder.AddWorldToCurrentPlayerLoop(world);
             }
             return world;
         }
