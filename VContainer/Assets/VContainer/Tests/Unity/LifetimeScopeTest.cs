@@ -160,6 +160,7 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        [Ignore("Resources/ will be included in the build and we want to use a different approch")]
         public void ParentTypeReference()
         {
             var prefab = Resources.Load<GameObject>("ParentChildRelationship");
