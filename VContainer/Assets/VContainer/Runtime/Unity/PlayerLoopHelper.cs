@@ -45,7 +45,7 @@ namespace VContainer.Unity
         static long initialized;
 
         // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        public static void Initialize()
+        public static void EnsureInitialized()
         {
             if (Interlocked.CompareExchange(ref initialized, 1, 0) != 0)
                 return;
@@ -146,6 +146,7 @@ namespace VContainer.Unity
 
         public static void Dispatch(PlayerLoopTiming timing, IPlayerLoopItem item)
         {
+            EnsureInitialized();
             Runners[(int)timing].Dispatch(item);
         }
 

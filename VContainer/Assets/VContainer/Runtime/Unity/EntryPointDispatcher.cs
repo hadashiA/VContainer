@@ -20,7 +20,7 @@ namespace VContainer.Unity
 
         public void Dispatch()
         {
-            PlayerLoopHelper.Initialize();
+            PlayerLoopHelper.EnsureInitialized();
 
             EntryPointExceptionHandler exceptionHandler = null;
             try
