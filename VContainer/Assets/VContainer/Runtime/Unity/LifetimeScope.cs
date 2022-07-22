@@ -141,7 +141,14 @@ namespace VContainer.Unity
         public void Dispose()
         {
             DisposeCore();
-            if (this != null) Destroy(gameObject);
+            if (this != null)
+            {
+                #if UNITY_EDITOR
+                DestroyImmediate(gameObject);
+                #else
+                Destroy(gameObject);
+                #endif
+            }
         }
 
         public void DisposeCore()

@@ -65,6 +65,10 @@ namespace VContainer.Unity
             if (RootLifetimeScope != null)
             {
                 RootLifetimeScope.IsRoot = true;
+                if (RootLifetimeScope.Container == null)
+                {
+                    RootLifetimeScope.Build();
+                }
             }
             Instance = this;
             
@@ -81,7 +85,7 @@ namespace VContainer.Unity
                 {
                     // Execute Dispose once at the slowest possible time.
                     // However, the GameObject may be destroyed at that time.
-                    PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new DisposeLoopItem(container));
+                    PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new DisposeLoopItem(RootLifetimeScope));
                 }
             }
         }
