@@ -85,7 +85,10 @@ namespace VContainer.Unity
                 {
                     // Execute Dispose once at the slowest possible time.
                     // However, the GameObject may be destroyed at that time.
-                    PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new DisposeLoopItem(RootLifetimeScope));
+                    PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new AsyncLoopItem(() =>
+                    {
+                        RootLifetimeScope.DisposeCore();                        
+                    }));
                 }
             }
         }

@@ -143,11 +143,7 @@ namespace VContainer.Unity
             DisposeCore();
             if (this != null)
             {
-                #if UNITY_EDITOR
-                DestroyImmediate(gameObject);
-                #else
                 Destroy(gameObject);
-                #endif
             }
         }
 

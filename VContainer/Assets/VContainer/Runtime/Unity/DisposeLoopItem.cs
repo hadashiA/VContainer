@@ -2,18 +2,18 @@ using System;
 
 namespace VContainer.Unity
 {
-    sealed class DisposeLoopItem : IPlayerLoopItem
+    sealed class AsyncLoopItem : IPlayerLoopItem
     {
-        readonly IDisposable disposable;
+        readonly Action action;
 
-        public DisposeLoopItem(IDisposable disposable)
+        public AsyncLoopItem(Action action)
         {
-            this.disposable = disposable;
+            this.action = action;
         }
-
+        
         public bool MoveNext()
         {
-            disposable.Dispose();
+            action();
             return false;
         }
     }
