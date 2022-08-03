@@ -182,12 +182,13 @@ namespace VContainer.Unity
             AwakeWaitingChildren(this);
         }
 
-        public LifetimeScope CreateChild(IInstaller installer = null)
+        public TScope CreateChild<TScope>(IInstaller installer = null)
+            where TScope : LifetimeScope
         {
             var childGameObject = new GameObject("LifetimeScope (Child)");
             childGameObject.SetActive(false);
             childGameObject.transform.SetParent(transform, false);
-            var child = childGameObject.AddComponent<LifetimeScope>();
+            var child = childGameObject.AddComponent<TScope>();
             if (installer != null)
             {
                 child.extraInstallers.Add(installer);
@@ -197,10 +198,18 @@ namespace VContainer.Unity
             return child;
         }
 
-        public LifetimeScope CreateChild(Action<IContainerBuilder> installation)
-            => CreateChild(new ActionInstaller(installation));
+        public LifetimeScope CreateChild(IInstaller installer = null)
+            => CreateChild<LifetimeScope>(installer);
 
-        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
+        public TScope CreateChild<TScope>(Action<IContainerBuilder> installation)
+            where TScope : LifetimeScope
+            => CreateChild<TScope>(new ActionInstaller(installation));
+
+        public LifetimeScope CreateChild(Action<IContainerBuilder> installation)
+            => CreateChild<LifetimeScope>(new ActionInstaller(installation));
+
+        public TScope CreateChildFromPrefab<TScope>(TScope prefab, IInstaller installer = null)
+            where TScope : LifetimeScope
         {
             var wasActive = prefab.gameObject.activeSelf;
             if (wasActive)
@@ -221,8 +230,15 @@ namespace VContainer.Unity
             return child;
         }
 
+        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
+            => CreateChildFromPrefab<LifetimeScope>(prefab, installer);
+
+        public TScope CreateChildFromPrefab<TScope>(TScope prefab, Action<IContainerBuilder> installation)
+            where TScope : LifetimeScope
+            => CreateChildFromPrefab<TScope>(prefab, new ActionInstaller(installation));
+
         public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
-            => CreateChildFromPrefab(prefab, new ActionInstaller(installation));
+            => CreateChildFromPrefab<LifetimeScope>(prefab, new ActionInstaller(installation));
 
         void InstallTo(IContainerBuilder builder)
         {
