@@ -122,7 +122,7 @@ namespace VContainer
             {
                 var registrationBuilder = registrationBuilders[i];
                 var registration = registrationBuilder.Build();
-                Diagnostics?.TraceBuild(this, registrationBuilder, registration);
+                Diagnostics?.TraceBuild(registrationBuilder, registration);
                 registrations[i] = registration;
             });
 #else
