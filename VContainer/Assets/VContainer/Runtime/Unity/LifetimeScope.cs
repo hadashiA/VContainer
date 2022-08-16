@@ -230,15 +230,9 @@ namespace VContainer.Unity
             return child;
         }
 
-        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
-            => CreateChildFromPrefab<LifetimeScope>(prefab, installer);
-
         public TScope CreateChildFromPrefab<TScope>(TScope prefab, Action<IContainerBuilder> installation)
             where TScope : LifetimeScope
-            => CreateChildFromPrefab<TScope>(prefab, new ActionInstaller(installation));
-
-        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
-            => CreateChildFromPrefab<LifetimeScope>(prefab, new ActionInstaller(installation));
+            => CreateChildFromPrefab(prefab, new ActionInstaller(installation));
 
         void InstallTo(IContainerBuilder builder)
         {
