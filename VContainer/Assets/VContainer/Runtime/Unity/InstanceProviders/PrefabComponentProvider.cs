@@ -35,6 +35,9 @@ namespace VContainer.Unity
                 ? UnityEngine.Object.Instantiate(prefab, parent)
                 : UnityEngine.Object.Instantiate(prefab);
 
+            if (VContainerSettings.Instance != null && VContainerSettings.Instance.RemoveClonePostfix)
+                component.name = prefab.name;
+
             try
             {
                 injector.Inject(component, resolver, customParameters);
