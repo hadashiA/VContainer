@@ -8,6 +8,7 @@ namespace VContainer
 {
     public interface IObjectResolver : IDisposable
     {
+        object ApplicationOrigin { get; }
         DiagnosticsCollector Diagnostics { get; set; }
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace VContainer
     {
         public IObjectResolver Root { get; }
         public IScopedObjectResolver Parent { get; }
+        public object ApplicationOrigin { get; }
         public DiagnosticsCollector Diagnostics { get; set; }
 
         readonly Registry registry;
@@ -56,11 +58,13 @@ namespace VContainer
 
         internal ScopedContainer(
             Registry registry,
+            object applicationOrigin,
             IObjectResolver root,
             IScopedObjectResolver parent = null)
         {
             Root = root;
             Parent = parent;
+            ApplicationOrigin = applicationOrigin;
             this.registry = registry;
             createInstance = registration =>
             {
@@ -184,6 +188,7 @@ namespace VContainer
 
     public sealed class Container : IObjectResolver
     {
+        public object ApplicationOrigin { get; }
         public DiagnosticsCollector Diagnostics { get; set; }
 
         readonly Registry registry;
@@ -192,15 +197,17 @@ namespace VContainer
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<Registration, Lazy<object>> createInstance;
 
-        internal Container(Registry registry)
+        internal Container(Registry registry, object applicationOrigin)
         {
             this.registry = registry;
-            rootScope = new ScopedContainer(registry, this);
+            rootScope = new ScopedContainer(registry, applicationOrigin, this);
 
             createInstance = registration =>
             {
                 return new Lazy<object>(() => registration.SpawnInstance(this));
             };
+
+            ApplicationOrigin = applicationOrigin;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

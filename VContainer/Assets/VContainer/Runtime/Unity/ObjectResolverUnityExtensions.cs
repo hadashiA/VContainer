@@ -33,7 +33,20 @@ namespace VContainer.Unity
 
         public static T Instantiate<T>(this IObjectResolver resolver, T prefab) where T : UnityEngine.Object
         {
-            var instance = UnityEngine.Object.Instantiate(prefab);
+            var scope = (LifetimeScope)resolver.ApplicationOrigin;
+
+            T instance;
+            if (scope.IsRoot)
+            {
+                instance = UnityEngine.Object.Instantiate(prefab);
+                UnityEngine.Object.DontDestroyOnLoad(instance);
+            }
+            else
+            {
+                instance = UnityEngine.Object.Instantiate(prefab, scope.transform);
+                ResetParent(instance);
+            }
+
             InjectUnityEngineObject(resolver, instance);
             return instance;
         }
@@ -53,7 +66,19 @@ namespace VContainer.Unity
             Quaternion rotation)
             where T : UnityEngine.Object
         {
-            var instance = UnityEngine.Object.Instantiate(prefab, position, rotation);
+            var scope = (LifetimeScope)resolver.ApplicationOrigin;
+
+            T instance;
+            if (scope.IsRoot)
+            {
+                instance = UnityEngine.Object.Instantiate(prefab, position, rotation);
+                UnityEngine.Object.DontDestroyOnLoad(instance);
+            }
+            else
+            {
+                instance = UnityEngine.Object.Instantiate(prefab, position, rotation, scope.transform);
+                ResetParent(instance);
+            }
             InjectUnityEngineObject(resolver, instance);
             return instance;
         }
@@ -77,6 +102,19 @@ namespace VContainer.Unity
                 resolver.InjectGameObject(gameObject);
             else
                 resolver.Inject(instance);
+        }
+
+        static void ResetParent<T>(T instance) where T : UnityEngine.Object
+        {
+            switch (instance)
+            {
+                case Component component:
+                    component.transform.parent = null;
+                    break;
+                case GameObject gameObject:
+                    gameObject.transform.parent = null;
+                    break;
+            }
         }
     }
 }
