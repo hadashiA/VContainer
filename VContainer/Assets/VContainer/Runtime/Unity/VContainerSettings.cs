@@ -65,7 +65,7 @@ namespace VContainer.Unity
             if (RootLifetimeScope != null)
             {
                 RootLifetimeScope.IsRoot = true;
-                if (RootLifetimeScope.Container == null)
+                if (RootLifetimeScope.Container == null && RootLifetimeScope.autoRun)
                 {
                     RootLifetimeScope.Build();
                 }
