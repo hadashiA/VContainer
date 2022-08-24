@@ -161,6 +161,13 @@ namespace VContainer.Unity
 
             if (Parent != null)
             {
+                if (VContainerSettings.Instance != null && Parent == VContainerSettings.Instance.RootLifetimeScope)
+                {
+                    if (Parent.Container == null)
+                        Parent.Build();
+                }
+
+                // ReSharper disable once PossibleNullReferenceException
                 Container = Parent.Container.CreateScope(builder =>
                 {
                     builder.ApplicationOrigin = this;
@@ -272,17 +279,8 @@ namespace VContainer.Unity
 
             // Find root from settings
             if (VContainerSettings.Instance != null)
-            {
-                var rootLifetimeScope = VContainerSettings.Instance.RootLifetimeScope;
-                if (rootLifetimeScope != null)
-                {
-                    if (rootLifetimeScope.Container == null)
-                    {
-                        rootLifetimeScope.Build();
-                    }
-                    return rootLifetimeScope;
-                }
-            }
+                return VContainerSettings.Instance.RootLifetimeScope;
+
             return null;
         }
 
