@@ -21,6 +21,10 @@ namespace VContainer.Unity
         [Tooltip("Disables script modification for LifetimeScope scripts.")]
         public bool DisableScriptModifier;
 
+        [SerializeField]
+        [Tooltip("Removes (Clone) postfix in IObjectResolver.Instantiate() and IContainerBuilder.RegisterComponentInNewPrefab().")]
+        public bool RemoveClonePostfix;
+
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Create/VContainer/VContainer Settings")]
         public static void CreateAsset()
