@@ -63,21 +63,24 @@ namespace VContainer.Unity
             LoadInstanceFromPreloadAssets();
         }
 #endif
-        
+
         void OnEnable()
         {
-            if (RootLifetimeScope != null)
+            if (Application.isPlaying)
             {
-                RootLifetimeScope.IsRoot = true;
-                if (RootLifetimeScope.Container == null && RootLifetimeScope.autoRun)
+                if (RootLifetimeScope != null)
                 {
-                    RootLifetimeScope.Build();
+                    RootLifetimeScope.IsRoot = true;
+                    if (RootLifetimeScope.Container == null && RootLifetimeScope.autoRun)
+                    {
+                        RootLifetimeScope.Build();
+                    }
                 }
+
+                Instance = this;
+                Application.quitting -= OnApplicationQuit;
+                Application.quitting += OnApplicationQuit;
             }
-            Instance = this;
-            
-            Application.quitting -= OnApplicationQuit;
-            Application.quitting += OnApplicationQuit;
         }
 
         void OnApplicationQuit()
@@ -91,7 +94,7 @@ namespace VContainer.Unity
                     // However, the GameObject may be destroyed at that time.
                     PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new AsyncLoopItem(() =>
                     {
-                        RootLifetimeScope.DisposeCore();                        
+                        RootLifetimeScope.DisposeCore();
                     }));
                 }
             }
