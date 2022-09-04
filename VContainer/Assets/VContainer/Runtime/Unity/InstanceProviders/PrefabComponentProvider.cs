@@ -41,6 +41,7 @@ namespace VContainer.Unity
             try
             {
                 injector.Inject(component, resolver, customParameters);
+                destination.ApplyDontDestroyOnLoadIfNeeded(component);
             }
             finally
             {
