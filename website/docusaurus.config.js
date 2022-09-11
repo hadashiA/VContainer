@@ -80,9 +80,9 @@ module.exports = {
       // ]
     },
     algolia: {
-      appId: process.env.ALGOLIA_APP_ID,
-      apiKey: process.env.ALGOLIA_API_KEY,
-      indexName: process.env.ALGOLIA_INDEX_NAME
+      appId: process.env.ALGOLIA_APP_ID ?? "dummy",
+      apiKey: process.env.ALGOLIA_API_KEY ?? "dummy",
+      indexName: process.env.ALGOLIA_INDEX_NAME ?? "dummy"
     },
   },
   presets: [
@@ -101,7 +101,7 @@ module.exports = {
           customCss: require.resolve('./src/css/custom.css'),
         },
         googleAnalytics: {
-          trackingID: process.env.GA_TRACKING_ID,
+          trackingID: process.env.GA_TRACKING_ID ?? "dummy",
           // Optional fields.
           anonymizeIP: true, // Should IPs be anonymized?
         },

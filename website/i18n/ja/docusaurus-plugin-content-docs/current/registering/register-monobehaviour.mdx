@@ -78,6 +78,21 @@ builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped)
 
 ```
 
+
+## Register as `DontDestroyOnLoad`
+
+RegsiterComponent* method chain can be DontDestroyOnLoad.
+
+```csharp
+// Instantiate new GameObject as DontDestroyOnLoad
+builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped)
+    .DontDestroyOnLoad();
+
+// Instantiate new prefab as DontDestroyOnLoad
+builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped)
+    .DontDestroyOnLoad();
+```
+
 ## Grouping MonoBehaviour's Registration
 
 ```csharp
