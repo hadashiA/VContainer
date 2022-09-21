@@ -150,7 +150,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        Registration FindRegistration(Type type)
+        internal Registration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
             while (scope != null)
