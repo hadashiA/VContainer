@@ -40,13 +40,6 @@ namespace VContainer.Internal
             return $"CollectionRegistration {ImplementationType} ContractTypes=[{contractTypes}] {Lifetime}";
         }
 
-        public CollectionInstanceProvider Clone()
-        {
-            var cloned = new CollectionInstanceProvider(ElementType);
-            cloned.Merge(this);
-            return cloned;
-        }
-
         public void Add(Registration registration)
         {
             foreach (var x in registrations)
@@ -57,14 +50,6 @@ namespace VContainer.Internal
                 }
             }
             registrations.Add(registration);
-        }
-
-        public void Merge(CollectionInstanceProvider parent)
-        {
-            foreach (var x in parent.registrations)
-            {
-                Add(x);
-            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
