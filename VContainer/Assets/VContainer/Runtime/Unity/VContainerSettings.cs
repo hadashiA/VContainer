@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace VContainer.Unity
 {
@@ -71,24 +72,42 @@ namespace VContainer.Unity
                 if (RootLifetimeScope != null)
                 {
                     RootLifetimeScope.IsRoot = true;
-                    if (RootLifetimeScope.Container == null && RootLifetimeScope.autoRun)
-                    {
-                        RootLifetimeScope.Build();
-                    }
                 }
 
                 Instance = this;
+
+                var activeScene = SceneManager.GetActiveScene();
+                if (activeScene.isLoaded)
+                {
+                    OnFirstSceneLoaded(activeScene, default);
+                }
+                else
+                {
+                    SceneManager.sceneLoaded -= OnFirstSceneLoaded;
+                    SceneManager.sceneLoaded += OnFirstSceneLoaded;
+                }
+
                 Application.quitting -= OnApplicationQuit;
                 Application.quitting += OnApplicationQuit;
             }
+        }
+
+        void OnFirstSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (RootLifetimeScope != null &&
+                RootLifetimeScope.Container == null &&
+                RootLifetimeScope.autoRun)
+            {
+                RootLifetimeScope.Build();
+            }
+            SceneManager.sceneLoaded -= OnFirstSceneLoaded;
         }
 
         void OnApplicationQuit()
         {
             if (RootLifetimeScope != null)
             {
-                var container = RootLifetimeScope.Container;
-                if (container != null)
+                if (RootLifetimeScope.Container != null)
                 {
                     // Execute Dispose once at the slowest possible time.
                     // However, the GameObject may be destroyed at that time.
