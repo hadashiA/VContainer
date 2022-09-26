@@ -63,6 +63,8 @@ namespace VContainer.Unity
             {
                 injector.Inject(monoBehaviour, resolver, customParameters);
             }
+
+            destination.ApplyDontDestroyOnLoadIfNeeded(component);
             return component;
         }
     }
