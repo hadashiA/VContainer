@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VContainer.Standalone", "VC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VContainer.StandaloneTests", "VContainer.StandaloneTests\VContainer.StandaloneTests.csproj", "{1E5A1C0D-F315-4BDF-B0DA-6B0C3E7D8017}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VContainer.SourceGenerator", "VContainer.SourceGenerator\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj", "{57A411F5-878E-480A-84E1-1B7243E790F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{1E5A1C0D-F315-4BDF-B0DA-6B0C3E7D8017}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E5A1C0D-F315-4BDF-B0DA-6B0C3E7D8017}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E5A1C0D-F315-4BDF-B0DA-6B0C3E7D8017}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57A411F5-878E-480A-84E1-1B7243E790F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57A411F5-878E-480A-84E1-1B7243E790F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57A411F5-878E-480A-84E1-1B7243E790F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57A411F5-878E-480A-84E1-1B7243E790F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
