@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace VContainer.SourceGenerator
@@ -41,12 +42,12 @@ namespace VContainer.SourceGenerator
 
         static void GenerateResolver(
             WorkItem workItem,
-            ReferenceSymbols referenceSymbols,
+            ReferenceSymbols references,
             in GeneratorExecutionContext context)
         {
             try
             {
-                var typeMeta = workItem.Analyze(in context);
+                var typeMeta = workItem.Analyze(in context, references);
                 if (typeMeta is null) return;
 
                 var codeWriter = new CodeWriter();
@@ -56,7 +57,6 @@ namespace VContainer.SourceGenerator
                     .Replace("<", "_")
                     .Replace(">", "_");
 
-                //var typeName = typeMeta.Symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
                 var generateTypeName = fullType.Replace(".", "_") + "_VContainerGeneratedInjector";
 
                 codeWriter.AppendLine("using System;");
@@ -81,7 +81,33 @@ namespace VContainer.SourceGenerator
 
                     using (codeWriter.BeginBlockScope("public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
                     {
-                        codeWriter.AppendLine("throw new System.NotImplementedException();");
+                        if (typeMeta.InheritsFrom(references.UnityEngineComponent))
+                        {
+                            codeWriter.AppendLine($"throw new NotSupportedException(UnityEngine.Component:{} cannot be `new`);");
+                        }
+                        else if (typeMeta.IsUseEmptyConstructor)
+                        {
+                            codeWriter.AppendLine($"return new {typeMeta.TypeName}();");
+                        }
+                        else
+                        {
+                            var parameters = typeMeta.Constructor!.Parameters
+                                .Select(param =>
+                                {
+                                    var paramType = param.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                                    var paramName = param.Name;
+                                    return (paramType, paramName);
+                                })
+                                .ToArray();
+
+                            foreach (var (paramType, paramName) in parameters)
+                            {
+                                codeWriter.AppendLine($"var {paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
+                            }
+
+                            var arguments = parameters.Select(x => $"{x.paramType} {x.paramName}");
+                            codeWriter.AppendLine($"new {typeMeta.TypeName}({string.Join(", ", arguments)});");
+                        }
                     }
                 }
 
