@@ -73,41 +73,16 @@ namespace VContainer.SourceGenerator
 
                 using (codeWriter.BeginBlockScope($"class {generateTypeName} : IInjector"))
                 {
-                    using (codeWriter.BeginBlockScope("public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
+                    if (!TryEmitInjectMethod(typeMeta, codeWriter, in context))
                     {
-                        codeWriter.AppendLine("throw new System.NotImplementedException();");
+                        return;
                     }
+
                     codeWriter.AppendLine();
 
-                    using (codeWriter.BeginBlockScope("public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
+                    if (!TryEmitCreateInstanceMethod(typeMeta, codeWriter, in context))
                     {
-                        if (typeMeta.InheritsFrom(references.UnityEngineComponent))
-                        {
-                            codeWriter.AppendLine($"throw new NotSupportedException(UnityEngine.Component:{} cannot be `new`);");
-                        }
-                        else if (typeMeta.IsUseEmptyConstructor)
-                        {
-                            codeWriter.AppendLine($"return new {typeMeta.TypeName}();");
-                        }
-                        else
-                        {
-                            var parameters = typeMeta.Constructor!.Parameters
-                                .Select(param =>
-                                {
-                                    var paramType = param.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-                                    var paramName = param.Name;
-                                    return (paramType, paramName);
-                                })
-                                .ToArray();
-
-                            foreach (var (paramType, paramName) in parameters)
-                            {
-                                codeWriter.AppendLine($"var {paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
-                            }
-
-                            var arguments = parameters.Select(x => $"{x.paramType} {x.paramName}");
-                            codeWriter.AppendLine($"new {typeMeta.TypeName}({string.Join(", ", arguments)});");
-                        }
+                        return;
                     }
                 }
 
@@ -124,6 +99,135 @@ namespace VContainer.SourceGenerator
                     DiagnosticDescriptors.UnexpectedErrorDescriptor,
                     Location.None,
                     ex.ToString().Replace(Environment.NewLine, " ")));
+            }
+
+            bool TryEmitInjectMethod(TypeMeta typeMeta, CodeWriter codeWriter, in GeneratorExecutionContext context)
+            {
+                using (codeWriter.BeginBlockScope(
+                           "public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
+                {
+                    var injectFields = typeMeta.GetInjectFields();
+                    var injectProperties = typeMeta.GetInjectProperties();
+                    var injectMethods = typeMeta.GetInjectMethods();
+
+                    if (injectFields.Count == 0 &&
+                        injectProperties.Count == 0 &&
+                        injectMethods.Count == 0)
+                    {
+                        codeWriter.AppendLine("return;");
+                        return true;
+                    }
+
+                    codeWriter.AppendLine($"var x = ({typeMeta.TypeName})instance;");
+
+                    foreach (var fieldSymbol in injectFields)
+                    {
+                        if (!fieldSymbol.CanBeCallFromInternal())
+                        {
+                            var invalid = Diagnostic.Create(
+                                DiagnosticDescriptors.CannotAccessInjectField,
+                                fieldSymbol.Locations.FirstOrDefault() ?? typeMeta.Syntax.GetLocation(),
+                                fieldSymbol.Name);
+                            context.ReportDiagnostic(invalid);
+                            return false;
+                        }
+
+                        var fieldTypeName =
+                            fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        codeWriter.AppendLine($"x.{fieldSymbol.Name} = resolver.Resolve<{fieldTypeName}>();");
+                    }
+
+                    foreach (var propSymbol in injectProperties)
+                    {
+                        if (!propSymbol.CanBeCallFromInternal())
+                        {
+                            var invalid = Diagnostic.Create(
+                                DiagnosticDescriptors.CannotAccessInjectProperty,
+                                propSymbol.Locations.FirstOrDefault() ?? typeMeta.Syntax.GetLocation(),
+                                propSymbol.Name);
+                            context.ReportDiagnostic(invalid);
+                            return false;
+                        }
+
+                        var propTypeName =
+                            propSymbol.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        codeWriter.AppendLine($"x.{propSymbol.Name} = resolver.Resolve<{propTypeName}>();");
+                    }
+
+                    foreach (var methodSymbol in injectMethods)
+                    {
+                        if (!methodSymbol.CanBeCallFromInternal())
+                        {
+                            var invalid = Diagnostic.Create(
+                                DiagnosticDescriptors.CannotAccessInjectMethod,
+                                methodSymbol.Locations.FirstOrDefault() ?? typeMeta.Syntax.GetLocation(),
+                                methodSymbol.Name);
+                            context.ReportDiagnostic(invalid);
+                            return false;
+                        }
+
+                        var parameters = methodSymbol.Parameters
+                            .Select(param =>
+                            {
+                                var paramType =
+                                    param.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                                var paramName = param.Name;
+                                return (paramType, paramName);
+                            })
+                            .ToArray();
+
+                        foreach (var (paramType, paramName) in parameters)
+                        {
+                            codeWriter.AppendLine(
+                                $"var {paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
+                        }
+
+                        var arguments = parameters.Select(x => $"{x.paramType} {x.paramName}");
+                        codeWriter.AppendLine($"x.{methodSymbol.Name}({string.Join(", ", arguments)});");
+                    }
+                    return true;
+                }
+            }
+
+            bool TryEmitCreateInstanceMethod(TypeMeta typeMeta, CodeWriter codeWriter, in GeneratorExecutionContext context)
+            {
+                using (codeWriter.BeginBlockScope("public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
+                {
+                    if (typeMeta.CtorInvalid is { } invalid)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(invalid, typeMeta.Syntax.GetLocation(), typeMeta.Symbol.Name));
+                        return false;
+                    }
+                    if (typeMeta.InheritsFrom(references.UnityEngineComponent))
+                    {
+                        codeWriter.AppendLine($"throw new NotSupportedException(\"UnityEngine.Component:{typeMeta.TypeName} cannot be `new`\");");
+                        return true;
+                    }
+                    if (typeMeta.IsUseEmptyConstructor)
+                    {
+                        codeWriter.AppendLine($"return new {typeMeta.TypeName}();");
+                        return true;
+                    }
+                    var parameters = typeMeta.Constructor!.Parameters
+                        .Select(param =>
+                        {
+                            var paramType =
+                                param.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                            var paramName = param.Name;
+                            return (paramType, paramName);
+                        })
+                        .ToArray();
+
+                    foreach (var (paramType, paramName) in parameters)
+                    {
+                        codeWriter.AppendLine(
+                            $"var {paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
+                    }
+
+                    var arguments = parameters.Select(x => $"{x.paramType} {x.paramName}");
+                    codeWriter.AppendLine($"new {typeMeta.TypeName}({string.Join(", ", arguments)});");
+                    return true;
+                }
             }
         }
     }

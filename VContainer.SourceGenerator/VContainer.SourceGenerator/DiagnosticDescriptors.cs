@@ -25,7 +25,33 @@ namespace VContainer.SourceGenerator
         public static readonly DiagnosticDescriptor MultipleCtorAttribute = new(
             id: "VCON0003",
             title: "[Inject] exists in multiple constructors",
-            messageFormat: "Mupltiple [Inject] exists in '{0}' but allows only single ctor",
+            messageFormat: "Multiple [Inject] exists in '{0}' but allows only single ctor",
+            category: Category,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
+
+
+        public static readonly DiagnosticDescriptor CannotAccessInjectField = new(
+            id: "VCON0003",
+            title: "[Inject] exists in private field",
+            messageFormat: "[Inject] exists in '{0}', by code generation, the setter should be accessible from a separate class in the same dll",
+            category: Category,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
+
+
+        public static readonly DiagnosticDescriptor CannotAccessInjectProperty = new(
+            id: "VCON0003",
+            title: "[Inject] exists in private property",
+            messageFormat: "[Inject] exists in '{0}', by code generation, the setter should be accessible from a separate class in the same dll",
+            category: Category,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor CannotAccessInjectMethod = new(
+            id: "VCON0003",
+            title: "[Inject] exists in private method",
+            messageFormat: "[Inject] exists in '{0}', by code generation, the method should be accessible from a separate class in the same dll",
             category: Category,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
