@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -22,13 +23,21 @@ namespace VContainer.SourceGenerator
                 if (moduleName.StartsWith("Unity.")) return;
                 if (moduleName.StartsWith("VContainer.")) return;
 
-                var referenceSymbols = new ReferenceSymbols(context.Compilation);
-                if (referenceSymbols.VContainerInjectAttribute is null) return;
+                var references = new ReferenceSymbols(context.Compilation);
+                if (references.VContainerInjectAttribute is null) return;
 
+                var codeWriter = new CodeWriter();
                 var syntaxCollector = (SyntaxCollector)context.SyntaxReceiver!;
                 foreach (var workItem in syntaxCollector.WorkItems)
                 {
-                    GenerateResolver(workItem, referenceSymbols, in context);
+                    var typeMeta = workItem.Analyze(in context, references);
+                    if (typeMeta is null) continue;
+
+                    if (TryEmitGeneratedInjector(typeMeta, codeWriter, references, in context))
+                    {
+                        context.AddSource($"{typeMeta.ToFullTypeName()}.VContainerGeneratedInjector.cs", codeWriter.ToString());
+                    }
+                    codeWriter.Clear();
                 }
             }
             catch (Exception ex)
@@ -40,25 +49,14 @@ namespace VContainer.SourceGenerator
             }
         }
 
-        static void GenerateResolver(
-            WorkItem workItem,
+        static bool TryEmitGeneratedInjector(
+            TypeMeta typeMeta,
+            CodeWriter codeWriter,
             ReferenceSymbols references,
             in GeneratorExecutionContext context)
         {
             try
             {
-                var typeMeta = workItem.Analyze(in context, references);
-                if (typeMeta is null) return;
-
-                var codeWriter = new CodeWriter();
-
-                var fullType = typeMeta.Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                    .Replace("global::", "")
-                    .Replace("<", "_")
-                    .Replace(">", "_");
-
-                var generateTypeName = fullType.Replace(".", "_") + "_VContainerGeneratedInjector";
-
                 codeWriter.AppendLine("using System;");
                 codeWriter.AppendLine("using System.Collections.Generic;");
                 codeWriter.AppendLine("using VContainer;");
@@ -71,18 +69,19 @@ namespace VContainer.SourceGenerator
                     codeWriter.BeginBlock();
                 }
 
+                var generateTypeName = $"{typeMeta.TypeName}VContainerGeneratedInjector";
                 using (codeWriter.BeginBlockScope($"class {generateTypeName} : IInjector"))
                 {
                     if (!TryEmitInjectMethod(typeMeta, codeWriter, in context))
                     {
-                        return;
+                        return false;
                     }
 
                     codeWriter.AppendLine();
 
                     if (!TryEmitCreateInstanceMethod(typeMeta, codeWriter, in context))
                     {
-                        return;
+                        return false;
                     }
                 }
 
@@ -90,8 +89,6 @@ namespace VContainer.SourceGenerator
                 {
                     codeWriter.EndBlock();
                 }
-
-                context.AddSource($"{fullType}.VContainerGeneratedInjector.cs", codeWriter.ToString());
             }
             catch (Exception ex)
             {
@@ -101,7 +98,7 @@ namespace VContainer.SourceGenerator
                     ex.ToString().Replace(Environment.NewLine, " ")));
             }
 
-            bool TryEmitInjectMethod(TypeMeta typeMeta, CodeWriter codeWriter, in GeneratorExecutionContext context)
+            static bool TryEmitInjectMethod(TypeMeta typeMeta, CodeWriter codeWriter, in GeneratorExecutionContext context)
             {
                 using (codeWriter.BeginBlockScope(
                            "public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
@@ -189,7 +186,7 @@ namespace VContainer.SourceGenerator
                 }
             }
 
-            bool TryEmitCreateInstanceMethod(TypeMeta typeMeta, CodeWriter codeWriter, in GeneratorExecutionContext context)
+            static bool TryEmitCreateInstanceMethod(TypeMeta typeMeta, CodeWriter codeWriter, in GeneratorExecutionContext context)
             {
                 using (codeWriter.BeginBlockScope("public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
                 {

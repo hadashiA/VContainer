@@ -80,5 +80,10 @@ namespace VContainer.SourceGenerator
             DecreaseIndent();
             AppendLine("}");
         }
+
+        public void Clear()
+        {
+            buffer.Clear();
+        }
     }
 }
