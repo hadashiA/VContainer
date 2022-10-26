@@ -35,7 +35,11 @@ namespace VContainer.SourceGenerator
 
                     if (TryEmitGeneratedInjector(typeMeta, codeWriter, references, in context))
                     {
-                        context.AddSource($"{typeMeta.ToFullTypeName()}.VContainerGeneratedInjector.cs", codeWriter.ToString());
+                        var fullType = typeMeta.Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
+                                .Replace("global::", "")
+                                .Replace("<", "_")
+                                .Replace(">", "_");
+                        context.AddSource($"{fullType}.VContainerGeneratedInjector.cs", codeWriter.ToString());
                     }
                     codeWriter.Clear();
                 }

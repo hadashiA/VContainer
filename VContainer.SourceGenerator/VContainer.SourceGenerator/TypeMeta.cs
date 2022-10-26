@@ -49,14 +49,6 @@ namespace VContainer.SourceGenerator
             return false;
         }
 
-        public string ToFullTypeName()
-        {
-            return Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                .Replace("global::", "")
-                .Replace("<", "_")
-                .Replace(">", "_");
-        }
-
         public IReadOnlyList<IFieldSymbol> GetInjectFields()
         {
             return Symbol.GetMembers()

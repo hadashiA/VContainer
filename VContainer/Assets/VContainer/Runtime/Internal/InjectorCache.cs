@@ -12,7 +12,7 @@ namespace VContainer.Internal
         {
             return Injectors.GetOrAdd(type, key =>
             {
-                var generatedType = type.Assembly.GetType($"{key.FullName}VContainerGeneratedInjector");
+                var generatedType = key.Assembly.GetType($"{key.FullName}VContainerGeneratedInjector", false);
                 if (generatedType != null)
                 {
                     return (IInjector)Activator.CreateInstance(generatedType);
