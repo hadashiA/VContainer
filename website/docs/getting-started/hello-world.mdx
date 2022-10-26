@@ -148,7 +148,7 @@ We should register this as running on Unity's life cycle events.
 :::note
 - RegisterEntryPoint&lt;GamePresenter&gt;() is an alias to register interfaces related to Unity's PlayerLoop event.
     - Similar to Register&lt;GamePresenter&gt;(Lifetime.Singleton).As&lt;ITickable&gt;()
-- Registering lifecycle events without relying on MonoBehaviour facilitates decupling of domain logic and presentation !
+- Registering lifecycle events without relying on MonoBehaviour facilitates decoupling of domain logic and presentation !
 :::
 
 If you have multiple EntryPoints, you can also use the following declaration as grouping.
