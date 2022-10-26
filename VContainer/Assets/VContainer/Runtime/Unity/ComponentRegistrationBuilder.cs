@@ -9,6 +9,7 @@ namespace VContainer.Unity
     {
         public Transform Parent;
         public Func<Transform> ParentFinder;
+        public bool DontDestroyOnLoad;
 
         public Transform GetParent()
         {
@@ -17,6 +18,14 @@ namespace VContainer.Unity
             if (ParentFinder != null)
                 return ParentFinder();
             return null;
+        }
+
+        public void ApplyDontDestroyOnLoadIfNeeded(Component component)
+        {
+            if (DontDestroyOnLoad)
+            {
+                UnityEngine.Object.DontDestroyOnLoad(component);
+            }
         }
     }
 
@@ -66,7 +75,7 @@ namespace VContainer.Unity
 
             if (instance != null)
             {
-                provider = new ExistingComponentProvider(instance, injector, Parameters);
+                provider = new ExistingComponentProvider(instance, injector, Parameters, destination.DontDestroyOnLoad);
             }
             else if (scene.IsValid())
             {
@@ -92,6 +101,12 @@ namespace VContainer.Unity
         public ComponentRegistrationBuilder UnderTransform(Func<Transform> parentFinder)
         {
             destination.ParentFinder = parentFinder;
+            return this;
+        }
+
+        public ComponentRegistrationBuilder DontDestroyOnLoad()
+        {
+            destination.DontDestroyOnLoad = true;
             return this;
         }
    }

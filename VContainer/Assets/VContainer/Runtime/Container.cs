@@ -131,7 +131,6 @@ namespace VContainer
                 default:
                     return registration.SpawnInstance(this);
             }
-
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -151,36 +150,13 @@ namespace VContainer
         Registration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
-            Registration entirelyCollection = null;
-
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
                 {
-                    switch (registration.Provider)
-                    {
-                        case CollectionInstanceProvider localCollection:
-                            if (entirelyCollection == null)
-                            {
-                                var collection = new CollectionInstanceProvider(localCollection.ElementType);
-                                collection.Merge(localCollection);
-                                entirelyCollection = new Registration(registration.ImplementationType, registration.Lifetime, registration.InterfaceTypes, collection);
-                            }
-                            else
-                            {
-                                ((CollectionInstanceProvider)entirelyCollection.Provider).Merge(localCollection);
-                            }
-                            break;
-                        default:
-                            return registration;
-                    }
+                    return registration;
                 }
                 scope = scope.Parent;
-            }
-
-            if (entirelyCollection != null)
-            {
-                return entirelyCollection;
             }
             throw new VContainerException(type, $"No such registration of type: {type}");
         }

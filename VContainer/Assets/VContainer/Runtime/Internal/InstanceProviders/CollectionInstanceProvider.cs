@@ -52,16 +52,20 @@ namespace VContainer.Internal
             registrations.Add(registration);
         }
 
-        public void Merge(CollectionInstanceProvider other)
-        {
-            foreach (var x in other.registrations)
-            {
-                Add(x);
-            }
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object SpawnInstance(IObjectResolver resolver)
+        {
+            if (resolver is IScopedObjectResolver scope)
+            {
+                var entirelyRegistrations = CollectFromParentScopes(scope);
+                return SpawnInstance(resolver, entirelyRegistrations);
+            }
+            return SpawnInstance(resolver, registrations);
+        }
+
+        internal object SpawnInstance(
+            IObjectResolver resolver,
+            IReadOnlyList<Registration> registrations)
         {
             var array = Array.CreateInstance(ElementType, registrations.Count);
             for (var i = 0; i < registrations.Count; i++)
@@ -69,6 +73,50 @@ namespace VContainer.Internal
                 array.SetValue(resolver.Resolve(registrations[i]), i);
             }
             return array;
+        }
+
+        internal List<Registration> CollectFromParentScopes(
+            IScopedObjectResolver scope,
+            bool localScopeOnly = false)
+        {
+            if (scope.Parent == null)
+            {
+                return registrations;
+            }
+
+            var finderType = InterfaceTypes[0];
+            List<Registration> mergedRegistrations = null;
+
+            scope = scope.Parent;
+            while (scope != null)
+            {
+                if (scope.TryGetRegistration(finderType, out var registration) &&
+                    registration.Provider is CollectionInstanceProvider parentCollection)
+                {
+                    if (mergedRegistrations == null)
+                    {
+                        // TODO: object pooling
+                        mergedRegistrations = new List<Registration>(registrations);
+                    }
+
+                    if (localScopeOnly)
+                    {
+                        foreach (var x in parentCollection.registrations)
+                        {
+                            if (x.Lifetime != Lifetime.Singleton)
+                            {
+                                mergedRegistrations.Add(x);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        mergedRegistrations.AddRange(parentCollection.registrations);
+                    }
+                }
+                scope = scope.Parent;
+            }
+            return mergedRegistrations ?? registrations;
         }
     }
 }

@@ -363,6 +363,21 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void RegisterComponentInNewPrefab_DontDestroyOnLoad()
+        {
+            var prefab = new GameObject("Sample").AddComponent<SampleMonoBehaviour>();
+
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton)
+                .DontDestroyOnLoad();
+
+            var container = builder.Build();
+            var instance = container.Resolve<SampleMonoBehaviour>();
+            Assert.That(instance.gameObject.scene.name, Is.EqualTo("DontDestroyOnLoad"));
+        }
+
+        [Test]
         public void UseComponentsWithParentTransform()
         {
             var go1 = new GameObject("Parent");

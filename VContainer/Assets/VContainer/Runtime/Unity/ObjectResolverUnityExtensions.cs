@@ -1,5 +1,4 @@
 using UnityEngine;
-using VContainer.Internal;
 
 namespace VContainer.Unity
 {
@@ -46,6 +45,7 @@ namespace VContainer.Unity
                 instance = UnityEngine.Object.Instantiate(prefab, scope.transform);
                 ResetParent(instance);
             }
+            SetName(instance, prefab);
 
             InjectUnityEngineObject(resolver, instance);
             return instance;
@@ -55,6 +55,8 @@ namespace VContainer.Unity
             where T : UnityEngine.Object
         {
             var instance = UnityEngine.Object.Instantiate(prefab, parent, worldPositionStays);
+            SetName(instance, prefab);
+
             InjectUnityEngineObject(resolver, instance);
             return instance;
         }
@@ -79,6 +81,8 @@ namespace VContainer.Unity
                 instance = UnityEngine.Object.Instantiate(prefab, position, rotation, scope.transform);
                 ResetParent(instance);
             }
+            
+            SetName(instance, prefab);
             InjectUnityEngineObject(resolver, instance);
             return instance;
         }
@@ -92,6 +96,8 @@ namespace VContainer.Unity
             where T : UnityEngine.Object
         {
             var instance = UnityEngine.Object.Instantiate(prefab, position, rotation, parent);
+            SetName(instance, prefab);
+
             InjectUnityEngineObject(resolver, instance);
             return instance;
         }
@@ -115,6 +121,12 @@ namespace VContainer.Unity
                     gameObject.transform.parent = null;
                     break;
             }
+        }
+
+        static void SetName<T>(T instance, T prefab) where T : UnityEngine.Object
+        {
+            if (VContainerSettings.Instance != null && VContainerSettings.Instance.RemoveClonePostfix)
+                instance.name = prefab.name;
         }
     }
 }

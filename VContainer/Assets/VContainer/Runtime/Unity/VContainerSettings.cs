@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace VContainer.Unity
 {
@@ -20,6 +21,10 @@ namespace VContainer.Unity
         [SerializeField]
         [Tooltip("Disables script modification for LifetimeScope scripts.")]
         public bool DisableScriptModifier;
+
+        [SerializeField]
+        [Tooltip("Removes (Clone) postfix in IObjectResolver.Instantiate() and IContainerBuilder.RegisterComponentInNewPrefab().")]
+        public bool RemoveClonePostfix;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Create/VContainer/VContainer Settings")]
@@ -59,35 +64,56 @@ namespace VContainer.Unity
             LoadInstanceFromPreloadAssets();
         }
 #endif
-        
+
         void OnEnable()
         {
-            if (RootLifetimeScope != null)
+            if (Application.isPlaying)
             {
-                RootLifetimeScope.IsRoot = true;
-                if (RootLifetimeScope.Container == null)
+                if (RootLifetimeScope != null)
                 {
-                    RootLifetimeScope.Build();
+                    RootLifetimeScope.IsRoot = true;
                 }
+
+                Instance = this;
+
+                var activeScene = SceneManager.GetActiveScene();
+                if (activeScene.isLoaded)
+                {
+                    OnFirstSceneLoaded(activeScene, default);
+                }
+                else
+                {
+                    SceneManager.sceneLoaded -= OnFirstSceneLoaded;
+                    SceneManager.sceneLoaded += OnFirstSceneLoaded;
+                }
+
+                Application.quitting -= OnApplicationQuit;
+                Application.quitting += OnApplicationQuit;
             }
-            Instance = this;
-            
-            Application.quitting -= OnApplicationQuit;
-            Application.quitting += OnApplicationQuit;
+        }
+
+        void OnFirstSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (RootLifetimeScope != null &&
+                RootLifetimeScope.Container == null &&
+                RootLifetimeScope.autoRun)
+            {
+                RootLifetimeScope.Build();
+            }
+            SceneManager.sceneLoaded -= OnFirstSceneLoaded;
         }
 
         void OnApplicationQuit()
         {
             if (RootLifetimeScope != null)
             {
-                var container = RootLifetimeScope.Container;
-                if (container != null)
+                if (RootLifetimeScope.Container != null)
                 {
                     // Execute Dispose once at the slowest possible time.
                     // However, the GameObject may be destroyed at that time.
                     PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new AsyncLoopItem(() =>
                     {
-                        RootLifetimeScope.DisposeCore();                        
+                        RootLifetimeScope.DisposeCore();
                     }));
                 }
             }

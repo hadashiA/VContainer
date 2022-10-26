@@ -21,7 +21,6 @@ namespace VContainer.Tests.Unity
 
             var entryPoint = lifetimeScope.Container.Resolve<SampleEntryPoint>();
             Assert.That(entryPoint, Is.InstanceOf<SampleEntryPoint>());
-
             Assert.That(entryPoint.InitializeCalled, Is.EqualTo(1));
             Assert.That(entryPoint.PostInitializeCalled, Is.EqualTo(1));
             Assert.That(entryPoint.StartCalled, Is.EqualTo(1));
@@ -189,6 +188,26 @@ namespace VContainer.Tests.Unity
             yield return null;
 
             Assert.That(handled, Is.EqualTo(1));
+        }
+
+        [UnityTest]
+        public IEnumerator FromParent_LifetimeScoped()
+        {
+            var parentScope = LifetimeScope.Create(builder =>
+            {
+                builder.RegisterEntryPoint<SampleEntryPoint>(Lifetime.Scoped).AsSelf();
+            });
+            var childScope = parentScope.CreateChild();
+
+            yield return null;
+            yield return null;
+
+            var parentEntryPoint = parentScope.Container.Resolve<SampleEntryPoint>();
+            var childEntryPoint = childScope.Container.Resolve<SampleEntryPoint>();
+            Assert.That(parentEntryPoint.InitializeCalled, Is.EqualTo(1));
+            Assert.That(parentEntryPoint.StartCalled, Is.EqualTo(1));
+            Assert.That(childEntryPoint.InitializeCalled, Is.EqualTo(1));
+            Assert.That(childEntryPoint.StartCalled, Is.EqualTo(1));
         }
     }
 }

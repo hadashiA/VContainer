@@ -25,7 +25,7 @@ namespace VContainer.Unity
         public ParentReference parentReference;
 
         [SerializeField]
-        bool autoRun = true;
+        public bool autoRun = true;
 
         [SerializeField]
         protected List<GameObject> autoInjectGameObjects;
@@ -161,6 +161,13 @@ namespace VContainer.Unity
 
             if (Parent != null)
             {
+                if (VContainerSettings.Instance != null && Parent == VContainerSettings.Instance.RootLifetimeScope)
+                {
+                    if (Parent.Container == null)
+                        Parent.Build();
+                }
+
+                // ReSharper disable once PossibleNullReferenceException
                 Container = Parent.Container.CreateScope(builder =>
                 {
                     builder.ApplicationOrigin = this;
@@ -185,12 +192,13 @@ namespace VContainer.Unity
             AwakeWaitingChildren(this);
         }
 
-        public LifetimeScope CreateChild(IInstaller installer = null)
+        public TScope CreateChild<TScope>(IInstaller installer = null)
+            where TScope : LifetimeScope
         {
             var childGameObject = new GameObject("LifetimeScope (Child)");
             childGameObject.SetActive(false);
             childGameObject.transform.SetParent(transform, false);
-            var child = childGameObject.AddComponent<LifetimeScope>();
+            var child = childGameObject.AddComponent<TScope>();
             if (installer != null)
             {
                 child.extraInstallers.Add(installer);
@@ -200,10 +208,18 @@ namespace VContainer.Unity
             return child;
         }
 
-        public LifetimeScope CreateChild(Action<IContainerBuilder> installation)
-            => CreateChild(new ActionInstaller(installation));
+        public LifetimeScope CreateChild(IInstaller installer = null)
+            => CreateChild<LifetimeScope>(installer);
 
-        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, IInstaller installer = null)
+        public TScope CreateChild<TScope>(Action<IContainerBuilder> installation)
+            where TScope : LifetimeScope
+            => CreateChild<TScope>(new ActionInstaller(installation));
+
+        public LifetimeScope CreateChild(Action<IContainerBuilder> installation)
+            => CreateChild<LifetimeScope>(new ActionInstaller(installation));
+
+        public TScope CreateChildFromPrefab<TScope>(TScope prefab, IInstaller installer = null)
+            where TScope : LifetimeScope
         {
             var wasActive = prefab.gameObject.activeSelf;
             if (wasActive)
@@ -224,7 +240,8 @@ namespace VContainer.Unity
             return child;
         }
 
-        public LifetimeScope CreateChildFromPrefab(LifetimeScope prefab, Action<IContainerBuilder> installation)
+        public TScope CreateChildFromPrefab<TScope>(TScope prefab, Action<IContainerBuilder> installation)
+            where TScope : LifetimeScope
             => CreateChildFromPrefab(prefab, new ActionInstaller(installation));
 
         void InstallTo(IContainerBuilder builder)
@@ -244,6 +261,7 @@ namespace VContainer.Unity
             extraInstallerStatic?.Install(builder);
 
             builder.RegisterInstance<LifetimeScope>(this).AsSelf();
+            EntryPointsBuilder.EnsureDispatcherRegistered(builder);
         }
 
         LifetimeScope GetRuntimeParent()
@@ -272,17 +290,8 @@ namespace VContainer.Unity
 
             // Find root from settings
             if (VContainerSettings.Instance != null)
-            {
-                var rootLifetimeScope = VContainerSettings.Instance.RootLifetimeScope;
-                if (rootLifetimeScope != null)
-                {
-                    if (rootLifetimeScope.Container == null)
-                    {
-                        rootLifetimeScope.Build();
-                    }
-                    return rootLifetimeScope;
-                }
-            }
+                return VContainerSettings.Instance.RootLifetimeScope;
+
             return null;
         }
 
