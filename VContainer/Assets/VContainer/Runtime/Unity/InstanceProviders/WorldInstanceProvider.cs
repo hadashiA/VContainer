@@ -25,12 +25,12 @@ namespace VContainer.Unity
             }
             else
             {
-                world.CreateSystem<InitializationSystemGroup>();
-                world.CreateSystem<SimulationSystemGroup>();
-                world.CreateSystem<PresentationSystemGroup>();
+                world.CreateSystemManaged<InitializationSystemGroup>();
+                world.CreateSystemManaged<SimulationSystemGroup>();
+                world.CreateSystemManaged<PresentationSystemGroup>();
 
                 ScriptBehaviourUpdateOrder.RemoveWorldFromCurrentPlayerLoop(world);
-                ScriptBehaviourUpdateOrder.AddWorldToCurrentPlayerLoop(world);
+                ScriptBehaviourUpdateOrder.AppendWorldToCurrentPlayerLoop(world);
             }
             return world;
         }

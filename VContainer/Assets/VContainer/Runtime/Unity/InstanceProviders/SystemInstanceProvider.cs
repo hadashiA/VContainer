@@ -38,17 +38,17 @@ namespace VContainer.Unity
             if (instance is null)
             {
                 instance = (ComponentSystemBase)injector.CreateInstance(resolver, customParameters);
-                world.AddSystem(instance);
+                world.AddSystemManaged(instance);
 
                 if (systemGroupType != null)
                 {
-                    var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystem(systemGroupType);
+                    var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystemManaged(systemGroupType);
                     systemGroup.AddSystemToUpdateList(instance);
                 }
 
                 return instance;
             }
-            return world.GetExistingSystem(systemType);
+            return world.GetExistingSystemManaged(systemType);
         }
 
         World GetWorld(IObjectResolver resolver)

@@ -96,7 +96,7 @@ namespace VContainer.Tests.Unity
 
             Assert.That(world.IsCreated, Is.True);
             Assert.That(system.World, Is.EqualTo(world));
-            Assert.That(world.GetExistingSystem<SystemB>(), Is.EqualTo(system));
+            Assert.That(world.GetExistingSystemManaged<SystemB>(), Is.EqualTo(system));
 
             container.Dispose();
             Assert.That(world.IsCreated, Is.False);

@@ -205,7 +205,7 @@ namespace VContainer.Unity
         public static RegistrationBuilder RegisterSystemFromWorld<T>(this IContainerBuilder builder, World world)
             where T : ComponentSystemBase
         {
-            var system = world.GetExistingSystem<T>();
+            var system = world.GetExistingSystemManaged<T>();
             if (system is null)
                 throw new ArgumentException($"{typeof(T).FullName} is not in the world {world}");
 
