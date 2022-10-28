@@ -28,7 +28,7 @@
             "define": "VCONTAINER_UNITASK_INTEGRATION"
         },
         {
-            "name": "com.unity.entities",
+            "name": "com.unity.entities.graphics",
             "expression": "",
             "define": "VCONTAINER_ECS_INTEGRATION"
         }

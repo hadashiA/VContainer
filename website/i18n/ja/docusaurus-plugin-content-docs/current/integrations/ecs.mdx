@@ -7,17 +7,22 @@ VContainer supports integration between Unity's ECS (Entity Component System) an
 ( This is an experimental feature. Any feedback is wellcome! :0 )
 
 :::caution
-Currently, this feature requires Unity 2019.3 or later versions.
+Currently, this feature requires Unity 2022.2.0b12 or later versions.
 :::
 
 ## Setup
 
-ECS features for VContainer is enabled if the project has the `com.unity.entities` package installed.
+ECS features for VContainer is enabled if the project has the `com.unity.entities.graphics` package installed.
 
 - Currently, ECS is a preview version. You may need the settings: `[Windows] -> [Package Manager]` and `[Advanced] -> [Show preview packages]`.
 - Select package of `Entities` and Press `[Install]`.
 
-If the `com.unity.entities` package exists, the `VCONTAINER_ECS_INTEGRATION` symbol is defined and the following features are enabled.
+If the `com.unity.entities.graphics` package exists, the `VCONTAINER_ECS_INTEGRATION` symbol is defined and the following features are enabled.
+
+:::caution
+Currently, the flag does not ensure that the correct versions of 'com.unity.entities' and 'com.unity.entities.graphics' are installed...
+The code has been written against version '1.0.0-exp.08' and tested up to versions 'com.unity.entities' '1.0.0-exp.12' and 'com.unity.entities.graphics' '1.0.0-exp.14'
+:::
 
 ## When using Unity's default World
 

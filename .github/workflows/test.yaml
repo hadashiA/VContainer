@@ -21,6 +21,7 @@ jobs:
     strategy:
       matrix:
         unityVersion:
+        - 2022.2.0b8
         - 2021.1.4f1
         - 2020.3.5f1
         - 2019.4.25f1
@@ -36,9 +37,9 @@ jobs:
           license: UNITY_LICENSE_2019_4
         - unityVersion: 2019.3.15f1
           license: UNITY_LICENSE_2019_3
-        - unityVersion: 2021.1.4f1
+        - unityVersion: 2022.2.0b12
           feature: 'ECS'
-          license: UNITY_LICENSE_2021_1
+          license: UNITY_LICENSE_2022_2
         # - unityVersion: 2018.4.31f1
         #   license: UNITY_LICENSE_2018_4
         #   externalPackage: 'None'
@@ -62,7 +63,13 @@ jobs:
       if: matrix.feature == 'ECS'
       shell: bash
       run: |
-        sed -i '2a "com.unity.entities": "0.17.0-preview.41",' ./VContainer/Packages/manifest.json
+        sed -i '2a "com.unity.entities": "1.0.0-exp.12",' ./VContainer/Packages/manifest.json
+
+    - name: Add Unity.Entities.Graphics
+      if: matrix.feature == 'ECS'
+      shell: bash
+      run: |
+        sed -i '2a "com.unity.entities.graphics": "1.0.0-exp.14",' ./VContainer/Packages/manifest.json
 
     - name: Enable CodeGen
       if: matrix.feature == 'CodeGen'
