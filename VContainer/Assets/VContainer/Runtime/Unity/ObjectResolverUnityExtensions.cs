@@ -32,18 +32,24 @@ namespace VContainer.Unity
 
         public static T Instantiate<T>(this IObjectResolver resolver, T prefab) where T : UnityEngine.Object
         {
-            var scope = (LifetimeScope)resolver.ApplicationOrigin;
-
             T instance;
-            if (scope.IsRoot)
+            if (resolver.ApplicationOrigin is LifetimeScope scope)
             {
-                instance = UnityEngine.Object.Instantiate(prefab);
-                UnityEngine.Object.DontDestroyOnLoad(instance);
+                if (scope.IsRoot)
+                {
+                    instance = UnityEngine.Object.Instantiate(prefab);
+                    UnityEngine.Object.DontDestroyOnLoad(instance);
+                }
+                else
+                {
+                    // Into the same scene as LifetimeScope
+                    instance = UnityEngine.Object.Instantiate(prefab, scope.transform);
+                    ResetParent(instance);
+                }
             }
             else
             {
-                instance = UnityEngine.Object.Instantiate(prefab, scope.transform);
-                ResetParent(instance);
+                instance = UnityEngine.Object.Instantiate(prefab);
             }
             SetName(instance, prefab);
 
@@ -68,20 +74,26 @@ namespace VContainer.Unity
             Quaternion rotation)
             where T : UnityEngine.Object
         {
-            var scope = (LifetimeScope)resolver.ApplicationOrigin;
-
             T instance;
-            if (scope.IsRoot)
+            if (resolver.ApplicationOrigin is LifetimeScope scope)
             {
-                instance = UnityEngine.Object.Instantiate(prefab, position, rotation);
-                UnityEngine.Object.DontDestroyOnLoad(instance);
+                if (scope.IsRoot)
+                {
+                    instance = UnityEngine.Object.Instantiate(prefab, position, rotation);
+                    UnityEngine.Object.DontDestroyOnLoad(instance);
+                }
+                else
+                {
+                    // Into the same scene as LifetimeScope
+                    instance = UnityEngine.Object.Instantiate(prefab, position, rotation, scope.transform);
+                    ResetParent(instance);
+                }
             }
             else
             {
-                instance = UnityEngine.Object.Instantiate(prefab, position, rotation, scope.transform);
-                ResetParent(instance);
+                instance = UnityEngine.Object.Instantiate(prefab, position, rotation);
             }
-            
+
             SetName(instance, prefab);
             InjectUnityEngineObject(resolver, instance);
             return instance;

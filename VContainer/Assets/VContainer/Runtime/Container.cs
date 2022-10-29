@@ -58,9 +58,9 @@ namespace VContainer
 
         internal ScopedContainer(
             Registry registry,
-            object applicationOrigin,
             IObjectResolver root,
-            IScopedObjectResolver parent = null)
+            IScopedObjectResolver parent = null,
+            object applicationOrigin = null)
         {
             Root = root;
             Parent = parent;
@@ -88,7 +88,10 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
         {
-            var containerBuilder = new ScopedContainerBuilder(Root, this);
+            var containerBuilder = new ScopedContainerBuilder(Root, this)
+            {
+                ApplicationOrigin = ApplicationOrigin
+            };
             installation?.Invoke(containerBuilder);
             return containerBuilder.BuildScope();
         }
@@ -173,10 +176,10 @@ namespace VContainer
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<Registration, Lazy<object>> createInstance;
 
-        internal Container(Registry registry, object applicationOrigin)
+        internal Container(Registry registry, object applicationOrigin = null)
         {
             this.registry = registry;
-            rootScope = new ScopedContainer(registry, applicationOrigin, this);
+            rootScope = new ScopedContainer(registry, this, applicationOrigin: applicationOrigin);
 
             createInstance = registration =>
             {

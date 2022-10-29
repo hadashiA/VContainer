@@ -36,7 +36,7 @@ namespace VContainer
         public IScopedObjectResolver BuildScope()
         {
             var registry = BuildRegistry();
-            var container = new ScopedContainer(registry, root, parent);
+            var container = new ScopedContainer(registry, root, parent, ApplicationOrigin);
             container.Diagnostics = Diagnostics;
             EmitCallbacks(container);
             return container;
