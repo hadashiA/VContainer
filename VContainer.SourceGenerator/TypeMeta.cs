@@ -10,6 +10,7 @@ namespace VContainer.SourceGenerator
         public TypeDeclarationSyntax Syntax { get; }
         public INamedTypeSymbol Symbol { get; }
         public string TypeName { get; }
+        public string FullTypeName { get; }
 
         ReferenceSymbols references;
 
@@ -20,8 +21,7 @@ namespace VContainer.SourceGenerator
             this.references = references;
 
             TypeName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-
-            DetectConstructor();
+            FullTypeName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         }
 
         public bool InheritsFrom(INamedTypeSymbol baseSymbol)

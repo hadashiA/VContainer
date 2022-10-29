@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -27,14 +28,26 @@ namespace VContainer.SourceGenerator
 
                 var codeWriter = new CodeWriter();
                 var syntaxCollector = (SyntaxCollector)context.SyntaxReceiver!;
+                var l = new List<TypeMeta>();
                 foreach (var workItem in syntaxCollector.WorkItems)
                 {
                     var typeMeta = workItem.Analyze(in context, references);
                     if (typeMeta is null) continue;
+                    if (!typeMeta.Symbol.CanBeCallFromInternal()) continue;
 
                     EmitGeneratedInjector(typeMeta, codeWriter, references, in context);
                     codeWriter.Clear();
+                    l.Add(typeMeta);
                 }
+
+                using (codeWriter.BeginBlockScope("class Unchi"))
+                {
+                    foreach (var typeMeta in l)
+                    {
+                        codeWriter.AppendLine($"// {typeMeta.TypeName}");
+                    }
+                }
+                context.AddSource("Unchi.cs", codeWriter.ToString());
             }
             catch (Exception ex)
             {
@@ -65,7 +78,12 @@ namespace VContainer.SourceGenerator
                     codeWriter.BeginBlock();
                 }
 
-                var generateTypeName = $"{typeMeta.TypeName}VContainerGeneratedInjector";
+                var fullType = typeMeta.FullTypeName
+                    .Replace("global::", "")
+                    .Replace("<", "_")
+                    .Replace(">", "_");
+
+                var generateTypeName = $"{fullType}VContainerGeneratedInjector";
                 using (codeWriter.BeginBlockScope($"class {generateTypeName} : IInjector"))
                 {
                     if (!TryEmitInjectMethod(typeMeta, codeWriter, in context))
@@ -86,11 +104,7 @@ namespace VContainer.SourceGenerator
                     codeWriter.EndBlock();
                 }
 
-                var fullType = typeMeta.Symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)
-                    .Replace("global::", "")
-                    .Replace("<", "_")
-                    .Replace(">", "_");
-                context.AddSource($"{fullType}.VContainerGeneratedInjector.cs", codeWriter.ToString());
+                context.AddSource($"{generateTypeName}.cs", codeWriter.ToString());
             }
             catch (Exception ex)
             {
@@ -153,7 +167,7 @@ namespace VContainer.SourceGenerator
                     }
 
                     var propTypeName =
-                        propSymbol.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        propSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                     codeWriter.AppendLine($"x.{propSymbol.Name} = resolver.Resolve<{propTypeName}>();");
                 }
 
@@ -173,7 +187,7 @@ namespace VContainer.SourceGenerator
                         .Select(param =>
                         {
                             var paramType =
-                                param.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                                param.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                             var paramName = param.Name;
                             return (paramType, paramName);
                         })
@@ -234,7 +248,7 @@ namespace VContainer.SourceGenerator
                 }
 
                 var arguments = parameters.Select(x => $"{x.paramType} {x.paramName}");
-                codeWriter.AppendLine($"new {typeMeta.TypeName}({string.Join(", ", arguments)});");
+                codeWriter.AppendLine($"return new {typeMeta.FullTypeName}({string.Join(", ", arguments)});");
             }
             return true;
         }
