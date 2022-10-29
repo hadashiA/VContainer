@@ -106,7 +106,7 @@ namespace VContainer
         public virtual IObjectResolver Build()
         {
             var registry = BuildRegistry();
-            var container = new Container(registry);
+            var container = new Container(registry, ApplicationOrigin);
             container.Diagnostics = Diagnostics;
             EmitCallbacks(container);
             return container;
