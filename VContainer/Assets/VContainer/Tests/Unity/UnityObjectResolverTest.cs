@@ -133,5 +133,23 @@ namespace VContainer.Tests.Unity
             Assert.That(instance3.transform.position, Is.EqualTo(new Vector3(1f, 2f, 3f)));
             Assert.That(instance3.transform.rotation, Is.EqualTo(Quaternion.Euler(1f, 2f, 3f)));
         }
+
+        [Test]
+        public void ReenterInjectGameObject()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Singleton);
+            var container = builder.Build();
+
+            var parent = new GameObject("Parent");
+            var original = new GameObject("Original");
+
+            var behaviour = original.AddComponent<SampleMonoBehaviour3>();
+            behaviour.Prefab = new GameObject("Nested");
+
+            var instance1 = container.Instantiate(original);
+            Assert.That(instance1, Is.Not.EqualTo(original));
+            Assert.That(instance1.GetComponent<SampleMonoBehaviour3>(), Is.InstanceOf<SampleMonoBehaviour3>());
+        }
     }
 }
