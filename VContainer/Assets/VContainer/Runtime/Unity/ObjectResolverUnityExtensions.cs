@@ -16,7 +16,10 @@ namespace VContainer.Unity
                 current.GetComponents(buffer);
                 foreach (var monoBehaviour in buffer)
                 {
-                    resolver.Inject(monoBehaviour);
+                    if (monoBehaviour != null)
+                    { // Can be null if the MonoBehaviour's type wasn't found (e.g. if it was stripped)
+                        resolver.Inject(monoBehaviour);
+                    }
                 }
 
                 var transform = current.transform;
