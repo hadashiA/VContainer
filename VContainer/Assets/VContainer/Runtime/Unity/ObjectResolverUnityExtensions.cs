@@ -6,19 +6,20 @@ namespace VContainer.Unity
     {
         public static void InjectGameObject(this IObjectResolver resolver, GameObject gameObject)
         {
-            var buffer = UnityEngineObjectListBuffer<MonoBehaviour>.Get();
-
             void InjectGameObjectRecursive(GameObject current)
             {
                 if (current == null) return;
 
-                buffer.Clear();
-                current.GetComponents(buffer);
-                foreach (var monoBehaviour in buffer)
+                using (UnityEngineObjectListBuffer<MonoBehaviour>.Get(out var buffer))
                 {
-                    if (monoBehaviour != null)
-                    { // Can be null if the MonoBehaviour's type wasn't found (e.g. if it was stripped)
-                        resolver.Inject(monoBehaviour);
+                    buffer.Clear();
+                    current.GetComponents(buffer);
+                    foreach (var monoBehaviour in buffer)
+                    {
+                        if (monoBehaviour != null)
+                        { // Can be null if the MonoBehaviour's type wasn't found (e.g. if it was stripped)
+                            resolver.Inject(monoBehaviour);
+                        }
                     }
                 }
 
