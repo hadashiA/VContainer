@@ -70,7 +70,7 @@ namespace VContainer.Tests.Unity
 
             Assert.That(worlds[0].Name, Is.EqualTo("My World 1"));
             Assert.That(worlds[1].Name, Is.EqualTo("My World 2"));
-            
+
             Assert.That(ScriptBehaviourUpdateOrder.IsWorldInCurrentPlayerLoop(worlds[0]), Is.True);
             Assert.That(ScriptBehaviourUpdateOrder.IsWorldInCurrentPlayerLoop(worlds[1]), Is.True);
 
@@ -96,7 +96,11 @@ namespace VContainer.Tests.Unity
 
             Assert.That(world.IsCreated, Is.True);
             Assert.That(system.World, Is.EqualTo(world));
+#if VCONTAINER_ECS_INTEGRATION_1_0
+            Assert.That(world.GetExistingSystemManaged<SystemB>(), Is.EqualTo(system));
+#else
             Assert.That(world.GetExistingSystem<SystemB>(), Is.EqualTo(system));
+#endif
 
             container.Dispose();
             Assert.That(world.IsCreated, Is.False);

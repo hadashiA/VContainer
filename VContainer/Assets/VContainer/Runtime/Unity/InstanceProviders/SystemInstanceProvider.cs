@@ -38,17 +38,29 @@ namespace VContainer.Unity
             if (instance is null)
             {
                 instance = (ComponentSystemBase)injector.CreateInstance(resolver, customParameters);
+#if VCONTAINER_ECS_INTEGRATION_1_0
+                world.AddSystemManaged(instance);
+#else
                 world.AddSystem(instance);
+#endif
 
                 if (systemGroupType != null)
                 {
+#if VCONTAINER_ECS_INTEGRATION_1_0
+                    var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystemManaged(systemGroupType);
+#else
                     var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystem(systemGroupType);
+#endif
                     systemGroup.AddSystemToUpdateList(instance);
                 }
 
                 return instance;
             }
+#if VCONTAINER_ECS_INTEGRATION_1_0
+            return world.GetExistingSystemManaged(systemType);
+#else
             return world.GetExistingSystem(systemType);
+#endif
         }
 
         World GetWorld(IObjectResolver resolver)
