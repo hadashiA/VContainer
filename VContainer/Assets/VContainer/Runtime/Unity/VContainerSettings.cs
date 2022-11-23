@@ -53,7 +53,8 @@ namespace VContainer.Unity
             var preloadAsset = UnityEditor.PlayerSettings.GetPreloadedAssets().FirstOrDefault(x => x is VContainerSettings);
             if (preloadAsset is VContainerSettings instance)
             {
-                instance.RootLifetimeScope?.DisposeCore();
+                if (instance.RootLifetimeScope != null)
+                    instance.RootLifetimeScope.DisposeCore();
                 instance.OnEnable();
             }
         }
