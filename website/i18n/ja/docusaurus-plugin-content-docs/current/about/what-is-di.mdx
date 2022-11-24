@@ -4,7 +4,7 @@ title: DIって何 ?
 
 DI(=Dependency Injection) は、オブジェクト指向プログラミングにおける一般的なテクニック/パターンのことです。
 
-あるクラスのコードの中から「委譲先のオブジェクトがどこからやってくるのか?」という情報を取り除き、クラスたちと、それらの関係を結びつける設定とを分けてしまおう、というのが主なコンセプトです。
+あるクラスのコードの中から「委譲先のオブジェクトがどこからやってくるのか?」という情報を取り除き、クラスたちとそれらの関係を結びつける設定とを分けてしまおう、というのが主なコンセプトです。
 
 DIで参照関係を組み立てると、アプリケーションのコードを変更せずともクラス同士の依存関係をつなぎかえることができるので、テスタビリティやある種のメンテナンス性が改善する... とかとか一般的には言われています。
 
@@ -12,7 +12,7 @@ DIで参照関係を組み立てると、アプリケーションのコードを
 
 :::note
 C# では、サーバやコンソールアプリケーションを書くための 設定・ロギング・などなどを整備する標準的な仕組み [Generic Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-5.0) がありますが、これはDIをベースにしたフレームワークとしてデザインされてます。
-.NET Core/.NET 5以降、サーバのフレームワークとしてデファクトスタンダードといえる [ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-5.0) もまた、Generic Host を利用したDIベースのスタイルです。
+.NET Core/.NET 以降、サーバのフレームワークとしてデファクトスタンダードといえる [ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-5.0) もまた、Generic Host を利用したDIベースのスタイルです。
 
 Generic Host をはじめとする Mircosoft.Extensions.* の名前を冠したパッケージは、 [dotnet/runtime](https://github.com/dotnet/runtime) リポジトリ内で管理されており、
 .NET環境やサーバサイドでは標準的な位置付けです。[Microsoft.Extensions.DependencyInjection](https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection) は、DIの基本的な機能を提供している他、DIのインターフェイスを標準化して、実装を他のライブラリと置き換える、といった仕組みも持っています。
