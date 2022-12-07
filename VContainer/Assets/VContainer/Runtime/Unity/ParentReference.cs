@@ -14,12 +14,8 @@ namespace VContainer.Unity
 
         public Type Type { get; private set; }
 
-        public ParentReference(Type type)
+        ParentReference(Type type)
         {
-            if (!typeof(LifetimeScope).IsAssignableFrom(type))
-            {
-                throw new ArgumentException($"{type} does not inherit {nameof(LifetimeScope)}. Be sure to inherit from it.");
-            }
             Type = type;
             TypeName = type.FullName;
             Object = null;
