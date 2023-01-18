@@ -4,13 +4,20 @@ namespace VContainer.SourceGenerator
 {
     public class ReferenceSymbols
     {
-        public INamedTypeSymbol? VContainerInjectAttribute { get; }
-        public INamedTypeSymbol? UnityEngineComponent { get; }
-
-        public ReferenceSymbols(Compilation compilation)
+        public static ReferenceSymbols? Create(Compilation compilation)
         {
-            VContainerInjectAttribute = compilation.GetTypeByMetadataName("VContainer.InjectAttribute");
-            UnityEngineComponent = compilation.GetTypeByMetadataName("UnityEngine.Component");
+            var injectAttribute = compilation.GetTypeByMetadataName("VContainer.InjectAttribute");
+            if (injectAttribute is null)
+                return null;
+
+            return new ReferenceSymbols
+            {
+                VContainerInjectAttribute = injectAttribute,
+                UnityEngineComponent = compilation.GetTypeByMetadataName("UnityEngine.Component"),
+            };
         }
+
+        public INamedTypeSymbol VContainerInjectAttribute { get; private set; }
+        public INamedTypeSymbol? UnityEngineComponent { get; private set; }
     }
 }

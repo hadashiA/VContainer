@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-
+        <TargetFramework>net7.0</TargetFramework>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -18,6 +17,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\VContainer.Standalone\VContainer.Standalone.csproj" />
+      <ProjectReference Include="..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj" />
+      <ProjectReference Include="..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj">
+        <OutputItemType>Analyzer</OutputItemType>
+        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
     </ItemGroup>
 
 </Project>

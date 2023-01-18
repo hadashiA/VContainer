@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -11,6 +12,15 @@ namespace VContainer.SourceGenerator
         public INamedTypeSymbol Symbol { get; }
         public string TypeName { get; }
         public string FullTypeName { get; }
+        public bool ExplicitInjectable { get; }
+
+        public IReadOnlyList<IMethodSymbol> Constructors { get; }
+        public IReadOnlyList<IMethodSymbol> ExplictInjectConstructors { get; }
+        public IReadOnlyList<IFieldSymbol> InjectFields { get; }
+        public IReadOnlyList<IPropertySymbol> InjectProperties { get; }
+        public IReadOnlyList<IMethodSymbol> InjectMethods { get; }
+
+        public bool IsGenerics => Symbol.Arity > 0;
 
         ReferenceSymbols references;
 
@@ -22,6 +32,17 @@ namespace VContainer.SourceGenerator
 
             TypeName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
             FullTypeName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+            Constructors = GetConstructors();
+            ExplictInjectConstructors = GetExplicitInjectConstructors();
+            InjectFields = GetInjectFields();
+            InjectProperties = GetInjectProperties();
+            InjectMethods = GetInjectMethods();
+
+            ExplicitInjectable = ExplictInjectConstructors.Count > 0 ||
+                                 InjectFields.Count > 0 ||
+                                 InjectProperties.Count > 0 ||
+                                 InjectMethods.Count > 0;
         }
 
         public bool InheritsFrom(INamedTypeSymbol baseSymbol)
@@ -44,46 +65,23 @@ namespace VContainer.SourceGenerator
             return false;
         }
 
-        public IMethodSymbol? GetInjectConstructor(out DiagnosticDescriptor? invalid)
+        IReadOnlyList<IMethodSymbol> GetExplicitInjectConstructors()
         {
-            var ctors = Symbol.InstanceConstructors
-                .Where(x => !x.IsImplicitlyDeclared) // remove empty ctor(struct always generate it), record's clone ctor
-                .ToArray();
-
-            if (ctors.Length == 0)
+            return Constructors.Where(ctor =>
             {
-                invalid = null;
-                return null;
-            }
-
-            if (ctors.Length <= 1)
-            {
-                invalid = null;
-                return ctors[0];
-            }
-
-            var ctorWithAttrs = ctors.Where(ctor =>
-            {
-                return ctor.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, references.VContainerInjectAttribute));
+                return ctor.GetAttributes().Any(attr =>
+                    SymbolEqualityComparer.Default.Equals(attr.AttributeClass, references.VContainerInjectAttribute));
             }).ToArray();
-
-            if (ctorWithAttrs.Length == 0)
-            {
-                invalid = DiagnosticDescriptors.MultipleCtorWithoutAttribute;
-                return null;
-            }
-
-            if (ctorWithAttrs.Length == 1)
-            {
-                invalid = null;
-                return ctorWithAttrs[0]; // ok
-            }
-            invalid = DiagnosticDescriptors.MultipleCtorAttribute;
-            return null;
         }
 
+        IReadOnlyList<IMethodSymbol> GetConstructors()
+        {
+            return Symbol.InstanceConstructors
+                .Where(x => !x.IsImplicitlyDeclared) // remove empty ctor(struct always generate it), record's clone ctor
+                .ToArray();
+        }
 
-        public IReadOnlyList<IFieldSymbol> GetInjectFields()
+        IReadOnlyList<IFieldSymbol> GetInjectFields()
         {
             return Symbol.GetMembers()
                 .OfType<IFieldSymbol>()
@@ -91,7 +89,7 @@ namespace VContainer.SourceGenerator
                 .ToArray();
         }
 
-        public IReadOnlyList<IPropertySymbol> GetInjectProperties()
+        IReadOnlyList<IPropertySymbol> GetInjectProperties()
         {
             return Symbol.GetMembers()
                 .OfType<IPropertySymbol>()
@@ -100,12 +98,18 @@ namespace VContainer.SourceGenerator
 
         }
 
-        public IReadOnlyList<IMethodSymbol> GetInjectMethods()
+        IReadOnlyList<IMethodSymbol> GetInjectMethods()
         {
             return Symbol.GetMembers()
                 .OfType<IMethodSymbol>()
-                .Where(x => x.ContainsAttribute(references.VContainerInjectAttribute))
+                .Where(x => x.MethodKind == MethodKind.DeclareMethod &&
+                            x.ContainsAttribute(references.VContainerInjectAttribute))
                 .ToArray();
+        }
+
+        public bool IsNested()
+        {
+            return Syntax.Parent is TypeDeclarationSyntax;
         }
     }
 }

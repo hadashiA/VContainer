@@ -14,20 +14,13 @@ namespace VContainer.SourceGenerator
 
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            try
+            if (IsCandidateType(syntaxNode))
             {
-                if (IsCandidateType(syntaxNode))
-                {
-                    WorkItems.Add(new WorkItem((TypeDeclarationSyntax)syntaxNode));
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Add($"Error parsing syntax: {ex}");
+                WorkItems.Add(new WorkItem((TypeDeclarationSyntax)syntaxNode));
             }
         }
 
-        bool IsCandidateType(SyntaxNode syntax)
+        static bool IsCandidateType(SyntaxNode syntax)
         {
             if (syntax is not ClassDeclarationSyntax classDeclarationSyntax)
             {

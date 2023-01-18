@@ -4,67 +4,68 @@ using VContainer.Internal;
 
 namespace VContainer.Tests
 {
+    class HasNoConstructor
+    {
+    }
+
+    class HasMultipleConstructor
+    {
+        public HasMultipleConstructor(int x)
+        {
+        }
+
+        public HasMultipleConstructor(int x, int y)
+        {
+        }
+    }
+
+    class HasStaticConstructor
+    {
+        static int Foo = 400;
+
+        [Inject]
+        public HasStaticConstructor()
+        {
+        }
+    }
+
+    class HasInjectConstructor
+    {
+        [Inject]
+        public HasInjectConstructor(int x, int y)
+        {
+        }
+    }
+
+    class HasInjectAndNoInjectConstructor
+    {
+        [Inject]
+        public HasInjectAndNoInjectConstructor(int x)
+        {
+        }
+
+        public HasInjectAndNoInjectConstructor(int x, int y)
+        {
+        }
+    }
+
+    class HasMultipleInjectConstructor
+    {
+        [Inject]
+        public HasMultipleInjectConstructor(int x)
+        {
+        }
+
+        [Inject]
+        public HasMultipleInjectConstructor(int x, int y)
+        {
+        }
+    }
+
+
     [TestFixture]
     public class TypeAnalyzerTest
     {
-        class HasNoConstructor
-        {
-        }
-
-        class HasMultipleConstructor
-        {
-            public HasMultipleConstructor(int x)
-            {
-            }
-
-            public HasMultipleConstructor(int x, int y)
-            {
-            }
-        }
-
-        class HasStaticConstructor
-        {
-            static int Foo = 400;
-
-            [Inject]
-            public HasStaticConstructor()
-            {
-            }
-        }
-
-        class HasInjectConstructor
-        {
-            [Inject]
-            public HasInjectConstructor(int x, int y)
-            {
-            }
-        }
-
-        class HasInjectAndNoInjectConstructor
-        {
-            [Inject]
-            public HasInjectAndNoInjectConstructor(int x)
-            {
-            }
-
-            public HasInjectAndNoInjectConstructor(int x, int y)
-            {
-            }
-        }
-
-        class HasMultipleInjectConstructor
-        {
-            [Inject]
-            public HasMultipleInjectConstructor(int x)
-            {
-            }
-
-            [Inject]
-            public HasMultipleInjectConstructor(int x, int y)
-            {
-            }
-        }
-
         [Test]
         public void AnalyzeNoConstructor()
         {
