@@ -84,6 +84,7 @@ namespace VContainer.SourceGenerator
         public void Clear()
         {
             buffer.Clear();
+            indentLevel = 0;
         }
     }
 }

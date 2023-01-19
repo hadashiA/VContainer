@@ -51,10 +51,10 @@ namespace VContainer.Tests
 
     class HasMultipleInjectConstructor
     {
-        [Inject]
-        public HasMultipleInjectConstructor(int x)
-        {
-        }
+        // [Inject]
+        // public HasMultipleInjectConstructor(int x)
+        // {
+        // }
 
         [Inject]
         public HasMultipleInjectConstructor(int x, int y)

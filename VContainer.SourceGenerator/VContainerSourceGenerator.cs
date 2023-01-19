@@ -17,7 +17,7 @@ namespace VContainer.SourceGenerator
             if (moduleName.StartsWith("UnityEngine.")) return;
             if (moduleName.StartsWith("UnityEditor.")) return;
             if (moduleName.StartsWith("Unity.")) return;
-            // if (moduleName.StartsWith("VContainer.")) return;
+            if (moduleName.StartsWith("VContainer.") && !moduleName.Contains("Test")) return;
 
             var references = ReferenceSymbols.Create(context.Compilation);
             if (references is null) return;
