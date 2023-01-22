@@ -175,6 +175,10 @@ namespace VContainer.Unity
 
             public SystemRegistrationBuilder Add<T>() where T : ComponentSystemBase
                 => containerBuilder.RegisterSystemIntoWorld<T>(worldName);
+#if VCONTAINER_ECS_INTEGRATION_1_0
+            public UnmanagedSystemRegistrationBuilder AddUnmanaged<T>(T system) where T : unmanaged, ISystem
+                => containerBuilder.RegisterUnmanagedSystemIntoWorld<T>(worldName);
+#endif
         }
 
         public readonly struct DefaultWorldBuilder
@@ -188,6 +192,10 @@ namespace VContainer.Unity
 
             public RegistrationBuilder Add<T>() where T : ComponentSystemBase
                 => containerBuilder.RegisterSystemFromDefaultWorld<T>();
+#if VCONTAINER_ECS_INTEGRATION_1_0
+            public RegistrationBuilder AddUnmanaged<T>() where T : unmanaged, ISystem
+                => containerBuilder.RegisterUnmanagedSystemFromDefaultWorld<T>();
+#endif
         }
 
         // Use exisiting world
@@ -201,7 +209,11 @@ namespace VContainer.Unity
         public static RegistrationBuilder RegisterSystemFromDefaultWorld<T>(this IContainerBuilder builder)
             where T : ComponentSystemBase
             => RegisterSystemFromWorld<T>(builder, World.DefaultGameObjectInjectionWorld);
-
+#if VCONTAINER_ECS_INTEGRATION_1_0
+        public static RegistrationBuilder RegisterUnmanagedSystemFromDefaultWorld<T>(this IContainerBuilder builder)
+            where T : unmanaged, ISystem
+            => RegisterUnmanagedSystemFromWorld<T>(builder, World.DefaultGameObjectInjectionWorld);
+#endif
         public static RegistrationBuilder RegisterSystemFromWorld<T>(this IContainerBuilder builder, World world)
             where T : ComponentSystemBase
         {
@@ -216,7 +228,22 @@ namespace VContainer.Unity
             return builder.RegisterComponent(system)
                 .As(typeof(ComponentSystemBase), typeof(T));
         }
+#if VCONTAINER_ECS_INTEGRATION_1_0
+        public static RegistrationBuilder RegisterUnmanagedSystemFromWorld<T>(this IContainerBuilder builder, World world)
+            where T : unmanaged, ISystem
+        {
+            var system = world.Unmanaged.GetExistingUnmanagedSystem<T>();
+            if (system == SystemHandle.Null)
+                throw new ArgumentException($"{typeof(T).FullName} is not in the world {world}");
 
+            Type refType = typeof(UnmanagedSystemReference<>);
+            Type target = refType.MakeGenericType(typeof(T));
+            var reference = (UnmanagedSystemReference)Activator.CreateInstance(target, system, world);
+            
+            return builder.RegisterComponent(reference)
+                .As(target);
+        }
+#endif
         // Use custom world
 
         public static void UseNewWorld(
@@ -250,7 +277,42 @@ namespace VContainer.Unity
 
             return builder.Register(registrationBuilder);
         }
+        public static SystemRegistrationBuilder RegisterSystemIntoWorld<T, T1>(
+            this IContainerBuilder builder,
+            string worldName)
+            where T : ComponentSystemBase
+            where T1 :　ComponentSystemGroup
+        {
+            var registrationBuilder = new SystemRegistrationBuilder(typeof(T), worldName)
+                .IntoGroup<T1>();
 
+            return builder.Register(registrationBuilder);
+        }
+
+#if VCONTAINER_ECS_INTEGRATION_1_0
+        public static UnmanagedSystemRegistrationBuilder RegisterUnmanagedSystemIntoWorld<T>(
+            this IContainerBuilder builder,
+            string worldName)
+            where T : unmanaged, ISystem
+        {
+            var registrationBuilder = new UnmanagedSystemRegistrationBuilder(typeof(T), worldName)
+                .IntoGroup<SimulationSystemGroup>();
+
+            return builder.Register(registrationBuilder);
+        }
+
+        public static UnmanagedSystemRegistrationBuilder RegisterUnmanagedSystemIntoWorld<T, T1>(
+            this IContainerBuilder builder,
+            string worldName)
+            where T : unmanaged, ISystem
+            where T1 :　ComponentSystemGroup
+        {
+            var registrationBuilder = new UnmanagedSystemRegistrationBuilder(typeof(T), worldName)
+                .IntoGroup<T1>();
+
+            return builder.Register(registrationBuilder);
+        }
+#endif
         public static SystemRegistrationBuilder RegisterSystemIntoDefaultWorld<T>(this IContainerBuilder builder)
             where T : ComponentSystemBase
         {
@@ -259,6 +321,36 @@ namespace VContainer.Unity
 
             return builder.Register(registrationBuilder);
         }
+
+        public static SystemRegistrationBuilder RegisterSystemIntoDefaultWorld<T, T1>(this IContainerBuilder builder)
+            where T : ComponentSystemBase
+            where T1 :　ComponentSystemGroup
+        {
+            var registrationBuilder = new SystemRegistrationBuilder(typeof(T), null)
+                .IntoGroup<T1>();
+
+            return builder.Register(registrationBuilder);
+        }
+
+#if VCONTAINER_ECS_INTEGRATION_1_0
+        public static UnmanagedSystemRegistrationBuilder RegisterUnmanagedSystemIntoDefaultWorld<T>(this IContainerBuilder builder)
+            where T : unmanaged, ISystem
+        {
+            var registrationBuilder = new UnmanagedSystemRegistrationBuilder(typeof(T), null)
+                .IntoGroup<SimulationSystemGroup>();
+
+            return builder.Register(registrationBuilder);
+        }
+        public static UnmanagedSystemRegistrationBuilder RegisterUnmanagedSystemIntoDefaultWorld<T, T1>(this IContainerBuilder builder)
+            where T : unmanaged, ISystem
+            where T1 :　ComponentSystemGroup
+        {
+            var registrationBuilder = new UnmanagedSystemRegistrationBuilder(typeof(T), null)
+                .IntoGroup<T1>();
+
+            return builder.Register(registrationBuilder);
+        }
+#endif
 #endif
     }
 }
