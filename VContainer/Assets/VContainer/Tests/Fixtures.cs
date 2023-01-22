@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.Entities;
 
 namespace VContainer.Tests
 {
@@ -173,6 +174,11 @@ namespace VContainer.Tests
     }
 
     class ServiceD : I7
+    {
+    }
+
+
+    struct NoDependencyUnmanagedServiceA
     {
     }
 
