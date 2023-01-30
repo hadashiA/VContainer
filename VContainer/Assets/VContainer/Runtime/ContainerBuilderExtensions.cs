@@ -65,6 +65,63 @@ namespace VContainer
             this IContainerBuilder builder,
             TInterface1 instance)
             => builder.RegisterInstance(instance).As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterInstance(
+            this IContainerBuilder builder,
+            Type interfaceType,
+            object instance)
+        {
+            var implementationType = instance.GetType(); 
+            if (!implementationType.IsAssignableFrom(interfaceType))
+            {
+                throw new VContainerException(interfaceType, $"{implementationType} is not assignable from {interfaceType}");
+            }
+            return builder.Register(new InstanceRegistrationBuilder(instance)).As(interfaceType);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterInstance(
+            this IContainerBuilder builder,
+            Type interfaceType,
+            Type interfaceType2,
+            object instance)
+        {
+            var implementationType = instance.GetType(); 
+            if (!implementationType.IsAssignableFrom(interfaceType))
+            {
+                throw new VContainerException(interfaceType, $"{implementationType} is not assignable from {interfaceType}");
+            }
+            if (!implementationType.IsAssignableFrom(interfaceType2))
+            {
+                throw new VContainerException(interfaceType2, $"{implementationType} is not assignable from {interfaceType2}");
+            }
+            return builder.RegisterInstance(instance).As(interfaceType, interfaceType2);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterInstance(
+            this IContainerBuilder builder,
+            Type interfaceType,
+            Type interfaceType2,
+            Type interfaceType3,
+            object instance)
+        {
+            var implementationType = instance.GetType(); 
+            if (!implementationType.IsAssignableFrom(interfaceType))
+            {
+                throw new VContainerException(interfaceType, $"{implementationType} is not assignable from {interfaceType}");
+            }
+            if (!implementationType.IsAssignableFrom(interfaceType2))
+            {
+                throw new VContainerException(interfaceType2, $"{implementationType} is not assignable from {interfaceType2}");
+            }
+            if (!implementationType.IsAssignableFrom(interfaceType3))
+            {
+                throw new VContainerException(interfaceType3, $"{implementationType} is not assignable from {interfaceType3}");
+            }
+            return builder.RegisterInstance(instance).As(interfaceType, interfaceType2, interfaceType3);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder RegisterFactory<T>(
