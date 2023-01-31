@@ -122,6 +122,12 @@ namespace VContainer.Unity
         {
             if (instance is GameObject gameObject)
                 resolver.InjectGameObject(gameObject);
+            else if( instance is Component component )
+                // if the prefab is instantiated with a component of a GameObject,
+                // (i.e. through the Instantiate<T>(T prefab) ),
+                // the newly instantiated GameObject which the returned component belongs to
+                // should also be injected.
+                resolver.InjectGameObject(component.gameObject);
             else
                 resolver.Inject(instance);
         }
