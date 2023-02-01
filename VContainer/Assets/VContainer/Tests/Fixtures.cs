@@ -1,5 +1,4 @@
 ﻿using System;
-using Unity.Entities;
 
 namespace VContainer.Tests
 {
