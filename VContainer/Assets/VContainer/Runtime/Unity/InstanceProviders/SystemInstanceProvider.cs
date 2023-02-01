@@ -38,7 +38,7 @@ namespace VContainer.Unity
             if (instance is null)
             {
                 instance = (ComponentSystemBase)injector.CreateInstance(resolver, customParameters);
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
                 world.AddSystemManaged(instance);
 #else
                 world.AddSystem(instance);
@@ -46,7 +46,7 @@ namespace VContainer.Unity
 
                 if (systemGroupType != null)
                 {
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
                     var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystemManaged(systemGroupType);
 #else
                     var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystem(systemGroupType);
@@ -56,7 +56,7 @@ namespace VContainer.Unity
 
                 return instance;
             }
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
             return world.GetExistingSystemManaged(systemType);
 #else
             return world.GetExistingSystem(systemType);

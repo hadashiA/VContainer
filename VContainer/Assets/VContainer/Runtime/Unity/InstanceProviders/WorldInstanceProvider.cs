@@ -25,7 +25,7 @@ namespace VContainer.Unity
             }
             else
             {
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
                 world.CreateSystemManaged<InitializationSystemGroup>();
                 world.CreateSystemManaged<SimulationSystemGroup>();
                 world.CreateSystemManaged<PresentationSystemGroup>();

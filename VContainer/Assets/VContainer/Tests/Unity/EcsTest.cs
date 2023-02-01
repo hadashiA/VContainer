@@ -30,7 +30,7 @@ namespace VContainer.Tests.Unity
         public override void Update() => UpdateCalled = true;
         public void Dispose() => Disposed = true;
     }
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
     
     
     [DisableAutoCreation]
@@ -92,7 +92,7 @@ namespace VContainer.Tests.Unity
             Assert.That(system, Is.InstanceOf<SystemA>());
             Assert.That(system.Service, Is.InstanceOf<I2>());
         }
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
         [Test]
         public void RegisterUnmanagedSystemFromDefaultWorld()
         {
@@ -121,7 +121,7 @@ namespace VContainer.Tests.Unity
             Assert.That(system.World, Is.EqualTo(World.DefaultGameObjectInjectionWorld));
         }
         
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
         [Test]
         public void RegisterUnmanagedSystemIntoDefaultWorld()
         {
@@ -172,7 +172,7 @@ namespace VContainer.Tests.Unity
 
             Assert.That(world.IsCreated, Is.True);
             Assert.That(system.World, Is.EqualTo(world));
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
             Assert.That(world.GetExistingSystemManaged<SystemB>(), Is.EqualTo(system));
 #else
             Assert.That(world.GetExistingSystem<SystemB>(), Is.EqualTo(system));
@@ -182,7 +182,7 @@ namespace VContainer.Tests.Unity
             Assert.That(world.IsCreated, Is.False);
             Assert.That(system.Disposed, Is.True);
         }
-#if VCONTAINER_ECS_INTEGRATION_1_0
+#if UNITY_2022_2_OR_NEWER
         [Test]
         public void RegisterUnManagedSystemIntoWorld()
         {
