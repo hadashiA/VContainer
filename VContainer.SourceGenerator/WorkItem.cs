@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -18,10 +19,13 @@ namespace VContainer.SourceGenerator
             var symbol = semanticModel.GetDeclaredSymbol(Syntax, context.CancellationToken);
             if (symbol is INamedTypeSymbol typeSymbol)
             {
-                return new TypeMeta(Syntax, typeSymbol, references);
+                var injectIgnore = symbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, references.VContainerInjectIgnoreAttribute));
+                if (!injectIgnore)
+                {
+                    return new TypeMeta(Syntax, typeSymbol, references);
+                }
             }
             return null;
         }
     }
 }
-
