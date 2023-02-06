@@ -69,8 +69,8 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder RegisterInstance(
             this IContainerBuilder builder,
-            Type interfaceType,
-            object instance)
+            object instance,
+            Type interfaceType)
         {
             var implementationType = instance.GetType(); 
             if (!implementationType.IsAssignableFrom(interfaceType))
@@ -83,9 +83,9 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder RegisterInstance(
             this IContainerBuilder builder,
+            object instance,
             Type interfaceType,
-            Type interfaceType2,
-            object instance)
+            Type interfaceType2)
         {
             var implementationType = instance.GetType(); 
             if (!implementationType.IsAssignableFrom(interfaceType))
@@ -102,10 +102,10 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder RegisterInstance(
             this IContainerBuilder builder,
+            object instance,
             Type interfaceType,
             Type interfaceType2,
-            Type interfaceType3,
-            object instance)
+            Type interfaceType3)
         {
             var implementationType = instance.GetType(); 
             if (!implementationType.IsAssignableFrom(interfaceType))
