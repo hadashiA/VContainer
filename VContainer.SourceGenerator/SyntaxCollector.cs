@@ -27,7 +27,8 @@ namespace VContainer.SourceGenerator
                 return false;
             }
 
-            if (classDeclarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.AbstractKeyword)))
+            if (classDeclarationSyntax.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.AbstractKeyword) ||
+                                                                 modifier.IsKind(SyntaxKind.StaticKeyword)))
             {
                 return false;
             }

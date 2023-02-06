@@ -304,7 +304,7 @@ namespace VContainer.SourceGenerator
                     .Select(param =>
                     {
                         var paramType =
-                            param.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                            param.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                         var paramName = param.Name;
                         return (paramType, paramName);
                     })
