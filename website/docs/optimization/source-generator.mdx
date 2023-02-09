@@ -1,20 +1,45 @@
 ---
-title: Pre IL Code Generation (Deprecated)
+title: Source Generator
 ---
 
-:::danger
-Deprecated. Use Source Generator instead.
-:::
-
 :::caution
-This feature requires Unity 2019.3 or later.
+This feature requires Unity 2021.3 or later.
 :::
 
-VContainer has the ability to perform the meta programming part faster by generating IL code at compile time.
-As a result, there is no reflection at runtime, and it is expected to be 3-6x faster.
-It works in the IL2CPP environment.
+VContainer has the ability to perform the meta programming part faster by generating code at compile time.
+
+In the old version, this was achieved by IL weaving using `Mono.Cecil`.
+Since VContainer 1.13.0, we have moved to Roslyn Source Generator.
+
+Roslyn Source Generator is a pre-code generator supported by Roslyn, the C# compiler toolchain.
+
+This method is integrated into Roslyn and is the standard method going forward in the C# development environment. Also, as with IL code generation, it does not pollute human-written source code.
+
+Source Generator is also described in the Unity manual.
+- https://docs.unity3d.com/Manual/roslyn-analyzers.html
 
 With VContainer, for example, the following code (as IL) is automatically generated:
+
+## How to enable VContainer Source Generator
+
+### 1. Download `VContainer.SourceGenerator.dll` to your project. (Somewhere under Assets/ folder)
+
+Download `VContainer.SourceGenerator.dll from the release page.
+https://github.com/hadashiA/VContainer/releases
+
+
+### 2. Mark as ``
+
+The next time the specified assembly is compiled, VContainer will make changes to the compiled dll.
+
+If it succeeds, it will be logged. For example:
+
+## Limitation
+
+- Nested classes
+- Struct
+
+##
 
 ```csharp
 class ClassA
@@ -44,28 +69,3 @@ class ClassA
         }
    }
 ```
-
-## How to enable code generation mode
-
-### 1. Add `VContainer.EnableCodeGen` asmdef to your references
-
-If you have asmdef in your project that refers to the following 2 asmdef, they are targets for IL weaving.
-
-- `VContainer`
-- `VContainer.EnableCodeGen`
-
-![](./assets/screenshot_enablecodegen.png)
-
-### 2. Build your assembly
-
-The next time the specified assembly is compiled, VContainer will make changes to the compiled dll.
-
-If it succeeds, it will be logged. For example:
-
-> VContainer code generation optimization for MyGame.dll 24 types (40.0355ms)
-
-:::note
-In Unity 2020.2 and later, the ILPostProcessor can no longer output logs.
-As a temporary measure, the above log is output as a warning, but it may be removed in the future.
-:::
-
