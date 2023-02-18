@@ -21,7 +21,7 @@ The extra fast DI (Dependency Injection) library running on Unity Game Engine.
 - Dispatch own PlayerLoopSystem
 - Flexible scoping
   - Application can freely create nested Lifetime Scope with any async way for you like.
-- Pre IL Code generation optimization mode
+- Accelerated mode with SourceGenerator (Optional)
 - Diagnositcs window on unity editor
 - UniTask Integration
 - ECS Integration *beta*

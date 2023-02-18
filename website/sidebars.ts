@@ -41,9 +41,10 @@ module.exports = {
       'diagnostics/diagnostics-window'
     ],
     'Optimization': [
-      'optimization/codegen',
+      'optimization/',
       'optimization/async-container-build',
       'optimization/parallel-container-build',
+      'optimization/codegen',
     ],
     'Comparing to other libraries': [
       'comparing/comparing-to-zenject'
