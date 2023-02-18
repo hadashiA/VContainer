@@ -182,6 +182,15 @@ namespace VContainer.SourceGenerator
                 }
 
                 // verify method
+                if (typeMeta.InjectMethods.Count > 1)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(
+                        DiagnosticDescriptors.GenericsNotSupported,
+                        typeMeta.InjectMethods.First().Locations.FirstOrDefault() ?? typeMeta.Syntax.GetLocation(),
+                        typeMeta.InjectMethods.First().Name));
+                    error = true;
+                }
+
                 foreach (var methodSymbol in typeMeta.InjectMethods)
                 {
                     if (!methodSymbol.CanBeCallFromInternal())

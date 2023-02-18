@@ -82,7 +82,7 @@ namespace VContainer.SourceGenerator
 
         IReadOnlyList<IFieldSymbol> GetInjectFields()
         {
-            return Symbol.GetMembers()
+            return Symbol.GetAllMembers()
                 .OfType<IFieldSymbol>()
                 .Where(x => x.ContainsAttribute(references.VContainerInjectAttribute))
                 .ToArray();
@@ -90,7 +90,7 @@ namespace VContainer.SourceGenerator
 
         IReadOnlyList<IPropertySymbol> GetInjectProperties()
         {
-            return Symbol.GetMembers()
+            return Symbol.GetAllMembers()
                 .OfType<IPropertySymbol>()
                 .Where(x => x.ContainsAttribute(references.VContainerInjectAttribute))
                 .ToArray();
@@ -99,7 +99,7 @@ namespace VContainer.SourceGenerator
 
         IReadOnlyList<IMethodSymbol> GetInjectMethods()
         {
-            return Symbol.GetMembers()
+            return Symbol.GetAllMembers()
                 .OfType<IMethodSymbol>()
                 .Where(x => x.MethodKind == MethodKind.DeclareMethod &&
                             x.ContainsAttribute(references.VContainerInjectAttribute))
