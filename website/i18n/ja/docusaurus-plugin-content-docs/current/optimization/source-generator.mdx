@@ -6,53 +6,56 @@ title: Source Generator
 This feature requires Unity 2021.3 or later.
 :::
 
-The main bottleneck in DI is metaprogramming. By default, VContainer does this through reflection, but has the ability to further accelerate it through compile-time code generation.
+VContainerはデフォルトではリフレクションを用いてメタプログラミングを行ないますが、
+[Roslyn Source Generator](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) に置き換えることで、実行速度を改善する機能が用意されています。
 
-VContainer, does this by utilizing the Roslyn SourceGenerator to pre-generate the code needed for metaprogramming.
-
-[Roslyn Source Generator](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) is a part of C# compiler toolchain.
-This is a standard metaprogramming feature in new .NET and C# development.
-(Yes, for example, in other languages, it is a macro, or something like that.)
-
-SourceGenerator, like IL weaving, does not pollute human-written code. However, it is easier to maintain than IL and easier to check the generated code.
+Source Generator は、C#コンパイラツールであるRoslynの機能の一部です。人間の書いたソースコードを汚すことなく追加のソースコードを差し込むことができる機能です。
+追加されるコードはC#であるため、ILコード生成や実行時のExpressionTeeと比較してデバッグやメンテナンス性が高くなっています。
+世の中には、マクロなどの仕組みがシンタックスに組み込まれているプログラミング言語がありますが、Source Generator はソースコードをコンパイル時に生成するという点で、共通点があります。
+これは新しい.NET環境におけるメタプログラミングの標準的な手法と言えます。
 
 :::info
-In the old version of VContainer, this feature was used by IL weaving using `Mono.Cecil`.
-Since VContainer 1.13.0, we have moved to Roslyn Source Generator.
+以前のバージョンのVContainerは、`Mono.Cecil` を用いたコンパイル時ILコード生成で同様のことを実現していましたが、
+VContainer 1.13.0 以降で、これをRoslyn Source Generatorに移行しました。
 :::
 
-Source Generator is also described in the Unity manual.
-- https://docs.unity3d.com/Manual/roslyn-analyzers.html
+## Source Generator を有効にする
 
+以下は、VContainerのSourceGeneratorモードを有効にする手順です。
 
-## How to enable VContainer Source Generator
+### 1. `VContainer.SourceGenerator.dll` をプロジェクトに追加
 
-### 1. Add `VContainer.SourceGenerator.dll` to your project.
-
-Download `VContainer.SourceGenerator.dll from the release page.
+VContainerのリリースページから 、`VContainer.SourceGenerator.dll をダウンロードします。
 https://github.com/hadashiA/VContainer/releases
 
-And Add this to somewhere under Assets/ folder in your project.
+VContainerがインストールされているUnityプロジェクトの Assets/ 以下の任意の場所にダウンロードしたdllを追加します。
 
-### 2. Mark as `RoslynAnalizer`
+### 2. `RoslynAnalizer` タグを付与
 
-Select `VcContainer.SourceGenerator.dll` in project.
-And, click label icon in bottom of the inspector window.
-Enter “RoslynAnalyzer” into the text input window in the Asset Labels sub-menu.
+Unityのプロジェクトビューで、 `VcContainer.SourceGenerator.dll` を選択します。
+インスペクターの下の方にあるラベルアイコンをクリックし、入力覧に “RoslynAnalyzer” と入力します。
+RoslynAnalyzer というasset labelを付与することで、UnityはこのdllをAnalyzer or SourceGenerator として認識してくれます。
 
 ![](./assets/screenshot_enablecodegen.png)
 
-## Limitation
+参考:
+- https://docs.unity3d.com/Manual/roslyn-analyzers.html
 
-SourceGenerator acceleration is not supported for type definitions like the following. (works by reflection)
+この状態でコンパイルを走らせると、VContaienrは自動的にDIのための高速なコードを生成するようになります。
 
-- Nested classes
-- Struct (value type)
-- If the access level is less than internal (for example, private), even if `[Inject]` is added, SourceGenerator is not supported.
+## 制限事項
+
+現在、以下のような型定義に対しては、SourceGeneratorの対象にはなりません。注意して下さい。
+(暗黙のうちにリフレクションでの動作にフォールバックされます)
+
+- VContainer.asmdef の参照がないC#コード
+- ネストしたクラス
+- struct型
+- アクセスレベルが internal未満のコンストラクタやメソッドやプロパティ (たとえば `[Inject]`アトリビュートがついていても、privateなもの)
 
 ## Remarks
 
-With VContainer, for example, the following code (as IL) is automatically generated:
+VContainerが自動生成するのは以下のようなコードです。
 
 ```csharp
 class ClassA

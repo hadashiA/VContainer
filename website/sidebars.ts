@@ -41,7 +41,7 @@ module.exports = {
       'diagnostics/diagnostics-window'
     ],
     'Optimization': [
-      'optimization/',
+      'optimization/source-generator',
       'optimization/async-container-build',
       'optimization/parallel-container-build',
       'optimization/codegen',

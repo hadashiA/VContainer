@@ -6,24 +6,19 @@ title: Source Generator
 This feature requires Unity 2021.3 or later.
 :::
 
-The main bottleneck in DI is metaprogramming. By default, VContainer does this through reflection, but has the ability to further accelerate it through compile-time code generation.
+VContainer uses reflection for metaprogramming by default.
+However, there is an option to improve execution performance by replacing it with [Roslyn Source Generator](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview).
 
-VContainer, does this by utilizing the Roslyn SourceGenerator to pre-generate the code needed for metaprogramming.
-
-[Roslyn Source Generator](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) is a part of C# compiler toolchain.
-This is a standard metaprogramming feature in new .NET and C# development.
-(Yes, for example, in other languages, it is a macro, or something like that.)
-
-SourceGenerator, like IL weaving, does not pollute human-written code. However, it is easier to maintain than IL and easier to check the generated code.
+Source Generator is part of Roslyn's functionality as a C# compiler tool.
+It is a feature that allows additional source code to be plugged in without contaminating the human-written source code.
+Since the added code is in C#, it is more debuggable and maintainable than IL code generation or ExpressionTee at runtime.
+While there are programming languages out there that have mechanisms such as "macros" built into their syntax, Source Generator has one thing in common in that it generates source code at compile time.
+This is a standard meta-programming approach in the new .NET environment.
 
 :::info
 In the old version of VContainer, this feature was used by IL weaving using `Mono.Cecil`.
 Since VContainer 1.13.0, we have moved to Roslyn Source Generator.
 :::
-
-Source Generator is also described in the Unity manual.
-- https://docs.unity3d.com/Manual/roslyn-analyzers.html
-
 
 ## How to enable VContainer Source Generator
 
@@ -42,12 +37,16 @@ Enter “RoslynAnalyzer” into the text input window in the Asset Labels sub-me
 
 ![](./assets/screenshot_roslynanalyzer.png)
 
+See more information:
+- https://docs.unity3d.com/Manual/roslyn-analyzers.html
+
 ## Limitation
 
 SourceGenerator acceleration is not supported for type definitions like the following. (works by reflection)
 
+- C# source without reference to VContainer.asmdef
 - Nested classes
-- Struct (value type)
+- Struct
 - If the access level is less than internal (for example, private), even if `[Inject]` is added, SourceGenerator is not supported.
 
 ## Remarks
