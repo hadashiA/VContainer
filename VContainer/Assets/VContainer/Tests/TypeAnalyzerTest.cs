@@ -49,6 +49,7 @@ namespace VContainer.Tests
         }
     }
 
+    #if !VCONTAINER_SOURCE_GENERATOR
     class HasMultipleInjectConstructor
     {
         [Inject]
@@ -61,6 +62,7 @@ namespace VContainer.Tests
         {
         }
     }
+    #endif
 
     [TestFixture]
     public class TypeAnalyzerTest
@@ -95,6 +97,7 @@ namespace VContainer.Tests
             Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.GetParameters().Length, Is.EqualTo(1));
         }
 
+        #if !VCONTAINER_SOURCE_GENERATOR
         [Test]
         public void AnalyzeDuplicateAttributeConstructor()
         {
@@ -103,6 +106,7 @@ namespace VContainer.Tests
                 TypeAnalyzer.Analyze(typeof(HasMultipleInjectConstructor));
             });
         }
+        #endif
 
         [Test]
         public void AnalyzeStaticConstructor()

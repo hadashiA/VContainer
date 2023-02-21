@@ -195,11 +195,10 @@ namespace VContainer.SourceGenerator
                 {
                     if (!methodSymbol.CanBeCallFromInternal())
                     {
-                        var invalid = Diagnostic.Create(
+                        context.ReportDiagnostic(Diagnostic.Create(
                             DiagnosticDescriptors.PrivateMethodNotSupported,
                             methodSymbol.Locations.FirstOrDefault() ?? typeMeta.Syntax.GetLocation(),
-                            methodSymbol.Name);
-                        context.ReportDiagnostic(invalid);
+                            methodSymbol.Name));
                         error = true;
                     }
                     if (methodSymbol.Arity > 0)
@@ -249,7 +248,7 @@ namespace VContainer.SourceGenerator
                             $"var {paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
                     }
 
-                    var arguments = parameters.Select(x => $"{x.paramType} {x.paramName}");
+                    var arguments = parameters.Select(x => $"({x.paramType}){x.paramName}");
                     codeWriter.AppendLine($"x.{methodSymbol.Name}({string.Join(", ", arguments)});");
                 }
                 return true;
@@ -306,7 +305,9 @@ namespace VContainer.SourceGenerator
                 }
                 if (constructorSymbol is null)
                 {
-                    codeWriter.AppendLine($"return new {typeMeta.TypeName}();");
+                    codeWriter.AppendLine($"var instance = new {typeMeta.TypeName}();");
+                    codeWriter.AppendLine("Inject(instance, resolver, parameters);");
+                    codeWriter.AppendLine("return instance;");
                     return true;
                 }
                 var parameters = constructorSymbol.Parameters
@@ -326,7 +327,9 @@ namespace VContainer.SourceGenerator
                 }
 
                 var arguments = parameters.Select(x => $"({x.paramType}){x.paramName}");
-                codeWriter.AppendLine($"return new {typeMeta.TypeName}({string.Join(", ", arguments)});");
+                codeWriter.AppendLine($"var instance = new {typeMeta.TypeName}({string.Join(", ", arguments)});");
+                codeWriter.AppendLine("Inject(instance, resolver, parameters);");
+                codeWriter.AppendLine("return instance;");
             }
             return true;
         }

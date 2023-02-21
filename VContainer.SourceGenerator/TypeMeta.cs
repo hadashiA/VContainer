@@ -85,6 +85,7 @@ namespace VContainer.SourceGenerator
             return Symbol.GetAllMembers()
                 .OfType<IFieldSymbol>()
                 .Where(x => x.ContainsAttribute(references.VContainerInjectAttribute))
+                .DistinctBy(x => x.Name)
                 .ToArray();
         }
 
@@ -93,15 +94,15 @@ namespace VContainer.SourceGenerator
             return Symbol.GetAllMembers()
                 .OfType<IPropertySymbol>()
                 .Where(x => x.ContainsAttribute(references.VContainerInjectAttribute))
+                .DistinctBy(x => x.Name)
                 .ToArray();
-
         }
 
         IReadOnlyList<IMethodSymbol> GetInjectMethods()
         {
             return Symbol.GetAllMembers()
                 .OfType<IMethodSymbol>()
-                .Where(x => x.MethodKind == MethodKind.DeclareMethod &&
+                .Where(x => x.MethodKind == MethodKind.Ordinary &&
                             x.ContainsAttribute(references.VContainerInjectAttribute))
                 .ToArray();
         }

@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <IsPackable>false</IsPackable>
+        <DefineConstants>VCONTAINER_SOURCE_GENERATOR</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,11 +18,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\VContainer.Standalone\VContainer.Standalone.csproj" />
-<!--      <ProjectReference Include="..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj" />-->
-<!--      <ProjectReference Include="..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj">-->
-<!--        <OutputItemType>Analyzer</OutputItemType>-->
-<!--        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>-->
-<!--      </ProjectReference>-->
+      <ProjectReference Include="..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj" />
+      <ProjectReference Include="..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj">
+        <OutputItemType>Analyzer</OutputItemType>
+        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
     </ItemGroup>
 
 </Project>
