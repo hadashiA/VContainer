@@ -399,3 +399,6 @@ VContainer.Benchmark/obj/*
 # Rider
 **/.idea/*
 **/.idea.meta
+
+.DS_Store
+
