@@ -8,7 +8,7 @@ jobs:
  star:
    runs-on: ubuntu-latest
    steps:
-   - uses: 8398a7/action-slack@v1
+   - uses: 8398a7/action-slack@v3
      with:
        status: ${{ job.status }}
        fields: repo
