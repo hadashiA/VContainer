@@ -133,7 +133,7 @@ namespace VContainer.SourceGenerator
                     return true;
                 }
 
-                codeWriter.AppendLine($"var x = ({typeMeta.TypeName})instance;");
+                codeWriter.AppendLine($"var __x = ({typeMeta.TypeName})instance;");
 
                 var error = false;
 
@@ -220,14 +220,14 @@ namespace VContainer.SourceGenerator
                 {
                     var fieldTypeName =
                         fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
-                    codeWriter.AppendLine($"x.{fieldSymbol.Name} = resolver.Resolve<{fieldTypeName}>();");
+                    codeWriter.AppendLine($"__x.{fieldSymbol.Name} = resolver.Resolve<{fieldTypeName}>();");
                 }
 
                 foreach (var propSymbol in typeMeta.InjectProperties)
                 {
                     var propTypeName =
                         propSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                    codeWriter.AppendLine($"x.{propSymbol.Name} = resolver.Resolve<{propTypeName}>();");
+                    codeWriter.AppendLine($"__x.{propSymbol.Name} = resolver.Resolve<{propTypeName}>();");
                 }
 
                 foreach (var methodSymbol in typeMeta.InjectMethods)
@@ -245,11 +245,11 @@ namespace VContainer.SourceGenerator
                     foreach (var (paramType, paramName) in parameters)
                     {
                         codeWriter.AppendLine(
-                            $"var {paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
+                            $"var __{paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
                     }
 
-                    var arguments = parameters.Select(x => $"({x.paramType}){x.paramName}");
-                    codeWriter.AppendLine($"x.{methodSymbol.Name}({string.Join(", ", arguments)});");
+                    var arguments = parameters.Select(x => $"({x.paramType})__{x.paramName}");
+                    codeWriter.AppendLine($"__x.{methodSymbol.Name}({string.Join(", ", arguments)});");
                 }
                 return true;
             }
@@ -305,9 +305,9 @@ namespace VContainer.SourceGenerator
                 }
                 if (constructorSymbol is null)
                 {
-                    codeWriter.AppendLine($"var instance = new {typeMeta.TypeName}();");
-                    codeWriter.AppendLine("Inject(instance, resolver, parameters);");
-                    codeWriter.AppendLine("return instance;");
+                    codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}();");
+                    codeWriter.AppendLine("Inject(__instance, resolver, parameters);");
+                    codeWriter.AppendLine("return __instance;");
                     return true;
                 }
                 var parameters = constructorSymbol.Parameters
@@ -323,13 +323,13 @@ namespace VContainer.SourceGenerator
                 foreach (var (paramType, paramName) in parameters)
                 {
                     codeWriter.AppendLine(
-                        $"var {paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
+                        $"var __{paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
                 }
 
-                var arguments = parameters.Select(x => $"({x.paramType}){x.paramName}");
-                codeWriter.AppendLine($"var instance = new {typeMeta.TypeName}({string.Join(", ", arguments)});");
-                codeWriter.AppendLine("Inject(instance, resolver, parameters);");
-                codeWriter.AppendLine("return instance;");
+                var arguments = parameters.Select(x => $"({x.paramType})__{x.paramName}");
+                codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}({string.Join(", ", arguments)});");
+                codeWriter.AppendLine("Inject(__instance, resolver, parameters);");
+                codeWriter.AppendLine("return __instance;");
             }
             return true;
         }
