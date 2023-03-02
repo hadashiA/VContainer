@@ -16,4 +16,9 @@ namespace VContainer
     public class InjectAttribute : PreserveAttribute
     {
     }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
+    public class InjectIgnoreAttribute : Attribute
+    {
+    }
 }

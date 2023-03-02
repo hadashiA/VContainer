@@ -21,7 +21,7 @@ The extra fast DI (Dependency Injection) library running on Unity Game Engine.
 - Dispatch own PlayerLoopSystem
 - Flexible scoping
   - Application can freely create nested Lifetime Scope with any async way for you like.
-- Pre IL Code generation optimization mode
+- Accelerated mode with SourceGenerator (Optional)
 - Diagnositcs window on unity editor
 - UniTask Integration
 - ECS Integration *beta*
@@ -52,7 +52,7 @@ Visit [vcontainer.hadashikick.jp](https://vcontainer.hadashikick.jp) to view the
 1. Navigate to your project's Packages folder and open the manifest.json file.
 2. Add this line below the "dependencies": { line
     - ```json title="Packages/manifest.json"
-      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.12.0",
+      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.13.0",
       ```
 3. UPM should now install the package.
 

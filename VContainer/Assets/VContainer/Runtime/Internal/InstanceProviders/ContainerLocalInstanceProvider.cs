@@ -27,7 +27,6 @@ namespace VContainer.Internal
             {
                 value = resolver.Resolve(valueRegistration);
             }
-
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(1);
             try
             {

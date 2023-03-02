@@ -73,19 +73,25 @@ namespace VContainer.Tests.Unity
         {
             var builder = new ContainerBuilder();
             builder.Register<ServiceA>(Lifetime.Singleton);
+            builder.Register<ServiceB>(Lifetime.Singleton);
             var container = builder.Build();
 
             var parent = new GameObject("Parent");
             var original = new GameObject("Original").AddComponent<SampleMonoBehaviour>();
+            original.gameObject.AddComponent<SampleMonoBehaviour2>();
 
             var instance1 = container.Instantiate(original);
             Assert.That(instance1, Is.Not.EqualTo(original));
             Assert.That(instance1.ServiceA, Is.InstanceOf<ServiceA>());
+            Assert.That(instance1.GetComponent<SampleMonoBehaviour2>().ServiceB, Is.InstanceOf<ServiceB>());
+
 
             var instance2 = container.Instantiate(original, parent.transform);
             Assert.That(parent.GetComponentInChildren<SampleMonoBehaviour>(), Is.EqualTo(instance2));
             Assert.That(instance2, Is.Not.EqualTo(original));
             Assert.That(instance2.ServiceA, Is.InstanceOf<ServiceA>());
+            Assert.That(instance2.GetComponent<SampleMonoBehaviour2>().ServiceB, Is.InstanceOf<ServiceB>());
+
 
             var instance3 = container.Instantiate(
                 original,
@@ -94,6 +100,7 @@ namespace VContainer.Tests.Unity
 
             Assert.That(instance3, Is.Not.EqualTo(original));
             Assert.That(instance3.ServiceA, Is.InstanceOf<ServiceA>());
+            Assert.That(instance3.GetComponent<SampleMonoBehaviour2>().ServiceB, Is.InstanceOf<ServiceB>());
             Assert.That(instance3.transform.position, Is.EqualTo(new Vector3(1f, 2f, 3f)));
             Assert.That(instance3.transform.rotation, Is.EqualTo(Quaternion.Euler(1f, 2f, 3f)));
         }

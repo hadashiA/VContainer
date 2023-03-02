@@ -8,9 +8,10 @@ jobs:
  star:
    runs-on: ubuntu-latest
    steps:
-   - uses: 8398a7/action-slack@v1
+   - uses: 8398a7/action-slack@v3
      with:
-       payload: |
-         { "text": "☆${{ github.event.repository.stargazers_count }} ${{ github.event.repository.html_url }}" }
+       status: ${{ job.status }}
+       fields: repo
+       text: "☆ from https://github.com/${{ github.event.sender.login }}, Total: ${{ github.event.repository.stargazers_count }}"
      env:
        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
