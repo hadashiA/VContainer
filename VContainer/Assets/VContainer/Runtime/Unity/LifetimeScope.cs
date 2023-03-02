@@ -11,8 +11,20 @@ namespace VContainer.Unity
     {
         public readonly struct ParentOverrideScope : IDisposable
         {
-            public ParentOverrideScope(LifetimeScope nextParent) => overrideParent = nextParent;
-            public void Dispose() => overrideParent = null;
+            readonly LifetimeScope parent;
+            
+            public ParentOverrideScope(LifetimeScope nextParent)
+            {
+                parent = nextParent;
+                overrideParent = nextParent;
+            }
+            
+            public void Dispose()
+            {
+                //don't remove in case it was overwritten
+                if(overrideParent == parent) 
+                    overrideParent = null;
+            }
         }
 
         public readonly struct ExtraInstallationScope : IDisposable
