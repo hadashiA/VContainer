@@ -32,7 +32,7 @@ If you don't want to use `openupm-cli` (or if you're hosting VContainer on an al
     }
   ],
   "dependencies": {
-    "jp.hadashikick.vcontainer": "1.13.0"
+    "jp.hadashikick.vcontainer": "1.13.1"
   }
 }
 ```
@@ -42,19 +42,11 @@ If you don't want to use `openupm-cli` (or if you're hosting VContainer on an al
 Navigate to your project's `Packages` folder and open the `manifest.json` file. Then add this package somewhere in the `dependencies` block:
 
 ```json title="Packages/manifest.json"
-      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.13.0",
+      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.13.1",
 ```
 
 UPM should now install the package. This is useful if you're maintaining a fork of VContainer for your own project but don't want to set up a private registry.
 
 ### Install manually (using .unitypackage)
-
-There's little reason to use `.unitypackage`s as all supported versions of Unity offer UPM. However, we provide one anyway just in case.
-
-Navigate to your project's `Packages` folder and open the `manifest.json` file. Then add this package somewhere in the `dependencies` block:
-
-```json title="Packages/manifest.json"
-      "com.unity.nuget.mono-cecil": "1.10.1",
-```
 
 Download the latest `.unitypackage` from the [releases](https://github.com/hadashiA/VContainer/releases) page and open it within your project. Install it as you would for any other package.
