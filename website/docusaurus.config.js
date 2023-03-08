@@ -55,8 +55,9 @@ module.exports = {
         },
         {
           href: 'https://github.com/hadashiA/VContainer',
-          label: 'GitHub',
+          // label: 'Github',
           position: 'right',
+          className: 'github-button'
         },
       ],
     },
@@ -67,17 +68,6 @@ module.exports = {
       //   src: 'img/favicon.png',
       //   href: 'https://github.com/hadashiA/VContainer',
       // },
-      // links: [
-      //   {
-      //     title: 'Author',
-      //     items: [
-      //       {
-      //         label: '@hadashiA',
-      //         href: 'https://twitter.com/hadashiA',
-      //       },
-      //     ],
-      //   }
-      // ]
     },
     algolia: {
       appId: process.env.ALGOLIA_APP_ID ?? "dummy",
@@ -108,4 +98,11 @@ module.exports = {
       },
     ],
   ],
+  scripts: [
+    {
+      src: '/loadbutton.js',
+      defer: true,
+      async: true
+    }
+  ]
 }
