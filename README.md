@@ -67,13 +67,8 @@ Visit [vcontainer.hadashikick.jp](https://vcontainer.hadashikick.jp) to view the
 
 ### Install manually (using .unitypackage)
 
-1. Navigate to your project's Packages folder and open the manifest.json file.
-2. Add this line below the "dependencies": { line
-    - ```json title="Packages/manifest.json"
-      "com.unity.nuget.mono-cecil": "1.10.1",
-      ```
-3. Download the .unitypackage from [releases](https://github.com/hadashiA/VContainer/releases) page.
-4. Open VContainer.x.x.x.unitypackage
+1. Download the .unitypackage from [releases](https://github.com/hadashiA/VContainer/releases) page.
+2. Open VContainer.x.x.x.unitypackage
 
 ## Basic Usage
 
