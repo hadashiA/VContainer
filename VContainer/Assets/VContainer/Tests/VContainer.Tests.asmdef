@@ -34,7 +34,7 @@
         },
         {
             "name": "com.unity.entities",
-            "expression": "(0.20,999)",
+            "expression": "(0.60,999)",
             "define": "VCONTAINER_ECS_INTEGRATION_1_0"
         }
     ],
