@@ -68,7 +68,7 @@ namespace VContainer
             }
         }
 
-        readonly List<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
+        internal readonly List<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
         DiagnosticsCollector diagnostics;
 

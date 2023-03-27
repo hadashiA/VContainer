@@ -206,6 +206,7 @@ namespace VContainer.Internal
             var injectMethods = default(List<InjectMethodInfo>);
             var injectFields = default(List<FieldInfo>);
             var injectProperties = default(List<PropertyInfo>);
+            var startType = type;
             while (type != null && type != typeof(object))
             {
                 // Methods, [Inject] Only
@@ -245,7 +246,7 @@ namespace VContainer.Internal
             }
 
             return new InjectTypeInfo(
-                type,
+                startType,
                 injectConstructor,
                 injectMethods,
                 injectFields,
