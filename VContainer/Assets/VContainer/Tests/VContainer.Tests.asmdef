@@ -5,6 +5,7 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "VContainer",
+        "Unity.Collections",
         "Unity.Entities",
         "UniTask"
     ],
