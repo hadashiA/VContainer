@@ -206,37 +206,35 @@ namespace VContainer.Internal
             var injectMethods = default(List<InjectMethodInfo>);
             var injectFields = default(List<FieldInfo>);
             var injectProperties = default(List<PropertyInfo>);
+            BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
             while (type != null && type != typeof(object))
             {
                 // Methods, [Inject] Only
-                foreach (var methodInfo in type.GetRuntimeMethods())
+                foreach (var methodInfo in type.GetMethods(bindingFlags))
                 {
-                    if (methodInfo.IsDefined(typeof(InjectAttribute), true))
+                    if (methodInfo.IsDefined(typeof(InjectAttribute), false))
                     {
-                        if (injectMethods == null)
-                            injectMethods = new List<InjectMethodInfo>();
+                        injectMethods ??= new List<InjectMethodInfo>();
                         injectMethods.Add(new InjectMethodInfo(methodInfo));
                     }
                 }
 
                 // Fields, [Inject] Only
-                foreach (var fieldInfo in type.GetRuntimeFields())
+                foreach (var fieldInfo in type.GetFields(bindingFlags))
                 {
-                    if (fieldInfo.IsDefined(typeof(InjectAttribute), true))
+                    if (fieldInfo.IsDefined(typeof(InjectAttribute), false))
                     {
-                        if (injectFields == null)
-                            injectFields = new List<FieldInfo>();
+                        injectFields ??= new List<FieldInfo>();
                         injectFields.Add(fieldInfo);
                     }
                 }
 
                 // Properties, [Inject] only
-                foreach (var propertyInfo in type.GetRuntimeProperties())
+                foreach (var propertyInfo in type.GetProperties(bindingFlags))
                 {
-                    if (propertyInfo.IsDefined(typeof(InjectAttribute), true))
+                    if (propertyInfo.IsDefined(typeof(InjectAttribute), false))
                     {
-                        if (injectProperties == null)
-                            injectProperties = new List<PropertyInfo>();
+                        injectProperties ??= new List<PropertyInfo>();
                         injectProperties.Add(propertyInfo);
                     }
                 }
