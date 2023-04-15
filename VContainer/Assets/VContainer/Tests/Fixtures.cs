@@ -313,4 +313,83 @@ namespace VContainer.Tests
             GenericsService = genericsService;
         }
     }
+
+    class BaseClassWithInjectAttribute
+    {
+        public int PrivatePropertyInjectCalls;
+        public int VirtualPropertyInjectCalls;
+        public int InjectPrivateMethodCalls;
+        public int InjectVirtualMethodCalls;
+
+        int privatePropertyValue;
+        int virtualPropertyValue;
+
+        [Inject]
+        int PrivatePropertyValue
+        {
+            get => privatePropertyValue;
+            set
+            {
+                privatePropertyValue = value;
+                PrivatePropertyInjectCalls++;
+            }
+        }
+
+        [Inject]
+        public virtual int VirtualPropertyValue
+        {
+            get => virtualPropertyValue;
+            set
+            {
+                virtualPropertyValue = value;
+                VirtualPropertyInjectCalls++;
+            }
+        }
+
+        [Inject]
+        void InjectPrivate(int value)
+        {
+            InjectPrivateMethodCalls++;
+        }
+
+        [Inject]
+        public virtual void InjectPublic(int value)
+        {
+            InjectVirtualMethodCalls++;
+        }
+    }
+
+    class SubClassWithOverrideInjectMembers : BaseClassWithInjectAttribute
+    {
+        public override int VirtualPropertyValue
+        {
+            get => base.VirtualPropertyValue;
+            set => base.VirtualPropertyValue = value;
+        }
+
+        public override void InjectPublic(int value)
+        {
+            base.InjectPublic(value);
+        }
+    }
+
+    class SubClassWithoutOverrideInjectMembers : BaseClassWithInjectAttribute
+    {
+    }
+
+    class SubClassOverrideWithInjectAttribute : BaseClassWithInjectAttribute
+    {
+        [Inject]
+        public override int VirtualPropertyValue
+        {
+            get => base.VirtualPropertyValue;
+            set => base.VirtualPropertyValue = value;
+        }
+
+        [Inject]
+        public override void InjectPublic(int value)
+        {
+            base.InjectPublic(value);
+        }
+    }
 }
