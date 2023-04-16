@@ -313,4 +313,76 @@ namespace VContainer.Tests
             GenericsService = genericsService;
         }
     }
+
+    class BaseClassWithInjectAttribute
+    {
+        public int InjectPropertySetterCalls;
+        public int InjectVirtualPropertySetterCalls;
+        public int InjectVirtualMethodCalls;
+
+        int inejctPropertyValue;
+        int injectVirtualPropertyValue;
+
+        [Inject]
+        public int InjectProperty
+        {
+            get => inejctPropertyValue;
+            set
+            {
+                inejctPropertyValue = value;
+                InjectPropertySetterCalls++;
+            }
+        }
+
+        [Inject]
+        public virtual int InjectVirtualProperty
+        {
+            get => injectVirtualPropertyValue;
+            set
+            {
+                injectVirtualPropertyValue = value;
+                InjectVirtualPropertySetterCalls++;
+            }
+        }
+
+        [Inject]
+        public virtual void InjectMethod(int value)
+        {
+            InjectVirtualMethodCalls++;
+        }
+    }
+
+    class SubClassWithOverrideInjectMembers : BaseClassWithInjectAttribute
+    {
+        public override int InjectVirtualProperty
+        {
+            get => base.InjectVirtualProperty;
+            set => base.InjectVirtualProperty = value;
+        }
+
+        public override void InjectMethod(int value)
+        {
+            base.InjectMethod(value);
+        }
+    }
+
+    class SubClassWithoutOverrideInjectMembers : BaseClassWithInjectAttribute
+    {
+    }
+
+    class SubClassOverrideWithInjectAttribute : BaseClassWithInjectAttribute
+    {
+        [Inject]
+        public override int InjectVirtualProperty
+        {
+            get => base.InjectVirtualProperty;
+            set => base.InjectVirtualProperty = value;
+        }
+
+        [Inject]
+        public override void InjectMethod(int value)
+        {
+            base.InjectMethod(value);
+        }
+    }
 }
