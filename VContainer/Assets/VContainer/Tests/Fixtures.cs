@@ -316,44 +316,37 @@ namespace VContainer.Tests
 
     class BaseClassWithInjectAttribute
     {
-        public int PrivatePropertyInjectCalls;
-        public int VirtualPropertyInjectCalls;
-        public int InjectPrivateMethodCalls;
+        public int InjectPropertySetterCalls;
+        public int InjectVirtualPropertySetterCalls;
         public int InjectVirtualMethodCalls;
 
-        int privatePropertyValue;
-        int virtualPropertyValue;
+        int inejctPropertyValue;
+        int injectVirtualPropertyValue;
 
         [Inject]
-        int PrivatePropertyValue
+        public int InjectProperty
         {
-            get => privatePropertyValue;
+            get => inejctPropertyValue;
             set
             {
-                privatePropertyValue = value;
-                PrivatePropertyInjectCalls++;
+                inejctPropertyValue = value;
+                InjectPropertySetterCalls++;
             }
         }
 
         [Inject]
-        public virtual int VirtualPropertyValue
+        public virtual int InjectVirtualProperty
         {
-            get => virtualPropertyValue;
+            get => injectVirtualPropertyValue;
             set
             {
-                virtualPropertyValue = value;
-                VirtualPropertyInjectCalls++;
+                injectVirtualPropertyValue = value;
+                InjectVirtualPropertySetterCalls++;
             }
         }
 
         [Inject]
-        void InjectPrivate(int value)
-        {
-            InjectPrivateMethodCalls++;
-        }
-
-        [Inject]
-        public virtual void InjectPublic(int value)
+        public virtual void InjectMethod(int value)
         {
             InjectVirtualMethodCalls++;
         }
@@ -361,15 +354,15 @@ namespace VContainer.Tests
 
     class SubClassWithOverrideInjectMembers : BaseClassWithInjectAttribute
     {
-        public override int VirtualPropertyValue
+        public override int InjectVirtualProperty
         {
-            get => base.VirtualPropertyValue;
-            set => base.VirtualPropertyValue = value;
+            get => base.InjectVirtualProperty;
+            set => base.InjectVirtualProperty = value;
         }
 
-        public override void InjectPublic(int value)
+        public override void InjectMethod(int value)
         {
-            base.InjectPublic(value);
+            base.InjectMethod(value);
         }
     }
 
@@ -380,16 +373,16 @@ namespace VContainer.Tests
     class SubClassOverrideWithInjectAttribute : BaseClassWithInjectAttribute
     {
         [Inject]
-        public override int VirtualPropertyValue
+        public override int InjectVirtualProperty
         {
-            get => base.VirtualPropertyValue;
-            set => base.VirtualPropertyValue = value;
+            get => base.InjectVirtualProperty;
+            set => base.InjectVirtualProperty = value;
         }
 
         [Inject]
-        public override void InjectPublic(int value)
+        public override void InjectMethod(int value)
         {
-            base.InjectPublic(value);
+            base.InjectMethod(value);
         }
     }
 }

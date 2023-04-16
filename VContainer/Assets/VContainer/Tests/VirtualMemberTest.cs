@@ -15,9 +15,8 @@ namespace VContainer.Tests
             var container = builder.Build();
             var subClass = container.Resolve<SubClassWithOverrideInjectMembers>();
 
-            Assert.That(subClass.PrivatePropertyInjectCalls, Is.EqualTo(1));
-            Assert.That(subClass.VirtualPropertyInjectCalls, Is.EqualTo(1));
-            Assert.That(subClass.InjectPrivateMethodCalls, Is.EqualTo(1));
+            Assert.That(subClass.InjectPropertySetterCalls, Is.EqualTo(1));
+            Assert.That(subClass.InjectVirtualPropertySetterCalls, Is.EqualTo(1));
             Assert.That(subClass.InjectVirtualMethodCalls, Is.EqualTo(1));
         }
 
@@ -31,9 +30,8 @@ namespace VContainer.Tests
             var container = builder.Build();
             var subClass = container.Resolve<SubClassWithoutOverrideInjectMembers>();
 
-            Assert.That(subClass.PrivatePropertyInjectCalls, Is.EqualTo(1));
-            Assert.That(subClass.VirtualPropertyInjectCalls, Is.EqualTo(1));
-            Assert.That(subClass.InjectPrivateMethodCalls, Is.EqualTo(1));
+            Assert.That(subClass.InjectPropertySetterCalls, Is.EqualTo(1));
+            Assert.That(subClass.InjectVirtualPropertySetterCalls, Is.EqualTo(1));
             Assert.That(subClass.InjectVirtualMethodCalls, Is.EqualTo(1));
         }
 
@@ -47,9 +45,8 @@ namespace VContainer.Tests
             var container = builder.Build();
             var subClass = container.Resolve<SubClassOverrideWithInjectAttribute>();
 
-            Assert.That(subClass.PrivatePropertyInjectCalls, Is.EqualTo(1));
-            Assert.That(subClass.VirtualPropertyInjectCalls, Is.EqualTo(1));
-            Assert.That(subClass.InjectPrivateMethodCalls, Is.EqualTo(1));
+            Assert.That(subClass.InjectPropertySetterCalls, Is.EqualTo(1));
+            Assert.That(subClass.InjectVirtualPropertySetterCalls, Is.EqualTo(1));
             Assert.That(subClass.InjectVirtualMethodCalls, Is.EqualTo(1));
         }
     }
