@@ -385,4 +385,8 @@ namespace VContainer.Tests
             base.InjectMethod(value);
         }
     }
+
+    class SampleAttribute : Attribute
+    {
+    }
 }

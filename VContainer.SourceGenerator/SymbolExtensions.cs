@@ -37,6 +37,16 @@ namespace VContainer.SourceGenerator
             return symbol.GetAttributes().Any(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, attribtue));
         }
 
+        public static IEnumerable<INamedTypeSymbol> GetAllBaseTypes(this INamedTypeSymbol symbol)
+        {
+            var t = symbol.BaseType;
+            while (t != null)
+            {
+                yield return t;
+                t = t.BaseType;
+            }
+        }
+
         public static bool CanBeCallFromInternal(this ISymbol symbol)
         {
             return symbol.DeclaredAccessibility >= Accessibility.Internal;
