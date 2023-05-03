@@ -17,15 +17,23 @@ namespace VContainer.SourceGenerator
         {
             var semanticModel = context.Compilation.GetSemanticModel(Syntax.SyntaxTree);
             var symbol = semanticModel.GetDeclaredSymbol(Syntax, context.CancellationToken);
-            if (symbol is INamedTypeSymbol typeSymbol)
+            if (symbol is not INamedTypeSymbol typeSymbol)
             {
-                var injectIgnore = symbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, references.VContainerInjectIgnoreAttribute));
-                if (!injectIgnore)
-                {
-                    return new TypeMeta(Syntax, typeSymbol, references);
-                }
+                return null;
             }
-            return null;
+            var isAttribute = typeSymbol.GetAllBaseTypes().Any(x => SymbolEqualityComparer.Default.Equals(x, references.AttributeBase));
+            if (isAttribute)
+            {
+                return null;
+            }
+
+            var injectIgnore = symbol.GetAttributes().Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, references.VContainerInjectIgnoreAttribute));
+            if (injectIgnore)
+            {
+                return null;
+            }
+
+            return new TypeMeta(Syntax, typeSymbol, references);
         }
     }
 }
