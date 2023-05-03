@@ -44,11 +44,17 @@ Then, from the inspector, do the following:
 See more information:
 - https://docs.unity3d.com/Manual/roslyn-analyzers.html
 
-## Limitation
+## Which classes are target to code generation?
+
+By default, classes in the assembly that reference VContainer.asmdef are target to code generation.
+
+If you want to exclude a target for reasons such as wanting to suppress unnecessary code generation, please add the [InjectIgnore] attribute to the type.
+
+
+### Limitation
 
 SourceGenerator acceleration is not supported for type definitions like the following. (works by reflection)
 
-- C# source without reference to VContainer.asmdef
 - Nested classes
 - Struct
 - If the access level is less than internal (for example, private), even if `[Inject]` is added, SourceGenerator is not supported.
