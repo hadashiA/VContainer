@@ -11,26 +11,40 @@ namespace VContainer.Unity
     {
         public readonly struct ParentOverrideScope : IDisposable
         {
-            readonly LifetimeScope parent;
-            
             public ParentOverrideScope(LifetimeScope nextParent)
             {
-                parent = nextParent;
-                overrideParent = nextParent;
+                lock (SyncRoot)
+                {
+                    GlobalOverrideParents.Push(nextParent);
+                }
             }
-            
+
             public void Dispose()
             {
-                //don't remove in case it was overwritten
-                if(overrideParent == parent) 
-                    overrideParent = null;
+                lock (SyncRoot)
+                {
+                    GlobalOverrideParents.Pop();
+                }
             }
         }
 
         public readonly struct ExtraInstallationScope : IDisposable
         {
-            public ExtraInstallationScope(IInstaller installer) => EnqueueExtra(installer);
-            void IDisposable.Dispose() => RemoveExtra();
+            public ExtraInstallationScope(IInstaller installer)
+            {
+                lock (SyncRoot)
+                {
+                    GlobalExtraInstallers.Push(installer);
+                }
+            }
+
+            void IDisposable.Dispose()
+            {
+                lock (SyncRoot)
+                {
+                    GlobalExtraInstallers.Pop();
+                }
+            }
         }
 
         [SerializeField]
@@ -42,8 +56,8 @@ namespace VContainer.Unity
         [SerializeField]
         protected List<GameObject> autoInjectGameObjects;
 
-        static LifetimeScope overrideParent;
-        static ExtraInstaller extraInstaller;
+        static readonly Stack<LifetimeScope> GlobalOverrideParents = new Stack<LifetimeScope>();
+        static readonly Stack<IInstaller> GlobalExtraInstallers = new Stack<IInstaller>();
         static readonly object SyncRoot = new object();
 
         static LifetimeScope Create(IInstaller installer = null)
@@ -53,7 +67,7 @@ namespace VContainer.Unity
             var newScope = gameObject.AddComponent<LifetimeScope>();
             if (installer != null)
             {
-                newScope.extraInstallers.Add(installer);
+                newScope.localExtraInstallers.Add(installer);
             }
             gameObject.SetActive(true);
             return newScope;
@@ -101,27 +115,11 @@ namespace VContainer.Unity
            return (LifetimeScope)FindObjectOfType(type);
         }
 
-        static void EnqueueExtra(IInstaller installer)
-        {
-            lock (SyncRoot)
-            {
-                if (extraInstaller != null)
-                    extraInstaller.Add(installer);
-                else
-                    extraInstaller = new ExtraInstaller { installer };
-            }
-        }
-
-        static void RemoveExtra()
-        {
-            lock (SyncRoot) extraInstaller = null;
-        }
-
         public IObjectResolver Container { get; private set; }
         public LifetimeScope Parent { get; private set; }
         public bool IsRoot { get; set; }
 
-        readonly List<IInstaller> extraInstallers = new List<IInstaller>();
+        readonly List<IInstaller> localExtraInstallers = new List<IInstaller>();
 
         protected virtual void Awake()
         {
@@ -198,8 +196,6 @@ namespace VContainer.Unity
                 Container = builder.Build();
             }
 
-            extraInstallers.Clear();
-
             AutoInjectAll();
             AwakeWaitingChildren(this);
         }
@@ -220,7 +216,7 @@ namespace VContainer.Unity
             var child = childGameObject.AddComponent<TScope>();
             if (installer != null)
             {
-                child.extraInstallers.Add(installer);
+                child.localExtraInstallers.Add(installer);
             }
             child.parentReference.Object = this;
             childGameObject.SetActive(true);
@@ -248,7 +244,7 @@ namespace VContainer.Unity
             var child = Instantiate(prefab, transform, false);
             if (installer != null)
             {
-                child.extraInstallers.Add(installer);
+                child.localExtraInstallers.Add(installer);
             }
             child.parentReference.Object = this;
             if (wasActive)
@@ -267,17 +263,19 @@ namespace VContainer.Unity
         {
             Configure(builder);
 
-            foreach (var installer in extraInstallers)
+            foreach (var installer in localExtraInstallers)
             {
                 installer.Install(builder);
             }
+            localExtraInstallers.Clear();
 
-            ExtraInstaller extraInstallerStatic;
             lock (SyncRoot)
             {
-                extraInstallerStatic = LifetimeScope.extraInstaller;
+                foreach (var installer in GlobalExtraInstallers)
+                {
+                    installer.Install(builder);
+                }
             }
-            extraInstallerStatic?.Install(builder);
 
             builder.RegisterInstance<LifetimeScope>(this).AsSelf();
             EntryPointsBuilder.EnsureDispatcherRegistered(builder);
@@ -303,9 +301,13 @@ namespace VContainer.Unity
                     $"{name} could not found parent reference of type : {parentReference.Type}");
             }
 
-            var nextParent = overrideParent;
-            if (nextParent != null)
-                return nextParent;
+            lock (SyncRoot)
+            {
+                if (GlobalOverrideParents.Count > 0)
+                {
+                    return GlobalOverrideParents.Peek();
+                }
+            }
 
             // Find root from settings
             if (VContainerSettings.Instance != null)
