@@ -12,14 +12,12 @@ namespace VContainer.Unity
     {
         public static void EnsureDispatcherRegistered(IContainerBuilder containerBuilder)
         {
-            if (!containerBuilder.Exists(typeof(EntryPointDispatcher), false))
+            if (containerBuilder.Exists(typeof(EntryPointDispatcher), false)) return;
+            containerBuilder.Register<EntryPointDispatcher>(Lifetime.Scoped);
+            containerBuilder.RegisterBuildCallback(container =>
             {
-                containerBuilder.Register<EntryPointDispatcher>(Lifetime.Scoped);
-                containerBuilder.RegisterBuildCallback(container =>
-                {
-                    container.Resolve<EntryPointDispatcher>().Dispatch();
-                });
-            }
+                container.Resolve<EntryPointDispatcher>().Dispatch();
+            });
         }
 
         readonly IContainerBuilder containerBuilder;
@@ -100,7 +98,9 @@ namespace VContainer.Unity
             configuration(new ComponentsBuilder(builder, root));
         }
 
-        public static RegistrationBuilder RegisterEntryPoint<T>(this IContainerBuilder builder, Lifetime lifetime = Lifetime.Singleton)
+        public static RegistrationBuilder RegisterEntryPoint<T>(
+            this IContainerBuilder builder,
+            Lifetime lifetime = Lifetime.Singleton)
         {
             EntryPointsBuilder.EnsureDispatcherRegistered(builder);
             return builder.Register<T>(lifetime).AsImplementedInterfaces();
@@ -113,7 +113,9 @@ namespace VContainer.Unity
             builder.RegisterInstance(new EntryPointExceptionHandler(exceptionHandler));
         }
 
-        public static RegistrationBuilder RegisterComponent<TInterface>(this IContainerBuilder builder, TInterface component)
+        public static RegistrationBuilder RegisterComponent<TInterface>(
+            this IContainerBuilder builder,
+            TInterface component)
         {
             var registrationBuilder = new ComponentRegistrationBuilder(component).As(typeof(TInterface));
             // Force inject execution
@@ -121,21 +123,40 @@ namespace VContainer.Unity
             return builder.Register(registrationBuilder);
         }
 
-        public static ComponentRegistrationBuilder RegisterComponentInHierarchy<T>(this IContainerBuilder builder)
+        public static ComponentRegistrationBuilder RegisterComponentInHierarchy(
+            this IContainerBuilder builder,
+            Type type)
         {
             var lifetimeScope = (LifetimeScope)builder.ApplicationOrigin;
             var scene = lifetimeScope.gameObject.scene;
 
-            var registrationBuilder = new ComponentRegistrationBuilder(scene, typeof(T));
+            var registrationBuilder = new ComponentRegistrationBuilder(scene, type);
             // Force inject execution
-            builder.RegisterBuildCallback(container =>
-            {
-                var type = registrationBuilder.InterfaceTypes != null
-                    ? registrationBuilder.InterfaceTypes[0]
-                    : registrationBuilder.ImplementationType;
-                container.Resolve(type);
-            });
+            builder.RegisterBuildCallback(
+                container =>
+                {
+                    container.Resolve(
+                        registrationBuilder.InterfaceTypes != null
+                            ? registrationBuilder.InterfaceTypes[0]
+                            : registrationBuilder.ImplementationType
+                    );
+                }
+            );
             return builder.Register(registrationBuilder);
+        }
+
+        public static ComponentRegistrationBuilder RegisterComponentInHierarchy<T>(this IContainerBuilder builder)
+        {
+            return builder.RegisterComponentInHierarchy(typeof(T));
+        }
+
+        public static ComponentRegistrationBuilder RegisterComponentOnNewGameObject(
+            this IContainerBuilder builder,
+            Type type,
+            Lifetime lifetime,
+            string newGameObjectName = null)
+        {
+            return builder.Register(new ComponentRegistrationBuilder(newGameObjectName, type, lifetime));
         }
 
         public static ComponentRegistrationBuilder RegisterComponentOnNewGameObject<T>(
@@ -144,7 +165,17 @@ namespace VContainer.Unity
             string newGameObjectName = null)
             where T : Component
         {
-            return builder.Register(new ComponentRegistrationBuilder(newGameObjectName, typeof(T), lifetime));
+            return builder.RegisterComponentOnNewGameObject(typeof(T), lifetime, newGameObjectName);
+        }
+
+        public static ComponentRegistrationBuilder RegisterComponentInNewPrefab<T>(
+            this IContainerBuilder builder,
+            Type type,
+            T prefab,
+            Lifetime lifetime)
+            where T : Component
+        {
+            return builder.Register(new ComponentRegistrationBuilder(prefab, type, lifetime));
         }
 
         public static ComponentRegistrationBuilder RegisterComponentInNewPrefab<T>(
@@ -153,11 +184,10 @@ namespace VContainer.Unity
             Lifetime lifetime)
             where T : Component
         {
-            return builder.Register(new ComponentRegistrationBuilder(prefab, typeof(T), lifetime));
+            return builder.RegisterComponentInNewPrefab(typeof(T), prefab, lifetime);
         }
 
 #if VCONTAINER_ECS_INTEGRATION
-
         public readonly struct NewWorldBuilder
         {
             readonly IContainerBuilder containerBuilder;
