@@ -271,6 +271,11 @@ VContainer is inspired by:
 
 [@hadashiA](https://twitter.com/hadashiA)
 
+Developing something like this, too.
+
+- [VYaml](https://github.com/hadashiA/VYaml)
+- [UniTaskPubSub](https://github.com/hadashiA/UniTaskPubSub)
+
 ## License
 
 MIT
