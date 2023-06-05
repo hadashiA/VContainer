@@ -2,25 +2,26 @@
 using System;
 using Cysharp.Threading.Tasks;
 
-namespace VContainer.Internal;
-
-internal sealed class AsyncFuncRegistrationBuilder<T> : RegistrationBuilder
+namespace VContainer.Internal
 {
-    private readonly Func<IObjectResolver, UniTask<T>> implementationProvider;
-
-    public AsyncFuncRegistrationBuilder(
-        Func<IObjectResolver, UniTask<T>> implementationProvider,
-        Type implementationType,
-        Lifetime lifetime) 
-        : base(implementationType, lifetime)
+    internal sealed class AsyncFuncRegistrationBuilder<T> : RegistrationBuilder
     {
-        this.implementationProvider = implementationProvider;
-    }
+        private readonly Func<IObjectResolver, UniTask<T>> implementationProvider;
 
-    public override Registration Build()
-    {
-        var spawner = new AsyncFuncInstanceProvider<T>(implementationProvider);
-        return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner);
+        public AsyncFuncRegistrationBuilder(
+            Func<IObjectResolver, UniTask<T>> implementationProvider,
+            Type implementationType,
+            Lifetime lifetime)
+            : base(implementationType, lifetime)
+        {
+            this.implementationProvider = implementationProvider;
+        }
+
+        public override Registration Build()
+        {
+            var spawner = new AsyncFuncInstanceProvider<T>(implementationProvider);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner);
+        }
     }
 }
 #endif
