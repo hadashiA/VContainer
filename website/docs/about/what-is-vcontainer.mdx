@@ -62,7 +62,7 @@ First, create a scope. References are automatically resolved for types registere
 ```csharp
 public class GameLifetimeScope : LifetimeScope
 {
-    public override void Configure(IContainerBuilder builder)
+    protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterEntryPoint<ActorPresenter>();
 
