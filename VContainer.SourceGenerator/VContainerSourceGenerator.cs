@@ -219,7 +219,7 @@ namespace VContainer.SourceGenerator
                 foreach (var fieldSymbol in typeMeta.InjectFields)
                 {
                     var fieldTypeName =
-                        fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
+                        fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                     codeWriter.AppendLine($"__x.{fieldSymbol.Name} = resolver.Resolve<{fieldTypeName}>();");
                 }
 
