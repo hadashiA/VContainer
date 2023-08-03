@@ -4,8 +4,7 @@
     "references": [
         "Unity.Collections",
         "Unity.Entities",
-        "UniTask",
-        "Unity.Collections"
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -20,6 +19,7 @@
             "expression": "",
             "define": "VCONTAINER_ECS_INTEGRATION"
         },
+        {
             "name": "com.cysharp.unitask",
             "expression": "",
             "define": "VCONTAINER_UNITASK_INTEGRATION"
