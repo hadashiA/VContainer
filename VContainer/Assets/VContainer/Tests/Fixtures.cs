@@ -188,11 +188,11 @@ namespace VContainer.Tests
     class MultipleInterfaceServiceB : I1, I2, I3
     {
     }
-    
+
     class MultipleInterfaceServiceC : I1, I2, I3
     {
     }
-    
+
     class MultipleInterfaceServiceD : I1, I2, I3
     {
     }
@@ -301,9 +301,9 @@ namespace VContainer.Tests
 
     class GenericsService<T>
     {
-        public readonly I2 ParameterService;
+        public readonly T ParameterService;
 
-        public GenericsService(I2 parameterService)
+        public GenericsService(T parameterService)
         {
             ParameterService = parameterService;
         }
@@ -317,5 +317,81 @@ namespace VContainer.Tests
         {
             GenericsService = genericsService;
         }
+    }
+
+    class BaseClassWithInjectAttribute
+    {
+        public int InjectPropertySetterCalls;
+        public int InjectVirtualPropertySetterCalls;
+        public int InjectVirtualMethodCalls;
+
+        int inejctPropertyValue;
+        int injectVirtualPropertyValue;
+
+        [Inject]
+        public int InjectProperty
+        {
+            get => inejctPropertyValue;
+            set
+            {
+                inejctPropertyValue = value;
+                InjectPropertySetterCalls++;
+            }
+        }
+
+        [Inject]
+        public virtual int InjectVirtualProperty
+        {
+            get => injectVirtualPropertyValue;
+            set
+            {
+                injectVirtualPropertyValue = value;
+                InjectVirtualPropertySetterCalls++;
+            }
+        }
+
+        [Inject]
+        public virtual void InjectMethod(int value)
+        {
+            InjectVirtualMethodCalls++;
+        }
+    }
+
+    class SubClassWithOverrideInjectMembers : BaseClassWithInjectAttribute
+    {
+        public override int InjectVirtualProperty
+        {
+            get => base.InjectVirtualProperty;
+            set => base.InjectVirtualProperty = value;
+        }
+
+        public override void InjectMethod(int value)
+        {
+            base.InjectMethod(value);
+        }
+    }
+
+    class SubClassWithoutOverrideInjectMembers : BaseClassWithInjectAttribute
+    {
+    }
+
+    class SubClassOverrideWithInjectAttribute : BaseClassWithInjectAttribute
+    {
+        [Inject]
+        public override int InjectVirtualProperty
+        {
+            get => base.InjectVirtualProperty;
+            set => base.InjectVirtualProperty = value;
+        }
+
+        [Inject]
+        public override void InjectMethod(int value)
+        {
+            base.InjectMethod(value);
+        }
+    }
+
+    class SampleAttribute : Attribute
+    {
     }
 }

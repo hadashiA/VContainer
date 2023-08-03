@@ -27,7 +27,7 @@ The extra fast DI (Dependency Injection) for Unity Game Engine. "V" means making
 - [Plain C# entry point on own PlayerLoopSystem](../integrations/entrypoint)
 - [Flexible scoping](../scoping/lifetime-overview)
   - Application can freely create nested Lifetime Scope with any async way for you like.
-- [Pre IL Code generation optimization mode](../optimization/codegen)
+- [Accelerated mode with Roslyn Source Generator](../optimization/source-generator)
 - [Diagnostics Window](../diagnostics/diagnostics-window)
 - [UniTask Integration](../integrations/unitask)
 - [ECS Integration](../integrations/ecs) *beta*
@@ -62,7 +62,7 @@ First, create a scope. References are automatically resolved for types registere
 ```csharp
 public class GameLifetimeScope : LifetimeScope
 {
-    public override void Configure(IContainerBuilder builder)
+    protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterEntryPoint<ActorPresenter>();
 

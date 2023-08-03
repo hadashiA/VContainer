@@ -11,9 +11,9 @@ jobs:
       NUGET_XMLDOC_MODE: skip
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
+      - uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 3.1.101
+          dotnet-version: 6.0.x
       - run: dotnet test -c Debug ./VContainer.StandaloneTests
 
   test-unity:
@@ -26,7 +26,8 @@ jobs:
         - 2019.4.25f1
         - 2019.3.15f1
         # feature: ['None', 'UniTask', 'ECS']
-        feature: ['Default', 'UniTask', 'CodeGen']
+        # feature: ['Default', 'UniTask', 'CodeGen']
+        feature: ['Default', 'UniTask']
         include:
         - unityVersion: 2021.1.4f1
           license: UNITY_LICENSE_2021_1

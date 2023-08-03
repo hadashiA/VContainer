@@ -12,6 +12,14 @@ namespace VContainer.Internal
         {
             return Injectors.GetOrAdd(type, key =>
             {
+                // SourceGenerator
+                var generatedType = key.Assembly.GetType($"{key.FullName}GeneratedInjector", false);
+                if (generatedType != null)
+                {
+                    return (IInjector)Activator.CreateInstance(generatedType);
+                }
+
+                // IL weaving (Deprecated)
                 var getter = key.GetMethod("__GetGeneratedInjector", BindingFlags.Static | BindingFlags.Public);
                 if (getter != null)
                 {

@@ -87,7 +87,7 @@ namespace VContainer.Internal
     {
         public Type ImplementationType => Dependency.ImplementationType;
         public IInstanceProvider Provider => Dependency.Provider;
-        
+
         public readonly Registration Dependency;
         readonly Registration owner;
         readonly object method; // ctor or method
@@ -202,40 +202,92 @@ namespace VContainer.Internal
                 if (!allowNoConstructor)
                     throw new VContainerException(type, $"Type does not found injectable constructor, type: {type.Name}");
             }
-            // Methods, [Inject] Only
+
             var injectMethods = default(List<InjectMethodInfo>);
-            foreach (var methodInfo in type.GetRuntimeMethods())
-            {
-                if (methodInfo.IsDefined(typeof(InjectAttribute), true))
-                {
-                    if (injectMethods == null)
-                        injectMethods = new List<InjectMethodInfo>();
-                    injectMethods.Add(new InjectMethodInfo(methodInfo));
-                }
-            }
-
-            // Fields, [Inject] Only
             var injectFields = default(List<FieldInfo>);
-            foreach (var fieldInfo in type.GetRuntimeFields())
-            {
-                if (fieldInfo.IsDefined(typeof(InjectAttribute), true))
-                {
-                    if (injectFields == null)
-                        injectFields = new List<FieldInfo>();
-                    injectFields.Add(fieldInfo);
-                }
-            }
-
-            // Properties, [Inject] only
             var injectProperties = default(List<PropertyInfo>);
-            foreach (var propertyInfo in type.GetRuntimeProperties())
+            var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+
+            while (type != null && type != typeof(object))
             {
-                if (propertyInfo.IsDefined(typeof(InjectAttribute), true))
+                // Methods, [Inject] Only
+                var methods = type.GetMethods(bindingFlags);
+                foreach (var methodInfo in methods)
                 {
-                    if (injectProperties == null)
-                        injectProperties = new List<PropertyInfo>();
-                    injectProperties.Add(propertyInfo);
+                    if (methodInfo.IsDefined(typeof(InjectAttribute), false))
+                    {
+                        if (injectMethods == null)
+                        {
+                            injectMethods = new List<InjectMethodInfo>();
+                        }
+                        else
+                        {
+                            // Skip if already exists
+                            foreach (var x in injectMethods)
+                            {
+                                if (x.MethodInfo.GetBaseDefinition() == methodInfo.GetBaseDefinition())
+                                    goto EndMethod;
+                            }
+                        }
+
+                        injectMethods.Add(new InjectMethodInfo(methodInfo));
+                    }
                 }
+                EndMethod:
+
+                // Fields, [Inject] Only
+                var fields = type.GetFields(bindingFlags);
+                foreach (var fieldInfo in fields)
+                {
+                    if (fieldInfo.IsDefined(typeof(InjectAttribute), false))
+                    {
+                        if (injectFields == null)
+                        {
+                            injectFields = new List<FieldInfo>();
+                        }
+                        else
+                        {
+                            // Skip if already exists
+                            foreach (var x in injectFields)
+                            {
+                                if (x.Name == fieldInfo.Name)
+                                    goto EndField;
+                            }
+
+                            if (injectFields.Any(x => x.Name == fieldInfo.Name))
+                            {
+                                continue;
+                            }
+                        }
+                        injectFields.Add(fieldInfo);
+                    }
+                }
+                EndField:
+
+                // Properties, [Inject] only
+                var props = type.GetProperties(bindingFlags);
+                foreach (var propertyInfo in props)
+                {
+                    if (propertyInfo.IsDefined(typeof(InjectAttribute), false))
+                    {
+                        if (injectProperties == null)
+                        {
+                            injectProperties = new List<PropertyInfo>();
+                        }
+                        else
+                        {
+                            foreach (var x in injectProperties)
+                            {
+                                if (x.Name == propertyInfo.Name)
+                                    goto EndProperty;
+                            }
+                        }
+                        injectProperties.Add(propertyInfo);
+                    }
+                }
+                EndProperty:
+
+                type = type.BaseType;
             }
 
             return new InjectTypeInfo(
@@ -271,9 +323,9 @@ namespace VContainer.Internal
                     {
                         return;
                     }
-                    
+
                     stack.Push(current);
-                    
+
                     var path = string.Join("\n",
                         stack.Take(i + 1)
                             .Reverse()
