@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "VContainer",
         "Unity.Entities",
-        "UniTask"
+        "UniTask",
+        "Unity.Collections"
     ],
     "includePlatforms": [],
     "excludePlatforms": [

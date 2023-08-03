@@ -5,7 +5,7 @@ using Unity.Entities;
 
 namespace VContainer.Unity
 {
-    public sealed class SystemInstanceProvider : IInstanceProvider
+    public sealed class SystemInstanceProvider<T> : IInstanceProvider where T : ComponentSystemBase
     {
         readonly Type systemType;
         readonly IInjector injector;
@@ -14,7 +14,7 @@ namespace VContainer.Unity
         readonly Type systemGroupType;
 
         World world;
-        ComponentSystemBase instance;
+        T instance;
 
         public SystemInstanceProvider(
             Type systemType,
@@ -37,7 +37,7 @@ namespace VContainer.Unity
 
             if (instance is null)
             {
-                instance = (ComponentSystemBase)injector.CreateInstance(resolver, customParameters);
+                instance = (T) injector.CreateInstance(resolver, customParameters);
 #if UNITY_2022_2_OR_NEWER
                 world.AddSystemManaged(instance);
 #else
