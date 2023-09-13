@@ -102,9 +102,9 @@ class ClassB
     public ClassB(IInputPort inputPort) { /* ... */ }
 }
 
-class ClassB
+class ClassC
 {
-    public ClassB(ServiceA serviceA) { /* ... */ }
+    public ClassC(ServiceA serviceA) { /* ... */ }
 }
 ```
 
@@ -201,7 +201,7 @@ builder.RegisterInstance<IInputPort>(serviceA);
 builder.RegisterInstance(serviceA)
     .As<IServiceA, IInputPort>();
 
-builder.RegisterInstance()
+builder.RegisterInstance(serviceA)
     .AsImplementedInterfaces();
 ```
 
