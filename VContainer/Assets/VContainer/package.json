@@ -8,9 +8,6 @@
   "license": "MIT",
   "documentationUrl": "https://vcontainer.hadashikick.jp/",
   "changelogUrl": "https://github.com/hadashiA/VContainer/releases",
-  "licensesUrl": "https://github.com/hadashiA/VContainer/blob/master/LICENSE",
-  "dependencies": {
-    "com.unity.nuget.mono-cecil": "1.10.1"
-  }
+  "licensesUrl": "https://github.com/hadashiA/VContainer/blob/master/LICENSE"
 }
 

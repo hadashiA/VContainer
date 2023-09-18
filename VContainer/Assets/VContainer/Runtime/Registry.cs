@@ -9,7 +9,7 @@ namespace VContainer.Internal
         [ThreadStatic]
         static IDictionary<Type, Registration> buildBuffer = new Dictionary<Type, Registration>(128);
 
-        readonly FixedTypeKeyHashtable<Registration> hashTable;
+        readonly TypeKeyHashTable2<Registration> hashTable;
 
         public static Registry Build(Registration[] registrations)
         {
@@ -40,7 +40,7 @@ namespace VContainer.Internal
                 }
             }
 
-            var hashTable = new FixedTypeKeyHashtable<Registration>(buildBuffer.ToArray());
+            var hashTable = new TypeKeyHashTable2<Registration>(buildBuffer.ToArray());
             return new Registry(hashTable);
         }
 
@@ -95,7 +95,7 @@ namespace VContainer.Internal
             }
         }
 
-        Registry(FixedTypeKeyHashtable<Registration> hashTable)
+        Registry(TypeKeyHashTable2<Registration> hashTable)
         {
             this.hashTable = hashTable;
         }

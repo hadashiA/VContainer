@@ -45,10 +45,10 @@ MonoBehaviour:
     y: 30
     width: 1896
     height: 977
-  m_MinSize: {x: 300, y: 150}
+  m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 17
+  controlID: 20
 --- !u!114 &3
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -64,9 +64,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1454.5
+    x: 1454
     y: 0
-    width: 441.5
+    width: 442
     height: 977
   m_MinSize: {x: 276, y: 71}
   m_MaxSize: {x: 4001, y: 4021}
@@ -93,7 +93,7 @@ MonoBehaviour:
     x: 0
     y: 0
     width: 354.5
-    height: 454
+    height: 459
   m_MinSize: {x: 201, y: 221}
   m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 15}
@@ -117,9 +117,9 @@ MonoBehaviour:
   m_Position:
     serializedVersion: 2
     x: 0
-    y: 454
-    width: 1454.5
-    height: 523
+    y: 459
+    width: 1454
+    height: 518
   m_MinSize: {x: 101, y: 121}
   m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 18}
@@ -128,7 +128,7 @@ MonoBehaviour:
   - {fileID: 18}
   - {fileID: 12}
   m_Selected: 1
-  m_LastSelected: 2
+  m_LastSelected: 0
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -219,12 +219,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1454.5
+    width: 1454
     height: 977
-  m_MinSize: {x: 200, y: 150}
+  m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 18
+  controlID: 21
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -244,12 +244,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1454.5
-    height: 454
+    width: 1454
+    height: 459
   m_MinSize: {x: 200, y: 50}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 19
+  controlID: 22
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -267,8 +267,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 354.5
     y: 0
-    width: 1100
-    height: 454
+    width: 1099.5
+    height: 459
   m_MinSize: {x: 202, y: 221}
   m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 16}
@@ -295,23 +295,31 @@ MonoBehaviour:
     m_Text: Test Runner
     m_Image: {fileID: 0}
     m_Tooltip: 
+    m_TextWithWhitespace: "UnityEditor.TestTools.TestRunner.TestRunnerWindow\u200B"
   m_Pos:
     serializedVersion: 2
     x: 20
-    y: 537
-    width: 1453.5
-    height: 502
+    y: 542
+    width: 1453
+    height: 497
+  m_SerializedDataModeController:
+    m_DataMode: 0
+    m_PreferredDataMode: 0
+    m_SupportedDataModes: 
+    isAutomatic: 1
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
+    m_ContainerData: []
+    m_OverlaysVisible: 1
   m_Spl:
-    ID: 147
+    ID: 179
     splitterInitialOffset: 317.5
     currentActiveSplitter: -1
     realSizes:
-    - 220
-    - 212
+    - 217.5
+    - 209.5
     relativeSizes:
     - 0.5093361
     - 0.4906639
@@ -321,7 +329,7 @@ MonoBehaviour:
     maxSizes:
     - 0
     - 0
-    lastTotalSize: 432
+    lastTotalSize: 427
     splitSize: 6
     xOffset: 0
     m_Version: 1
@@ -338,7 +346,7 @@ MonoBehaviour:
       name: VContainer
       fullName: VContainer
       resultStatus: 4
-      duration: 0.2408899
+      duration: 0.360033
       messages: One or more child tests were ignored
       output: 
       stacktrace: 
@@ -354,7 +362,7 @@ MonoBehaviour:
       name: VContainer.Tests.dll
       fullName: /Users/hadashi/dev/VContainer/VContainer/Library/ScriptAssemblies/VContainer.Tests.dll
       resultStatus: 4
-      duration: 0.2363806
+      duration: 0.3570393
       messages: One or more child tests were ignored
       output: 
       stacktrace: 
@@ -366,11 +374,11 @@ MonoBehaviour:
       parentId: 1004
       parentUniqueId: '[VContainer][suite]'
     - id: 1118
-      uniqueId: VContainer.Tests.dll/[VContainer][suite]
+      uniqueId: 'VContainer.Tests.dll/[VContainer][suite]'
       name: VContainer
       fullName: VContainer
       resultStatus: 4
-      duration: 0.2355624
+      duration: 0.354973
       messages: One or more child tests were ignored
       output: 
       stacktrace: 
@@ -382,11 +390,11 @@ MonoBehaviour:
       parentId: 1117
       parentUniqueId: '[VContainer.Tests.dll][suite]'
     - id: 1119
-      uniqueId: VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
       name: Tests
       fullName: VContainer.Tests
       resultStatus: 4
-      duration: 0.2349119
+      duration: 0.3528904
       messages: One or more child tests were ignored
       output: 
       stacktrace: 
@@ -396,13 +404,46 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1118
-      parentUniqueId: VContainer.Tests.dll/[VContainer][suite]
+      parentUniqueId: 'VContainer.Tests.dll/[VContainer][suite]'
+    - id: 1003
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.BaseClassPrivateMemberTest][suite]'
+      name: BaseClassPrivateMemberTest
+      fullName: VContainer.Tests.BaseClassPrivateMemberTest
+      resultStatus: 1
+      duration: 0.0029571
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1125
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
+    - id: 1004
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/BaseClassPrivateMemberTest/[VContainer.Tests][VContainer.Tests.BaseClassPrivateMemberTest.BaseClassPrivateMemberInject]'
+      name: BaseClassPrivateMemberInject
+      fullName: VContainer.Tests.BaseClassPrivateMemberTest.BaseClassPrivateMemberInject
+      resultStatus: 1
+      duration: 0.0002354
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1003
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.BaseClassPrivateMemberTest][suite]'
     - id: 1007
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.CappedArrayPoolTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.CappedArrayPoolTest][suite]'
       name: CappedArrayPoolTest
       fullName: VContainer.Tests.CappedArrayPoolTest
       resultStatus: 1
-      duration: 0.0126954
+      duration: 0.0065628
       messages: 
       output: 
       stacktrace: 
@@ -412,13 +453,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1119
-      parentUniqueId: VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]
-    - id: 1008
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/CappedArrayPoolTest/[VContainer.Tests][VContainer.Tests.CappedArrayPoolTest.RentWithExpandBucket]
-      name: RentWithExpandBucket
-      fullName: VContainer.Tests.CappedArrayPoolTest.RentWithExpandBucket
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
+    - id: 1007
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/CappedArrayPoolTest/[VContainer.Tests][VContainer.Tests.CappedArrayPoolTest.Rent_ExpandBucket]'
+      name: Rent_ExpandBucket
+      fullName: VContainer.Tests.CappedArrayPoolTest.Rent_ExpandBucket
       resultStatus: 1
-      duration: 0.0064268
+      duration: 0.0000547
       messages: 
       output: 
       stacktrace: 
@@ -428,14 +469,31 @@ MonoBehaviour:
       isSuite: 0
       categories:
       - Uncategorized
-      parentId: 1007
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.CappedArrayPoolTest][suite]
+      parentId: 1005
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.CappedArrayPoolTest][suite]'
+    - id: 1006
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/CappedArrayPoolTest/[VContainer.Tests][VContainer.Tests.CappedArrayPoolTest.Return_ClearElements]'
+      name: Return_ClearElements
+      fullName: VContainer.Tests.CappedArrayPoolTest.Return_ClearElements
+      resultStatus: 1
+      duration: 0.0000307
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1005
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.CappedArrayPoolTest][suite]'
     - id: 1009
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
       name: ContainerTest
       fullName: VContainer.Tests.ContainerTest
       resultStatus: 1
-      duration: 0.0255678
+      duration: 0.0078257
       messages: 
       output: 
       stacktrace: 
@@ -445,13 +503,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1119
-      parentUniqueId: VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
     - id: 1031
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.CircularDependency]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.CircularDependency]'
       name: CircularDependency
       fullName: VContainer.Tests.ContainerTest.CircularDependency
       resultStatus: 1
-      duration: 0.0068164
+      duration: 0.0001067
       messages: 
       output: 
       stacktrace: 
@@ -462,13 +520,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1033
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.CircularDependencyMsg]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.CircularDependencyMsg]'
       name: CircularDependencyMsg
       fullName: VContainer.Tests.ContainerTest.CircularDependencyMsg
       resultStatus: 1
-      duration: 0.0021124
+      duration: 0.0000814
       messages: 
       output: 
       stacktrace: 
@@ -479,13 +537,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1032
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.CircularDependencyWithAbstract]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.CircularDependencyWithAbstract]'
       name: CircularDependencyWithAbstract
       fullName: VContainer.Tests.ContainerTest.CircularDependencyWithAbstract
       resultStatus: 1
-      duration: 0.0003186
+      duration: 0.0000694
       messages: 
       output: 
       stacktrace: 
@@ -496,13 +554,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1030
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ErrorMessageIncludesDependency]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ErrorMessageIncludesDependency]'
       name: ErrorMessageIncludesDependency
       fullName: VContainer.Tests.ContainerTest.ErrorMessageIncludesDependency
       resultStatus: 1
-      duration: 0.0018457
+      duration: 0.0001357
       messages: 
       output: 
       stacktrace: 
@@ -513,13 +571,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1034
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.Inject]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.Inject]'
       name: Inject
       fullName: VContainer.Tests.ContainerTest.Inject
       resultStatus: 1
-      duration: 0.0007838
+      duration: 0.0000424
       messages: 
       output: 
       stacktrace: 
@@ -530,13 +588,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1023
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterFromFunc]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterFromFunc]'
       name: RegisterFromFunc
       fullName: VContainer.Tests.ContainerTest.RegisterFromFunc
       resultStatus: 1
-      duration: 0.0003271
+      duration: 0.0000316
       messages: 
       output: 
       stacktrace: 
@@ -547,13 +605,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1025
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterFromFuncWithDisposable]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterFromFuncWithDisposable]'
       name: RegisterFromFuncWithDisposable
       fullName: VContainer.Tests.ContainerTest.RegisterFromFuncWithDisposable
       resultStatus: 1
-      duration: 0.0007213
+      duration: 0.0000318
       messages: 
       output: 
       stacktrace: 
@@ -564,13 +622,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1024
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterFromFuncWithInterface]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterFromFuncWithInterface]'
       name: RegisterFromFuncWithInterface
       fullName: VContainer.Tests.ContainerTest.RegisterFromFuncWithInterface
       resultStatus: 1
-      duration: 0.0001779
+      duration: 0.000039
       messages: 
       output: 
       stacktrace: 
@@ -581,13 +639,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1021
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterInstance]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterInstance]'
       name: RegisterInstance
       fullName: VContainer.Tests.ContainerTest.RegisterInstance
       resultStatus: 1
-      duration: 0.0003148
+      duration: 0.0000413
       messages: 
       output: 
       stacktrace: 
@@ -598,13 +656,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1022
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterInstanceWithEnum]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterInstanceWithEnum]'
       name: RegisterInstanceWithEnum
       fullName: VContainer.Tests.ContainerTest.RegisterInstanceWithEnum
       resultStatus: 1
-      duration: 0.0007022
+      duration: 0.0000292
       messages: 
       output: 
       stacktrace: 
@@ -615,13 +673,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1029
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterInvalidInterface]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterInvalidInterface]'
       name: RegisterInvalidInterface
       fullName: VContainer.Tests.ContainerTest.RegisterInvalidInterface
       resultStatus: 1
-      duration: 0.000105
+      duration: 0.0000303
       messages: 
       output: 
       stacktrace: 
@@ -632,13 +690,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1026
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterMultipleDisposables]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterMultipleDisposables]'
       name: RegisterMultipleDisposables
       fullName: VContainer.Tests.ContainerTest.RegisterMultipleDisposables
       resultStatus: 1
-      duration: 0.0016188
+      duration: 0.0000466
       messages: 
       output: 
       stacktrace: 
@@ -649,13 +707,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1028
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterSystem]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterSystem]'
       name: RegisterSystem
       fullName: VContainer.Tests.ContainerTest.RegisterSystem
       resultStatus: 1
-      duration: 0.0001088
+      duration: 0.000023
       messages: 
       output: 
       stacktrace: 
@@ -666,13 +724,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1027
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterWithParameter]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.RegisterWithParameter]'
       name: RegisterWithParameter
       fullName: VContainer.Tests.ContainerTest.RegisterWithParameter
       resultStatus: 1
-      duration: 0.0004476
+      duration: 0.0000506
       messages: 
       output: 
       stacktrace: 
@@ -683,13 +741,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1016
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveAllInjectableFeatures]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveAllInjectableFeatures]'
       name: ResolveAllInjectableFeatures
       fullName: VContainer.Tests.ContainerTest.ResolveAllInjectableFeatures
       resultStatus: 1
-      duration: 0.0007996
+      duration: 0.0000833
       messages: 
       output: 
       stacktrace: 
@@ -700,13 +758,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1013
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveAsInterfaces]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveAsInterfaces]'
       name: ResolveAsInterfaces
       fullName: VContainer.Tests.ContainerTest.ResolveAsInterfaces
       resultStatus: 1
-      duration: 0.0001826
+      duration: 0.0000434
       messages: 
       output: 
       stacktrace: 
@@ -717,13 +775,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1014
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveAsInterfacesAndSelf]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveAsInterfacesAndSelf]'
       name: ResolveAsInterfacesAndSelf
       fullName: VContainer.Tests.ContainerTest.ResolveAsInterfacesAndSelf
       resultStatus: 1
-      duration: 0.0001648
+      duration: 0.0000419
       messages: 
       output: 
       stacktrace: 
@@ -734,13 +792,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1017
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveCollection]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveCollection]'
       name: ResolveCollection
       fullName: VContainer.Tests.ContainerTest.ResolveCollection
       resultStatus: 1
-      duration: 0.0009985
+      duration: 0.0000541
       messages: 
       output: 
       stacktrace: 
@@ -751,13 +809,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1015
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveDependencies]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveDependencies]'
       name: ResolveDependencies
       fullName: VContainer.Tests.ContainerTest.ResolveDependencies
       resultStatus: 1
-      duration: 0.0001669
+      duration: 0.0000529
       messages: 
       output: 
       stacktrace: 
@@ -768,13 +826,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1020
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveGenerics]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveGenerics]'
       name: ResolveGenerics
       fullName: VContainer.Tests.ContainerTest.ResolveGenerics
       resultStatus: 1
-      duration: 0.0002185
+      duration: 0.0000372
       messages: 
       output: 
       stacktrace: 
@@ -785,13 +843,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1018
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveLastOneWhenConflicted]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveLastOneWhenConflicted]'
       name: ResolveLastOneWhenConflicted
       fullName: VContainer.Tests.ContainerTest.ResolveLastOneWhenConflicted
       resultStatus: 1
-      duration: 0.0001206
+      duration: 0.000034
       messages: 
       output: 
       stacktrace: 
@@ -802,13 +860,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1019
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveOnceAsCollection]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveOnceAsCollection]'
       name: ResolveOnceAsCollection
       fullName: VContainer.Tests.ContainerTest.ResolveOnceAsCollection
       resultStatus: 1
-      duration: 0.0005773
+      duration: 0.0000462
       messages: 
       output: 
       stacktrace: 
@@ -819,13 +877,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1012
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveScoped]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveScoped]'
       name: ResolveScoped
       fullName: VContainer.Tests.ContainerTest.ResolveScoped
       resultStatus: 1
-      duration: 0.0001022
+      duration: 0.0000271
       messages: 
       output: 
       stacktrace: 
@@ -836,13 +894,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1011
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveSingleton]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveSingleton]'
       name: ResolveSingleton
       fullName: VContainer.Tests.ContainerTest.ResolveSingleton
       resultStatus: 1
-      duration: 0.0000925
+      duration: 0.0000271
       messages: 
       output: 
       stacktrace: 
@@ -853,13 +911,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1010
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveTransient]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ContainerTest/[VContainer.Tests][VContainer.Tests.ContainerTest.ResolveTransient]'
       name: ResolveTransient
       fullName: VContainer.Tests.ContainerTest.ResolveTransient
       resultStatus: 1
-      duration: 0.0009004
+      duration: 0.0000326
       messages: 
       output: 
       stacktrace: 
@@ -870,13 +928,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1009
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ContainerTest][suite]'
     - id: 1035
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.FactoryTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.FactoryTest][suite]'
       name: FactoryTest
       fullName: VContainer.Tests.FactoryTest
       resultStatus: 1
-      duration: 0.0067404
+      duration: 0.0082478
       messages: 
       output: 
       stacktrace: 
@@ -886,13 +944,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1119
-      parentUniqueId: VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
     - id: 1038
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/FactoryTest/[VContainer.Tests][VContainer.Tests.FactoryTest.RegisterFactoryWithContainerScoped]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/FactoryTest/[VContainer.Tests][VContainer.Tests.FactoryTest.RegisterFactoryWithContainerScoped]'
       name: RegisterFactoryWithContainerScoped
       fullName: VContainer.Tests.FactoryTest.RegisterFactoryWithContainerScoped
       resultStatus: 1
-      duration: 0.0015779
+      duration: 0.0001696
       messages: 
       output: 
       stacktrace: 
@@ -903,13 +961,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1035
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.FactoryTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.FactoryTest][suite]'
     - id: 1037
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/FactoryTest/[VContainer.Tests][VContainer.Tests.FactoryTest.RegisterFactoryWithContainerTransient]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/FactoryTest/[VContainer.Tests][VContainer.Tests.FactoryTest.RegisterFactoryWithContainerTransient]'
       name: RegisterFactoryWithContainerTransient
       fullName: VContainer.Tests.FactoryTest.RegisterFactoryWithContainerTransient
       resultStatus: 1
-      duration: 0.0008544
+      duration: 0.0001186
       messages: 
       output: 
       stacktrace: 
@@ -920,13 +978,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1035
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.FactoryTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.FactoryTest][suite]'
     - id: 1036
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/FactoryTest/[VContainer.Tests][VContainer.Tests.FactoryTest.RegisterFactoryWithParams]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/FactoryTest/[VContainer.Tests][VContainer.Tests.FactoryTest.RegisterFactoryWithParams]'
       name: RegisterFactoryWithParams
       fullName: VContainer.Tests.FactoryTest.RegisterFactoryWithParams
       resultStatus: 1
-      duration: 0.0005552
+      duration: 0.0000664
       messages: 
       output: 
       stacktrace: 
@@ -937,13 +995,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1035
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.FactoryTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.FactoryTest][suite]'
     - id: 1039
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
       name: ScopedContainerTest
       fullName: VContainer.Tests.ScopedContainerTest
       resultStatus: 1
-      duration: 0.0074382
+      duration: 0.0060763
       messages: 
       output: 
       stacktrace: 
@@ -953,13 +1011,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1119
-      parentUniqueId: VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
     - id: 1040
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScope]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScope]'
       name: CreateScope
       fullName: VContainer.Tests.ScopedContainerTest.CreateScope
       resultStatus: 1
-      duration: 0.0003839
+      duration: 0.0000967
       messages: 
       output: 
       stacktrace: 
@@ -970,13 +1028,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1041
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScopeAndRegister]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScopeAndRegister]'
       name: CreateScopeAndRegister
       fullName: VContainer.Tests.ScopedContainerTest.CreateScopeAndRegister
       resultStatus: 1
-      duration: 0.0002485
+      duration: 0.0001042
       messages: 
       output: 
       stacktrace: 
@@ -987,13 +1045,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1044
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScopeWithRegisterOnlyInterfaces]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScopeWithRegisterOnlyInterfaces]'
       name: CreateScopeWithRegisterOnlyInterfaces
       fullName: VContainer.Tests.ScopedContainerTest.CreateScopeWithRegisterOnlyInterfaces
       resultStatus: 1
-      duration: 0.0002049
+      duration: 0.0000646
       messages: 
       output: 
       stacktrace: 
@@ -1004,13 +1062,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1043
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScopeWithRegisterSingleton]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScopeWithRegisterSingleton]'
       name: CreateScopeWithRegisterSingleton
       fullName: VContainer.Tests.ScopedContainerTest.CreateScopeWithRegisterSingleton
       resultStatus: 1
-      duration: 0.000351
+      duration: 0.0000914
       messages: 
       output: 
       stacktrace: 
@@ -1021,13 +1079,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1042
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScopeWithResolveSingleton]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.CreateScopeWithResolveSingleton]'
       name: CreateScopeWithResolveSingleton
       fullName: VContainer.Tests.ScopedContainerTest.CreateScopeWithResolveSingleton
       resultStatus: 1
-      duration: 0.0001603
+      duration: 0.0000392
       messages: 
       output: 
       stacktrace: 
@@ -1038,13 +1096,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1049
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.Inject]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.Inject]'
       name: Inject
       fullName: VContainer.Tests.ScopedContainerTest.Inject
       resultStatus: 1
-      duration: 0.000196
+      duration: 0.0000462
       messages: 
       output: 
       stacktrace: 
@@ -1055,13 +1113,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1050
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.InstanceRegistrationDoesNotDisposal]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.InstanceRegistrationDoesNotDisposal]'
       name: InstanceRegistrationDoesNotDisposal
       fullName: VContainer.Tests.ScopedContainerTest.InstanceRegistrationDoesNotDisposal
       resultStatus: 1
-      duration: 0.0001171
+      duration: 0.0000345
       messages: 
       output: 
       stacktrace: 
@@ -1072,13 +1130,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1048
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.ResolveCollectionByLazyInstance]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.ResolveCollectionByLazyInstance]'
       name: ResolveCollectionByLazyInstance
       fullName: VContainer.Tests.ScopedContainerTest.ResolveCollectionByLazyInstance
       resultStatus: 1
-      duration: 0.00034
+      duration: 0.0000664
       messages: 
       output: 
       stacktrace: 
@@ -1089,13 +1147,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1046
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.ResolveCollectionFromParent]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.ResolveCollectionFromParent]'
       name: ResolveCollectionFromParent
       fullName: VContainer.Tests.ScopedContainerTest.ResolveCollectionFromParent
       resultStatus: 1
-      duration: 0.0001237
+      duration: 0.0000635
       messages: 
       output: 
       stacktrace: 
@@ -1106,13 +1164,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1047
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.ResolveCollectionFromParentByContinuous]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.ResolveCollectionFromParentByContinuous]'
       name: ResolveCollectionFromParentByContinuous
       fullName: VContainer.Tests.ScopedContainerTest.ResolveCollectionFromParentByContinuous
       resultStatus: 1
-      duration: 0.0002057
+      duration: 0.0000503
       messages: 
       output: 
       stacktrace: 
@@ -1123,13 +1181,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1045
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.ResolveFromParent]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/ScopedContainerTest/[VContainer.Tests][VContainer.Tests.ScopedContainerTest.ResolveFromParent]'
       name: ResolveFromParent
       fullName: VContainer.Tests.ScopedContainerTest.ResolveFromParent
       resultStatus: 1
-      duration: 0.000109
+      duration: 0.0000446
       messages: 
       output: 
       stacktrace: 
@@ -1140,13 +1198,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1039
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.ScopedContainerTest][suite]'
     - id: 1051
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]'
       name: TypeAnalyzerTest
       fullName: VContainer.Tests.TypeAnalyzerTest
       resultStatus: 1
-      duration: 0.0073496
+      duration: 0.0052064
       messages: 
       output: 
       stacktrace: 
@@ -1156,13 +1214,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1119
-      parentUniqueId: VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
     - id: 1054
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeAttributeConstructor]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeAttributeConstructor]'
       name: AnalyzeAttributeConstructor
       fullName: VContainer.Tests.TypeAnalyzerTest.AnalyzeAttributeConstructor
       resultStatus: 1
-      duration: 0.0003595
+      duration: 0.0000752
       messages: 
       output: 
       stacktrace: 
@@ -1173,13 +1231,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1051
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]'
     - id: 1055
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeCombinedConstructor]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeCombinedConstructor]'
       name: AnalyzeCombinedConstructor
       fullName: VContainer.Tests.TypeAnalyzerTest.AnalyzeCombinedConstructor
       resultStatus: 1
-      duration: 0.0000946
+      duration: 0.0000463
       messages: 
       output: 
       stacktrace: 
@@ -1190,13 +1248,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1051
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]'
     - id: 1056
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeDuplicateAttributeConstructor]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeDuplicateAttributeConstructor]'
       name: AnalyzeDuplicateAttributeConstructor
       fullName: VContainer.Tests.TypeAnalyzerTest.AnalyzeDuplicateAttributeConstructor
       resultStatus: 1
-      duration: 0.0001287
+      duration: 0.0000512
       messages: 
       output: 
       stacktrace: 
@@ -1207,13 +1265,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1051
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]'
     - id: 1053
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeNoAttributeConstructor]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeNoAttributeConstructor]'
       name: AnalyzeNoAttributeConstructor
       fullName: VContainer.Tests.TypeAnalyzerTest.AnalyzeNoAttributeConstructor
       resultStatus: 1
-      duration: 0.0000683
+      duration: 0.0000323
       messages: 
       output: 
       stacktrace: 
@@ -1224,13 +1282,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1051
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]'
     - id: 1052
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeNoConstructor]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeNoConstructor]'
       name: AnalyzeNoConstructor
       fullName: VContainer.Tests.TypeAnalyzerTest.AnalyzeNoConstructor
       resultStatus: 1
-      duration: 0.0000611
+      duration: 0.0000236
       messages: 
       output: 
       stacktrace: 
@@ -1241,13 +1299,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1051
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]'
     - id: 1057
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeStaticConstructor]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/TypeAnalyzerTest/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest.AnalyzeStaticConstructor]'
       name: AnalyzeStaticConstructor
       fullName: VContainer.Tests.TypeAnalyzerTest.AnalyzeStaticConstructor
       resultStatus: 1
-      duration: 0.000066
+      duration: 0.0000289
       messages: 
       output: 
       stacktrace: 
@@ -1258,13 +1316,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1051
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.TypeAnalyzerTest][suite]'
     - id: 1120
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
       name: Unity
       fullName: VContainer.Tests.Unity
       resultStatus: 4
-      duration: 0.1735695
+      duration: 0.3078907
       messages: One or more child tests were ignored
       output: 
       stacktrace: 
@@ -1274,13 +1332,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1119
-      parentUniqueId: VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
     - id: 1058
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
       name: EntryPointTest
       fullName: VContainer.Tests.Unity.EntryPointTest
       resultStatus: 1
-      duration: 0.1049058
+      duration: 0.1845785
       messages: 
       output: 
       stacktrace: 
@@ -1290,13 +1348,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1059
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.Create]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.Create]'
       name: Create
       fullName: VContainer.Tests.Unity.EntryPointTest.Create
       resultStatus: 1
-      duration: 0.0497846
+      duration: 0.0513236
       messages: 
       output: 
       stacktrace: 
@@ -1307,13 +1365,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1068
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.FromParent_LifetimeScoped]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.FromParent_LifetimeScoped]'
       name: FromParent_LifetimeScoped
       fullName: VContainer.Tests.Unity.EntryPointTest.FromParent_LifetimeScoped
       resultStatus: 1
-      duration: 0.0084045
+      duration: 0.0143333
       messages: 
       output: 
       stacktrace: 
@@ -1324,13 +1382,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1060
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.InitializeExceptionHandler]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.InitializeExceptionHandler]'
       name: InitializeExceptionHandler
       fullName: VContainer.Tests.Unity.EntryPointTest.InitializeExceptionHandler
       resultStatus: 1
-      duration: 0.0054285
+      duration: 0.0156846
       messages: 
       output: 
       stacktrace: 
@@ -1341,13 +1399,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1066
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.LateTickableExceptionHandler]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.LateTickableExceptionHandler]'
       name: LateTickableExceptionHandler
       fullName: VContainer.Tests.Unity.EntryPointTest.LateTickableExceptionHandler
       resultStatus: 1
-      duration: 0.0054411
+      duration: 0.0116979
       messages: 
       output: 
       stacktrace: 
@@ -1358,13 +1416,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1061
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.PostInitializeExceptionHandler]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.PostInitializeExceptionHandler]'
       name: PostInitializeExceptionHandler
       fullName: VContainer.Tests.Unity.EntryPointTest.PostInitializeExceptionHandler
       resultStatus: 1
-      duration: 0.0067377
+      duration: 0.0170173
       messages: 
       output: 
       stacktrace: 
@@ -1375,13 +1433,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1067
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.PostLateTickableExceptionHandler]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.PostLateTickableExceptionHandler]'
       name: PostLateTickableExceptionHandler
       fullName: VContainer.Tests.Unity.EntryPointTest.PostLateTickableExceptionHandler
       resultStatus: 1
-      duration: 0.0065479
+      duration: 0.0137638
       messages: 
       output: 
       stacktrace: 
@@ -1392,13 +1450,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1063
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.PostStartableExceptionHandler]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.PostStartableExceptionHandler]'
       name: PostStartableExceptionHandler
       fullName: VContainer.Tests.Unity.EntryPointTest.PostStartableExceptionHandler
       resultStatus: 1
-      duration: 0.0065426
+      duration: 0.0150329
       messages: 
       output: 
       stacktrace: 
@@ -1409,13 +1467,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1065
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.PostTickableExceptionHandler]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.PostTickableExceptionHandler]'
       name: PostTickableExceptionHandler
       fullName: VContainer.Tests.Unity.EntryPointTest.PostTickableExceptionHandler
       resultStatus: 1
-      duration: 0.0042529
+      duration: 0.0145009
       messages: 
       output: 
       stacktrace: 
@@ -1426,13 +1484,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1062
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.StartableExceptionHandler]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.StartableExceptionHandler]'
       name: StartableExceptionHandler
       fullName: VContainer.Tests.Unity.EntryPointTest.StartableExceptionHandler
       resultStatus: 1
-      duration: 0.0043271
+      duration: 0.0140753
       messages: 
       output: 
       stacktrace: 
@@ -1443,13 +1501,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1064
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.TickableExceptionHandler]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/EntryPointTest/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest.TickableExceptionHandler]'
       name: TickableExceptionHandler
       fullName: VContainer.Tests.Unity.EntryPointTest.TickableExceptionHandler
       resultStatus: 1
-      duration: 0.0054477
+      duration: 0.0140618
       messages: 
       output: 
       stacktrace: 
@@ -1460,13 +1518,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1058
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.EntryPointTest][suite]'
     - id: 1069
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
       name: LifetimeScopeTest
       fullName: VContainer.Tests.Unity.LifetimeScopeTest
       resultStatus: 4
-      duration: 0.0187936
+      duration: 0.0403264
       messages: One or more child tests were ignored
       output: 
       stacktrace: 
@@ -1476,13 +1534,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1071
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.Create]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.Create]'
       name: Create
       fullName: VContainer.Tests.Unity.LifetimeScopeTest.Create
       resultStatus: 1
-      duration: 0.0032945
+      duration: 0.0120643
       messages: 
       output: 
       stacktrace: 
@@ -1493,13 +1551,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1069
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
     - id: 1072
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.CreateChild]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.CreateChild]'
       name: CreateChild
       fullName: VContainer.Tests.Unity.LifetimeScopeTest.CreateChild
       resultStatus: 1
-      duration: 0.0074373
+      duration: 0.0202193
       messages: 
       output: 
       stacktrace: 
@@ -1510,13 +1568,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1069
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
     - id: 1073
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.CreateChildFromPrefab]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.CreateChildFromPrefab]'
       name: CreateChildFromPrefab
       fullName: VContainer.Tests.Unity.LifetimeScopeTest.CreateChildFromPrefab
       resultStatus: 1
-      duration: 0.0014176
+      duration: 0.0004633
       messages: 
       output: 
       stacktrace: 
@@ -1527,13 +1585,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1069
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
     - id: 1074
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.CreateChildFromPrefabWithInActive]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.CreateChildFromPrefabWithInActive]'
       name: CreateChildFromPrefabWithInActive
       fullName: VContainer.Tests.Unity.LifetimeScopeTest.CreateChildFromPrefabWithInActive
       resultStatus: 1
-      duration: 0.0005958
+      duration: 0.0003498
       messages: 
       output: 
       stacktrace: 
@@ -1544,13 +1602,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1069
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
     - id: 1075
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.CreateScopeWithSingleton]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.CreateScopeWithSingleton]'
       name: CreateScopeWithSingleton
       fullName: VContainer.Tests.Unity.LifetimeScopeTest.CreateScopeWithSingleton
       resultStatus: 1
-      duration: 0.0003935
+      duration: 0.0002398
       messages: 
       output: 
       stacktrace: 
@@ -1561,13 +1619,30 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1069
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
+    - id: 1080
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.EnqueueExtraInstaller]'
+      name: EnqueueExtraInstaller
+      fullName: VContainer.Tests.Unity.LifetimeScopeTest.EnqueueExtraInstaller
+      resultStatus: 1
+      duration: 0.0004316
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1072
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
     - id: 1070
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.EnqueueParent]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.EnqueueParent]'
       name: EnqueueParent
       fullName: VContainer.Tests.Unity.LifetimeScopeTest.EnqueueParent
       resultStatus: 1
-      duration: 0.0005166
+      duration: 0.0002959
       messages: 
       output: 
       stacktrace: 
@@ -1578,13 +1653,30 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1069
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]
-    - id: 1072
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.ParentTypeReference]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
+    - id: 1079
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.EnqueueParent_Multiply]'
+      name: EnqueueParent_Multiply
+      fullName: VContainer.Tests.Unity.LifetimeScopeTest.EnqueueParent_Multiply
+      resultStatus: 1
+      duration: 0.0003217
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1072
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
+    - id: 1081
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/LifetimeScopeTest/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest.ParentTypeReference]'
       name: ParentTypeReference
       fullName: VContainer.Tests.Unity.LifetimeScopeTest.ParentTypeReference
       resultStatus: 4
-      duration: 0.0001066
+      duration: 0.0000016
       messages: Resources/ will be included in the build and we want to use a different
         approch
       output: 
@@ -1595,14 +1687,14 @@ MonoBehaviour:
       isSuite: 0
       categories:
       - Uncategorized
-      parentId: 1065
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]
+      parentId: 1072
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.LifetimeScopeTest][suite]'
     - id: 1113
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+FixedTickableLoopItemTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+FixedTickableLoopItemTest][suite]'
       name: PlayerLoopItemTest+FixedTickableLoopItemTest
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+FixedTickableLoopItemTest
       resultStatus: 1
-      duration: 0.0040723
+      duration: 0.0093519
       messages: 
       output: 
       stacktrace: 
@@ -1612,13 +1704,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1114
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+FixedTickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+FixedTickableLoopItemTest.MoveNextWithoutAllocation]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+FixedTickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+FixedTickableLoopItemTest.MoveNextWithoutAllocation]'
       name: MoveNextWithoutAllocation
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+FixedTickableLoopItemTest.MoveNextWithoutAllocation
       resultStatus: 1
-      duration: 0.0015681
+      duration: 0.0000684
       messages: 
       output: 
       stacktrace: 
@@ -1629,13 +1721,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1113
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+FixedTickableLoopItemTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+FixedTickableLoopItemTest][suite]'
     - id: 1115
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostFixedTickableLoopItemTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostFixedTickableLoopItemTest][suite]'
       name: PlayerLoopItemTest+PostFixedTickableLoopItemTest
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+PostFixedTickableLoopItemTest
       resultStatus: 1
-      duration: 0.0028517
+      duration: 0.0064115
       messages: 
       output: 
       stacktrace: 
@@ -1645,13 +1737,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1116
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+PostFixedTickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostFixedTickableLoopItemTest.MoveNextWithoutAllocation]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+PostFixedTickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostFixedTickableLoopItemTest.MoveNextWithoutAllocation]'
       name: MoveNextWithoutAllocation
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+PostFixedTickableLoopItemTest.MoveNextWithoutAllocation
       resultStatus: 1
-      duration: 0.0002877
+      duration: 0.0000536
       messages: 
       output: 
       stacktrace: 
@@ -1662,13 +1754,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1115
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostFixedTickableLoopItemTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostFixedTickableLoopItemTest][suite]'
     - id: 1111
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostLateTickableLoopItemTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostLateTickableLoopItemTest][suite]'
       name: PlayerLoopItemTest+PostLateTickableLoopItemTest
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+PostLateTickableLoopItemTest
       resultStatus: 1
-      duration: 0.0026568
+      duration: 0.0092028
       messages: 
       output: 
       stacktrace: 
@@ -1678,13 +1770,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1112
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+PostLateTickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostLateTickableLoopItemTest.MoveNextWithoutAllocation]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+PostLateTickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostLateTickableLoopItemTest.MoveNextWithoutAllocation]'
       name: MoveNextWithoutAllocation
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+PostLateTickableLoopItemTest.MoveNextWithoutAllocation
       resultStatus: 1
-      duration: 0.0002478
+      duration: 0.000096
       messages: 
       output: 
       stacktrace: 
@@ -1695,13 +1787,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1111
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostLateTickableLoopItemTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostLateTickableLoopItemTest][suite]'
     - id: 1109
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostTickableLoopItemTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostTickableLoopItemTest][suite]'
       name: PlayerLoopItemTest+PostTickableLoopItemTest
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+PostTickableLoopItemTest
       resultStatus: 1
-      duration: 0.0045733
+      duration: 0.0062809
       messages: 
       output: 
       stacktrace: 
@@ -1711,13 +1803,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1110
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+PostTickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostTickableLoopItemTest.MoveNextWithoutAllocation]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+PostTickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostTickableLoopItemTest.MoveNextWithoutAllocation]'
       name: MoveNextWithoutAllocation
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+PostTickableLoopItemTest.MoveNextWithoutAllocation
       resultStatus: 1
-      duration: 0.0002766
+      duration: 0.0000848
       messages: 
       output: 
       stacktrace: 
@@ -1728,13 +1820,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1109
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostTickableLoopItemTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+PostTickableLoopItemTest][suite]'
     - id: 1107
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+TickableLoopItemTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+TickableLoopItemTest][suite]'
       name: PlayerLoopItemTest+TickableLoopItemTest
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+TickableLoopItemTest
       resultStatus: 1
-      duration: 0.0024837
+      duration: 0.011463
       messages: 
       output: 
       stacktrace: 
@@ -1744,13 +1836,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1108
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+TickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+TickableLoopItemTest.MoveNextWithoutAllocation]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopItemTest+TickableLoopItemTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+TickableLoopItemTest.MoveNextWithoutAllocation]'
       name: MoveNextWithoutAllocation
       fullName: VContainer.Tests.Unity.PlayerLoopItemTest+TickableLoopItemTest.MoveNextWithoutAllocation
       resultStatus: 1
-      duration: 0.000221
+      duration: 0.0000956
       messages: 
       output: 
       stacktrace: 
@@ -1761,13 +1853,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1107
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+TickableLoopItemTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopItemTest+TickableLoopItemTest][suite]'
     - id: 1077
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopRunnerTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopRunnerTest][suite]'
       name: PlayerLoopRunnerTest
       fullName: VContainer.Tests.Unity.PlayerLoopRunnerTest
       resultStatus: 1
-      duration: 0.0042038
+      duration: 0.008742
       messages: 
       output: 
       stacktrace: 
@@ -1777,13 +1869,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1078
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopRunnerTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopRunnerTest.Run]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/PlayerLoopRunnerTest/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopRunnerTest.Run]'
       name: Run
       fullName: VContainer.Tests.Unity.PlayerLoopRunnerTest.Run
       resultStatus: 1
-      duration: 0.0003696
+      duration: 0.0000692
       messages: 
       output: 
       stacktrace: 
@@ -1794,13 +1886,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1077
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopRunnerTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.PlayerLoopRunnerTest][suite]'
     - id: 1079
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
       name: UnityContainerBuilderTest
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest
       resultStatus: 1
-      duration: 0.0197979
+      duration: 0.0168401
       messages: 
       output: 
       stacktrace: 
@@ -1810,13 +1902,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1100
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.DispatchMonoBehaviour]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.DispatchMonoBehaviour]'
       name: DispatchMonoBehaviour
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.DispatchMonoBehaviour
       resultStatus: 1
-      duration: 0.0089968
+      duration: 0.0074218
       messages: 
       output: 
       stacktrace: 
@@ -1827,13 +1919,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1082
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponent]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponent]'
       name: RegisterComponent
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponent
       resultStatus: 1
-      duration: 0.0002583
+      duration: 0.0001306
       messages: 
       output: 
       stacktrace: 
@@ -1844,13 +1936,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1083
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentAsInterface]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentAsInterface]'
       name: RegisterComponentAsInterface
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentAsInterface
       resultStatus: 1
-      duration: 0.0001567
+      duration: 0.0000635
       messages: 
       output: 
       stacktrace: 
@@ -1861,13 +1953,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1085
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchy]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchy]'
       name: RegisterComponentInHierarchy
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchy
       resultStatus: 1
-      duration: 0.0014903
+      duration: 0.0002448
       messages: 
       output: 
       stacktrace: 
@@ -1878,13 +1970,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1086
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyAsInterfaces]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyAsInterfaces]'
       name: RegisterComponentInHierarchyAsInterfaces
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyAsInterfaces
       resultStatus: 1
-      duration: 0.0003004
+      duration: 0.000168
       messages: 
       output: 
       stacktrace: 
@@ -1895,13 +1987,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1090
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyAutoInject]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyAutoInject]'
       name: RegisterComponentInHierarchyAutoInject
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyAutoInject
       resultStatus: 1
-      duration: 0.0002984
+      duration: 0.0001345
       messages: 
       output: 
       stacktrace: 
@@ -1912,13 +2004,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1088
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyUnderInactive]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyUnderInactive]'
       name: RegisterComponentInHierarchyUnderInactive
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyUnderInactive
       resultStatus: 1
-      duration: 0.0002851
+      duration: 0.0001493
       messages: 
       output: 
       stacktrace: 
@@ -1929,13 +2021,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1087
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyUnderTransform]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyUnderTransform]'
       name: RegisterComponentInHierarchyUnderTransform
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyUnderTransform
       resultStatus: 1
-      duration: 0.0004062
+      duration: 0.000229
       messages: 
       output: 
       stacktrace: 
@@ -1946,13 +2038,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1089
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyWithBuiltinType]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyWithBuiltinType]'
       name: RegisterComponentInHierarchyWithBuiltinType
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInHierarchyWithBuiltinType
       resultStatus: 1
-      duration: 0.0004742
+      duration: 0.0001551
       messages: 
       output: 
       stacktrace: 
@@ -1963,13 +2055,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1093
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefab]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefab]'
       name: RegisterComponentInNewPrefab
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefab
       resultStatus: 1
-      duration: 0.0004995
+      duration: 0.0001075
       messages: 
       output: 
       stacktrace: 
@@ -1980,13 +2072,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1098
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefab_DontDestroyOnLoad]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefab_DontDestroyOnLoad]'
       name: RegisterComponentInNewPrefab_DontDestroyOnLoad
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefab_DontDestroyOnLoad
       resultStatus: 1
-      duration: 0.0002619
+      duration: 0.0000555
       messages: 
       output: 
       stacktrace: 
@@ -1997,13 +2089,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1094
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabScoped]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabScoped]'
       name: RegisterComponentInNewPrefabScoped
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabScoped
       resultStatus: 1
-      duration: 0.0002032
+      duration: 0.0000599
       messages: 
       output: 
       stacktrace: 
@@ -2014,13 +2106,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1095
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithAwake]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithAwake]'
       name: RegisterComponentInNewPrefabWithAwake
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithAwake
       resultStatus: 1
-      duration: 0.0001881
+      duration: 0.0000547
       messages: 
       output: 
       stacktrace: 
@@ -2031,13 +2123,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1097
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithFailedResolve]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithFailedResolve]'
       name: RegisterComponentInNewPrefabWithFailedResolve
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithFailedResolve
       resultStatus: 1
-      duration: 0.0002345
+      duration: 0.0001027
       messages: 
       output: 
       stacktrace: 
@@ -2048,13 +2140,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1096
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithInActive]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithInActive]'
       name: RegisterComponentInNewPrefabWithInActive
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentInNewPrefabWithInActive
       resultStatus: 1
-      duration: 0.000179
+      duration: 0.000053
       messages: 
       output: 
       stacktrace: 
@@ -2065,13 +2157,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1091
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentOnNewGameObject]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentOnNewGameObject]'
       name: RegisterComponentOnNewGameObject
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentOnNewGameObject
       resultStatus: 1
-      duration: 0.0003249
+      duration: 0.0000515
       messages: 
       output: 
       stacktrace: 
@@ -2082,13 +2174,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1092
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentOnNewGameObjectUnderTransform]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentOnNewGameObjectUnderTransform]'
       name: RegisterComponentOnNewGameObjectUnderTransform
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentOnNewGameObjectUnderTransform
       resultStatus: 1
-      duration: 0.0002234
+      duration: 0.000081
       messages: 
       output: 
       stacktrace: 
@@ -2099,13 +2191,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1084
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentWithAutoInjection]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentWithAutoInjection]'
       name: RegisterComponentWithAutoInjection
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterComponentWithAutoInjection
       resultStatus: 1
-      duration: 0.0001017
+      duration: 0.0000393
       messages: 
       output: 
       stacktrace: 
@@ -2116,13 +2208,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1080
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterEntryPoint]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterEntryPoint]'
       name: RegisterEntryPoint
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterEntryPoint
       resultStatus: 1
-      duration: 0.0003667
+      duration: 0.0001308
       messages: 
       output: 
       stacktrace: 
@@ -2133,13 +2225,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1081
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterEntryPointMultiple]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterEntryPointMultiple]'
       name: RegisterEntryPointMultiple
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.RegisterEntryPointMultiple
       resultStatus: 1
-      duration: 0.0004295
+      duration: 0.0001257
       messages: 
       output: 
       stacktrace: 
@@ -2150,13 +2242,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1099
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.UseComponentsWithParentTransform]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityContainerBuilderTest/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest.UseComponentsWithParentTransform]'
       name: UseComponentsWithParentTransform
       fullName: VContainer.Tests.Unity.UnityContainerBuilderTest.UseComponentsWithParentTransform
       resultStatus: 1
-      duration: 0.000788
+      duration: 0.0001787
       messages: 
       output: 
       stacktrace: 
@@ -2167,13 +2259,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1079
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityContainerBuilderTest][suite]'
     - id: 1101
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]'
       name: UnityObjectResolverTest
       fullName: VContainer.Tests.Unity.UnityObjectResolverTest
       resultStatus: 1
-      duration: 0.0056992
+      duration: 0.0081656
       messages: 
       output: 
       stacktrace: 
@@ -2183,13 +2275,13 @@ MonoBehaviour:
       isSuite: 1
       categories: []
       parentId: 1120
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.Unity][suite]'
     - id: 1102
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObject]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObject]'
       name: InjectGameObject
       fullName: VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObject
       resultStatus: 1
-      duration: 0.0003681
+      duration: 0.0001073
       messages: 
       output: 
       stacktrace: 
@@ -2200,13 +2292,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1101
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]'
     - id: 1103
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObjectAllMonoBehaviour]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObjectAllMonoBehaviour]'
       name: InjectGameObjectAllMonoBehaviour
       fullName: VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObjectAllMonoBehaviour
       resultStatus: 1
-      duration: 0.0001599
+      duration: 0.0000682
       messages: 
       output: 
       stacktrace: 
@@ -2217,13 +2309,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1101
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]'
     - id: 1104
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObjectWithChildren]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObjectWithChildren]'
       name: InjectGameObjectWithChildren
       fullName: VContainer.Tests.Unity.UnityObjectResolverTest.InjectGameObjectWithChildren
       resultStatus: 1
-      duration: 0.0001878
+      duration: 0.0000824
       messages: 
       output: 
       stacktrace: 
@@ -2234,13 +2326,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1101
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]'
     - id: 1106
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InstantiateGameObject]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InstantiateGameObject]'
       name: InstantiateGameObject
       fullName: VContainer.Tests.Unity.UnityObjectResolverTest.InstantiateGameObject
       resultStatus: 1
-      duration: 0.0016018
+      duration: 0.0001638
       messages: 
       output: 
       stacktrace: 
@@ -2251,13 +2343,13 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1101
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]'
     - id: 1105
-      uniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InstantiateMonoBehaviour]
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.InstantiateMonoBehaviour]'
       name: InstantiateMonoBehaviour
       fullName: VContainer.Tests.Unity.UnityObjectResolverTest.InstantiateMonoBehaviour
       resultStatus: 1
-      duration: 0.0004746
+      duration: 0.0001777
       messages: 
       output: 
       stacktrace: 
@@ -2268,8 +2360,92 @@ MonoBehaviour:
       categories:
       - Uncategorized
       parentId: 1101
-      parentUniqueId: VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]
-    m_ResultText: 'VContainer (0.241s)
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]'
+    - id: 1112
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/UnityObjectResolverTest/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest.ReenterInjectGameObject]'
+      name: ReenterInjectGameObject
+      fullName: VContainer.Tests.Unity.UnityObjectResolverTest.ReenterInjectGameObject
+      resultStatus: 1
+      duration: 0.0000734
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1106
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/Unity/[VContainer.Tests][VContainer.Tests.Unity.UnityObjectResolverTest][suite]'
+    - id: 1057
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.VirtualMemberTest][suite]'
+      name: VirtualMemberTest
+      fullName: VContainer.Tests.VirtualMemberTest
+      resultStatus: 1
+      duration: 0.0051684
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1125
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/[VContainer.Tests][VContainer.Tests][suite]'
+    - id: 1060
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/VirtualMemberTest/[VContainer.Tests][VContainer.Tests.VirtualMemberTest.SubClassOverrideWithInjectAttribute]'
+      name: SubClassOverrideWithInjectAttribute
+      fullName: VContainer.Tests.VirtualMemberTest.SubClassOverrideWithInjectAttribute
+      resultStatus: 1
+      duration: 0.0000712
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1057
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.VirtualMemberTest][suite]'
+    - id: 1059
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/VirtualMemberTest/[VContainer.Tests][VContainer.Tests.VirtualMemberTest.SubClassWithoutOverrideInjectMembers]'
+      name: SubClassWithoutOverrideInjectMembers
+      fullName: VContainer.Tests.VirtualMemberTest.SubClassWithoutOverrideInjectMembers
+      resultStatus: 1
+      duration: 0.0000424
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1057
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.VirtualMemberTest][suite]'
+    - id: 1058
+      uniqueId: 'VContainer.Tests.dll/VContainer/Tests/VirtualMemberTest/[VContainer.Tests][VContainer.Tests.VirtualMemberTest.SubClassWithOverrideInjectMembers]'
+      name: SubClassWithOverrideInjectMembers
+      fullName: VContainer.Tests.VirtualMemberTest.SubClassWithOverrideInjectMembers
+      resultStatus: 1
+      duration: 0.0000355
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1057
+      parentUniqueId: 'VContainer.Tests.dll/VContainer/Tests/[VContainer.Tests][VContainer.Tests.VirtualMemberTest][suite]'
+    m_ResultText: 'VContainer (0.360s)
 
       ---
 
@@ -2374,48 +2550,58 @@ MonoBehaviour:
   m_MaxSize: {x: 10000, y: 10000}
   m_TitleContent:
     m_Text: Project
-    m_Image: {fileID: -5467254957812901981, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: -5179483145760003458, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
+    m_TextWithWhitespace: "Project\u200B"
   m_Pos:
     serializedVersion: 2
     x: 20
-    y: 537
-    width: 1453.5
-    height: 502
+    y: 542
+    width: 1453
+    height: 497
+  m_SerializedDataModeController:
+    m_DataMode: 0
+    m_PreferredDataMode: 0
+    m_SupportedDataModes: 
+    isAutomatic: 1
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
+    m_ContainerData: []
+    m_OverlaysVisible: 1
   m_SearchFilter:
     m_NameFilter: 
     m_ClassNames: []
     m_AssetLabels: []
     m_AssetBundleNames: []
-    m_VersionControlStates: []
-    m_SoftLockControlStates: []
     m_ReferencingInstanceIDs: 
     m_SceneHandles: 
     m_ShowAllHits: 0
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/VContainer/Tests
+    - Assets/VContainer/Editor
     m_Globs: []
+    m_ProductIds: 
+    m_AnyWithAssetOrigin: 0
     m_OriginalText: 
+    m_ImportLogFlags: 0
+    m_FilterByTypeIntersection: 0
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/VContainer/Tests
+  - Assets/VContainer/Editor/CodeGen
   m_LastFoldersGridSize: -1
   m_LastProjectPath: /Users/hadashi/dev/VContainer/VContainer
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 2a4b0000
-    m_LastClickedID: 19242
-    m_ExpandedIDs: 00000000144b00001a4b000000ca9a3bffffff7f
+    m_SelectedIDs: ba4b0000
+    m_LastClickedID: 19386
+    m_ExpandedIDs: 00000000b24b0000b44b000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -2443,7 +2629,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000144b0000
+    m_ExpandedIDs: 00000000b24b0000b44b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -2518,16 +2704,24 @@ MonoBehaviour:
     m_Image: {fileID: -440750813802333266, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
+    m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1474.5
+    x: 1474
     y: 83
-    width: 440.5
+    width: 441
     height: 956
+  m_SerializedDataModeController:
+    m_DataMode: 0
+    m_PreferredDataMode: 0
+    m_SupportedDataModes: 
+    isAutomatic: 1
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
+    m_ContainerData: []
+    m_OverlaysVisible: 1
   m_ObjectsLockedBeforeSerialization: []
   m_InstanceIDsLockedBeforeSerialization: 
   m_PreviewResizer:
@@ -2535,7 +2729,7 @@ MonoBehaviour:
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
   m_LastInspectedObjectInstanceID: -1
-  m_LastVerticalScrollValue: 517
+  m_LastVerticalScrollValue: 0
   m_GlobalObjectId: 
   m_InspectorMode: 0
   m_LockTracker:
@@ -2557,25 +2751,33 @@ MonoBehaviour:
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Hierarchy
-    m_Image: {fileID: 7966133145522015247, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: -3734745235275155857, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
+    m_TextWithWhitespace: "Hierarchy\u200B"
   m_Pos:
     serializedVersion: 2
     x: 20
     y: 83
     width: 353.5
-    height: 433
+    height: 438
+  m_SerializedDataModeController:
+    m_DataMode: 0
+    m_PreferredDataMode: 0
+    m_SupportedDataModes: 
+    isAutomatic: 1
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
+    m_ContainerData: []
+    m_OverlaysVisible: 1
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
+      m_SelectedIDs: f0e0ffff
       m_LastClickedID: 0
-      m_ExpandedIDs: 5cedffff18f3ffff28f4ffff
+      m_ExpandedIDs: 28e2ffff44e5ffffa0e5ffff84e6ffffe0e6ffff12eaffff88ecffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -2615,15 +2817,21 @@ MonoBehaviour:
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Scene
-    m_Image: {fileID: 2593428753322112591, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: 8634526014445323508, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
+    m_TextWithWhitespace: "Scene\u200B"
   m_Pos:
     serializedVersion: 2
     x: 374.5
     y: 83
-    width: 1098
-    height: 433
+    width: 1097.5
+    height: 438
+  m_SerializedDataModeController:
+    m_DataMode: 0
+    m_PreferredDataMode: 0
+    m_SupportedDataModes: 
+    isAutomatic: 1
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -2639,6 +2847,8 @@ MonoBehaviour:
       id: Tool Settings
       index: 0
       layout: 1
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 0
       containerId: overlay-toolbar__top
       floating: 0
@@ -2650,39 +2860,47 @@ MonoBehaviour:
       id: unity-grid-and-snap-toolbar
       index: 1
       layout: 1
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-toolbar__top
       floating: 0
       collapsed: 0
       displayed: 1
-      snapOffset: {x: 0, y: 0}
+      snapOffset: {x: 24, y: 0}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
       id: unity-scene-view-toolbar
       index: 0
       layout: 1
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-toolbar__top
       floating: 0
       collapsed: 0
       displayed: 0
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: 0, y: 0}
+      snapOffsetDelta: {x: -24, y: 0}
       snapCorner: 1
       id: unity-search-toolbar
       index: 1
       layout: 1
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 0
       containerId: overlay-container--left
       floating: 0
       collapsed: 0
       displayed: 1
-      snapOffset: {x: 0, y: 0}
+      snapOffset: {x: 24, y: 0}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
       id: unity-transform-toolbar
       index: 0
       layout: 2
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 0
       containerId: overlay-container--left
       floating: 0
@@ -2694,6 +2912,8 @@ MonoBehaviour:
       id: unity-component-tools
       index: 1
       layout: 2
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 0
       containerId: overlay-container--right
       floating: 0
@@ -2705,17 +2925,21 @@ MonoBehaviour:
       id: Orientation
       index: 0
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
       displayed: 0
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: 0, y: 0}
+      snapOffsetDelta: {x: 24, y: 0}
       snapCorner: 0
       id: Scene View/Light Settings
       index: 0
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
@@ -2727,28 +2951,34 @@ MonoBehaviour:
       id: Scene View/Camera
       index: 1
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
       displayed: 0
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: 0, y: 0}
+      snapOffsetDelta: {x: 24, y: 0}
       snapCorner: 0
       id: Scene View/Cloth Constraints
-      index: 2
+      index: 1
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
       displayed: 0
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: 0, y: 0}
+      snapOffsetDelta: {x: 24, y: 0}
       snapCorner: 0
       id: Scene View/Cloth Collisions
-      index: 3
+      index: 2
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
@@ -2760,6 +2990,8 @@ MonoBehaviour:
       id: Scene View/Navmesh Display
       index: 4
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
@@ -2771,6 +3003,8 @@ MonoBehaviour:
       id: Scene View/Agent Display
       index: 6
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
@@ -2782,50 +3016,60 @@ MonoBehaviour:
       id: Scene View/Obstacle Display
       index: 9
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
       displayed: 0
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: 0, y: 0}
+      snapOffsetDelta: {x: 24, y: 0}
       snapCorner: 0
       id: Scene View/Occlusion Culling
-      index: 5
+      index: 3
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
       displayed: 0
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: 0, y: 0}
+      snapOffsetDelta: {x: 24, y: 0}
       snapCorner: 0
       id: Scene View/Physics Debugger
-      index: 7
+      index: 4
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
       displayed: 0
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: 0, y: 0}
+      snapOffsetDelta: {x: 24, y: 0}
       snapCorner: 0
       id: Scene View/Scene Visibility
-      index: 8
+      index: 5
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
       displayed: 0
       snapOffset: {x: 0, y: 0}
-      snapOffsetDelta: {x: 0, y: 0}
+      snapOffsetDelta: {x: 24, y: 0}
       snapCorner: 0
       id: Scene View/Particles
-      index: 10
+      index: 7
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
@@ -2837,6 +3081,8 @@ MonoBehaviour:
       id: Scene View/Tilemap
       index: 11
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
@@ -2848,6 +3094,8 @@ MonoBehaviour:
       id: Scene View/Tilemap Palette Helper
       index: 12
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
@@ -2859,6 +3107,8 @@ MonoBehaviour:
       id: NavigationOverlay
       index: 8
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
     - dockPosition: 1
       containerId: overlay-container--right
       floating: 0
@@ -2868,8 +3118,78 @@ MonoBehaviour:
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
       id: Scene View/TrailRenderer
-      index: 9
+      index: 6
       layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
+    - dockPosition: 1
+      containerId: overlay-container--right
+      floating: 0
+      collapsed: 0
+      displayed: 1
+      snapOffset: {x: 48, y: 48}
+      snapOffsetDelta: {x: 0, y: 0}
+      snapCorner: 0
+      id: AINavigationOverlay
+      index: 8
+      layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
+    - dockPosition: 0
+      containerId: overlay-toolbar__top
+      floating: 0
+      collapsed: 0
+      displayed: 0
+      snapOffset: {x: 48, y: 48}
+      snapOffsetDelta: {x: 0, y: 0}
+      snapCorner: 0
+      id: Brush Attributes
+      index: 2
+      layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
+    - dockPosition: 0
+      containerId: overlay-toolbar__left
+      floating: 0
+      collapsed: 0
+      displayed: 0
+      snapOffset: {x: 48, y: 48}
+      snapOffsetDelta: {x: 0, y: 0}
+      snapCorner: 0
+      id: Terrain Tools
+      index: 0
+      layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
+    - dockPosition: 0
+      containerId: overlay-toolbar__left
+      floating: 0
+      collapsed: 0
+      displayed: 0
+      snapOffset: {x: 48, y: 48}
+      snapOffsetDelta: {x: 0, y: 0}
+      snapCorner: 0
+      id: Brush Masks
+      index: 1
+      layout: 4
+      size: {x: 0, y: 0}
+      sizeOverridden: 0
+    m_ContainerData:
+    - containerId: overlay-toolbar__top
+      scrollOffset: 0
+    - containerId: overlay-toolbar__left
+      scrollOffset: 0
+    - containerId: overlay-container--left
+      scrollOffset: 0
+    - containerId: overlay-container--right
+      scrollOffset: 0
+    - containerId: overlay-toolbar__right
+      scrollOffset: 0
+    - containerId: overlay-toolbar__bottom
+      scrollOffset: 0
+    - containerId: Floating
+      scrollOffset: 0
+    m_OverlaysVisible: 1
   m_WindowGUID: cc27987af1a868c49b0894db9c0f5429
   m_Gizmos: 1
   m_OverrideSceneCullingMask: 6917529027641081856
@@ -2975,37 +3295,40 @@ MonoBehaviour:
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Game
-    m_Image: {fileID: -6423792434712278376, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: 4621777727084837110, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
+    m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
     x: 374.5
     y: 83
-    width: 1098
-    height: 433
+    width: 1097.5
+    height: 438
+  m_SerializedDataModeController:
+    m_DataMode: 0
+    m_PreferredDataMode: 0
+    m_SupportedDataModes: 
+    isAutomatic: 1
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
+    m_ContainerData: []
+    m_OverlaysVisible: 1
   m_SerializedViewNames: []
   m_SerializedViewValues: []
   m_PlayModeViewName: GameView
   m_ShowGizmos: 0
   m_TargetDisplay: 0
   m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
-  m_TargetSize: {x: 1098, y: 412}
+  m_TargetSize: {x: 1097.5, y: 417}
   m_TextureFilterMode: 0
   m_TextureHideFlags: 61
   m_RenderIMGUI: 1
   m_EnterPlayModeBehavior: 0
-  m_fullscreenMonitorIdx: 0
-  m_playModeBehaviorIdx: 0
   m_UseMipMap: 0
-  m_isFullscreen: 0
-  m_suppressRenderingForFullscreen: 0
   m_VSyncEnabled: 0
-  m_PlayFocused: 0
   m_Gizmos: 0
   m_Stats: 0
   m_SelectedSizes: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -3014,10 +3337,10 @@ MonoBehaviour:
     m_VRangeLocked: 0
     hZoomLockedByDefault: 0
     vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -274.5
-    m_HBaseRangeMax: 274.5
-    m_VBaseRangeMin: -103
-    m_VBaseRangeMax: 103
+    m_HBaseRangeMin: -274.375
+    m_HBaseRangeMax: 274.375
+    m_VBaseRangeMin: -104.25
+    m_VBaseRangeMax: 104.25
     m_HAllowExceedBaseRangeMin: 1
     m_HAllowExceedBaseRangeMax: 1
     m_VAllowExceedBaseRangeMin: 1
@@ -3035,30 +3358,28 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 21
-      width: 1098
-      height: 412
+      width: 1097.5
+      height: 417
     m_Scale: {x: 2, y: 2}
-    m_Translation: {x: 549, y: 206}
+    m_Translation: {x: 548.75, y: 208.5}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -274.5
-      y: -103
-      width: 549
-      height: 206
+      x: -274.375
+      y: -104.25
+      width: 548.75
+      height: 208.5
     m_MinimalGUI: 1
   m_defaultScale: 2
-  m_LastWindowPixelSize: {x: 2196, y: 866}
+  m_LastWindowPixelSize: {x: 2195, y: 876}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 01000000000000000000
   m_XRRenderMode: 0
   m_RenderTexture: {fileID: 0}
-  m_showToolbar: 1
-  m_showToolbarOnFullscreen: 0
 --- !u!114 &18
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -3075,16 +3396,24 @@ MonoBehaviour:
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
     m_Text: Console
-    m_Image: {fileID: -4327648978806127646, guid: 0000000000000000d000000000000000,
+    m_Image: {fileID: -4950941429401207979, guid: 0000000000000000d000000000000000,
       type: 0}
     m_Tooltip: 
+    m_TextWithWhitespace: "Console\u200B"
   m_Pos:
     serializedVersion: 2
     x: 20
-    y: 537
-    width: 1453.5
-    height: 502
+    y: 542
+    width: 1453
+    height: 497
+  m_SerializedDataModeController:
+    m_DataMode: 0
+    m_PreferredDataMode: 0
+    m_SupportedDataModes: 
+    isAutomatic: 1
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
+    m_ContainerData: []
+    m_OverlaysVisible: 1

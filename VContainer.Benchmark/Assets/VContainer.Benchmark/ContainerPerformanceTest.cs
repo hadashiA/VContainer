@@ -1,13 +1,74 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using NUnit.Framework;
 using Unity.PerformanceTesting;
 using VContainer;
 using VContainer.Benchmark.Fixtures;
+using VContainer.Internal;
 
 namespace Vcontainer.Benchmark
 {
     public class ContainerPerformanceTest
     {
         const int N = 10_000;
+
+        [Test]
+        [Performance]
+        public void HashTable()
+        {
+            var entries = new KeyValuePair<Type, int>[]
+            {
+                new(typeof(int), 100),
+                new(typeof(long), 100),
+                new(typeof(short), 100),
+                new(typeof(byte), 100),
+                new(typeof(float), 100),
+                new(typeof(double), 100),
+                new(typeof(int[]), 100),
+                new(typeof(long[]), 100),
+                new(typeof(short[]), 100),
+                new(typeof(byte[]), 100),
+                new(typeof(float[]), 100),
+                new(typeof(double[]), 100),
+                new(typeof(ServiceA), 100),
+                new(typeof(ServiceB), 200),
+                new(typeof(ServiceC), 200),
+                new(typeof(SubObjectA), 200),
+                new(typeof(SubObjectB), 200),
+                new(typeof(SubObjectC), 200),
+            };
+
+            var t1 = new FixedTypeKeyHashtable<int>(entries);
+            var t2 = new TypeKeyHashTable2<int>(entries);
+
+            Measure
+                .Method(() =>
+                {
+                    for (var i = 0; i < N; i++)
+                    {
+                        t1.TryGet(typeof(ServiceA), out _);
+                        t1.TryGet(typeof(ServiceB), out _);
+                        t1.TryGet(typeof(ServiceC), out _);
+                    }
+                })
+                .SampleGroup("T1")
+                .GC()
+                .Run();
+
+            Measure
+                .Method(() =>
+                {
+                    for (var i = 0; i < N; i++)
+                    {
+                        t2.TryGet(typeof(ServiceA), out _);
+                        t2.TryGet(typeof(ServiceB), out _);
+                        t2.TryGet(typeof(ServiceC), out _);
+                    }
+                })
+                .SampleGroup("T2")
+                .GC()
+                .Run();
+        }
 
         [Test]
         [Performance]
