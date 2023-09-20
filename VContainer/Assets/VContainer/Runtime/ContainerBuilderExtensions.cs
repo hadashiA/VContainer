@@ -131,6 +131,14 @@ namespace VContainer
             Lifetime lifetime)
             => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, TParam2, TParam3, TParam4, T>), lifetime));
 
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterFromResolve<TInterface>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, TInterface> implementationProvider)
+            where TInterface : class
+            => builder.Register(new InstanceRegistrationFromResolveBuilder(implementationProvider, typeof(TInterface))).As(typeof(TInterface));
+        
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
         public static void RegisterContainer(this IContainerBuilder builder)
         {
