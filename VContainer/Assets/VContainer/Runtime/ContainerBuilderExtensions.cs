@@ -139,6 +139,20 @@ namespace VContainer
             where TInterface : class
             => builder.Register(new InstanceRegistrationFromResolveBuilder(implementationProvider, typeof(TInterface))).As(typeof(TInterface));
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterFromResolve<TInterface1, TInterface2>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, TInterface1> implementationProvider)
+            where TInterface1 : class
+            => builder.RegisterFromResolve(implementationProvider).As(typeof(TInterface1), typeof(TInterface2));
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterFromResolve<TInterface1, TInterface2, TInterface3>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, TInterface1> implementationProvider)
+            where TInterface1 : class
+            => builder.RegisterFromResolve(implementationProvider).As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
+        
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
         public static void RegisterContainer(this IContainerBuilder builder)
         {
