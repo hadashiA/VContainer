@@ -2,26 +2,24 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
     sealed class FindComponentProvider : IInstanceProvider
     {
         readonly Type componentType;
-        readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> customParameters;
         ComponentDestination destination;
         Scene scene;
 
         public FindComponentProvider(
             Type componentType,
-            IInjector injector,
             IReadOnlyList<IInjectParameter> customParameters,
             in Scene scene,
             in ComponentDestination destination)
         {
             this.componentType = componentType;
-            this.injector = injector;
             this.customParameters = customParameters;
             this.scene = scene;
             this.destination = destination;
@@ -61,6 +59,7 @@ namespace VContainer.Unity
 
             if (component is MonoBehaviour monoBehaviour)
             {
+                var injector = InjectorCache.GetOrBuild(monoBehaviour.GetType());
                 injector.Inject(monoBehaviour, resolver, customParameters);
             }
 

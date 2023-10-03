@@ -70,23 +70,25 @@ namespace VContainer.Unity
 
         public override Registration Build()
         {
-            var injector = InjectorCache.GetOrBuild(ImplementationType);
             IInstanceProvider provider;
 
             if (instance != null)
             {
+                var injector = InjectorCache.GetOrBuild(ImplementationType);
                 provider = new ExistingComponentProvider(instance, injector, Parameters, destination.DontDestroyOnLoad);
             }
             else if (scene.IsValid())
             {
-                provider = new FindComponentProvider(ImplementationType, injector, Parameters, in scene, in destination);
+                provider = new FindComponentProvider(ImplementationType, Parameters, in scene, in destination);
             }
             else if (prefab != null)
             {
+                var injector = InjectorCache.GetOrBuild(prefab.GetType());
                 provider = new PrefabComponentProvider(prefab, injector, Parameters, in destination);
             }
             else
             {
+                var injector = InjectorCache.GetOrBuild(ImplementationType);
                 provider = new NewGameObjectProvider(ImplementationType, injector, Parameters, in destination, gameObjectName);
             }
             return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
