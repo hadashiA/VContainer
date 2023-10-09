@@ -63,6 +63,22 @@ namespace VContainer.Tests.Unity
 
             Assert.That(container.Resolve<IComponent>(), Is.EqualTo(component));
         }
+        
+        [Test]
+        public void RegisterComponentUsingBaseClass()
+        {
+            SampleBaseMonoBehaviour existingComponent = new GameObject("Sample")
+                .AddComponent<SampleDerivedMonoBehaviour>();
+
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponent(existingComponent);
+            var container = builder.Build();
+            
+            var target = (SampleDerivedMonoBehaviour) container.Resolve<SampleBaseMonoBehaviour>();
+
+            Assert.That(target.Service, Is.InstanceOf<ServiceA>());
+        }
 
         [Test]
         public void RegisterComponentWithAutoInjection()
@@ -217,6 +233,21 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void RegisterComponentInHierarchyUsingBaseClass()
+        {
+            var go = new GameObject("Sample");
+            var target = go.AddComponent<SampleDerivedMonoBehaviour>();
+            
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleBaseMonoBehaviour>();
+            });
+
+            Assert.That(target.Service, Is.InstanceOf<ServiceA>());
+        }
+
+        [Test]
         public void RegisterComponentOnNewGameObject()
         {
             var builder = new ContainerBuilder();
@@ -280,6 +311,21 @@ namespace VContainer.Tests.Unity
             Assert.That(resolved2.transform.parent, Is.EqualTo(go1.transform));
             Assert.That(resolved1, Is.Not.EqualTo(resolved2));
             Assert.That(prefab.gameObject.activeSelf, Is.True);
+        }
+        
+        [Test]
+        public void RegisterComponentInNewPrefabUsingBaseClass()
+        {
+            SampleBaseMonoBehaviour prefab = new GameObject("Sample").AddComponent<SampleDerivedMonoBehaviour>();
+
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponentInNewPrefab(prefab, Lifetime.Singleton);
+            var container = builder.Build();
+            
+            var target = (SampleDerivedMonoBehaviour) container.Resolve<SampleBaseMonoBehaviour>();
+
+            Assert.That(target.Service, Is.InstanceOf<ServiceA>());
         }
 
         [Test]
