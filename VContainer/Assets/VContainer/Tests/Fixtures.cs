@@ -176,6 +176,11 @@ namespace VContainer.Tests
     {
     }
 
+
+    struct NoDependencyUnmanagedServiceA
+    {
+    }
+
     class MultipleInterfaceServiceA : I1, I2, I3
     {
     }

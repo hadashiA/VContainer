@@ -20,11 +20,6 @@
             "define": "VCONTAINER_ECS_INTEGRATION"
         },
         {
-            "name": "com.unity.entities",
-            "expression": "(0.60,999)",
-            "define": "VCONTAINER_ECS_INTEGRATION_1_0"
-        },
-        {
             "name": "com.cysharp.unitask",
             "expression": "",
             "define": "VCONTAINER_UNITASK_INTEGRATION"

@@ -32,11 +32,6 @@
             "name": "com.unity.entities",
             "expression": "",
             "define": "VCONTAINER_ECS_INTEGRATION"
-        },
-        {
-            "name": "com.unity.entities",
-            "expression": "(0.60,999)",
-            "define": "VCONTAINER_ECS_INTEGRATION_1_0"
         }
     ],
     "noEngineReferences": false

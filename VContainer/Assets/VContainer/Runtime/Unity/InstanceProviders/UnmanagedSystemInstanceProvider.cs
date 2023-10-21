@@ -1,11 +1,11 @@
-#if VCONTAINER_ECS_INTEGRATION
+#if VCONTAINER_ECS_INTEGRATION && UNITY_2022_2_OR_NEWER
 using System;
 using System.Collections.Generic;
 using Unity.Entities;
 
 namespace VContainer.Unity
 {
-    public sealed class SystemInstanceProvider<T> : IInstanceProvider where T : ComponentSystemBase
+    public sealed class UnmanagedSystemInstanceProvider : IInstanceProvider
     {
         readonly Type systemType;
         readonly IInjector injector;
@@ -13,10 +13,10 @@ namespace VContainer.Unity
         readonly string worldName;
         readonly Type systemGroupType;
 
-        World world;
-        T instance;
+        private World world;
+        private UnmanagedSystemReference instance;
 
-        public SystemInstanceProvider(
+        public UnmanagedSystemInstanceProvider(
             Type systemType,
             string worldName,
             Type systemGroupType,
@@ -37,44 +37,34 @@ namespace VContainer.Unity
 
             if (instance is null)
             {
-                instance = (T) injector.CreateInstance(resolver, customParameters);
-#if UNITY_2022_2_OR_NEWER
-                world.AddSystemManaged(instance);
-#else
-                world.AddSystem(instance);
-#endif
+                SystemHandle handle = world.GetOrCreateSystem(systemType);
+                injector.Inject(handle, resolver, customParameters);
 
-                if (systemGroupType != null)
+                if (systemGroupType is not null)
                 {
-#if UNITY_2022_2_OR_NEWER
-                    var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystemManaged(systemGroupType);
-#else
-                    var systemGroup = (ComponentSystemGroup)world.GetOrCreateSystem(systemGroupType);
-#endif
-                    systemGroup.AddSystemToUpdateList(instance);
+                    var systemGroup = (ComponentSystemGroup) world.GetOrCreateSystemManaged(systemGroupType);
+                    systemGroup.AddSystemToUpdateList(handle);
                 }
-
+                Type refType = typeof(UnmanagedSystemReference<>);
+                Type target = refType.MakeGenericType(systemType);
+                instance = (UnmanagedSystemReference)Activator.CreateInstance(target, handle, world);
                 return instance;
             }
-#if UNITY_2022_2_OR_NEWER
-            return world.GetExistingSystemManaged(systemType);
-#else
-            return world.GetExistingSystem(systemType);
-#endif
+            return instance;
         }
 
-        World GetWorld(IObjectResolver resolver)
+        private World GetWorld(IObjectResolver resolver)
         {
             if (worldName is null && World.DefaultGameObjectInjectionWorld != null)
                 return World.DefaultGameObjectInjectionWorld;
 
             var worlds = resolver.Resolve<IEnumerable<World>>();
-            foreach (var world in worlds)
+            foreach (World w in worlds)
             {
-                if (world.Name == worldName)
-                    return world;
+                if (w.Name == worldName)
+                    return w;
             }
-            throw new VContainerException(systemType, $"World `{worldName}` is not registered");
+            throw new VContainerException(systemType, $"World `{worldName}` is not Created");
         }
     }
 }
