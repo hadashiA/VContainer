@@ -47,6 +47,23 @@ namespace VContainer.Unity
             }
         }
 
+        public readonly struct ExtraLocalInstallationScope : IDisposable
+        {
+            private readonly LifetimeScope _scope;
+            private readonly IInstaller _installer;
+
+            public ExtraLocalInstallationScope(LifetimeScope scope, IInstaller installer)
+            {
+                _installer = installer;
+                _scope = scope;
+            }
+            
+            public void Dispose()
+            {
+                _scope.localExtraInstallers.Remove(_installer);
+            }
+        }
+
         [SerializeField]
         public ParentReference parentReference;
 
@@ -258,6 +275,12 @@ namespace VContainer.Unity
         public TScope CreateChildFromPrefab<TScope>(TScope prefab, Action<IContainerBuilder> installation)
             where TScope : LifetimeScope
             => CreateChildFromPrefab(prefab, new ActionInstaller(installation));
+
+        public ExtraLocalInstallationScope EnqueueLocalInstaller(IInstaller installer)
+        {
+            localExtraInstallers.Add(installer);
+            return new ExtraLocalInstallationScope(this, installer);
+        }
 
         void InstallTo(IContainerBuilder builder)
         {
