@@ -28,7 +28,7 @@ namespace VContainer
                     var parameter = parameters[i];
                     if (parameter.Match(parameterType, parameterName))
                     {
-                        return parameter.Value;
+                        return parameter.GetValue(resolver);
                     }
                 }
             }
