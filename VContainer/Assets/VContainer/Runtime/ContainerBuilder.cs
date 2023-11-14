@@ -18,6 +18,7 @@ namespace VContainer
 
         T Register<T>(T registrationBuilder) where T : RegistrationBuilder;
         void RegisterBuildCallback(Action<IObjectResolver> container);
+        void RegisterDisposeCallback(Action<IObjectResolver> callback);
         bool Exists(Type type, bool includeInterfaceTypes = false);
     }
 
@@ -36,7 +37,7 @@ namespace VContainer
         public IScopedObjectResolver BuildScope()
         {
             var registry = BuildRegistry();
-            var container = new ScopedContainer(registry, root, parent, ApplicationOrigin);
+            var container = new ScopedContainer(registry, root, parent, ApplicationOrigin, disposeCallbacks?.ToArray());
             container.Diagnostics = Diagnostics;
             EmitCallbacks(container);
             return container;
@@ -70,6 +71,7 @@ namespace VContainer
 
         readonly List<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
         List<Action<IObjectResolver>> buildCallbacks;
+        protected List<Action<IObjectResolver>> disposeCallbacks;
         DiagnosticsCollector diagnostics;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -86,6 +88,14 @@ namespace VContainer
             if (buildCallbacks == null)
                 buildCallbacks = new List<Action<IObjectResolver>>();
             buildCallbacks.Add(callback);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RegisterDisposeCallback(Action<IObjectResolver> callback)
+        {
+            if (disposeCallbacks == null)
+                disposeCallbacks = new List<Action<IObjectResolver>>();
+            disposeCallbacks.Add(callback);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -106,7 +116,7 @@ namespace VContainer
         public virtual IObjectResolver Build()
         {
             var registry = BuildRegistry();
-            var container = new Container(registry, ApplicationOrigin);
+            var container = new Container(registry, ApplicationOrigin, disposeCallbacks?.ToArray());
             container.Diagnostics = Diagnostics;
             EmitCallbacks(container);
             return container;

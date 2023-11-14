@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using VContainer.Diagnostics;
 using VContainer.Internal;
@@ -55,17 +56,20 @@ namespace VContainer
         readonly ConcurrentDictionary<Registration, Lazy<object>> sharedInstances = new ConcurrentDictionary<Registration, Lazy<object>>();
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<Registration, Lazy<object>> createInstance;
+        readonly IEnumerable<Action<IObjectResolver>> disposeCallbacks;
 
         internal ScopedContainer(
             Registry registry,
             IObjectResolver root,
             IScopedObjectResolver parent = null,
-            object applicationOrigin = null)
+            object applicationOrigin = null,
+            IEnumerable<Action<IObjectResolver>> disposeCallbacks = null)
         {
             Root = root;
             Parent = parent;
             ApplicationOrigin = applicationOrigin;
             this.registry = registry;
+            this.disposeCallbacks = disposeCallbacks;
             createInstance = registration =>
             {
                 return new Lazy<object>(() => registration.SpawnInstance(this));
@@ -110,6 +114,8 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
+            EmitDisposeCallbacks();
+            
             disposables.Dispose();
             sharedInstances.Clear();
         }
@@ -163,6 +169,17 @@ namespace VContainer
             }
             throw new VContainerException(type, $"No such registration of type: {type}");
         }
+        
+        void EmitDisposeCallbacks()
+        {
+            if (disposeCallbacks == null) 
+                return;
+            
+            foreach (var callback in disposeCallbacks)
+            {
+                callback(this);
+            }
+        }
     }
 
     public sealed class Container : IObjectResolver
@@ -175,8 +192,9 @@ namespace VContainer
         readonly ConcurrentDictionary<Registration, Lazy<object>> sharedInstances = new ConcurrentDictionary<Registration, Lazy<object>>();
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<Registration, Lazy<object>> createInstance;
+        readonly IEnumerable<Action<IObjectResolver>> disposeCallbacks;
 
-        internal Container(Registry registry, object applicationOrigin = null)
+        internal Container(Registry registry, object applicationOrigin = null, IEnumerable<Action<IObjectResolver>> disposeCallbacks = null)
         {
             this.registry = registry;
             rootScope = new ScopedContainer(registry, this, applicationOrigin: applicationOrigin);
@@ -187,6 +205,8 @@ namespace VContainer
             };
 
             ApplicationOrigin = applicationOrigin;
+
+            this.disposeCallbacks = disposeCallbacks;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -223,9 +243,22 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
+            EmitDisposeCallbacks();
+                    
             rootScope.Dispose();
             disposables.Dispose();
             sharedInstances.Clear();
+        }
+
+        void EmitDisposeCallbacks()
+        {
+            if (disposeCallbacks == null) 
+                return;
+            
+            foreach (var callback in disposeCallbacks)
+            {
+                callback(this);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
