@@ -518,5 +518,25 @@ namespace VContainer.Tests
             var ctorInjectable = new ServiceA(new NoDependencyServiceA());
             Assert.DoesNotThrow(() => container.Inject(ctorInjectable));
         }
+
+        [Test]
+        public void AsNoneLazy()
+        {
+            var builder = new ContainerBuilder();
+
+            bool wasResolved = false;
+            
+            builder.Register(_ =>
+            {
+                wasResolved = true;
+                return new NoDependencyServiceA();
+            },  Lifetime.Scoped);
+
+            builder.AsNoneLazy<NoDependencyServiceA>();
+            
+            _ = builder.Build();
+            
+            Assert.That(wasResolved, Is.True);
+        }
     }
 }
