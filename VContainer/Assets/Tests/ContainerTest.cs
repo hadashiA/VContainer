@@ -566,5 +566,24 @@ namespace VContainer.Tests
             var ctorInjectable = new ServiceA(new NoDependencyServiceA());
             Assert.DoesNotThrow(() => container.Inject(ctorInjectable));
         }
+
+        [Test]
+        public void OnContainerDisposeCallback()
+        {
+            NoDependencyServiceA resolvedJustBeforeDispose = null;
+            
+            var builder = new ContainerBuilder();
+            
+            builder.Register<NoDependencyServiceA>(Lifetime.Scoped);
+            builder.RegisterDisposeCallback(resolver => resolvedJustBeforeDispose = resolver.Resolve<NoDependencyServiceA>());
+
+            var container = builder.Build();
+            
+            Assert.That(resolvedJustBeforeDispose, Is.Null);
+            
+            container.Dispose();
+            
+            Assert.That(resolvedJustBeforeDispose, Is.Not.Null);
+        }
     }
 }

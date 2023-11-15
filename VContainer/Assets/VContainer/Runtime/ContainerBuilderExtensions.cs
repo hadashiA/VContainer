@@ -145,7 +145,7 @@ namespace VContainer
             Lifetime lifetime)
             => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, TParam2, TParam3, TParam4, T>), lifetime));
 
-        public static void RegisterDisposeCallback(this IContainerBuilder builder, Action<IDisposable> callback)
+        public static void RegisterDisposeCallback(this IContainerBuilder builder, Action<IObjectResolver> callback)
         {
             builder.Register(container => new ActionDisposable(callback, container), Lifetime.Scoped);
         }
