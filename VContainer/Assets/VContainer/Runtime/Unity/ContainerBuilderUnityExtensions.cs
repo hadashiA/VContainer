@@ -168,14 +168,15 @@ namespace VContainer.Unity
             return builder.RegisterComponentOnNewGameObject(typeof(T), lifetime, newGameObjectName);
         }
 
-        public static ComponentRegistrationBuilder RegisterComponentInNewPrefab<T>(
+        public static ComponentRegistrationBuilder RegisterComponentInNewPrefab(
             this IContainerBuilder builder,
-            Type type,
-            T prefab,
+            Type interfaceType,
+            Component prefab,
             Lifetime lifetime)
-            where T : Component
         {
-            return builder.Register(new ComponentRegistrationBuilder(prefab, type, lifetime));
+            var componentRegistrationBuilder = builder.Register(new ComponentRegistrationBuilder(_ => prefab, prefab.GetType(), lifetime));
+            componentRegistrationBuilder.As(interfaceType);
+            return componentRegistrationBuilder;
         }
 
         public static ComponentRegistrationBuilder RegisterComponentInNewPrefab<T>(
@@ -185,6 +186,26 @@ namespace VContainer.Unity
             where T : Component
         {
             return builder.RegisterComponentInNewPrefab(typeof(T), prefab, lifetime);
+        }
+        
+        public static ComponentRegistrationBuilder RegisterComponentInNewPrefab<T>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, T> prefab,
+            Lifetime lifetime)
+            where T : Component
+        {
+            return builder.Register(new ComponentRegistrationBuilder(prefab, typeof(T), lifetime));
+        }
+        
+        public static ComponentRegistrationBuilder RegisterComponentInNewPrefab<TInterface, TImplement>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, TImplement> prefab,
+            Lifetime lifetime)
+            where TImplement : Component, TInterface
+        {
+            var componentRegistrationBuilder = builder.Register(new ComponentRegistrationBuilder(prefab, typeof(TImplement), lifetime));
+            componentRegistrationBuilder.As<TInterface>();
+            return componentRegistrationBuilder;
         }
 
 #if VCONTAINER_ECS_INTEGRATION
