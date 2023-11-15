@@ -26,6 +26,10 @@ namespace VContainer
         /// This version of resolve will look for instances from only the registration information already founds.
         /// </remarks>
         object Resolve(Registration registration);
+
+        bool TryGetSharedInstance(Type type, out object instance);
+        bool TryGetSharedInstance(Registration registration, out object instance);
+        
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
         void Inject(object instance);
     }
@@ -83,6 +87,23 @@ namespace VContainer
                 return Diagnostics.TraceResolve(registration, ResolveCore);
             }
             return ResolveCore(registration);
+        }
+
+        public bool TryGetSharedInstance(Type type, out object instance)
+        {
+            return TryGetSharedInstance(FindRegistration(type), out instance);
+        }
+
+        public bool TryGetSharedInstance(Registration registration, out object instance)
+        {
+            if (sharedInstances.TryGetValue(registration, out var lazyInstance) && lazyInstance.IsValueCreated)
+            {
+                instance = lazyInstance.Value;
+                return true;
+            }
+
+            instance = null;
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -207,6 +228,26 @@ namespace VContainer
                 return Diagnostics.TraceResolve(registration, ResolveCore);
             }
             return ResolveCore(registration);
+        }
+        
+        public bool TryGetSharedInstance(Type type, out object instance)
+        {
+            if (registry.TryGet(type, out var registration)) 
+                return TryGetSharedInstance(registration, out instance);
+            
+            instance = null;
+            return false;
+        }
+
+        public bool TryGetSharedInstance(Registration registration, out object instance)
+        {
+            if (sharedInstances.TryGetValue(registration, out var lazyInstance) && lazyInstance.IsValueCreated)
+            {
+                instance = lazyInstance.Value;
+                return true;
+            }
+
+            return rootScope.TryGetSharedInstance(registration, out instance);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
