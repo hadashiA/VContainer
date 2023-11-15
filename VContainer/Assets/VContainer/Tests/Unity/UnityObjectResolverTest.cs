@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using UnityEngine;
 using VContainer.Unity;
@@ -139,6 +140,22 @@ namespace VContainer.Tests.Unity
                 Assert.That(instance.ServiceAInAwake, Is.InstanceOf<ServiceA>());
                 Assert.That(instance.ServiceA, Is.InstanceOf<ServiceA>());
             }
+        }
+
+        [Test]
+        public void Instantiate_ExceptionThrownDuringInjection_PrefabIsStillEnabled()
+        {
+            var builder = new ContainerBuilder();
+            
+            var original = new GameObject("Original").AddComponent<SampleMonoBehaviour>();
+            
+            //Throws in resolving
+            builder.Register<ServiceA>(_ => throw new(), Lifetime.Singleton);
+
+            var container = builder.Build();
+
+            Assert.Throws<Exception>(() => container.Instantiate(original));
+            Assert.That(original.gameObject.activeSelf, Is.True);
         }
 
         [Test]
