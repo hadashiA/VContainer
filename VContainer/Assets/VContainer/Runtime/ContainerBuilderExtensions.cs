@@ -130,6 +130,13 @@ namespace VContainer
             Func<IObjectResolver, Func<TParam1, TParam2, TParam3, TParam4, T>> factoryFactory,
             Lifetime lifetime)
             => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, TParam2, TParam3, TParam4, T>), lifetime));
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IContainerBuilder AsNoneLazy<T>(this IContainerBuilder builder)
+        {
+            builder.RegisterBuildCallback(resolver => _ = resolver.Resolve<T>());
+            return builder;
+        }
 
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
         public static void RegisterContainer(this IContainerBuilder builder)
