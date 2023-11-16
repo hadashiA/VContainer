@@ -218,16 +218,16 @@ namespace VContainer.SourceGenerator
 
                 foreach (var fieldSymbol in typeMeta.InjectFields)
                 {
-                    var fieldTypeName =
-                        fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                    codeWriter.AppendLine($"__x.{fieldSymbol.Name} = resolver.Resolve<{fieldTypeName}>();");
+                    var fieldTypeName = fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                    
+                    codeWriter.AppendLine($"__x.{fieldSymbol.Name} = ({fieldTypeName})resolver.ResolveOrParameter(typeof({fieldTypeName}), \"{fieldSymbol.Name}\", parameters);");
                 }
 
                 foreach (var propSymbol in typeMeta.InjectProperties)
                 {
-                    var propTypeName =
-                        propSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                    codeWriter.AppendLine($"__x.{propSymbol.Name} = resolver.Resolve<{propTypeName}>();");
+                    var propTypeName = propSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                    
+                    codeWriter.AppendLine($"__x.{propSymbol.Name} = ({propTypeName})resolver.ResolveOrParameter(typeof({propTypeName}), \"{propSymbol.Name}\", parameters);");
                 }
 
                 foreach (var methodSymbol in typeMeta.InjectMethods)
