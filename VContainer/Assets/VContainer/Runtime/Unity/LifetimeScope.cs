@@ -55,6 +55,9 @@ namespace VContainer.Unity
 
         [SerializeField]
         protected List<GameObject> autoInjectGameObjects;
+        
+        [SerializeField] 
+        InstallerComponent[] componentInstallers;
 
         static readonly Stack<LifetimeScope> GlobalOverrideParents = new Stack<LifetimeScope>();
         static readonly Stack<IInstaller> GlobalExtraInstallers = new Stack<IInstaller>();
@@ -263,18 +266,14 @@ namespace VContainer.Unity
         {
             Configure(builder);
 
-            foreach (var installer in localExtraInstallers)
-            {
-                installer.Install(builder);
-            }
+            builder.Register(componentInstallers);
+
+            builder.Register(localExtraInstallers);
             localExtraInstallers.Clear();
 
             lock (SyncRoot)
             {
-                foreach (var installer in GlobalExtraInstallers)
-                {
-                    installer.Install(builder);
-                }
+                builder.Register(GlobalExtraInstallers);
             }
 
             builder.RegisterInstance<LifetimeScope>(this).AsSelf();
