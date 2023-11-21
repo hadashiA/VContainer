@@ -165,6 +165,7 @@ namespace VContainer.Internal
         public static InjectTypeInfo Analyze(Type type)
         {
             var injectConstructor = default(InjectConstructorInfo);
+            var analyzedType = type;
             var typeInfo = type.GetTypeInfo();
 
             // Constructor, single [Inject] constructor -> single most parameters constuctor
@@ -291,7 +292,7 @@ namespace VContainer.Internal
             }
 
             return new InjectTypeInfo(
-                type,
+                analyzedType,
                 injectConstructor,
                 injectMethods,
                 injectFields,
