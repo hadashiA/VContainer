@@ -18,6 +18,15 @@ namespace VContainer
         /// This version of resolve looks for all of scopes
         /// </remarks>
         object Resolve(Type type);
+        
+        /// <summary>
+        /// Try resolve from type
+        /// </summary>
+        /// <remarks>
+        /// This version of resolve looks for all of scopes
+        /// </remarks>
+        /// <returns>Successfully resolved</returns>
+        bool TryResolve(Type type, out object resolved);
 
         /// <summary>
         /// Resolve from meta with registration
@@ -74,6 +83,18 @@ namespace VContainer
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(Type type) => Resolve(FindRegistration(type));
+
+        public bool TryResolve(Type type, out object resolved)
+        {
+            if (TryFindRegistration(type, out var registration))
+            {
+                resolved = Resolve(registration);
+                return true;
+            }
+
+            resolved = default;
+            return false;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(Registration registration)
@@ -156,16 +177,27 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Registration FindRegistration(Type type)
         {
+            if (TryFindRegistration(type, out var registration))
+                return registration;
+                    
+            throw new VContainerException(type, $"No such registration of type: {type}");
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal bool TryFindRegistration(Type type, out Registration registration)
+        {
             IScopedObjectResolver scope = this;
             while (scope != null)
             {
-                if (scope.TryGetRegistration(type, out var registration))
+                if (scope.TryGetRegistration(type, out registration))
                 {
-                    return registration;
+                    return true;
                 }
                 scope = scope.Parent;
             }
-            throw new VContainerException(type, $"No such registration of type: {type}");
+
+            registration = default;
+            return false;
         }
     }
 
@@ -201,6 +233,19 @@ namespace VContainer
                 return Resolve(registration);
             }
             throw new VContainerException(type, $"No such registration of type: {type}");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryResolve(Type type, out object resolved)
+        {
+            if (registry.TryGet(type, out var registration))
+            {
+                resolved = Resolve(registration);
+                return true;
+            }
+            
+            resolved = default;
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
