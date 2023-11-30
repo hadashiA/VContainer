@@ -518,5 +518,61 @@ namespace VContainer.Tests
             var ctorInjectable = new ServiceA(new NoDependencyServiceA());
             Assert.DoesNotThrow(() => container.Inject(ctorInjectable));
         }
+
+        [Test]
+        public void TryResolveTransient()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<NoDependencyServiceA>(Lifetime.Transient);
+
+            var container = builder.Build();
+            
+            Assert.That(container.TryResolve<NoDependencyServiceA>(out var obj1), Is.True);
+            Assert.That(container.TryResolve<NoDependencyServiceA>(out var obj2), Is.True);
+            Assert.That(container.TryResolve<NoDependencyServiceB>(out var obj3), Is.False);
+
+            Assert.That(obj1, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(obj2, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(obj1, Is.Not.EqualTo(obj2));
+            Assert.That(obj3, Is.Null);
+        }
+        
+        [Test]
+        public void TryResolveSingleton()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<NoDependencyServiceA>(Lifetime.Singleton);
+
+            var container = builder.Build();
+            Assert.That(container.TryResolve<NoDependencyServiceA>(out var obj1), Is.True);
+            Assert.That(container.TryResolve<NoDependencyServiceA>(out var obj2), Is.True);
+            Assert.That(container.TryResolve<NoDependencyServiceB>(out var obj3), Is.False);
+
+            Assert.That(obj1, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(obj2, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(obj1, Is.EqualTo(obj2));
+            Assert.That(obj3, Is.Null);
+        }
+
+        [Test]
+        public void TryResolveScoped()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<DisposableServiceA>(Lifetime.Scoped);
+
+            var container = builder.Build();
+            Assert.That(container.TryResolve<DisposableServiceA>(out var obj1), Is.True);
+            Assert.That(container.TryResolve<DisposableServiceA>(out var obj2), Is.True);
+            Assert.That(container.TryResolve<DisposableServiceB>(out var obj3), Is.False);
+
+            Assert.That(obj1, Is.TypeOf<DisposableServiceA>());
+            Assert.That(obj2, Is.TypeOf<DisposableServiceA>());
+            Assert.That(obj1, Is.EqualTo(obj2));
+            Assert.That(obj3, Is.Null);
+
+            container.Dispose();
+
+            Assert.That(obj1.Disposed, Is.True);
+        }
     }
 }
