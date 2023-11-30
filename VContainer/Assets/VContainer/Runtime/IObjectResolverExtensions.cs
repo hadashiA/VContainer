@@ -9,6 +9,30 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Resolve<T>(this IObjectResolver resolver) => (T)resolver.Resolve(typeof(T));
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryResolve<T>(this IObjectResolver resolver, out T resolved)
+        {
+            if (resolver.TryResolve(typeof(T), out var r))
+            {
+                resolved = (T)r;
+                return true;
+            }
+
+            resolved = default;
+            return false;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T ResolveOrDefault<T>(this IObjectResolver resolver, T defaultValue = default)
+        {
+            if (resolver.TryResolve(typeof(T), out var value))
+            {
+                return (T)value;
+            }
+
+            return defaultValue;
+        }
+
         // Using from CodeGen
         [Preserve]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
