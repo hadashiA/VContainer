@@ -192,8 +192,9 @@ namespace VContainer.Unity
                     ApplicationOrigin = this,
                     Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null,
                 };
+                builder.RegisterBuildCallback(resolver => Container = resolver);
                 InstallTo(builder);
-                Container = builder.Build();
+                builder.Build();
             }
 
             AutoInjectAll();
