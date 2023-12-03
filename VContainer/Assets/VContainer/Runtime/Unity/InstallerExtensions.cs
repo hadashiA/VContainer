@@ -20,10 +20,14 @@ namespace VContainer.Unity
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IContainerBuilder Register(this IContainerBuilder builder, IEnumerable<IInstaller> installers)
         {
-            foreach (var installer in installers)
+            if (installers != null)
             {
-                builder.Register(installer);
+                foreach (var installer in installers)
+                {
+                    builder.Register(installer);
+                }
             }
+            
 
             return builder;
         }
