@@ -83,8 +83,7 @@ namespace VContainer.Unity
             }
             else if (prefab != null)
             {
-                var injector = InjectorCache.GetOrBuild(prefab.GetType());
-                provider = new PrefabComponentProvider(prefab, injector, Parameters, in destination);
+                provider = new PrefabComponentProvider(prefab, Parameters, in destination);
             }
             else
             {

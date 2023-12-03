@@ -1,22 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
     sealed class PrefabComponentProvider : IInstanceProvider
     {
-        readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> customParameters;
         readonly Component prefab;
         ComponentDestination destination;
 
         public PrefabComponentProvider(
             Component prefab,
-            IInjector injector,
             IReadOnlyList<IInjectParameter> customParameters,
             in ComponentDestination destination)
         {
-            this.injector = injector;
             this.customParameters = customParameters;
             this.prefab = prefab;
             this.destination = destination;
@@ -32,15 +30,15 @@ namespace VContainer.Unity
 
             var parent = destination.GetParent();
             var component = parent != null
-                ? UnityEngine.Object.Instantiate(prefab, parent)
-                : UnityEngine.Object.Instantiate(prefab);
+                ? Object.Instantiate(prefab, parent)
+                : Object.Instantiate(prefab);
 
             if (VContainerSettings.Instance != null && VContainerSettings.Instance.RemoveClonePostfix)
                 component.name = prefab.name;
 
             try
             {
-                injector.Inject(component, resolver, customParameters);
+                resolver.InjectGameObject(component.gameObject, customParameters);
                 destination.ApplyDontDestroyOnLoadIfNeeded(component);
             }
             finally

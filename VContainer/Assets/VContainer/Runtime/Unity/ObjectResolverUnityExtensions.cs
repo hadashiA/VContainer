@@ -1,10 +1,12 @@
+using System.Collections.Generic;
 using UnityEngine;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
     public static class ObjectResolverUnityExtensions
     {
-        public static void InjectGameObject(this IObjectResolver resolver, GameObject gameObject)
+        public static void InjectGameObject(this IObjectResolver resolver, GameObject gameObject, IReadOnlyList<IInjectParameter> parameters = null)
         {
             void InjectGameObjectRecursive(GameObject current)
             {
@@ -18,7 +20,8 @@ namespace VContainer.Unity
                     {
                         if (monoBehaviour != null)
                         { // Can be null if the MonoBehaviour's type wasn't found (e.g. if it was stripped)
-                            resolver.Inject(monoBehaviour);
+                            var injector = InjectorCache.GetOrBuild(monoBehaviour.GetType());
+                            injector.Inject(monoBehaviour, resolver, parameters);
                         }
                     }
                 }
