@@ -178,8 +178,9 @@ namespace VContainer.Unity
                 }
 
                 // ReSharper disable once PossibleNullReferenceException
-                Container = Parent.Container.CreateScope(builder =>
+                Parent.Container.CreateScope(builder =>
                 {
+                    builder.RegisterBuildCallback(SetContainer);
                     builder.ApplicationOrigin = this;
                     builder.Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null;
                     InstallTo(builder);
@@ -192,12 +193,18 @@ namespace VContainer.Unity
                     ApplicationOrigin = this,
                     Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null,
                 };
+                builder.RegisterBuildCallback(SetContainer);
                 InstallTo(builder);
-                Container = builder.Build();
+                builder.Build();
             }
-
-            AutoInjectAll();
+            
             AwakeWaitingChildren(this);
+        }
+
+        private void SetContainer(IObjectResolver container)
+        {
+            Container = container;
+            AutoInjectAll();
         }
 
         public TScope CreateChild<TScope>(IInstaller installer = null)
