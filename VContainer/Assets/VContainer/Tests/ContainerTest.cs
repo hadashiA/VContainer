@@ -518,5 +518,35 @@ namespace VContainer.Tests
             var ctorInjectable = new ServiceA(new NoDependencyServiceA());
             Assert.DoesNotThrow(() => container.Inject(ctorInjectable));
         }
+
+        [Test]
+        public void RegisterWithCallback()
+        {
+            {
+                NoDependencyServiceA fromCallback = null;
+            
+                var builder = new ContainerBuilder();
+                builder.Register<NoDependencyServiceA>(Lifetime.Scoped, (service, _) => fromCallback = service);
+
+                var container = builder.Build();
+
+                var fromResolve = container.Resolve<NoDependencyServiceA>();
+                
+                Assert.That(fromResolve, Is.Not.Null.And.EqualTo(fromCallback));
+            }
+            
+            {
+                NoDependencyServiceA fromCallback = null;
+            
+                var builder = new ContainerBuilder();
+                builder.Register(_ => new NoDependencyServiceA(), Lifetime.Scoped, (service, _) => fromCallback = service);
+
+                var container = builder.Build();
+
+                var fromResolve = container.Resolve<NoDependencyServiceA>();
+                
+                Assert.That(fromResolve, Is.Not.Null.And.EqualTo(fromCallback));
+            }
+        }
     }
 }
