@@ -8,6 +8,28 @@ namespace VContainer
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Resolve<T>(this IObjectResolver resolver) => (T)resolver.Resolve(typeof(T));
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryGetSharedInstance<T>(this IObjectResolver resolver, out T instance)
+        {
+            if (!resolver.TryGetSharedInstance(typeof(T), out var boxed))
+            {
+                instance = default;
+                return false;
+            }
+
+            instance = (T)boxed;
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T GetSharedInstanceOrDefault<T>(this IObjectResolver resolver)
+        {
+            if (resolver.TryGetSharedInstance<T>(out var instance))
+                return instance;
+            
+            return default;
+        }
 
         // Using from CodeGen
         [Preserve]

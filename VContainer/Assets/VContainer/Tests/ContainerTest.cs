@@ -518,5 +518,75 @@ namespace VContainer.Tests
             var ctorInjectable = new ServiceA(new NoDependencyServiceA());
             Assert.DoesNotThrow(() => container.Inject(ctorInjectable));
         }
+
+        [Test]
+        public void TryGetSharedInstance()
+        {
+            {
+                const Lifetime lifetime = Lifetime.Singleton;
+                
+                var builder = new ContainerBuilder();
+                bool serviceWasResolved = false;
+
+                builder.Register(_ =>
+                {
+                    serviceWasResolved = true;
+                    return new NoDependencyServiceA();
+                }, lifetime);
+                
+                var container = builder.Build();
+                
+                Assert.That(container.TryGetSharedInstance(typeof(NoDependencyServiceA), out _), Is.False);
+                Assert.That(serviceWasResolved, Is.False);
+                
+                _ = container.Resolve<NoDependencyServiceA>();
+                
+                Assert.That(container.TryGetSharedInstance(typeof(NoDependencyServiceA), out _), Is.True);
+            }
+            
+            {
+                const Lifetime lifetime = Lifetime.Scoped;
+                
+                var builder = new ContainerBuilder();
+                bool serviceWasResolved = false;
+
+                builder.Register(_ =>
+                {
+                    serviceWasResolved = true;
+                    return new NoDependencyServiceA();
+                }, lifetime);
+                
+                var container = builder.Build();
+                
+                Assert.That(container.TryGetSharedInstance(typeof(NoDependencyServiceA), out _), Is.False);
+                Assert.That(serviceWasResolved, Is.False);
+                
+                _ = container.Resolve<NoDependencyServiceA>();
+                
+                Assert.That(container.TryGetSharedInstance(typeof(NoDependencyServiceA), out _), Is.True);
+            }
+            
+            {
+                const Lifetime lifetime = Lifetime.Transient;
+                
+                var builder = new ContainerBuilder();
+                bool serviceWasResolved = false;
+
+                builder.Register(_ =>
+                {
+                    serviceWasResolved = true;
+                    return new NoDependencyServiceA();
+                }, lifetime);
+                
+                var container = builder.Build();
+                
+                Assert.That(container.TryGetSharedInstance(typeof(NoDependencyServiceA), out _), Is.False);
+                Assert.That(serviceWasResolved, Is.False);
+                
+                _ = container.Resolve<NoDependencyServiceA>();
+                
+                Assert.That(container.TryGetSharedInstance(typeof(NoDependencyServiceA), out _), Is.False);
+            }
+        }
     }
 }
