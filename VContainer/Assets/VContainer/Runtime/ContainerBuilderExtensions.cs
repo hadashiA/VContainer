@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using VContainer.Internal;
-using VContainer.Runtime.Internal;
 
 namespace VContainer
 {

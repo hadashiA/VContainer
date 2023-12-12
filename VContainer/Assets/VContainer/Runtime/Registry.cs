@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using VContainer.Runtime.Internal.InstanceProviders;
 
 namespace VContainer.Internal
 {
@@ -57,7 +56,7 @@ namespace VContainer.Internal
                 }
                 else
                 {
-                    collection = new CollectionInstanceProvider(service) {exists};
+                    collection = new CollectionInstanceProvider(service) { exists };
                     var newRegistration = new Registration(
                         RuntimeTypeCache.ArrayTypeOf(service),
                         Lifetime.Transient,
@@ -110,7 +109,7 @@ namespace VContainer.Internal
             {
                 var openGenericType = RuntimeTypeCache.OpenGenericTypeOf(interfaceType);
                 var typeParameters = RuntimeTypeCache.GenericTypeParametersOf(interfaceType);
-                return TryGetClosedGenericRegistration(interfaceType,openGenericType, out registration) ||
+                return TryGetClosedGenericRegistration(interfaceType, openGenericType, out registration) ||
                        TryFallbackToSingleElementCollection(interfaceType, openGenericType, typeParameters, out registration) ||
                        TryFallbackToContainerLocal(interfaceType, openGenericType, typeParameters, out registration);
             }

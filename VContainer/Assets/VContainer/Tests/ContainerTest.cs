@@ -254,20 +254,20 @@ namespace VContainer.Tests
         {
             var builder = new ContainerBuilder();
 
-            builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient);
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient).AsSelf();
             builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Transient).As(typeof(IGenericService<>)).AsSelf();
             builder.RegisterOpenGeneric(typeof(IGenericService<,>), typeof(GenericsService2<,>), Lifetime.Singleton);
             builder.Register<HasGenericDependency>(Lifetime.Singleton);
 
             var container = builder.Build();
-            var obj1 = container.Resolve<IGenericService<int>>();
-            var obj2 = container.Resolve<IGenericService<int, string>>();
-            var obj3 = container.Resolve<IGenericService<int, string>>();
-            var obj4 = container.Resolve<GenericsService<int>>();
+            var obj1 = container.Resolve<IGenericService<NoDependencyServiceA>>();
+            var obj2 = container.Resolve<IGenericService<string, NoDependencyServiceA>>();
+            var obj3 = container.Resolve<IGenericService<string, NoDependencyServiceA>>();
+            var obj4 = container.Resolve<GenericsService<NoDependencyServiceA>>();
             var obj5 = container.Resolve<HasGenericDependency>();
 
-            Assert.That(obj1, Is.TypeOf<GenericsService<int>>());
-            Assert.That(obj2, Is.TypeOf<GenericsService2<int, string>>());
+            Assert.That(obj1, Is.TypeOf<GenericsService<NoDependencyServiceA>>());
+            Assert.That(obj2, Is.TypeOf<GenericsService2<string, NoDependencyServiceA>>());
             Assert.AreSame(obj2, obj3);
             Assert.NotNull(obj4);
             Assert.AreNotSame(obj4, obj1);

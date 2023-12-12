@@ -1,49 +1,57 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using VContainer.Internal;
 
-namespace VContainer.Runtime.Internal.InstanceProviders
+namespace VContainer.Internal
 {
     public class OpenGenericInstanceProvider : IInstanceProvider
     {
-        readonly Type ImplementationType;
-        readonly Lifetime Lifetime;
+        readonly Type implementationType;
+        readonly Lifetime lifetime;
         readonly IReadOnlyList<IInjectParameter> customParameters;
-
-        private readonly ConcurrentDictionary<Type, Registration> _registrations =
-            new ConcurrentDictionary<Type, Registration>();
+        readonly ConcurrentDictionary<Type, Registration> registrations;
 
         public OpenGenericInstanceProvider(Type implementationType, Lifetime lifetime,
             List<IInjectParameter> injectParameters)
         {
-            ImplementationType = implementationType;
-            Lifetime = lifetime;
+            this.implementationType = implementationType;
+            this.lifetime = lifetime;
             customParameters = injectParameters;
+            registrations = new ConcurrentDictionary<Type, Registration>();
         }
 
         public Registration GetClosedRegistration(Type interfaceType)
         {
-            var registration = _registrations.GetOrAdd(interfaceType, _ =>
+            var registrationArgs = new RegistrationArguments()
             {
-                var genericArguments = interfaceType.GetGenericArguments();
-                var newType = ImplementationType.MakeGenericType(genericArguments);
+                ImplementationType = implementationType,
+                Lifetime = lifetime,
+                CustomParameters = customParameters,
+            };
+            return registrations.GetOrAdd(interfaceType, static (type, args) =>
+                CreateRegistration(type, args), registrationArgs);
+        }
 
-                var injector = InjectorCache.GetOrBuild(newType);
-                var spawner = new InstanceProvider(injector, customParameters);
-                return new Registration(
-                    newType,
-                    Lifetime,
-                    new List<Type>(1) {interfaceType},
-                    spawner);
-            });
+        private static Registration CreateRegistration(Type type, RegistrationArguments args)
+        {
+            var genericArguments = type.GetGenericArguments();
+            var newType = args.ImplementationType.MakeGenericType(genericArguments);
 
-            return registration;
+            var injector = InjectorCache.GetOrBuild(newType);
+            var spawner = new InstanceProvider(injector, args.CustomParameters);
+            return new Registration(newType, args.Lifetime, new List<Type>(1) { type }, spawner);
         }
 
         public object SpawnInstance(IObjectResolver resolver)
         {
             throw new InvalidOperationException();
+        }
+
+        private struct RegistrationArguments
+        {
+            public Type ImplementationType;
+            public Lifetime Lifetime;
+            public IReadOnlyList<IInjectParameter> CustomParameters;
         }
     }
 }

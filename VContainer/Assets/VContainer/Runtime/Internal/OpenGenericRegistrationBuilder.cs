@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using VContainer.Runtime.Internal.InstanceProviders;
 
-namespace VContainer.Runtime.Internal
+namespace VContainer.Internal
 {
     public class OpenGenericRegistrationBuilder : RegistrationBuilder
     {
@@ -39,7 +38,7 @@ namespace VContainer.Runtime.Internal
                 {
                     InterfaceTypes = new List<Type>();
                 }
-                
+
                 if (!InterfaceTypes.Contains(interfaceType))
                     InterfaceTypes.Add(interfaceType);
 
