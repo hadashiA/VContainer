@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace VContainer.Unity
 {
@@ -16,6 +17,14 @@ namespace VContainer.Unity
         [SerializeField]
         [Tooltip("Enables the collection of information that can be viewed in the VContainerDiagnosticsWindow. Note: Performance degradation")]
         public bool EnableDiagnostics;
+
+        [SerializeField]
+        [Tooltip("Disables script modification for LifetimeScope scripts.")]
+        public bool DisableScriptModifier;
+
+        [SerializeField]
+        [Tooltip("Removes (Clone) postfix in IObjectResolver.Instantiate() and IContainerBuilder.RegisterComponentInNewPrefab().")]
+        public bool RemoveClonePostfix;
 
 #if UNITY_EDITOR
         [UnityEditor.MenuItem("Assets/Create/VContainer/VContainer Settings")]
@@ -44,6 +53,8 @@ namespace VContainer.Unity
             var preloadAsset = UnityEditor.PlayerSettings.GetPreloadedAssets().FirstOrDefault(x => x is VContainerSettings);
             if (preloadAsset is VContainerSettings instance)
             {
+                if (instance.RootLifetimeScope != null)
+                    instance.RootLifetimeScope.DisposeCore();
                 instance.OnEnable();
             }
         }
@@ -54,35 +65,60 @@ namespace VContainer.Unity
             // For editor, we need to load the Preload asset manually.
             LoadInstanceFromPreloadAssets();
         }
-
-        [UnityEditor.InitializeOnLoadMethod]
-        static void EditorInitialize()
-        {
-            // RootLifetimeScope must be disposed before it can be resumed.
-            UnityEditor.EditorApplication.playModeStateChanged += state =>
-            {
-                switch (state)
-                {
-                    case UnityEditor.PlayModeStateChange.ExitingPlayMode:
-                        if (Instance != null)
-                        {
-                            if (Instance.RootLifetimeScope != null)
-                            {
-                                Instance.RootLifetimeScope.DisposeCore();
-                            }
-                            Instance = null;
-                        }
-                        break;
-                }
-            };
-        }
 #endif
 
         void OnEnable()
         {
+            if (Application.isPlaying)
+            {
+                if (RootLifetimeScope != null)
+                {
+                    RootLifetimeScope.IsRoot = true;
+                }
+
+                Instance = this;
+
+                var activeScene = SceneManager.GetActiveScene();
+                if (activeScene.isLoaded)
+                {
+                    OnFirstSceneLoaded(activeScene, default);
+                }
+                else
+                {
+                    SceneManager.sceneLoaded -= OnFirstSceneLoaded;
+                    SceneManager.sceneLoaded += OnFirstSceneLoaded;
+                }
+
+                Application.quitting -= OnApplicationQuit;
+                Application.quitting += OnApplicationQuit;
+            }
+        }
+
+        void OnFirstSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (RootLifetimeScope != null &&
+                RootLifetimeScope.Container == null &&
+                RootLifetimeScope.autoRun)
+            {
+                RootLifetimeScope.Build();
+            }
+            SceneManager.sceneLoaded -= OnFirstSceneLoaded;
+        }
+
+        void OnApplicationQuit()
+        {
             if (RootLifetimeScope != null)
-                RootLifetimeScope.IsRoot = true;
-            Instance = this;
+            {
+                if (RootLifetimeScope.Container != null)
+                {
+                    // Execute Dispose once at the slowest possible time.
+                    // However, the GameObject may be destroyed at that time.
+                    PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new AsyncLoopItem(() =>
+                    {
+                        RootLifetimeScope.DisposeCore();
+                    }));
+                }
+            }
         }
     }
 }

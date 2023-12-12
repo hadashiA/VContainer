@@ -1,5 +1,6 @@
 import * as React from "react"
 import { ResponsiveBar } from '@nivo/bar'
+import { useGraphTheme } from "./GraphThemeContext"
 
 const data = [
   {
@@ -9,9 +10,12 @@ const data = [
   }
 ]
 
-export const GCAllocGraph: React.FC<{ height: number }> = ({ height }) =>
-  <div style={{height, width: '100%'}}>
+export function GCAllocGraph({ height }: { height: number } ): JSX.Element {
+  const { theme } = useGraphTheme()
+
+  return <div style={{height, width: '100%'}}>
     <ResponsiveBar
+      theme={theme}
       data={data}
       groupMode="grouped"
       layout="vertical"
@@ -107,3 +111,4 @@ export const GCAllocGraph: React.FC<{ height: number }> = ({ height }) =>
       motionDamping={15}
     />
   </div>
+}

@@ -2,6 +2,7 @@
     "name": "VContainer",
     "rootNamespace": "",
     "references": [
+        "Unity.Collections",
         "Unity.Entities",
         "UniTask"
     ],

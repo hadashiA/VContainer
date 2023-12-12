@@ -15,7 +15,18 @@ namespace VContainer.Internal
 
         public object SpawnInstance(IObjectResolver resolver)
         {
-            var value = resolver.Resolve(valueRegistration);
+            object value;
+
+            if (resolver is ScopedContainer scope &&
+                valueRegistration.Provider is CollectionInstanceProvider collectionProvider)
+            {
+                var entirelyRegistrations = collectionProvider.CollectFromParentScopes(scope, localScopeOnly: true);
+                value = collectionProvider.SpawnInstance(resolver, entirelyRegistrations);
+            }
+            else
+            {
+                value = resolver.Resolve(valueRegistration);
+            }
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(1);
             try
             {
@@ -27,5 +38,5 @@ namespace VContainer.Internal
                 CappedArrayPool<object>.Shared8Limit.Return(parameterValues);
             }
         }
-    }
+   }
 }

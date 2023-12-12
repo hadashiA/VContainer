@@ -62,6 +62,7 @@ namespace VContainer.Internal
             var i = array.Length - 1;
             lock (syncRoot)
             {
+                Array.Clear(array, 0, array.Length);
                 if (tails[i] > 0)
                     tails[i] -= 1;
             }

@@ -8,6 +8,7 @@ namespace VContainer
 {
     public interface IObjectResolver : IDisposable
     {
+        object ApplicationOrigin { get; }
         DiagnosticsCollector Diagnostics { get; set; }
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace VContainer
     {
         public IObjectResolver Root { get; }
         public IScopedObjectResolver Parent { get; }
+        public object ApplicationOrigin { get; }
         public DiagnosticsCollector Diagnostics { get; set; }
 
         readonly Registry registry;
@@ -57,10 +59,12 @@ namespace VContainer
         internal ScopedContainer(
             Registry registry,
             IObjectResolver root,
-            IScopedObjectResolver parent = null)
+            IScopedObjectResolver parent = null,
+            object applicationOrigin = null)
         {
             Root = root;
             Parent = parent;
+            ApplicationOrigin = applicationOrigin;
             this.registry = registry;
             createInstance = registration =>
             {
@@ -84,7 +88,10 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null)
         {
-            var containerBuilder = new ScopedContainerBuilder(Root, this);
+            var containerBuilder = new ScopedContainerBuilder(Root, this)
+            {
+                ApplicationOrigin = ApplicationOrigin
+            };
             installation?.Invoke(containerBuilder);
             return containerBuilder.BuildScope();
         }
@@ -127,7 +134,6 @@ namespace VContainer
                 default:
                     return registration.SpawnInstance(this);
             }
-
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -144,39 +150,16 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        Registration FindRegistration(Type type)
+        internal Registration FindRegistration(Type type)
         {
             IScopedObjectResolver scope = this;
-            Registration entirelyCollection = null;
-
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
                 {
-                    switch (registration.Provider)
-                    {
-                        case CollectionInstanceProvider localCollection:
-                            if (entirelyCollection == null)
-                            {
-                                var collection = new CollectionInstanceProvider(localCollection.ElementType);
-                                collection.Merge(localCollection);
-                                entirelyCollection = new Registration(registration.ImplementationType, registration.Lifetime, registration.InterfaceTypes, collection);
-                            }
-                            else
-                            {
-                                ((CollectionInstanceProvider)entirelyCollection.Provider).Merge(localCollection);
-                            }
-                            break;
-                        default:
-                            return registration;
-                    }
+                    return registration;
                 }
                 scope = scope.Parent;
-            }
-
-            if (entirelyCollection != null)
-            {
-                return entirelyCollection;
             }
             throw new VContainerException(type, $"No such registration of type: {type}");
         }
@@ -184,6 +167,7 @@ namespace VContainer
 
     public sealed class Container : IObjectResolver
     {
+        public object ApplicationOrigin { get; }
         public DiagnosticsCollector Diagnostics { get; set; }
 
         readonly Registry registry;
@@ -192,15 +176,17 @@ namespace VContainer
         readonly CompositeDisposable disposables = new CompositeDisposable();
         readonly Func<Registration, Lazy<object>> createInstance;
 
-        internal Container(Registry registry)
+        internal Container(Registry registry, object applicationOrigin = null)
         {
             this.registry = registry;
-            rootScope = new ScopedContainer(registry, this);
+            rootScope = new ScopedContainer(registry, this, applicationOrigin: applicationOrigin);
 
             createInstance = registration =>
             {
                 return new Lazy<object>(() => registration.SpawnInstance(this));
             };
+
+            ApplicationOrigin = applicationOrigin;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

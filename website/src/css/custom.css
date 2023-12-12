@@ -87,15 +87,19 @@ html[data-theme='dark'] {
   font-size: 0.85rem;
 }
 
+.menu__link.menu__link--sublist-caret {
+    padding-left: 0;
+}
+
 .menu__link.menu__link--sublist.menu__link--active {
   color: var(--ifm-font-color-base);
 }
 
-.menu>ul.menu__list li>a {
-  padding-left: 0;
-  /*padding-right: 0;*/
-  /*margin: 0;*/
-}
+/*.menu>ul.menu__list li>a {*/
+/*  padding-left: 0;*/
+/*  !*padding-right: 0;*!*/
+/*  !*margin: 0;*!*/
+/*}*/
 
 .menu>ul.menu__list ul.menu__list {
   border-left: 1px solid rgba(0,27,61,.075);

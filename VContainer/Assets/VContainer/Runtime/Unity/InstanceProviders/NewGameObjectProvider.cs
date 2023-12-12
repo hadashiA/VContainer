@@ -42,6 +42,8 @@ namespace VContainer.Unity
             var component = gameObject.AddComponent(componentType);
 
             injector.Inject(component, resolver, customParameters);
+            destination.ApplyDontDestroyOnLoadIfNeeded(component);
+
             component.gameObject.SetActive(true);
             return component;
         }

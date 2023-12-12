@@ -13,6 +13,8 @@ namespace VContainer
     {
         object ApplicationOrigin { get; set; }
         DiagnosticsCollector Diagnostics { get; set; }
+        int Count { get; }
+        RegistrationBuilder this[int index] { get; set; }
 
         T Register<T>(T registrationBuilder) where T : RegistrationBuilder;
         void RegisterBuildCallback(Action<IObjectResolver> container);
@@ -34,7 +36,7 @@ namespace VContainer
         public IScopedObjectResolver BuildScope()
         {
             var registry = BuildRegistry();
-            var container = new ScopedContainer(registry, root, parent);
+            var container = new ScopedContainer(registry, root, parent, ApplicationOrigin);
             container.Diagnostics = Diagnostics;
             EmitCallbacks(container);
             return container;
@@ -47,6 +49,14 @@ namespace VContainer
     public class ContainerBuilder : IContainerBuilder
     {
         public object ApplicationOrigin { get; set; }
+
+        public int Count => registrationBuilders.Count;
+
+        public RegistrationBuilder this[int index]
+        {
+            get => registrationBuilders[index];
+            set => registrationBuilders[index] = value;
+        }
 
         public DiagnosticsCollector Diagnostics
         {
@@ -96,7 +106,7 @@ namespace VContainer
         public virtual IObjectResolver Build()
         {
             var registry = BuildRegistry();
-            var container = new Container(registry);
+            var container = new Container(registry, ApplicationOrigin);
             container.Diagnostics = Diagnostics;
             EmitCallbacks(container);
             return container;
@@ -112,7 +122,7 @@ namespace VContainer
             {
                 var registrationBuilder = registrationBuilders[i];
                 var registration = registrationBuilder.Build();
-                Diagnostics?.TraceBuild(this, registrationBuilder, registration);
+                Diagnostics?.TraceBuild(registrationBuilder, registration);
                 registrations[i] = registration;
             });
 #else

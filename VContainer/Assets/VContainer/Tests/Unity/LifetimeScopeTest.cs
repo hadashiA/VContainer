@@ -8,21 +8,6 @@ namespace VContainer.Tests.Unity
 {
     public class LifetimeScopeTest
     {
-        [Test]
-        public void EnqueueParent()
-        {
-            var parent = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
-
-            using (LifetimeScope.EnqueueParent(parent))
-            {
-                var child = new GameObject("LifetimeScope Child 1").AddComponent<LifetimeScope>();
-                Assert.That(child.Parent, Is.EqualTo(parent));
-            }
-
-            var child2 = new GameObject("LifetimeScope Child 2").AddComponent<LifetimeScope>();
-            Assert.That(child2.Parent, Is.Null);
-        }
-
         [UnityTest]
         public IEnumerator Create()
         {
@@ -160,6 +145,74 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void EnqueueParent()
+        {
+            var parent = new GameObject("LifetimeScope").AddComponent<LifetimeScope>();
+
+            using (LifetimeScope.EnqueueParent(parent))
+            {
+                var child = new GameObject("LifetimeScope Child 1").AddComponent<LifetimeScope>();
+                Assert.That(child.Parent, Is.EqualTo(parent));
+            }
+
+            var child2 = new GameObject("LifetimeScope Child 2").AddComponent<LifetimeScope>();
+            Assert.That(child2.Parent, Is.Null);
+        }
+
+        [Test]
+        public void EnqueueParent_Multiply()
+        {
+            var parent1 = new GameObject("LifetimeScope Parent 1").AddComponent<LifetimeScope>();
+
+            using (LifetimeScope.EnqueueParent(parent1))
+            {
+                var parent2 = new GameObject("LifetimeScope Parent 2").AddComponent<LifetimeScope>();
+                Assert.That(parent2.Parent, Is.EqualTo(parent1));
+
+                using (LifetimeScope.EnqueueParent(parent2))
+                {
+                    var child = new GameObject("LifetimeScope Child").AddComponent<LifetimeScope>();
+                    Assert.That(child.Parent, Is.EqualTo(parent2));
+                }
+            }
+        }
+
+        [Test]
+        public void EnqueueExtraInstaller()
+        {
+            using (LifetimeScope.Enqueue(builder => builder.Register<NoDependencyServiceA>(Lifetime.Scoped)))
+            {
+                var scope1 = new GameObject("LifetimeScope 1").AddComponent<LifetimeScope>();
+                Assert.That(scope1.Container.Resolve<NoDependencyServiceA>(), Is.InstanceOf<NoDependencyServiceA>());
+
+                using (LifetimeScope.Enqueue(builder => builder.Register<NoDependencyServiceB>(Lifetime.Scoped)))
+                {
+                    var scope2 = new GameObject("LifetimeScope 2").AddComponent<LifetimeScope>();
+                    Assert.That(scope2.Container.Resolve<NoDependencyServiceA>(), Is.InstanceOf<NoDependencyServiceA>());
+                    Assert.That(scope2.Container.Resolve<NoDependencyServiceB>(), Is.InstanceOf<NoDependencyServiceB>());
+                }
+
+                var scope3 = new GameObject("LifetimeScope 3").AddComponent<LifetimeScope>();
+                Assert.That(scope3.Container.Resolve<NoDependencyServiceA>(), Is.InstanceOf<NoDependencyServiceA>());
+                Assert.Throws<VContainerException>(() =>
+                {
+                    scope3.Container.Resolve<NoDependencyServiceB>();
+                });
+            }
+
+            var scope4 = new GameObject("LifetimeScope 4").AddComponent<LifetimeScope>();
+            Assert.Throws<VContainerException>(() =>
+            {
+                scope4.Container.Resolve<NoDependencyServiceA>();
+            });
+            Assert.Throws<VContainerException>(() =>
+            {
+                scope4.Container.Resolve<NoDependencyServiceB>();
+            });
+        }
+
+        [Test]
+        [Ignore("Resources/ will be included in the build and we want to use a different approch")]
         public void ParentTypeReference()
         {
             var prefab = Resources.Load<GameObject>("ParentChildRelationship");

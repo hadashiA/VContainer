@@ -1,6 +1,5 @@
 #if VCONTAINER_ECS_INTEGRATION
 using System;
-using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine.LowLevel;
 
@@ -26,10 +25,21 @@ namespace VContainer.Unity
             }
             else
             {
+#if UNITY_2022_2_OR_NEWER
+                world.CreateSystemManaged<InitializationSystemGroup>();
+                world.CreateSystemManaged<SimulationSystemGroup>();
+                world.CreateSystemManaged<PresentationSystemGroup>();
+
+                ScriptBehaviourUpdateOrder.RemoveWorldFromCurrentPlayerLoop(world);
+                ScriptBehaviourUpdateOrder.AppendWorldToCurrentPlayerLoop(world);
+#else
                 world.CreateSystem<InitializationSystemGroup>();
                 world.CreateSystem<SimulationSystemGroup>();
                 world.CreateSystem<PresentationSystemGroup>();
-                ScriptBehaviourUpdateOrder.UpdatePlayerLoop(world, PlayerLoop.GetCurrentPlayerLoop());
+
+                ScriptBehaviourUpdateOrder.RemoveWorldFromCurrentPlayerLoop(world);
+                ScriptBehaviourUpdateOrder.AddWorldToCurrentPlayerLoop(world);
+#endif
             }
             return world;
         }

@@ -1,0 +1,93 @@
+---
+title: Source Generator
+---
+
+:::caution
+This feature requires Unity 2021.3 or later.
+:::
+
+VContainerはデフォルトではリフレクションを用いてメタプログラミングを行ないますが、メタプログラミング部分を [Roslyn Source Generator](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview) で事前生成ことで、実行速度を改善する機能が用意されています。
+
+Source Generator は、C#コンパイラツールであるRoslynの機能で、コンパイル時に人間の書いたソースコードを汚すことなく追加のC#コードを差し込むことができます。
+追加されるコードはC#であるため、ILコード生成や実行時のExpressionTeeと比較するとデバッグが容易でメンテナンス性が高いことが利点です。ソースコードをコンパイル時に生成するという点では、他の言語にあるマクロなどの機能と用途などに共通点があります。
+SourceGenerator は 新しい.NET環境において標準的な位置づけと言えます。
+
+:::info
+以前のバージョンのVContainerは、`Mono.Cecil` を用いたコンパイル時ILコード生成で同様のことを実現していましたが、
+VContainer 1.13.0 以降で、これをRoslyn Source Generatorに移行しました。
+:::
+
+## Source Generator を有効にする
+
+以下は、VContainerのSourceGeneratorモードを有効にする手順です。
+
+### 1. `VContainer.SourceGenerator.dll` をプロジェクトに追加
+
+VContainerのリリースページから 、`VContainer.SourceGenerator.dll をダウンロードします。
+https://github.com/hadashiA/VContainer/releases
+
+VContainerがインストールされているUnityプロジェクトの Assets/ 以下の任意の場所にダウンロードしたdllを追加します。
+
+### 2. `RoslynAnalizer` タグを付与
+
+Unityのプロジェクトビューで、 `VcContainer.SourceGenerator.dll` を選択します。
+インスペクターの下の方にあるラベルアイコンをクリックし、入力覧に “RoslynAnalyzer” と入力します。
+RoslynAnalyzer というasset labelを付与することで、UnityはこのdllをAnalyzer or SourceGenerator として認識してくれます。
+
+![](./assets/screenshot_roslynanalyzer.png)
+
+また、インスペクターの 「Select platform for plugin」セクションのチェックを全て外して下さい。
+
+参考: UnityでのSourceGeneratorの動作について、以下に詳細がドキュメントがあります。
+- https://docs.unity3d.com/Manual/roslyn-analyzers.html
+
+この状態でコンパイルを走らせると、VContaienrは自動的にDIのための高速なコードを生成するようになります。
+
+## コード生成対象になるクラス
+
+デフォルトでは、VContainer.asmdef の参照があるアセンブリ内のクラスはコード生成の対象になります。
+
+無駄なコード生成を抑制したい等の理由で、対象から除外したい場合は、型に対して `[InjectIgnore]` アトリビュートを付与してください。
+
+
+## 制限事項
+
+現在、以下のような型定義に対しては、SourceGeneratorの対象にはなりません。注意して下さい。
+(暗黙のうちにリフレクションでの動作にフォールバックされます)
+
+- ネストしたクラス
+- struct型
+- アクセスレベルが internal未満のコンストラクタやメソッドやプロパティ (たとえば `[Inject]`アトリビュートがついていても、privateなもの)
+
+## Remarks
+
+VContainerが自動生成するのは以下のようなコードです。
+
+```csharp
+class ClassA
+{
+    private sealed class __GeneratedInjector : IInjector
+    {
+        public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
+        {
+            I6 fromConstructor = resolver.ResolveOrParameter<I6>("fromConstructor1", parameters);
+            I7 fromConstructor2 = resolver.ResolveOrParameter<I7>("fromConstructor2", parameters);
+            return new ClassA(fromConstructor, fromConstructor2);
+        }
+
+        public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
+        {
+            ClassA clasA = (ClassA)instance;
+            I3 service = resolver.ResolveOrParameter<I3>("service3", parameters);
+            I4 service2 = resolver.ResolveOrParameter<I4>("service4", parameters);
+            allInjectionFeatureService.MethodInjectable1(service, service2);
+            I5 service3 = resolver.ResolveOrParameter<I5>("service5", parameters);
+            I6 service4 = resolver.ResolveOrParameter<I6>("service6", parameters);
+            classA.MethodInjectable2(service3, service4);
+            classA.PrivatePropertyInjectable = resolver.Resolve<I2>();
+            classA.PublicPropertyInjectable = resolver.Resolve<I3>();
+            classA.privateFieldInjectable = resolver.Resolve<I4>();
+            classA.PublicFieldInjectable = resolver.Resolve<I5>();
+        }
+   }
+```

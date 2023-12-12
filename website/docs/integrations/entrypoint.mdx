@@ -6,7 +6,7 @@ VContainer allows plain C# to be the starting point for application processing.
 Using it instead of MonoBehaviour, which has a lot of features, can help you build a simple control flow.
 
 ```csharp
-clas FooController : IStartable
+class FooController : IStartable
 {
     void IStartable.Start()
     {
@@ -30,7 +30,7 @@ Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: 
 
 ## Available interfaces
 
-| VContaienr entry point                | Timing |
+| VContainer entry point                | Timing |
 |:--------------------------------------|:----------------------------------|
 | `IInitializable.Initialize()`         | Immediately after building the container |
 | `IPostInitializable.PostInitialize()` | Late `IInitializable.Initialize()`  |

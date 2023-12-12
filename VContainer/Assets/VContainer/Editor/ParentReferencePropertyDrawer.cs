@@ -27,6 +27,11 @@ namespace VContainer.Editor
             if (names == null)
             {
                 names = GetAllTypeNames();
+                if (prop.serializedObject.targetObject is LifetimeScope lifetimeScope)
+                {
+                    var lifetimeScopeName = lifetimeScope.GetType().FullName;
+                    names = names.Where(name => name != lifetimeScopeName).ToArray();
+                }
             }
 
             var typeNameProp = prop.FindPropertyRelative("TypeName");

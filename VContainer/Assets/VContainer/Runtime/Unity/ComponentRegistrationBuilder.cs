@@ -9,6 +9,7 @@ namespace VContainer.Unity
     {
         public Transform Parent;
         public Func<Transform> ParentFinder;
+        public bool DontDestroyOnLoad;
 
         public Transform GetParent()
         {
@@ -17,6 +18,14 @@ namespace VContainer.Unity
             if (ParentFinder != null)
                 return ParentFinder();
             return null;
+        }
+
+        public void ApplyDontDestroyOnLoadIfNeeded(Component component)
+        {
+            if (DontDestroyOnLoad)
+            {
+                UnityEngine.Object.DontDestroyOnLoad(component);
+            }
         }
     }
 
@@ -61,23 +70,25 @@ namespace VContainer.Unity
 
         public override Registration Build()
         {
-            var injector = InjectorCache.GetOrBuild(ImplementationType);
             IInstanceProvider provider;
 
             if (instance != null)
             {
-                provider = new ExistingComponentProvider(instance, injector, Parameters);
+                var injector = InjectorCache.GetOrBuild(ImplementationType);
+                provider = new ExistingComponentProvider(instance, injector, Parameters, destination.DontDestroyOnLoad);
             }
             else if (scene.IsValid())
             {
-                provider = new FindComponentProvider(ImplementationType, injector, Parameters, in scene, in destination);
+                provider = new FindComponentProvider(ImplementationType, Parameters, in scene, in destination);
             }
             else if (prefab != null)
             {
+                var injector = InjectorCache.GetOrBuild(prefab.GetType());
                 provider = new PrefabComponentProvider(prefab, injector, Parameters, in destination);
             }
             else
             {
+                var injector = InjectorCache.GetOrBuild(ImplementationType);
                 provider = new NewGameObjectProvider(ImplementationType, injector, Parameters, in destination, gameObjectName);
             }
             return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
@@ -92,6 +103,12 @@ namespace VContainer.Unity
         public ComponentRegistrationBuilder UnderTransform(Func<Transform> parentFinder)
         {
             destination.ParentFinder = parentFinder;
+            return this;
+        }
+
+        public ComponentRegistrationBuilder DontDestroyOnLoad()
+        {
+            destination.DontDestroyOnLoad = true;
             return this;
         }
    }
