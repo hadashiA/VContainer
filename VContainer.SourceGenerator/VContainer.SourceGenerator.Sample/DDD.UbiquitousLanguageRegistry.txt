@@ -1,5 +1,0 @@
-Customer
-Product
-Stock
-Shop
-Employee
