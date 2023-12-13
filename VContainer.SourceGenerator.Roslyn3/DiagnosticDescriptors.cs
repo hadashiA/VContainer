@@ -4,7 +4,7 @@ namespace VContainer.SourceGenerator
 {
     static class DiagnosticDescriptors
     {
-        const string Category = "VContainer.SourceGenerator";
+        const string Category = "VContainer.SourceGenerator.Roslyn3";
 
         public static readonly DiagnosticDescriptor UnexpectedErrorDescriptor = new(
             id: "VCON0001",
