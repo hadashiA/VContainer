@@ -255,23 +255,27 @@ namespace VContainer.Tests
             var builder = new ContainerBuilder();
 
             builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient).AsSelf();
-            builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Transient).As(typeof(IGenericService<>)).AsSelf();
-            builder.RegisterOpenGeneric(typeof(IGenericService<,>), typeof(GenericsService2<,>), Lifetime.Singleton);
+            builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Transient)
+                .AsImplementedInterfaces()
+                .AsSelf();
+            builder.RegisterOpenGeneric(typeof(IGenericService<,>), typeof(GenericsService2<,>), Lifetime.Singleton)
+                .AsSelf();
             builder.Register<HasGenericDependency>(Lifetime.Singleton);
 
             var container = builder.Build();
             var obj1 = container.Resolve<IGenericService<NoDependencyServiceA>>();
             var obj2 = container.Resolve<IGenericService<string, NoDependencyServiceA>>();
             var obj3 = container.Resolve<IGenericService<string, NoDependencyServiceA>>();
-            var obj4 = container.Resolve<GenericsService<NoDependencyServiceA>>();
-            var obj5 = container.Resolve<HasGenericDependency>();
+            var obj4 = container.Resolve<GenericsService2<string, NoDependencyServiceA>>();
+            var obj5 = container.Resolve<GenericsService<NoDependencyServiceA>>();
+            var obj6 = container.Resolve<HasGenericDependency>();
 
             Assert.That(obj1, Is.TypeOf<GenericsService<NoDependencyServiceA>>());
             Assert.That(obj2, Is.TypeOf<GenericsService2<string, NoDependencyServiceA>>());
             Assert.AreSame(obj2, obj3);
-            Assert.NotNull(obj4);
-            Assert.AreNotSame(obj4, obj1);
-            Assert.That(obj5.Service, Is.TypeOf<GenericsService<NoDependencyServiceA>>());
+            Assert.AreSame(obj3, obj4);
+            Assert.AreNotSame(obj1, obj5);
+            Assert.That(obj6.Service, Is.TypeOf<GenericsService<NoDependencyServiceA>>());
         }
 
         [Test]

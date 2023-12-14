@@ -20,8 +20,8 @@ namespace VContainer.Internal
 
         public override Registration Build()
         {
-            var spawner = new OpenGenericInstanceProvider(ImplementationType, Lifetime, Parameters);
-            return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner);
+            var provider = new OpenGenericInstanceProvider(ImplementationType, Lifetime, Parameters);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
         }
 
         protected override void AddInterfaceType(Type interfaceType)
