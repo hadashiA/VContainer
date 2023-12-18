@@ -137,10 +137,10 @@ namespace VContainer.Unity
             switch (instance)
             {
                 case Component component:
-                    component.transform.parent = null;
+                    component.transform.SetParent(null, false);
                     break;
                 case GameObject gameObject:
-                    gameObject.transform.parent = null;
+                    gameObject.transform.SetParent(null, false);
                     break;
             }
         }

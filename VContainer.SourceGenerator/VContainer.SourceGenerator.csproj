@@ -1,31 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <RootNamespace>VContaienr.SourceGenerator</RootNamespace>
-        <AnalyzerLanguage>cs</AnalyzerLanguage>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
-        <LangVersion>11</LangVersion>
+        <LangVersion>12</LangVersion>
+        <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
-        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-        <DevelopmentDependency>true</DevelopmentDependency>
+        <LangVersion>latest</LangVersion>
+
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IsRoslynComponent>true</IsRoslynComponent>
+
+        <RootNamespace>VContainer.SourceGenerator</RootNamespace>
+        <PackageId>VContainer.SourceGenerator</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Mainly used for Unity, Unity 2021.3 has Roslyn 3.9.0(see: Editor\Data\DotNetSdkRoslyn\ -->
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.9.0" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3">
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.1.0"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.1.0"/>
     </ItemGroup>
 
 
-    <!-- Copy files for Unity -->
-    <PropertyGroup>
-        <DestinationRoot>$(MSBuildProjectDirectory)\..\VContainer\Assets\VContainer\Runtime</DestinationRoot>
-    </PropertyGroup>
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="$(Configuration) == 'Release'">
-        <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(DestinationRoot)\$(TargetFileName)" SkipUnchangedFiles="true" />
-    </Target>
 </Project>

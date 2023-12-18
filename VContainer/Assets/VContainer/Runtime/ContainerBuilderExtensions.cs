@@ -60,7 +60,6 @@ namespace VContainer
             this IContainerBuilder builder,
             Func<IObjectResolver, TInterface> implementationConfiguration,
             Lifetime lifetime)
-            where TInterface : class
             => builder.Register(new FuncRegistrationBuilder(implementationConfiguration, typeof(TInterface), lifetime));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

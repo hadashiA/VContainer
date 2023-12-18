@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,30 +8,32 @@ namespace VContainer.Unity
     {
         readonly IInjector injector;
         readonly IReadOnlyList<IInjectParameter> customParameters;
-        readonly Component prefab;
+        readonly Func<IObjectResolver, Component> prefabFinder;
         ComponentDestination destination;
 
         public PrefabComponentProvider(
-            Component prefab,
+            Func<IObjectResolver, Component> prefabFinder,
             IInjector injector,
             IReadOnlyList<IInjectParameter> customParameters,
             in ComponentDestination destination)
         {
             this.injector = injector;
             this.customParameters = customParameters;
-            this.prefab = prefab;
+            this.prefabFinder = prefabFinder;
             this.destination = destination;
         }
 
         public object SpawnInstance(IObjectResolver resolver)
         {
+            var prefab = prefabFinder(resolver);
+            var parent = destination.GetParent(resolver);
+            
             var wasActive = prefab.gameObject.activeSelf;
             if (wasActive)
             {
                 prefab.gameObject.SetActive(false);
             }
-
-            var parent = destination.GetParent();
+            
             var component = parent != null
                 ? UnityEngine.Object.Instantiate(prefab, parent)
                 : UnityEngine.Object.Instantiate(prefab);

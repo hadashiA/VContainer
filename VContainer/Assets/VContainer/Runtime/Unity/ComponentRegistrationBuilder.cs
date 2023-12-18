@@ -8,15 +8,15 @@ namespace VContainer.Unity
     struct ComponentDestination
     {
         public Transform Parent;
-        public Func<Transform> ParentFinder;
+        public Func<IObjectResolver, Transform> ParentFinder;
         public bool DontDestroyOnLoad;
 
-        public Transform GetParent()
+        public Transform GetParent(IObjectResolver resolver)
         {
             if (Parent != null)
                 return Parent;
             if (ParentFinder != null)
-                return ParentFinder();
+                return ParentFinder(resolver);
             return null;
         }
 
@@ -32,7 +32,7 @@ namespace VContainer.Unity
     public sealed class ComponentRegistrationBuilder : RegistrationBuilder
     {
         readonly object instance;
-        readonly Component prefab;
+        readonly Func<IObjectResolver, Component> prefabFinder;
         readonly string gameObjectName;
 
         ComponentDestination destination;
@@ -51,12 +51,12 @@ namespace VContainer.Unity
         }
 
         internal ComponentRegistrationBuilder(
-            Component prefab,
+            Func<IObjectResolver, Component> prefabFinder,
             Type implementationType,
             Lifetime lifetime)
             : base(implementationType, lifetime)
         {
-            this.prefab = prefab;
+            this.prefabFinder = prefabFinder;
         }
 
         internal ComponentRegistrationBuilder(
@@ -81,10 +81,10 @@ namespace VContainer.Unity
             {
                 provider = new FindComponentProvider(ImplementationType, Parameters, in scene, in destination);
             }
-            else if (prefab != null)
+            else if (prefabFinder != null)
             {
-                var injector = InjectorCache.GetOrBuild(prefab.GetType());
-                provider = new PrefabComponentProvider(prefab, injector, Parameters, in destination);
+                var injector = InjectorCache.GetOrBuild(ImplementationType);
+                provider = new PrefabComponentProvider(prefabFinder, injector, Parameters, in destination);
             }
             else
             {
@@ -101,6 +101,12 @@ namespace VContainer.Unity
         }
 
         public ComponentRegistrationBuilder UnderTransform(Func<Transform> parentFinder)
+        {
+            destination.ParentFinder = _ => parentFinder();
+            return this;
+        }
+
+        public ComponentRegistrationBuilder UnderTransform(Func<IObjectResolver, Transform> parentFinder)
         {
             destination.ParentFinder = parentFinder;
             return this;
