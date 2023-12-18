@@ -34,7 +34,7 @@ namespace VContainer.Unity
             var gameObject = new GameObject(name);
             gameObject.SetActive(false);
 
-            var parent = destination.GetParent();
+            var parent = destination.GetParent(resolver);
             if (parent != null)
             {
                 gameObject.transform.SetParent(parent);

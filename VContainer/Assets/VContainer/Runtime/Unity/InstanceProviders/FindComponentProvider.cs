@@ -29,7 +29,7 @@ namespace VContainer.Unity
         {
             var component = default(Component);
 
-            var parent = destination.GetParent();
+            var parent = destination.GetParent(resolver);
             if (parent != null)
             {
                 component = parent.GetComponentInChildren(componentType, true);
