@@ -47,7 +47,7 @@ namespace VContainer
             return this;
         }
 
-        public RegistrationBuilder AsImplementedInterfaces()
+        public virtual RegistrationBuilder AsImplementedInterfaces()
         {
             InterfaceTypes = InterfaceTypes ?? new List<Type>();
             InterfaceTypes.AddRange(ImplementationType.GetInterfaces());
