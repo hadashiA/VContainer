@@ -30,6 +30,14 @@ namespace VContainer.Tests
     {
     }
 
+    interface IGenericService<T>
+    {
+    }
+
+    interface IGenericService<T1,T2>
+    {
+    }
+
     class AllInjectionFeatureService : I1
     {
         public bool ConstructorCalled;
@@ -299,11 +307,31 @@ namespace VContainer.Tests
         }
     }
 
-    class GenericsService<T>
+    class HasGenericDependency
+    {
+        public readonly IGenericService<NoDependencyServiceA> Service;
+
+        public HasGenericDependency(IGenericService<NoDependencyServiceA> service)
+        {
+            Service = service;
+        }
+    }
+
+    class GenericsService<T> : IGenericService<T>
     {
         public readonly T ParameterService;
 
         public GenericsService(T parameterService)
+        {
+            ParameterService = parameterService;
+        }
+    }
+
+    class GenericsService2<T1,T2> : IGenericService<T1,T2>
+    {
+        public readonly IGenericService<T2> ParameterService;
+
+        public GenericsService2(IGenericService<T2> parameterService)
         {
             ParameterService = parameterService;
         }

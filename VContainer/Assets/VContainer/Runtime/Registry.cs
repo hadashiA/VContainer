@@ -109,9 +109,27 @@ namespace VContainer.Internal
             {
                 var openGenericType = RuntimeTypeCache.OpenGenericTypeOf(interfaceType);
                 var typeParameters = RuntimeTypeCache.GenericTypeParametersOf(interfaceType);
-                return TryFallbackToSingleElementCollection(interfaceType, openGenericType, typeParameters, out registration) ||
+                return TryGetClosedGenericRegistration(interfaceType, openGenericType, typeParameters, out registration) ||
+                       TryFallbackToSingleElementCollection(interfaceType, openGenericType, typeParameters, out registration) ||
                        TryFallbackToContainerLocal(interfaceType, openGenericType, typeParameters, out registration);
             }
+            return false;
+        }
+
+        bool TryGetClosedGenericRegistration(Type interfaceType, Type openGenericType,
+            Type[] typeParameters,
+            out Registration registration)
+        {
+            if (hashTable.TryGet(openGenericType, out var openGenericRegistration))
+            {
+                if (openGenericRegistration.Provider is OpenGenericInstanceProvider implementationRegistration)
+                {
+                    registration = implementationRegistration.GetClosedRegistration(interfaceType, typeParameters);
+                    return true;
+                }
+            }
+
+            registration = null;
             return false;
         }
 
