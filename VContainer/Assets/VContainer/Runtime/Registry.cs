@@ -133,7 +133,18 @@ namespace VContainer.Internal
             return false;
         }
 
-        public bool Exists(Type type) => hashTable.TryGet(type, out _);
+        public bool Exists(Type type)
+        {
+            if (hashTable.TryGet(type, out _))
+                return true;
+
+            if (type.IsConstructedGenericType)
+            {
+                type = RuntimeTypeCache.OpenGenericTypeOf(type);
+            }
+
+            return hashTable.TryGet(type, out _);
+        }
 
         bool TryFallbackToContainerLocal(
             Type closedGenericType,

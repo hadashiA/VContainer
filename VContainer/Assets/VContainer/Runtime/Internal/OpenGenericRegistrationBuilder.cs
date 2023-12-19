@@ -24,6 +24,19 @@ namespace VContainer.Internal
             return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
         }
 
+        public override RegistrationBuilder AsImplementedInterfaces()
+        {
+            InterfaceTypes = InterfaceTypes ?? new List<Type>();
+            foreach (var i in ImplementationType.GetInterfaces())
+            {
+                if (!i.IsGenericType)
+                    continue;
+
+                InterfaceTypes.Add(i.GetGenericTypeDefinition());
+            }
+            return this;
+        }
+
         protected override void AddInterfaceType(Type interfaceType)
         {
             if (interfaceType.IsConstructedGenericType)

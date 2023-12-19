@@ -102,6 +102,40 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void CreateScopeWithResolveOpenGeneric()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<NoDependencyServiceA>(Lifetime.Transient);
+            builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Singleton)
+                .AsImplementedInterfaces()
+                .AsSelf();
+
+            builder.RegisterOpenGeneric(typeof(GenericsService2<,>), Lifetime.Singleton)
+                .AsImplementedInterfaces()
+                .AsSelf();
+
+            var container = builder.Build();
+            var scopedContainer = container.CreateScope(childBuilder =>
+            {
+                childBuilder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Singleton)
+                    .AsImplementedInterfaces()
+                    .AsSelf();
+            });
+
+            var singleton = container.Resolve<GenericsService<NoDependencyServiceA>>();
+            var singleton2 = scopedContainer.Resolve<GenericsService<NoDependencyServiceA>>();
+            var singleton3 = container.Resolve<GenericsService2<int,NoDependencyServiceA>>();
+            var singleton4 = scopedContainer.Resolve<GenericsService2<int,NoDependencyServiceA>>();
+
+            Assert.AreNotSame(singleton, singleton2);
+            Assert.AreSame(singleton3, singleton4);
+
+            scopedContainer.Dispose();
+
+            Assert.True(singleton2.Disposed);
+        }
+
+        [Test]
         public void CreateScopeWithRegisterSingleton()
         {
             var builder = new ContainerBuilder();

@@ -317,13 +317,21 @@ namespace VContainer.Tests
         }
     }
 
-    class GenericsService<T> : IGenericService<T>
+    class GenericsService<T> : IGenericService<T>, IDisposable
     {
         public readonly T ParameterService;
+
+        public bool Disposed { get; private set; }
 
         public GenericsService(T parameterService)
         {
             ParameterService = parameterService;
+            Disposed = false;
+        }
+
+        public void Dispose()
+        {
+            Disposed = true;
         }
     }
 
