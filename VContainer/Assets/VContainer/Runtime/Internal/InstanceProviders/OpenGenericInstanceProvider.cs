@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -7,59 +6,62 @@ namespace VContainer.Internal
 {
     public class OpenGenericInstanceProvider : IInstanceProvider
     {
+        class TypeParametersEqualityComparer : IEqualityComparer<Type[]>
+        {
+            public bool Equals(Type[] x, Type[] y)
+            {
+                if (x == null || y == null) return x == y;
+                if (x.Length != y.Length) return false;
+
+                for (var i = 0; i < x.Length; i++)
+                {
+                    if (x[i] != y[i]) return false;
+                }
+                return true;
+            }
+
+            public int GetHashCode(Type[] typeParameters)
+            {
+                var hash = 5381;
+                foreach (var typeParameter in typeParameters)
+                {
+                    hash = ((hash << 5) + hash) ^ typeParameter.GetHashCode();
+                }
+                return hash;
+            }
+        }
+
         readonly Lifetime lifetime;
         readonly Type implementationType;
         readonly IReadOnlyList<IInjectParameter> customParameters;
 
-        readonly ConcurrentDictionary<int, Registration> registrations;
-        readonly ConcurrentDictionary<Type, int> typeParametersHashes;
+        readonly ConcurrentDictionary<Type[], Registration> constructedRegistrations = new ConcurrentDictionary<Type[], Registration>(new TypeParametersEqualityComparer());
+        readonly Func<Type[], Registration> createRegistrationFunc;
 
-        public OpenGenericInstanceProvider(Type implementationType, Lifetime lifetime,
-            List<IInjectParameter> injectParameters)
+        public OpenGenericInstanceProvider(Type implementationType, Lifetime lifetime, List<IInjectParameter> injectParameters)
         {
             this.implementationType = implementationType;
             this.lifetime = lifetime;
             customParameters = injectParameters;
-            typeParametersHashes = new ConcurrentDictionary<Type, int>();
-            registrations = new ConcurrentDictionary<int, Registration>();
+            createRegistrationFunc = CreateRegistration;
         }
 
         public Registration GetClosedRegistration(Type closedInterfaceType, Type[] typeParameters)
         {
-            var typeParametersHash = typeParametersHashes.GetOrAdd(closedInterfaceType, static (_, arg) =>
-                ((IStructuralEquatable)arg).GetHashCode(EqualityComparer<Type>.Default), typeParameters);
-
-            var registrationArgs = new RegistrationArguments
-            {
-                ImplementationType = implementationType,
-                Lifetime = lifetime,
-                CustomParameters = customParameters,
-                TypeParameters = typeParameters
-            };
-
-            return registrations.GetOrAdd(typeParametersHash, static (_, args) =>
-                CreateRegistration(args), registrationArgs);
+            return constructedRegistrations.GetOrAdd(typeParameters, createRegistrationFunc);
         }
 
-        private static Registration CreateRegistration(RegistrationArguments args)
+        Registration CreateRegistration(Type[] typeParameters)
         {
-            var newType = args.ImplementationType.MakeGenericType(args.TypeParameters);
+            var newType = implementationType.MakeGenericType(typeParameters);
             var injector = InjectorCache.GetOrBuild(newType);
-            var spawner = new InstanceProvider(injector, args.CustomParameters);
-            return new Registration(newType, args.Lifetime, new List<Type>(1) { newType }, spawner);
+            var spawner = new InstanceProvider(injector, customParameters);
+            return new Registration(newType, lifetime, new List<Type>(1) { newType }, spawner);
         }
 
         public object SpawnInstance(IObjectResolver resolver)
         {
             throw new InvalidOperationException();
         }
-
-        private struct RegistrationArguments
-        {
-            public Type ImplementationType;
-            public Lifetime Lifetime;
-            public IReadOnlyList<IInjectParameter> CustomParameters;
-            public Type[] TypeParameters;
-        }
-    }
+   }
 }
