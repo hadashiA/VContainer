@@ -26,7 +26,7 @@ namespace VContainer.Internal
 
         public Registration GetClosedRegistration(Type closedInterfaceType, Type[] typeParameters)
         {
-            var typeParametersHash = typeParametersHashes.GetOrAdd(closedInterfaceType, static (_, arg) =>
+            var typeParametersHash = typeParametersHashes.GetOrAdd(closedInterfaceType, (_, arg) =>
                 ((IStructuralEquatable)arg).GetHashCode(EqualityComparer<Type>.Default), typeParameters);
 
             var registrationArgs = new RegistrationArguments
@@ -37,8 +37,7 @@ namespace VContainer.Internal
                 TypeParameters = typeParameters
             };
 
-            return registrations.GetOrAdd(typeParametersHash, static (_, args) =>
-                CreateRegistration(args), registrationArgs);
+            return registrations.GetOrAdd(typeParametersHash, (_, args) => CreateRegistration(args), registrationArgs);
         }
 
         private static Registration CreateRegistration(RegistrationArguments args)
