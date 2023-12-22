@@ -110,6 +110,10 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
+            if (Diagnostics != null)
+            {
+                Diagnostics.Clear();
+            }
             disposables.Dispose();
             sharedInstances.Clear();
         }
@@ -223,6 +227,10 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
+            if (Diagnostics != null)
+            {
+                Diagnostics.Clear();
+            }
             rootScope.Dispose();
             disposables.Dispose();
             sharedInstances.Clear();

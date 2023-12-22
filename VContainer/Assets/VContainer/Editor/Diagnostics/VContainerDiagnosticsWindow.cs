@@ -66,6 +66,12 @@ namespace VContainer.Editor.Diagnostics
             Repaint();
         }
 
+        void OnPlayModeStateChange(PlayModeStateChange state)
+        {
+            treeView.ReloadAndSort();
+            Repaint();
+        }
+
         void OnEnable()
         {
             window = this; // set singleton.
@@ -76,11 +82,13 @@ namespace VContainer.Editor.Diagnostics
             searchField = new SearchField();
 
             DiagnositcsContext.OnContainerBuilt += Reload;
+            EditorApplication.playModeStateChanged += OnPlayModeStateChange;
         }
 
         void OnDisable()
         {
             DiagnositcsContext.OnContainerBuilt -= Reload;
+            EditorApplication.playModeStateChanged -= OnPlayModeStateChange;
         }
 
         void OnGUI()
