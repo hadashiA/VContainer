@@ -53,6 +53,14 @@ And
 [Unity - Manual: Order of Execution for Event Functions](https://docs.unity3d.com/Manual/ExecutionOrder.html)
 :::
 
+### async
+
+`IAsyncStartable` is available as a variant of IStartable.
+It has the same timing as IStartable, but `async Awaitable StartAsync()` is available.
+
+If you are a UniTask user, you can also choose the UniTask version of StartAsync.
+[UniTask integration](../integrations/unitask)
+
 ## Handle of the exception that was not caught
 
 On the application side, exceptions thrown in processes such as Start() and Tick() cannot be caught outside.
