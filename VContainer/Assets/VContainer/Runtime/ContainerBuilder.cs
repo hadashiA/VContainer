@@ -69,7 +69,7 @@ namespace VContainer
         }
 
         readonly List<RegistrationBuilder> registrationBuilders = new List<RegistrationBuilder>();
-        List<Action<IObjectResolver>> buildCallbacks;
+        Action<IObjectResolver> buildCallback;
         DiagnosticsCollector diagnostics;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -83,9 +83,7 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RegisterBuildCallback(Action<IObjectResolver> callback)
         {
-            if (buildCallbacks == null)
-                buildCallbacks = new List<Action<IObjectResolver>>();
-            buildCallbacks.Add(callback);
+            buildCallback += callback;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -149,13 +147,7 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void EmitCallbacks(IObjectResolver container)
         {
-            if (buildCallbacks == null) return;
-
-            foreach (var callback in buildCallbacks)
-            {
-                callback.Invoke(container);
-            }
-
+            buildCallback?.Invoke(container);
             Diagnostics?.NotifyContainerBuilt(container);
         }
     }

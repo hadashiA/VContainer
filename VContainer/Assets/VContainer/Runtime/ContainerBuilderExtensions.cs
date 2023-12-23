@@ -145,6 +145,11 @@ namespace VContainer
             Lifetime lifetime)
             => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, TParam2, TParam3, TParam4, T>), lifetime));
 
+        public static void RegisterDisposeCallback(this IContainerBuilder builder, Action<IDisposable> callback)
+        {
+            builder.Register(container => new ActionDisposable(callback, container), Lifetime.Scoped);
+        }
+
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
         public static void RegisterContainer(this IContainerBuilder builder)
         {
