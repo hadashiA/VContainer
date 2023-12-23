@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using UnityEngine;
 using VContainer.Unity;
@@ -114,31 +115,47 @@ namespace VContainer.Tests.Unity
             var container = builder.Build();
 
             var parent = new GameObject("Parent");
-            var original = new GameObject("Original");
-
-            original.AddComponent<SampleMonoBehaviour>();
+            var original = new GameObject("Original").AddComponent<SampleMonoBehaviour>();
 
             var instance1 = container.Instantiate(original);
-            Assert.That(instance1, Is.Not.EqualTo(original));
-            Assert.That(instance1.GetComponent<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
-            Assert.That(instance1.GetComponent<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
+            AssertInstantiatedInstance(instance1);
 
             var instance2 = container.Instantiate(original, parent.transform);
             Assert.That(parent.transform.GetChild(0), Is.EqualTo(instance2.transform));
-            Assert.That(instance2, Is.Not.EqualTo(original));
-            Assert.That(instance2.GetComponent<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
-            Assert.That(instance2.GetComponent<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
+            AssertInstantiatedInstance(instance2);
 
             var instance3 = container.Instantiate(
                 original,
                 new Vector3(1f, 2f, 3f),
                 Quaternion.Euler(1f, 2f, 3f));
 
-            Assert.That(instance3, Is.Not.EqualTo(original));
-            Assert.That(instance3.GetComponent<SampleMonoBehaviour>(), Is.InstanceOf<SampleMonoBehaviour>());
-            Assert.That(instance3.GetComponent<SampleMonoBehaviour>().ServiceA, Is.InstanceOf<ServiceA>());
+            AssertInstantiatedInstance(instance3);
+
             Assert.That(instance3.transform.position, Is.EqualTo(new Vector3(1f, 2f, 3f)));
             Assert.That(instance3.transform.rotation, Is.EqualTo(Quaternion.Euler(1f, 2f, 3f)));
+
+            void AssertInstantiatedInstance(SampleMonoBehaviour instance)
+            {
+                Assert.That(instance, Is.Not.EqualTo(original));
+                Assert.That(instance.ServiceAInAwake, Is.InstanceOf<ServiceA>());
+                Assert.That(instance.ServiceA, Is.InstanceOf<ServiceA>());
+            }
+        }
+
+        [Test]
+        public void Instantiate_ExceptionThrownDuringInjection_PrefabIsStillEnabled()
+        {
+            var builder = new ContainerBuilder();
+            
+            var original = new GameObject("Original").AddComponent<SampleMonoBehaviour>();
+            
+            //Throws in resolving
+            builder.Register<ServiceA>(_ => throw new(), Lifetime.Singleton);
+
+            var container = builder.Build();
+
+            Assert.Throws<Exception>(() => container.Instantiate(original));
+            Assert.That(original.gameObject.activeSelf, Is.True);
         }
 
         [Test]
