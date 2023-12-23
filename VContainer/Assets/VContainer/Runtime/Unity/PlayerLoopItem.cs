@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-#if VCONTAINER_UNITASK_INTEGRATION
 using System.Threading;
+#if VCONTAINER_UNITASK_INTEGRATION
 using Cysharp.Threading.Tasks;
 #endif
 
@@ -293,7 +293,7 @@ namespace VContainer.Unity
         public void Dispose() => disposed = true;
     }
 
-#if VCONTAINER_UNITASK_INTEGRATION
+#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2023_1_OR_NEWER
     sealed class AsyncStartableLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IAsyncStartable> entries;
@@ -315,10 +315,14 @@ namespace VContainer.Unity
             foreach (var x in entries)
             {
                 var task = x.StartAsync(cts.Token);
+#if VCONTAINER_UNITASK_INTEGRATION
                 if (exceptionHandler != null)
                     task.Forget(ex => exceptionHandler.Publish(ex));
                 else
                     task.Forget();
+#else
+                var _ = AwaitableHelper.Forget(task, exceptionHandler);
+#endif
             }
             return false;
         }
