@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using VContainer.Internal;
 
@@ -144,6 +145,12 @@ namespace VContainer
             Func<IObjectResolver, Func<TParam1, TParam2, TParam3, TParam4, T>> factoryFactory,
             Lifetime lifetime)
             => builder.Register(new FuncRegistrationBuilder(factoryFactory, typeof(Func<TParam1, TParam2, TParam3, TParam4, T>), lifetime));
+
+        public static void RegisterDisposeCallback(this IContainerBuilder builder, Action<IObjectResolver> callback)
+        {
+            builder.Register(container => new BuilderCallbackDisposable(callback, container), Lifetime.Scoped);
+            builder.RegisterBuildCallback(container => container.Resolve<IReadOnlyList<BuilderCallbackDisposable>>());
+        }
 
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
         public static void RegisterContainer(this IContainerBuilder builder)
