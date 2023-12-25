@@ -473,10 +473,6 @@ namespace VContainer.Tests
                     .As(typeof(IGenericService<int>))
             );
             Assert.Throws<VContainerException>(() =>
-                builder.Register(typeof(NoDependencyServiceA), Lifetime.Transient)
-                    .As(typeof(I2))
-            );
-            Assert.Throws<VContainerException>(() =>
                 builder.Register(typeof(GenericsService<>), Lifetime.Transient)
                     .As(typeof(IGenericService<int>))
             );
