@@ -146,11 +146,11 @@ namespace VContainer.Tests.Unity
         public void Instantiate_ExceptionThrownDuringInjection_PrefabIsStillEnabled()
         {
             var builder = new ContainerBuilder();
-            
+
             var original = new GameObject("Original").AddComponent<SampleMonoBehaviour>();
-            
+
             //Throws in resolving
-            builder.Register<ServiceA>(_ => throw new(), Lifetime.Singleton);
+            builder.Register<ServiceA>(_ => throw new Exception(), Lifetime.Singleton);
 
             var container = builder.Build();
 
