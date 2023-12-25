@@ -106,18 +106,18 @@ namespace VContainer.Tests
         {
             var builder = new ContainerBuilder();
             builder.Register<NoDependencyServiceA>(Lifetime.Transient);
-            builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Singleton)
+            builder.Register(typeof(GenericsService<>), Lifetime.Singleton)
                 .AsImplementedInterfaces()
                 .AsSelf();
 
-            builder.RegisterOpenGeneric(typeof(GenericsService2<,>), Lifetime.Singleton)
+            builder.Register(typeof(GenericsService2<,>), Lifetime.Singleton)
                 .AsImplementedInterfaces()
                 .AsSelf();
 
             var container = builder.Build();
             var scopedContainer = container.CreateScope(childBuilder =>
             {
-                childBuilder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Singleton)
+                childBuilder.Register(typeof(GenericsService<>), Lifetime.Singleton)
                     .AsImplementedInterfaces()
                     .AsSelf();
             });
@@ -227,7 +227,7 @@ namespace VContainer.Tests
             //Assert.That(singletonService, Is.InstanceOf<ServiceA>());
             Assert.That(scopedService, Is.InstanceOf<ServiceB>());
         }
-        
+
         [Test]
         public void ResolveCollectionFromParent()
         {
@@ -240,11 +240,11 @@ namespace VContainer.Tests
             {
                 childBuilder.Register<I1CollectionService>(Lifetime.Scoped);
             });
-            
+
             var scopedService = childContainer.Resolve<I1CollectionService>();
             Assert.That(scopedService.enumerable.Count(), Is.EqualTo(2));
         }
-        
+
         [Test]
         public void ResolveCollectionFromParentByContinuous()
         {
@@ -258,12 +258,12 @@ namespace VContainer.Tests
                 childBuilder.Register<I1, MultipleInterfaceServiceC>(Lifetime.Singleton);
                 childBuilder.Register<I1, MultipleInterfaceServiceD>(Lifetime.Singleton);
             });
-            
+
             var scopedService = childContainer.Resolve<IReadOnlyList<I1>>();
             var moreScopedService = childContainer.Resolve<IReadOnlyList<I1>>();
             Assert.That(moreScopedService.Count(), Is.EqualTo(4));
         }
-        
+
         [Test]
         public void ResolveCollectionByLazyInstance()
         {
@@ -271,17 +271,17 @@ namespace VContainer.Tests
             builder.Register<I1, MultipleInterfaceServiceA>(Lifetime.Scoped);
             builder.Register<I1, MultipleInterfaceServiceB>(Lifetime.Scoped);
             builder.Register<I1CollectionService>(Lifetime.Scoped);
-            
+
             var parentContainer = builder.Build();
 
             var childContainer = parentContainer.CreateScope(childBuilder =>
             {
             });
-            
+
             var scopedService = childContainer.Resolve<I1CollectionService>();
             Assert.That(scopedService.enumerable.Count(), Is.EqualTo(2));
         }
-        
+
         public class I1CollectionService
         {
             public readonly IReadOnlyList<I1> enumerable;

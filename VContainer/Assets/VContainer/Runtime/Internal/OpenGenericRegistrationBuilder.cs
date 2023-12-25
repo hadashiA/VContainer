@@ -5,12 +5,6 @@ namespace VContainer.Internal
 {
     public class OpenGenericRegistrationBuilder : RegistrationBuilder
     {
-        public OpenGenericRegistrationBuilder(Type type, Type implementationType, Lifetime lifetime)
-            : this(implementationType, lifetime)
-        {
-            As(type);
-        }
-
         public OpenGenericRegistrationBuilder(Type implementationType, Lifetime lifetime)
             : base(implementationType, lifetime)
         {
