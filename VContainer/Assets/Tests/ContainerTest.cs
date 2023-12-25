@@ -571,19 +571,24 @@ namespace VContainer.Tests
         public void OnContainerDisposeCallback()
         {
             NoDependencyServiceA resolvedJustBeforeDispose = null;
-            
+            NoDependencyServiceB resolvedJustBeforeDispose2 = null;
+
             var builder = new ContainerBuilder();
-            
+
             builder.Register<NoDependencyServiceA>(Lifetime.Scoped);
+            builder.Register<NoDependencyServiceB>(Lifetime.Scoped);
             builder.RegisterDisposeCallback(resolver => resolvedJustBeforeDispose = resolver.Resolve<NoDependencyServiceA>());
+            builder.RegisterDisposeCallback(resolver => resolvedJustBeforeDispose2 = resolver.Resolve<NoDependencyServiceB>());
 
             var container = builder.Build();
-            
+
             Assert.That(resolvedJustBeforeDispose, Is.Null);
-            
+            Assert.That(resolvedJustBeforeDispose2, Is.Null);
+
             container.Dispose();
-            
+
             Assert.That(resolvedJustBeforeDispose, Is.Not.Null);
+            Assert.That(resolvedJustBeforeDispose2, Is.Not.Null);
         }
     }
 }

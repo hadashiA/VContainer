@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using VContainer.Internal;
 
@@ -147,7 +148,8 @@ namespace VContainer
 
         public static void RegisterDisposeCallback(this IContainerBuilder builder, Action<IObjectResolver> callback)
         {
-            builder.Register(container => new ActionDisposable(callback, container), Lifetime.Scoped);
+            builder.Register(container => new BuilderCallbackDisposable(callback, container), Lifetime.Scoped);
+            builder.RegisterBuildCallback(container => container.Resolve<IReadOnlyList<BuilderCallbackDisposable>>());
         }
 
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]
