@@ -11,43 +11,30 @@ namespace VContainer
         public static RegistrationBuilder Register(
             this IContainerBuilder builder,
             Type type,
-            Lifetime lifetime)
-            => builder.Register(new RegistrationBuilder(type, lifetime));
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RegistrationBuilder RegisterOpenGeneric(
-            this IContainerBuilder builder,
-            Type type,
-            Type implementationType,
-            Lifetime lifetime)
-            => builder.Register(new OpenGenericRegistrationBuilder(type, implementationType, lifetime));
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static RegistrationBuilder RegisterOpenGeneric(
-            this IContainerBuilder builder,
-            Type type,
-            Lifetime lifetime)
-            => builder.Register(new OpenGenericRegistrationBuilder(type, lifetime));
+            Lifetime lifetime) =>
+            builder.Register(type.IsGenericType && type.IsGenericTypeDefinition
+                ? new OpenGenericRegistrationBuilder(type, lifetime)
+                : new RegistrationBuilder(type, lifetime));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register<T>(
             this IContainerBuilder builder,
-            Lifetime lifetime)
-            => builder.Register(typeof(T), lifetime);
+            Lifetime lifetime) =>
+            builder.Register(typeof(T), lifetime);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register<TInterface, TImplement>(
             this IContainerBuilder builder,
             Lifetime lifetime)
-            where TImplement : TInterface
-            => builder.Register<TImplement>(lifetime).As<TInterface>();
+            where TImplement : TInterface =>
+            builder.Register<TImplement>(lifetime).As<TInterface>();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register<TInterface1, TInterface2, TImplement>(
             this IContainerBuilder builder,
             Lifetime lifetime)
-            where TImplement : TInterface1, TInterface2
-            => builder.Register<TImplement>(lifetime).As(typeof(TInterface1), typeof(TInterface2));
+            where TImplement : TInterface1, TInterface2 =>
+            builder.Register<TImplement>(lifetime).As(typeof(TInterface1), typeof(TInterface2));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register<TInterface1, TInterface2, TInterface3, TImplement>(

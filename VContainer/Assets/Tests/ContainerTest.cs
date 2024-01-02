@@ -255,10 +255,11 @@ namespace VContainer.Tests
             var builder = new ContainerBuilder();
 
             builder.Register<I2, NoDependencyServiceA>(Lifetime.Transient).AsSelf();
-            builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Transient)
+            builder.Register(typeof(GenericsService<>), Lifetime.Transient)
                 .AsImplementedInterfaces()
                 .AsSelf();
-            builder.RegisterOpenGeneric(typeof(IGenericService<,>), typeof(GenericsService2<,>), Lifetime.Singleton)
+            builder.Register(typeof(GenericsService2<,>), Lifetime.Singleton)
+                .As(typeof(IGenericService<,>))
                 .AsSelf();
             builder.Register<HasGenericDependency>(Lifetime.Singleton);
 
@@ -464,16 +465,15 @@ namespace VContainer.Tests
         {
             var builder = new ContainerBuilder();
             Assert.Throws<VContainerException>(() =>
-                builder.RegisterOpenGeneric(typeof(IGenericService<>), typeof(GenericsService<int>), Lifetime.Transient)
+                builder.Register(typeof(GenericsService<int>), Lifetime.Transient)
+                    .As(typeof(IGenericService<>))
             );
             Assert.Throws<VContainerException>(() =>
-                builder.RegisterOpenGeneric(typeof(IGenericService<int>), typeof(GenericsService<>), Lifetime.Transient)
+                builder.Register(typeof(GenericsService<>), Lifetime.Transient)
+                    .As(typeof(IGenericService<int>))
             );
             Assert.Throws<VContainerException>(() =>
-                builder.RegisterOpenGeneric(typeof(I2), typeof(NoDependencyServiceA), Lifetime.Transient)
-            );
-            Assert.Throws<VContainerException>(() =>
-                builder.RegisterOpenGeneric(typeof(GenericsService<>), Lifetime.Transient)
+                builder.Register(typeof(GenericsService<>), Lifetime.Transient)
                     .As(typeof(IGenericService<int>))
             );
         }
