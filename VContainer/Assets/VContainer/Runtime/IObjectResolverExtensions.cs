@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using VContainer.Internal;
 
 namespace VContainer
 {
@@ -34,21 +33,6 @@ namespace VContainer
                 }
             }
             return resolver.Resolve(parameterType);
-        }
-
-        public static object CreateInstance<T>(this IObjectResolver container) =>
-            container.CreateInstance(typeof(T));
-
-        public static object CreateInstance<T>(this IObjectResolver container, IReadOnlyList<IInjectParameter> parameters) =>
-            container.CreateInstance(typeof(T), parameters);
-
-        public static object CreateInstance(this IObjectResolver container, Type type) =>
-            container.CreateInstance(type, null);
-
-        public static object CreateInstance(this IObjectResolver container, Type type, IReadOnlyList<IInjectParameter> parameters)
-        {
-            var injector = InjectorCache.GetOrBuild(type);
-            return injector.CreateInstance(container, parameters);
         }
     }
 }
