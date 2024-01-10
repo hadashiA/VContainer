@@ -16,6 +16,15 @@ namespace VContainer
                 ? new OpenGenericRegistrationBuilder(type, lifetime)
                 : new RegistrationBuilder(type, lifetime));
 
+        public static RegistrationBuilder Register(
+            this IContainerBuilder builder,
+            Type interfaceType,
+            Type implementationType,
+            Lifetime lifetime)
+        {
+            return builder.Register(implementationType, lifetime).As(interfaceType);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register<T>(
             this IContainerBuilder builder,
