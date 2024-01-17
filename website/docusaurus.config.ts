@@ -1,4 +1,8 @@
-module.exports = {
+import {themes as prismThemes} from 'prism-react-renderer';
+import type {Config} from '@docusaurus/types';
+import type * as Preset from '@docusaurus/preset-classic';
+
+const config: Config = {
   title: 'VContainer',
   tagline: 'The extra fast DI (Dependency Injection) for Unity Game Engine',
   url: 'https://vcontainer.hadashikick.jp',
@@ -8,29 +12,42 @@ module.exports = {
   favicon: 'img/favicon.png',
   organizationName: 'hadashiA', // Usually your GitHub org/user name.
   projectName: 'VContainer', // Usually your repo name.
+
   i18n: {
     defaultLocale: 'en',
-    locales: ['en', 'ja']
+    locales: ['en', 'ja'],
   },
+
+  presets: [
+    [
+      'classic',
+      {
+        docs: {
+          sidebarPath: './sidebars.ts',
+          sidebarCollapsed: false,
+          sidebarCollapsible: false,
+          routeBasePath: '/',
+          editUrl: 'https://github.com/hadashiA/VContainer/edit/master/website/',
+        },
+        theme: {
+          customCss: './src/css/custom.css',
+        },
+      } satisfies Preset.Options,
+    ],
+  ],
+  scripts: [
+    {
+      src: '/loadbutton.js',
+      defer: true,
+      async: true
+    }
+  ],
   themeConfig: {
+    // Replace with your project's social card
+    image: 'img/vcontainer@2x.png',
     metadata: [
       { name: 'google-site-verification', content: 'ldYnOkZTq5AfzmJzEbsFzWXAYp9tyO5IhmYQv45MMDY' },
     ],
-    image: 'img/vcontainer@2x.png',
-    colorMode: {
-      // Hides the switch in the navbar
-      // Useful if you want to support a single color mode
-      disableSwitch: false,
-
-      // Should we use the prefers-color-scheme media-query,
-      // using user system preferences, instead of the hardcoded defaultMode
-      respectPrefersColorScheme: false,
-    },
-    prism: {
-      additionalLanguages: ['csharp'],
-      theme: require('prism-react-renderer/themes/vsDark'),
-      darkTheme: require('prism-react-renderer/themes/vsDark'),
-    },
     navbar: {
       title: 'VContainer',
       // logo: {
@@ -69,40 +86,12 @@ module.exports = {
       //   href: 'https://github.com/hadashiA/VContainer',
       // },
     },
-    algolia: {
-      appId: process.env.ALGOLIA_APP_ID ?? "dummy",
-      apiKey: process.env.ALGOLIA_API_KEY ?? "dummy",
-      indexName: process.env.ALGOLIA_INDEX_NAME ?? "dummy"
+    prism: {
+      additionalLanguages: ['csharp'],
+      theme: prismThemes.vsDark,
+      darkTheme: prismThemes.vsDark,
     },
-  },
-  presets: [
-    [
-      '@docusaurus/preset-classic',
-      {
-        docs: {
-          sidebarPath: require.resolve('./sidebars.ts'),
-          sidebarCollapsed: false,
-          sidebarCollapsible: false,
-          routeBasePath: '/',
-          // Please change this to your repo.
-          editUrl: 'https://github.com/hadashiA/VContainer/edit/master/website/',
-        },
-        theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
-        googleAnalytics: {
-          trackingID: process.env.GA_TRACKING_ID ?? "dummy",
-          // Optional fields.
-          anonymizeIP: true, // Should IPs be anonymized?
-        },
-      },
-    ],
-  ],
-  scripts: [
-    {
-      src: '/loadbutton.js',
-      defer: true,
-      async: true
-    }
-  ]
-}
+  } satisfies Preset.ThemeConfig,
+};
+
+export default config;

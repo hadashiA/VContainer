@@ -1,5 +1,5 @@
 {
-  "name": "vcontainer-website",
+  "name": "website",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -18,12 +18,18 @@
     "@docusaurus/core": "3.1.0",
     "@docusaurus/preset-classic": "3.1.0",
     "@mdx-js/react": "^3.0.0",
+    "@nivo/bar": "^0.84.0",
+    "@nivo/core": "^0.84.0",
+    "clsx": "^2.0.0",
+    "prism-react-renderer": "^2.3.0",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "prism-react-renderer": "^2.3.0",      
-    "@nivo/bar": "^0.80.0",
-    "@nivo/core": "^0.80.0",
-    "clsx": "^2.0.0"
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "3.1.0",
+    "@docusaurus/tsconfig": "3.1.0",
+    "@docusaurus/types": "3.1.0",
+    "typescript": "~5.2.2"
   },
   "browserslist": {
     "production": [
@@ -37,10 +43,7 @@
       "last 5 safari version"
     ]
   },
-  "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.1.0",
-    "@docusaurus/tsconfig": "3.1.0",
-    "@docusaurus/types": "3.1.0",
-    "typescript": "~5.2.2"
+  "engines": {
+    "node": ">=18.0"
   }
 }
