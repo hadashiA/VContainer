@@ -104,7 +104,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -140,7 +139,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -176,7 +174,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -212,7 +209,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -248,7 +244,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -284,7 +279,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
