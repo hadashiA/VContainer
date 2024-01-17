@@ -21,6 +21,7 @@
     "@nivo/bar": "^0.84.0",
     "@nivo/core": "^0.84.0",
     "clsx": "^2.0.0",
+    "docusaurus-lunr-search": "^3.3.2",
     "prism-react-renderer": "^2.3.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
