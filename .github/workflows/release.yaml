@@ -21,7 +21,7 @@ jobs:
     with:
       tag: ${{ github.event.inputs.tag }}
       dry-run: ${{ fromJson(github.event.inputs.dry-run) }}
-  
+
   build-unity:
     needs: [update-version-number]
     runs-on: ubuntu-latest
@@ -39,7 +39,10 @@ jobs:
         key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
         restore-keys: |
           Library-
- 
+
+    # set release tag(*.*.*) to env.GIT_TAG
+    - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          
     - name: Decode Unity License File
       run: |
         mkdir ./tmp
@@ -47,22 +50,19 @@ jobs:
    
     - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
 
-    # set release tag(*.*.*) to env.GIT_TAG
-    - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-    - name: Export unitypackage
-      run: $UNITY_BIN -quit -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./
-      working-directory: VContainer
-
     - uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
           8.0.x
-         
+
     - name: Build SourceGenerator
       run: |
-        dotnet build -c Release ./VContainer.SourceGenerator
-        dotnet build -c Release ./VContainer.SourceGenerator.Roslyn3
+        dotnet build -c Release ./VContainer.SourceGenerator /p:Version=${{ env.GIT_TAG }}
+        dotnet build -c Release ./VContainer.SourceGenerator.Roslyn3 /p:Version=${{ env.GIT_TAG }}
+
+    - name: Export unitypackage
+      run: $UNITY_BIN -quit -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./
+      working-directory: VContainer
 
     - uses: actions/upload-artifact@v3
       with:
