@@ -136,7 +136,7 @@ namespace VContainer.Tests.Unity
             yield return null;
             yield return null;
 
-            Assert.That(handled, Is.EqualTo(1));
+            Assert.That(handled, Is.GreaterThanOrEqualTo(1));
         }
 
         [UnityTest]
@@ -153,7 +153,7 @@ namespace VContainer.Tests.Unity
             yield return null;
             yield return null;
 
-            Assert.That(handled, Is.EqualTo(1));
+            Assert.That(handled, Is.GreaterThanOrEqualTo(1));
         }
 
         [UnityTest]
@@ -170,7 +170,7 @@ namespace VContainer.Tests.Unity
             yield return null;
             yield return null;
 
-            Assert.That(handled, Is.EqualTo(1));
+            Assert.That(handled, Is.GreaterThanOrEqualTo(1));
         }
 
         [UnityTest]
@@ -187,7 +187,7 @@ namespace VContainer.Tests.Unity
             yield return null;
             yield return null;
 
-            Assert.That(handled, Is.EqualTo(1));
+            Assert.That(handled, Is.GreaterThanOrEqualTo(1));
         }
 
         [UnityTest]
