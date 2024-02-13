@@ -117,7 +117,9 @@ namespace VContainer.Unity
 
         public IObjectResolver Container { get; private set; }
         public LifetimeScope Parent { get; private set; }
-        public bool IsRoot { get; set; }
+
+        public bool IsRoot => VContainerSettings.Instance != null &&
+                              VContainerSettings.Instance.IsRootLifetimeScopeInstance(this);
 
         readonly List<IInstaller> localExtraInstallers = new List<IInstaller>();
 
@@ -171,7 +173,7 @@ namespace VContainer.Unity
 
             if (Parent != null)
             {
-                if (VContainerSettings.Instance != null && Parent == VContainerSettings.Instance.RootLifetimeScope)
+                if (VContainerSettings.Instance != null && Parent.IsRoot)
                 {
                     if (Parent.Container == null)
                         Parent.Build();
@@ -197,7 +199,7 @@ namespace VContainer.Unity
                 InstallTo(builder);
                 builder.Build();
             }
-            
+
             AwakeWaitingChildren(this);
         }
 
@@ -318,7 +320,9 @@ namespace VContainer.Unity
 
             // Find root from settings
             if (VContainerSettings.Instance != null)
-                return VContainerSettings.Instance.RootLifetimeScope;
+            {
+                return VContainerSettings.Instance.GetOrCreateRootLifetimeScopeInstance();
+            }
 
             return null;
         }
