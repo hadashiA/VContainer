@@ -1,11 +1,29 @@
 name: Release
 
 on:
-  push:
-    tags: ["[0-9]+.[0-9]+.[0-9]+*"]
-    branches: ['release-test']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "tag: git tag you want create. (sample 1.0.0)"
+        required: true
+      dry-run:
+        description: "dry-run: false = create release/nuget. true = never create release/nuget."
+        required: true
+        default: false
+        type: boolean
+
+env:
+  GIT_TAG: ${{ github.event.inputs.tag }}
+    
 jobs:
+  update-version-number:
+    uses: ./.github/workflows/update-version-number.yaml
+    with:
+      tag: ${{ github.event.inputs.tag }}
+      dry-run: ${{ fromJson(github.event.inputs.dry-run) }}
+
   build-unity:
+    needs: [update-version-number]
     runs-on: ubuntu-latest
     env:
       UNITY_LICENSE_FILE: ./tmp/ulf
@@ -14,28 +32,37 @@ jobs:
       image: gableroux/unity3d:2020.1.13f1-linux-il2cpp
     steps:
     - uses: actions/checkout@v2
+
+    - uses: actions/cache@v3
+      with:
+        path: Library
+        key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+        restore-keys: |
+          Library-
+
+    # set release tag(*.*.*) to env.GIT_TAG
+    - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          
     - name: Decode Unity License File
       run: |
         mkdir ./tmp
         echo -n ${{ secrets.UNITY_LICENSE_2020_1_BASE64 }} | base64 --decode > $UNITY_LICENSE_FILE
+   
     - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
-
-    # set release tag(*.*.*) to env.GIT_TAG
-    - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-    - name: Export unitypackage
-      run: $UNITY_BIN -quit -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./
-      working-directory: VContainer
 
     - uses: actions/setup-dotnet@v3
       with:
         dotnet-version: |
           8.0.x
-         
+
     - name: Build SourceGenerator
       run: |
-        dotnet build -c Release ./VContainer.SourceGenerator
-        dotnet build -c Release ./VContainer.SourceGenerator.Roslyn3
+        dotnet build -c Release ./VContainer.SourceGenerator /p:Version=${{ env.GIT_TAG }}
+        dotnet build -c Release ./VContainer.SourceGenerator.Roslyn3 /p:Version=${{ env.GIT_TAG }}
+
+    - name: Export unitypackage
+      run: $UNITY_BIN -quit -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./
+      working-directory: VContainer
 
     - uses: actions/upload-artifact@v3
       with:
@@ -45,30 +72,43 @@ jobs:
           ./VContainer.SourceGenerator/bin/Release/netstandard2.0/VContainer.SourceGenerator.dll
           ./VContainer.SourceGenerator.Roslyn3/bin/Release/netstandard2.0/VContainer.SourceGenerator.Roslyn3.dll
 
-  # create-release:
-  #   needs: [build-unity]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - run: echo "GIT_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+  create-release:
+    needs: [build-unity]
+    runs-on: ubuntu-latest
+    steps:
 
-  #   # Create Releases
-  #   - uses: actions/create-release@v1
-  #     id: create_release
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     with:
-  #       tag_name: ${{ env.GIT_TAG }}
-  #       release_name: v${{ env.GIT_TAG }}
+    if: github.event.inputs.dry-run == 'false'    
+    needs: [update-version-number, build-dotnet]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 10
+    steps:
+    - uses: actions/download-artifact@v2-preview
+    - uses: softprops/action-gh-release@v1
+      id: create_release
+      with:
+        tag_name: ${{ env.GIT_TAG }}
+        name: v${{ env.GIT_TAG }}
+        draft: true
+        prerelease: false
+        generate_release_notes: true
 
-  #   # Download(All) Artifacts to current directory
-  #   - uses: actions/download-artifact@v2-preview
+    # Create Releases
+    - uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.GIT_TAG }}
+        release_name: v${{ env.GIT_TAG }}
 
-  #   # Upload to Releases(unitypackage)
-  #   - uses: actions/upload-release-asset@v1
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     with:
-  #       upload_url: ${{ steps.create_release.outputs.upload_url }}
-  #       asset_path: ./VContainer.${{ env.GIT_TAG }}.unitypackage
-  #       asset_name: VContainer.${{ env.GIT_TAG }}.unitypackage
-  #       asset_content_type: application/octet-stream
+    # Upload to Releases(unitypackage)
+    - uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./VContainer.${{ env.GIT_TAG }}.unitypackage
+        asset_name: VContainer.${{ env.GIT_TAG }}.unitypackage
+        asset_content_type: application/octet-stream

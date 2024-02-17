@@ -1,0 +1,105 @@
+name: Update Version Number
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "git tag you want create. (sample 1.0.0)"
+        required: true
+        type: string
+      dry-run:
+        description: "true to simularate commit but not push change."
+        required: true
+        type: boolean
+      push-tag:
+        description: "true = push tag. false = no push tag."
+        required: false
+        type: boolean
+        default: true
+    
+  workflow_call:
+    inputs:
+      tag:
+        description: "git tag you want create. (sample 1.0.0)"
+        required: true
+        type: string
+      dry-run:
+        description: "true to simularate commit but not push change."
+        required: true
+        type: boolean
+      push-tag:
+        description: "true = push tag. false = no push tag."
+        required: false
+        type: boolean
+        default: true
+    outputs:
+      sha:
+        description: "Git commit sha has changed."
+        value: ${{ jobs.update-packagejson.outputs.sha }}
+      branch-name:
+        description: Git branch name created.
+        value: ${{ jobs.update-packagejson.outputs.branch-name }}
+      is-branch-created:
+        description: Indicate is Git branch created or not.
+        value: ${{ jobs.update-packagejson.outputs.is-branch-created }}
+
+jobs:
+  update-version-number:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      sha: ${{ steps.commit.outputs.sha }}
+      branch-name: ${{ steps.configure.outputs.branch-name }}
+      is-branch-created: ${{ steps.configure.outputs.is-branch-created }}
+    steps:
+      - name: Configure Output variables
+        id: configure
+        run: |
+          echo "git-tag=${{ inputs.tag }}" | tee -a "$GITHUB_OUTPUT"
+          echo "dry-run=${{ inputs.dry-run }}" | tee -a "$GITHUB_OUTPUT"
+          echo "branch-name=test-release/${{ inputs.tag }}" | tee -a "$GITHUB_OUTPUT"
+          echo "is-branch-created=${{ inputs.dry-run }}" | tee -a "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Update version number ${{ steps.configure.outputs.git-tag }}
+        run: |
+          ruby .github/update_version_number.rb ${{ steps.configure.outputs.git-tag }}
+          
+      - name: Check update on git
+        id: check_update
+        run: git diff --exit-code || echo "changed=1" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Commit files
+        id: commit
+        if: ${{ steps.check_update.outputs.changed == '1' }}
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "${{ steps.configure.outputs.git-tag }}" -a
+          echo "sha=$(git rev-parse HEAD)" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Create Tag
+        if: ${{ steps.check_update.outputs.changed == '1' && inputs.push-tag }}
+        run: git tag ${{ steps.configure.outputs.git-tag }}
+
+      - name: Push changes
+        if: ${{ steps.configure.outputs.dry-run == 'false' && steps.check_update.outputs.changed == '1' }}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: ${{ inputs.push-tag }}
+
+      - name: Push changes (dry-run)
+        if: ${{ steps.configure.outputs.dry-run == 'true' && steps.check_update.outputs.changed == '1' }}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "refs/heads/${{ steps.configure.outputs.branch-name }}"
+          tags: false
+          force: true
