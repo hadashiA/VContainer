@@ -80,7 +80,7 @@ jobs:
       contents: write
     timeout-minutes: 10
     steps:
-    - uses: actions/download-artifact@v2-preview
+    - uses: actions/download-artifact@v4
     - uses: softprops/action-gh-release@v1
       id: create_release
       with:
@@ -89,22 +89,8 @@ jobs:
         draft: true
         prerelease: false
         generate_release_notes: true
-
-    # Create Releases
-    - uses: actions/create-release@v1
-      id: create_release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ env.GIT_TAG }}
-        release_name: v${{ env.GIT_TAG }}
-
-    # Upload to Releases(unitypackage)
-    - uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./VContainer.${{ env.GIT_TAG }}.unitypackage
-        asset_name: VContainer.${{ env.GIT_TAG }}.unitypackage
-        asset_content_type: application/octet-stream
+        files: |
+          ./VContainer.${{ env.GIT_TAG }}.unitypackage
+          ./VContainer.SourceGenerator.dll
+          ./VContainer.SourceGenerator.Roslyn3.dll
+       
