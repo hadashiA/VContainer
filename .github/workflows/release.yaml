@@ -78,7 +78,7 @@ jobs:
     steps:
 
     if: github.event.inputs.dry-run == 'false'    
-    needs: [update-version-number, build-dotnet]
+    needs: [update-version-number]
     runs-on: ubuntu-latest
     permissions:
       contents: write
