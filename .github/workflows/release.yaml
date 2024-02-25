@@ -87,7 +87,7 @@ jobs:
         prerelease: false
         generate_release_notes: true
         files: |
-          ./VContainer.${{ env.GIT_TAG }}.unitypackage
-          ./VContainer.SourceGenerator.dll
-          ./VContainer.SourceGenerator.Roslyn3.dll
+          ./VContainer/VContainer.${{ env.GIT_TAG }}.unitypackage
+          ./VContainer.SourceGenerator/bin/Release/netstandard2.0/VContainer.SourceGenerator.dll
+          ./VContainer.SourceGenerator.Roslyn3/bin/Release/netstandard2.0/VContainer.SourceGenerator.Roslyn3.dll
        
