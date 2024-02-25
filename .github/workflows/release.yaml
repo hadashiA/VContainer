@@ -75,11 +75,7 @@ jobs:
   create-release:
     needs: [build-unity]
     runs-on: ubuntu-latest
-    steps:
-
-    if: github.event.inputs.dry-run == 'false'    
-    needs: [update-version-number]
-    runs-on: ubuntu-latest
+    if: github.event.inputs.dry-run == 'false'
     permissions:
       contents: write
     timeout-minutes: 10
