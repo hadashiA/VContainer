@@ -28,13 +28,13 @@ namespace VContainer
         object Resolve(Registration registration);
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
         void Inject(object instance);
+        bool TryGetRegistration(Type type, out Registration registration);
     }
 
     public interface IScopedObjectResolver : IObjectResolver
     {
         IObjectResolver Root { get; }
         IScopedObjectResolver Parent { get; }
-        bool TryGetRegistration(Type type, out Registration registration);
     }
 
     public enum Lifetime
@@ -223,6 +223,11 @@ namespace VContainer
             var injector = InjectorCache.GetOrBuild(instance.GetType());
             injector.Inject(instance, this, null);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryGetRegistration(Type type, out Registration registration)
+            => registry.TryGet(type, out registration);
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
