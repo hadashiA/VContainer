@@ -14,7 +14,7 @@ on:
 
 env:
   GIT_TAG: ${{ github.event.inputs.tag }}
-    
+   
 jobs:
   update-version-number:
     uses: ./.github/workflows/update-version-number.yaml

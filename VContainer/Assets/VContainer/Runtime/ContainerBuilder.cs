@@ -18,7 +18,7 @@ namespace VContainer
 
         T Register<T>(T registrationBuilder) where T : RegistrationBuilder;
         void RegisterBuildCallback(Action<IObjectResolver> container);
-        bool Exists(Type type, bool includeInterfaceTypes = false);
+        bool Exists(Type type, bool includeInterfaceTypes = false, bool findParentScopes = false);
     }
 
     public sealed class ScopedContainerBuilder : ContainerBuilder
@@ -44,6 +44,31 @@ namespace VContainer
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override IObjectResolver Build() => BuildScope();
+
+        public override bool Exists(Type type, bool includeInterfaceTypes = false, bool findParentScopes = false)
+        {
+            if (base.Exists(type, includeInterfaceTypes, findParentScopes))
+            {
+                return true;
+            }
+
+            if (findParentScopes)
+            {
+                var next = parent;
+                while (next != null)
+                {
+                    if (parent.TryGetRegistration(type, out var registration))
+                    {
+                        if (includeInterfaceTypes || registration.ImplementationType == type)
+                        {
+                            return true;
+                        }
+                    }
+                    next = next.Parent;
+                }
+            }
+            return false;
+        }
     }
 
     public class ContainerBuilder : IContainerBuilder
@@ -87,7 +112,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Exists(Type type, bool includeInterfaceTypes = false)
+        public virtual bool Exists(Type type, bool includeInterfaceTypes = false, bool findParentScopes = false)
         {
             foreach (var registrationBuilder in registrationBuilders)
             {
