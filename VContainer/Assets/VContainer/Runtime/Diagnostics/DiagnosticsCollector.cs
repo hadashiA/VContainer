@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using VContainer.Internal;
 
@@ -69,11 +70,14 @@ namespace VContainer.Diagnostics
                 owner?.Dependencies.Add(current);
 
                 resolveCallStack.Value.Push(current);
+                var watch = Stopwatch.StartNew();
                 var instance = resolving(registration);
+                watch.Stop();
                 resolveCallStack.Value.Pop();
 
                 if (!current.ResolveInfo.Instances.Contains(instance))
                 {
+                    current.ResolveInfo.InitialResolveTime = watch.ElapsedMilliseconds;
                     current.ResolveInfo.Instances.Add(instance);
                 }
 
