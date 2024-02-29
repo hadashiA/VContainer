@@ -75,15 +75,38 @@ namespace VContainer.Diagnostics
                 watch.Stop();
                 resolveCallStack.Value.Pop();
 
+                SetResolveTime(current, watch.ElapsedMilliseconds);
+
                 if (!current.ResolveInfo.Instances.Contains(instance))
                 {
-                    current.ResolveInfo.InitialResolveTime = watch.ElapsedMilliseconds;
                     current.ResolveInfo.Instances.Add(instance);
                 }
 
                 return instance;
             }
             return resolving(registration);
+        }
+
+        private static void SetResolveTime(DiagnosticsInfo current, long elapsedMilliseconds)
+        {
+            var resolves = current.ResolveInfo.RefCount;
+            var resolveTime = current.ResolveInfo.ResolveTime;
+
+            switch (current.ResolveInfo.Registration.Lifetime)
+            {
+                case Lifetime.Transient:
+                    resolveTime = (resolveTime * (resolves - 1) + elapsedMilliseconds) / resolves;
+                    break;
+                case Lifetime.Scoped:
+                case Lifetime.Singleton:
+                    if (elapsedMilliseconds > resolveTime)
+                        resolveTime = elapsedMilliseconds;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            current.ResolveInfo.ResolveTime = resolveTime;
         }
 
         public void NotifyContainerBuilt(IObjectResolver container)

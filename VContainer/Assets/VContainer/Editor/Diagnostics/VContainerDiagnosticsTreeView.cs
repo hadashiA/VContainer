@@ -17,7 +17,7 @@ namespace VContainer.Editor.Diagnostics
         public RegistrationBuilder RegistrationBuilder => DiagnosticsInfo.RegisterInfo.RegistrationBuilder;
         public Registration Registration => DiagnosticsInfo.ResolveInfo.Registration;
         public int? RefCount => DiagnosticsInfo.ResolveInfo.RefCount;
-        public long InitialResolveTime => DiagnosticsInfo.ResolveInfo.InitialResolveTime;
+        public long ResolveTime => DiagnosticsInfo.ResolveInfo.ResolveTime;
 
         public string TypeSummary => TypeNameHelper.GetTypeAlias(Registration.ImplementationType);
 
@@ -249,7 +249,7 @@ namespace VContainer.Editor.Diagnostics
                         EditorGUI.LabelField(cellRect, item.ScopeName, labelStyle);
                         break;
                     case 6:
-                        EditorGUI.LabelField(cellRect, item.InitialResolveTime.ToString(), labelStyle);
+                        EditorGUI.LabelField(cellRect, item.ResolveTime.ToString(), labelStyle);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
@@ -302,8 +302,8 @@ namespace VContainer.Editor.Diagnostics
                         : items.OrderByDescending(x => x.ScopeName);
                 case 6:
                     return ascending
-                        ? items.OrderBy(x => x.InitialResolveTime)
-                        : items.OrderByDescending(x => x.InitialResolveTime);
+                        ? items.OrderBy(x => x.ResolveTime)
+                        : items.OrderByDescending(x => x.ResolveTime);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sortedColumnIndex), sortedColumnIndex, null);
             }
