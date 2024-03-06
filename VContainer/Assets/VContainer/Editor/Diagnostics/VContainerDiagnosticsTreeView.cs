@@ -17,6 +17,7 @@ namespace VContainer.Editor.Diagnostics
         public RegistrationBuilder RegistrationBuilder => DiagnosticsInfo.RegisterInfo.RegistrationBuilder;
         public Registration Registration => DiagnosticsInfo.ResolveInfo.Registration;
         public int? RefCount => DiagnosticsInfo.ResolveInfo.RefCount;
+        public long ResolveTime => DiagnosticsInfo.ResolveInfo.ResolveTime;
 
         public string TypeSummary => TypeNameHelper.GetTypeAlias(Registration.ImplementationType);
 
@@ -85,6 +86,7 @@ namespace VContainer.Editor.Diagnostics
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Register"), width = 15f },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("RefCount"), width = 5f },
             new MultiColumnHeaderState.Column { headerContent = new GUIContent("Scope"), width = 20f },
+            new MultiColumnHeaderState.Column { headerContent = new GUIContent("Time"), width = 20f },
         };
 
         static int idSeed;
@@ -246,6 +248,9 @@ namespace VContainer.Editor.Diagnostics
                     case 5:
                         EditorGUI.LabelField(cellRect, item.ScopeName, labelStyle);
                         break;
+                    case 6:
+                        EditorGUI.LabelField(cellRect, item.ResolveTime.ToString(), labelStyle);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
                 }
@@ -295,6 +300,10 @@ namespace VContainer.Editor.Diagnostics
                     return ascending
                         ? items.OrderBy(x => x.ScopeName)
                         : items.OrderByDescending(x => x.ScopeName);
+                case 6:
+                    return ascending
+                        ? items.OrderBy(x => x.ResolveTime)
+                        : items.OrderByDescending(x => x.ResolveTime);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(sortedColumnIndex), sortedColumnIndex, null);
             }

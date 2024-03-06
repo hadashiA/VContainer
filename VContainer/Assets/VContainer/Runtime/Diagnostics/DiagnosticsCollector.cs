@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using VContainer.Internal;
 
@@ -69,8 +70,12 @@ namespace VContainer.Diagnostics
                 owner?.Dependencies.Add(current);
 
                 resolveCallStack.Value.Push(current);
+                var watch = Stopwatch.StartNew();
                 var instance = resolving(registration);
+                watch.Stop();
                 resolveCallStack.Value.Pop();
+
+                SetResolveTime(current, watch.ElapsedMilliseconds);
 
                 if (!current.ResolveInfo.Instances.Contains(instance))
                 {
@@ -80,6 +85,28 @@ namespace VContainer.Diagnostics
                 return instance;
             }
             return resolving(registration);
+        }
+
+        private static void SetResolveTime(DiagnosticsInfo current, long elapsedMilliseconds)
+        {
+            var resolves = current.ResolveInfo.RefCount;
+            var resolveTime = current.ResolveInfo.ResolveTime;
+
+            switch (current.ResolveInfo.Registration.Lifetime)
+            {
+                case Lifetime.Transient:
+                    resolveTime = (resolveTime * (resolves - 1) + elapsedMilliseconds) / resolves;
+                    break;
+                case Lifetime.Scoped:
+                case Lifetime.Singleton:
+                    if (elapsedMilliseconds > resolveTime)
+                        resolveTime = elapsedMilliseconds;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            current.ResolveInfo.ResolveTime = resolveTime;
         }
 
         public void NotifyContainerBuilt(IObjectResolver container)
