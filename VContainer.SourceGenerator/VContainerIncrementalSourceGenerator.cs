@@ -106,7 +106,7 @@ public class VContainerIncrementalSourceGenerator : IIncrementalGenerator
                 var attributeName = attributeSymbol.ContainingType.ToDisplayString();
 
                 // Ignore
-                if (attributeName == "VContainer.InjectIgnore")
+                if (attributeName == "VContainer.InjectIgnoreAttribute")
                     return null;
             }
         }
