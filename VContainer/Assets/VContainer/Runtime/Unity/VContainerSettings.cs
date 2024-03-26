@@ -48,24 +48,6 @@ namespace VContainer.Unity
             preloadedAssets.Add(newSettings);
             UnityEditor.PlayerSettings.SetPreloadedAssets(preloadedAssets.ToArray());
         }
-
-        public static void LoadInstanceFromPreloadAssets()
-        {
-            var preloadAsset = UnityEditor.PlayerSettings.GetPreloadedAssets().FirstOrDefault(x => x is VContainerSettings);
-            if (preloadAsset is VContainerSettings instance)
-            {
-                if (instance.RootLifetimeScope != null)
-                    instance.RootLifetimeScope.DisposeCore();
-                instance.OnEnable();
-            }
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void RuntimeInitialize()
-        {
-            // For editor, we need to load the Preload asset manually.
-            LoadInstanceFromPreloadAssets();
-        }
 #endif
 
         public LifetimeScope GetOrCreateRootLifetimeScopeInstance()
