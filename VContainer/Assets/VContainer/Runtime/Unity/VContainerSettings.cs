@@ -54,8 +54,7 @@ namespace VContainer.Unity
             var preloadAsset = UnityEditor.PlayerSettings.GetPreloadedAssets().FirstOrDefault(x => x is VContainerSettings);
             if (preloadAsset is VContainerSettings instance)
             {
-                if (instance.RootLifetimeScope != null)
-                    instance.RootLifetimeScope.DisposeCore();
+                instance.OnDisable();
                 instance.OnEnable();
             }
         }
@@ -104,6 +103,11 @@ namespace VContainer.Unity
                     SceneManager.sceneLoaded += OnFirstSceneLoaded;
                 }
             }
+        }
+
+        void OnDisable()
+        {
+            Instance = null;
         }
 
         void OnFirstSceneLoaded(Scene scene, LoadSceneMode mode)
