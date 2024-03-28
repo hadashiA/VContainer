@@ -94,7 +94,7 @@ namespace VContainer.Unity
                 RootLifetimeScope.autoRun &&
                 (rootLifetimeScopeInstance == null || rootLifetimeScopeInstance.Container == null))
             {
-                GetOrCreateRootLifetimeScopeInstance().Build();
+                GetOrCreateRootLifetimeScopeInstance();
             }
             SceneManager.sceneLoaded -= OnFirstSceneLoaded;
         }
