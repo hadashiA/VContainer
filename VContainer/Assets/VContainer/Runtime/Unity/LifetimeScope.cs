@@ -47,6 +47,8 @@ namespace VContainer.Unity
             }
         }
 
+        int instanceId;
+
         [SerializeField]
         public ParentReference parentReference;
 
@@ -65,6 +67,10 @@ namespace VContainer.Unity
             var gameObject = new GameObject("LifetimeScope");
             gameObject.SetActive(false);
             var newScope = gameObject.AddComponent<LifetimeScope>();
+            if (VContainerSettings.DiagnosticsEnabled)
+            {
+                newScope.instanceId = gameObject.GetInstanceID();
+            }
             if (installer != null)
             {
                 newScope.localExtraInstallers.Add(installer);
@@ -168,6 +174,10 @@ namespace VContainer.Unity
             Container?.Dispose();
             Container = null;
             CancelAwake(this);
+            if (VContainerSettings.DiagnosticsEnabled)
+            {
+                DiagnositcsContext.RemoveCollector(instanceId);
+            }
         }
 
         public void Build()
@@ -188,7 +198,7 @@ namespace VContainer.Unity
                 {
                     builder.RegisterBuildCallback(SetContainer);
                     builder.ApplicationOrigin = this;
-                    builder.Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null;
+                    builder.Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(instanceId, name) : null;
                     InstallTo(builder);
                 });
             }
@@ -197,7 +207,7 @@ namespace VContainer.Unity
                 var builder = new ContainerBuilder
                 {
                     ApplicationOrigin = this,
-                    Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null,
+                    Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(instanceId, name) : null,
                 };
                 builder.RegisterBuildCallback(SetContainer);
                 InstallTo(builder);
@@ -227,6 +237,10 @@ namespace VContainer.Unity
                 childGameObject.transform.SetParent(transform, false);
             }
             var child = childGameObject.AddComponent<TScope>();
+            if (VContainerSettings.DiagnosticsEnabled)
+            {
+                child.instanceId = childGameObject.GetInstanceID();
+            }
             if (installer != null)
             {
                 child.localExtraInstallers.Add(installer);
