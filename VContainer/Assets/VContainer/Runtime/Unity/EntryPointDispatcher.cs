@@ -22,14 +22,7 @@ namespace VContainer.Unity
         {
             PlayerLoopHelper.EnsureInitialized();
 
-            EntryPointExceptionHandler exceptionHandler = null;
-            try
-            {
-                exceptionHandler = container.Resolve<EntryPointExceptionHandler>();
-            }
-            catch (VContainerException ex) when (ex.InvalidType == typeof(EntryPointExceptionHandler))
-            {
-            }
+            EntryPointExceptionHandler exceptionHandler = container.ResolveOrDefault<EntryPointExceptionHandler>();
 
             var initializables = container.Resolve<ContainerLocal<IReadOnlyList<IInitializable>>>().Value;
             for (var i = 0; i < initializables.Count; i++)
