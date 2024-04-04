@@ -671,7 +671,6 @@ namespace VContainer.Tests
             container.Dispose();
 
             Assert.That(obj1.Disposed, Is.True);
->>>>>>> 1d6258b (Added Unit tests):VContainer/Assets/VContainer/Tests/ContainerTest.cs
         }
     }
 }

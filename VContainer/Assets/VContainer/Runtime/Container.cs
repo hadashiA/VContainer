@@ -18,7 +18,7 @@ namespace VContainer
         /// This version of resolve looks for all of scopes
         /// </remarks>
         object Resolve(Type type);
-        
+
         /// <summary>
         /// Try resolve from type
         /// </summary>
@@ -35,7 +35,9 @@ namespace VContainer
         /// This version of resolve will look for instances from only the registration information already founds.
         /// </remarks>
         object Resolve(Registration registration);
+
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
+
         void Inject(object instance);
         bool TryGetRegistration(Type type, out Registration registration);
     }
@@ -82,7 +84,14 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(Type type) => Resolve(FindRegistration(type));
+        public object Resolve(Type type)
+        {
+            if (TryFindRegistration(type, out var registration))
+            {
+                return Resolve(registration);
+            }
+            throw new VContainerException(type, $"No such registration of type: {type}");
+        }
 
         public bool TryResolve(Type type, out object resolved)
         {
@@ -175,15 +184,6 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Registration FindRegistration(Type type)
-        {
-            if (TryFindRegistration(type, out var registration))
-                return registration;
-                    
-            throw new VContainerException(type, $"No such registration of type: {type}");
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal bool TryFindRegistration(Type type, out Registration registration)
         {
             IScopedObjectResolver scope = this;
@@ -228,7 +228,7 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(Type type)
         {
-            if (registry.TryGet(type, out var registration))
+            if (TryGetRegistration(type, out var registration))
             {
                 return Resolve(registration);
             }
@@ -238,12 +238,12 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryResolve(Type type, out object resolved)
         {
-            if (registry.TryGet(type, out var registration))
+            if (TryGetRegistration(type, out var registration))
             {
                 resolved = Resolve(registration);
                 return true;
             }
-            
+
             resolved = default;
             return false;
         }
