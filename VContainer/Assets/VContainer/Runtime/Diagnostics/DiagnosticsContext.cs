@@ -52,5 +52,13 @@ namespace VContainer.Diagnostics
         {
             return GetDiagnosticsInfos().FirstOrDefault(x => x.ResolveInfo.Registration == registration);
         }
+
+        public static void RemoveCollector(string name)
+        {
+            lock (collectors)
+            {
+                collectors.Remove(name);
+            }
+        }
     }
 }

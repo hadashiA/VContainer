@@ -56,6 +56,8 @@ namespace VContainer.Unity
         [SerializeField]
         protected List<GameObject> autoInjectGameObjects;
 
+        string scopeName;
+
         static readonly Stack<LifetimeScope> GlobalOverrideParents = new Stack<LifetimeScope>();
         static readonly Stack<IInstaller> GlobalExtraInstallers = new Stack<IInstaller>();
         static readonly object SyncRoot = new object();
@@ -129,6 +131,10 @@ namespace VContainer.Unity
 
         protected virtual void Awake()
         {
+            if (VContainerSettings.DiagnosticsEnabled && string.IsNullOrEmpty(scopeName))
+            {
+                scopeName = $"{name} ({gameObject.GetInstanceID()})";
+            }
             try
             {
                 Parent = GetRuntimeParent();
@@ -168,6 +174,10 @@ namespace VContainer.Unity
             Container?.Dispose();
             Container = null;
             CancelAwake(this);
+            if (VContainerSettings.DiagnosticsEnabled)
+            {
+                DiagnositcsContext.RemoveCollector(scopeName);
+            }
         }
 
         public void Build()
@@ -188,7 +198,7 @@ namespace VContainer.Unity
                 {
                     builder.RegisterBuildCallback(SetContainer);
                     builder.ApplicationOrigin = this;
-                    builder.Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null;
+                    builder.Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(scopeName) : null;
                     InstallTo(builder);
                 });
             }
@@ -197,7 +207,7 @@ namespace VContainer.Unity
                 var builder = new ContainerBuilder
                 {
                     ApplicationOrigin = this,
-                    Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(name) : null,
+                    Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(scopeName) : null,
                 };
                 builder.RegisterBuildCallback(SetContainer);
                 InstallTo(builder);
