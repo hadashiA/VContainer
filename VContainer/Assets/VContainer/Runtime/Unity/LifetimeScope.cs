@@ -56,7 +56,6 @@ namespace VContainer.Unity
         [SerializeField]
         protected List<GameObject> autoInjectGameObjects;
 
-        [SerializeField]
         string scopeName;
 
         static readonly Stack<LifetimeScope> GlobalOverrideParents = new Stack<LifetimeScope>();
@@ -132,7 +131,7 @@ namespace VContainer.Unity
 
         protected virtual void Awake()
         {
-            if (string.IsNullOrEmpty(scopeName))
+            if (VContainerSettings.DiagnosticsEnabled && string.IsNullOrEmpty(scopeName))
             {
                 scopeName = $"{name} ({gameObject.GetInstanceID()})";
             }
