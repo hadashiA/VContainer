@@ -6,19 +6,19 @@ namespace VContainer.Diagnostics
 {
     public static class DiagnositcsContext
     {
-        static readonly Dictionary<int, DiagnosticsCollector> collectors
-            = new Dictionary<int, DiagnosticsCollector>();
+        static readonly Dictionary<string, DiagnosticsCollector> collectors
+            = new Dictionary<string, DiagnosticsCollector>();
 
         public static event Action<IObjectResolver> OnContainerBuilt;
 
-        public static DiagnosticsCollector GetCollector(int instanceId, string name)
+        public static DiagnosticsCollector GetCollector(string name)
         {
             lock (collectors)
             {
-                if (!collectors.TryGetValue(instanceId, out var collector))
+                if (!collectors.TryGetValue(name, out var collector))
                 {
-                    collector = new DiagnosticsCollector($"${name}/{instanceId}");
-                    collectors.Add(instanceId, collector);
+                    collector = new DiagnosticsCollector(name);
+                    collectors.Add(name, collector);
                 }
                 return collector;
             }
@@ -53,11 +53,11 @@ namespace VContainer.Diagnostics
             return GetDiagnosticsInfos().FirstOrDefault(x => x.ResolveInfo.Registration == registration);
         }
 
-        public static void RemoveCollector(int instanceId)
+        public static void RemoveCollector(string name)
         {
             lock (collectors)
             {
-                collectors.Remove(instanceId);
+                collectors.Remove(name);
             }
         }
     }

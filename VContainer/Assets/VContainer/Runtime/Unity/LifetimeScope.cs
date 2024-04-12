@@ -47,8 +47,6 @@ namespace VContainer.Unity
             }
         }
 
-        int instanceId;
-
         [SerializeField]
         public ParentReference parentReference;
 
@@ -57,6 +55,9 @@ namespace VContainer.Unity
 
         [SerializeField]
         protected List<GameObject> autoInjectGameObjects;
+
+        [SerializeField]
+        string scopeName;
 
         static readonly Stack<LifetimeScope> GlobalOverrideParents = new Stack<LifetimeScope>();
         static readonly Stack<IInstaller> GlobalExtraInstallers = new Stack<IInstaller>();
@@ -67,10 +68,6 @@ namespace VContainer.Unity
             var gameObject = new GameObject("LifetimeScope");
             gameObject.SetActive(false);
             var newScope = gameObject.AddComponent<LifetimeScope>();
-            if (VContainerSettings.DiagnosticsEnabled)
-            {
-                newScope.instanceId = gameObject.GetInstanceID();
-            }
             if (installer != null)
             {
                 newScope.localExtraInstallers.Add(installer);
@@ -135,6 +132,10 @@ namespace VContainer.Unity
 
         protected virtual void Awake()
         {
+            if (string.IsNullOrEmpty(scopeName))
+            {
+                scopeName = $"{name} ({gameObject.GetInstanceID()})";
+            }
             try
             {
                 Parent = GetRuntimeParent();
@@ -176,7 +177,7 @@ namespace VContainer.Unity
             CancelAwake(this);
             if (VContainerSettings.DiagnosticsEnabled)
             {
-                DiagnositcsContext.RemoveCollector(instanceId);
+                DiagnositcsContext.RemoveCollector(scopeName);
             }
         }
 
@@ -198,7 +199,7 @@ namespace VContainer.Unity
                 {
                     builder.RegisterBuildCallback(SetContainer);
                     builder.ApplicationOrigin = this;
-                    builder.Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(instanceId, name) : null;
+                    builder.Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(scopeName) : null;
                     InstallTo(builder);
                 });
             }
@@ -207,7 +208,7 @@ namespace VContainer.Unity
                 var builder = new ContainerBuilder
                 {
                     ApplicationOrigin = this,
-                    Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(instanceId, name) : null,
+                    Diagnostics = VContainerSettings.DiagnosticsEnabled ? DiagnositcsContext.GetCollector(scopeName) : null,
                 };
                 builder.RegisterBuildCallback(SetContainer);
                 InstallTo(builder);
@@ -237,10 +238,6 @@ namespace VContainer.Unity
                 childGameObject.transform.SetParent(transform, false);
             }
             var child = childGameObject.AddComponent<TScope>();
-            if (VContainerSettings.DiagnosticsEnabled)
-            {
-                child.instanceId = childGameObject.GetInstanceID();
-            }
             if (installer != null)
             {
                 child.localExtraInstallers.Add(installer);
