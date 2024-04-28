@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using VContainer.Unity;
@@ -140,6 +141,22 @@ namespace VContainer.Tests.Unity
                 Assert.That(instance.ServiceAInAwake, Is.InstanceOf<ServiceA>());
                 Assert.That(instance.ServiceA, Is.InstanceOf<ServiceA>());
             }
+        }
+        
+        [Test]
+        public void WhenFailingDuringInstantiateGameObject_TheGameObjectIsStillEnabled()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Singleton);
+            var container = builder.Build();
+
+            var parent = new GameObject("Parent");
+            GameObject original = new GameObject("Original");
+            original.AddComponent<CrashingSampleMonoBehaviour>();
+
+            Assert.Catch(() => container.Instantiate(original, parent.transform));
+            
+            Assert.That(original.gameObject.activeSelf, Is.True);
         }
 
         [Test]

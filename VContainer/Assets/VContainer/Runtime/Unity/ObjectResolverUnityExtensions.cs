@@ -183,14 +183,18 @@ namespace VContainer.Unity
             var wasActive = prefab.activeSelf;
             prefab.SetActive(false);
 
-            var instance = UnityEngine.Object.Instantiate(prefab, parent, worldPositionStays);
-            SetName(instance, prefab);
-
-            resolver.InjectGameObject(instance);
-
-            prefab.SetActive(wasActive);
-            instance.SetActive(wasActive);
-
+            GameObject instance = null;
+            try
+            {
+                instance = UnityEngine.Object.Instantiate(prefab, parent, worldPositionStays);
+                SetName(instance, prefab);
+                resolver.InjectGameObject(instance);
+            }
+            finally
+            {
+                prefab.SetActive(wasActive);
+                instance?.SetActive(wasActive);    
+            }
             return instance;
         }
 
