@@ -57,7 +57,7 @@ namespace VContainer
                 var next = parent;
                 while (next != null)
                 {
-                    if (parent.TryGetRegistration(type, out var registration))
+                    if (next.TryGetRegistration(type, out var registration))
                     {
                         if (includeInterfaceTypes || registration.ImplementationType == type)
                         {
