@@ -24,7 +24,7 @@ namespace VContainer.Internal
                 {
                     buckets[i][j] = new T[arrayLength];
                 }
-                tails[i] = buckets[i].Length - 1;
+                tails[i] = 0;
             }
         }
 
@@ -48,7 +48,12 @@ namespace VContainer.Internal
                     buckets[i] = bucket;
                 }
 
-                var result = bucket[tail] ?? new T[length];
+                if (bucket[tail] == null)
+                {
+                    bucket[tail] = new T[length];
+                }
+
+                var result = bucket[tail];
                 tails[i] += 1;
                 return result;
             }
