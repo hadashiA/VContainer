@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement style="max-width: 620px; min-width: 620px; flex-grow: 1; padding-left: 19px; padding-right: 1px; padding-top: 15px;">
+        <ui:VisualElement style="height: 25px; width: 604px; flex-shrink: 0; flex-direction: row;">
+            <ui:Label name="conversionName" style="-unity-font-style: bold; font-size: 16px; width: 593px; padding-right: 16px; flex-grow: 1; flex-shrink: 1;" />
+            <ui:Image name="converterContainerHelpIcon" />
+        </ui:VisualElement>
+        <ui:TextElement name="conversionInfo" style="height: 46px; width: 606px; flex-shrink: 0;" />
+        <ui:HelpBox message-type="Warning" text="This process makes irreversible changes to the project. Back up your project before proceeding." />
+        <ui:VisualElement style="flex-direction: row;">
+            <ui:DropdownField index="-1" name="conversionsDropDown" style="height: 27px; width: 208px; display: flex;" />
+            <ui:VisualElement style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:ScrollView scroll-deceleration-rate="0,135" elasticity="0,1" name="convertersScrollView" style="flex-grow: 1; flex-shrink: 1; max-width: none; width: 632px; padding-right: 0; padding-left: 4px;" />
+    </ui:VisualElement>
+    <ui:VisualElement style="flex-direction: row-reverse; flex-shrink: 0; padding-left: 15px; padding-right: 14px;">
+        <ui:Button text=" Convert Assets" name="convertButton" style="flex-direction: column; margin-bottom: 15px;" />
+        <ui:Label style="flex-grow: 1;" />
+        <ui:Button text="Initialize Converters" name="initializeButton" tooltip="This will initialize all the converters that has been toggled on." style="flex-direction: column; margin-bottom: 15px;" />
+    </ui:VisualElement>
+</ui:UXML>

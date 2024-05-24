@@ -1,0 +1,11 @@
+{
+    "name": "com.unity.modules.audio",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "Audio",
+    "description": "The Audio module implements Unity's audio system. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.AudioModule.html",
+    "icon": ".icon.png",
+    "dependencies": {
+
+    }
+}

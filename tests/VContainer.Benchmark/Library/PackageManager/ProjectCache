@@ -1,0 +1,1792 @@
+m_ProjectFiles:
+  m_ManifestFileStatus:
+    m_FilePath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Packages/manifest.json
+    m_PathExists: 1
+    m_ContentTrackingEnabled: 1
+    m_ModificationDate:
+      serializedVersion: 2
+      ticks: 638346081520000000
+    m_Hash: 2855145626
+  m_LockFileStatus:
+    m_FilePath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Packages/packages-lock.json
+    m_PathExists: 1
+    m_ContentTrackingEnabled: 1
+    m_ModificationDate:
+      serializedVersion: 2
+      ticks: 638346081520000000
+    m_Hash: 2579949531
+m_EmbeddedPackageManifests:
+  m_ManifestsStatus: {}
+m_LocalPackages:
+  m_LocalFileStatus:
+  - m_FilePath: /Users/hadashi/dev/VContainer/VContainer/Assets/VContainer/package.json
+    m_PathExists: 1
+    m_ContentTrackingEnabled: 1
+    m_ModificationDate:
+      serializedVersion: 2
+      ticks: 638346081460000000
+    m_Hash: 3383211392
+  - m_FilePath: /Users/hadashi/dev/VContainer/VContainer/Assets/VContainer
+    m_PathExists: 1
+    m_ContentTrackingEnabled: 1
+    m_ModificationDate:
+      serializedVersion: 2
+      ticks: 0
+    m_Hash: 0
+m_ProjectPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Packages
+m_EditorVersion: 2023.1.18f1 (2b639e48c919)
+m_ResolvedPackages:
+- packageId: com.gustavopsantos.reflex@https://github.com/gustavopsantos/reflex.git?path=/Reflex/Assets/Reflex/#1.0.3
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 5
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.gustavopsantos.reflex@d4260044ec
+  assetPath: Packages/com.gustavopsantos.reflex
+  name: com.gustavopsantos.reflex
+  displayName: Reflex
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: 
+  description: Minimal dependency injection framework for Unity
+  status: 0
+  errors: []
+  versions:
+    all: []
+    compatible: []
+    recommended: 
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords:
+  - Dependency Injection
+  - IoC
+  - DI
+  - DI Container
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: https://github.com/gustavopsantos/reflex
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: d4260044ec0c7e22830281125c035b49c7e54b7e
+    revision: 1.0.3
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.svermeulen.extenject@9.2.0-stcf3
+  testable: 0
+  isDirectDependency: 1
+  version: 9.2.0-stcf3
+  source: 1
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.svermeulen.extenject@9.2.0-stcf3
+  assetPath: Packages/com.svermeulen.extenject
+  name: com.svermeulen.extenject
+  displayName: Extenject
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: 
+  description: Dependency Injection Framework for Unity3D
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 0.0.1
+    - 9.0.0
+    - 9.1.0-1.metaFileFix
+    - 9.1.0
+    - 9.2.0-stcf1
+    - 9.2.0-stcf2
+    - 9.2.0-stcf3
+    compatible:
+    - 0.0.1
+    - 9.0.0
+    - 9.1.0-1.metaFileFix
+    - 9.1.0
+    - 9.2.0-stcf1
+    - 9.2.0-stcf2
+    - 9.2.0-stcf3
+    recommended: 
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: scoped:project:package.openupm.com
+    name: package.openupm.com
+    url: https://package.openupm.com
+    scopes:
+    - com.openupm
+    - com.svermeulen.extenject
+    isDefault: 0
+    capabilities: 0
+    configSource: 4
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 637318888550490000
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.ai.navigation@1.1.5
+  testable: 0
+  isDirectDependency: 1
+  version: 1.1.5
+  source: 1
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.ai.navigation@1.1.5
+  assetPath: Packages/com.unity.ai.navigation
+  name: com.unity.ai.navigation
+  displayName: AI Navigation
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: assets
+  description: High-level NavMesh components for building and using NavMeshes at
+    runtime and at edit time.
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0-exp.1
+    - 1.0.0-exp.2
+    - 1.0.0-exp.3
+    - 1.0.0-exp.4
+    - 1.1.0-pre.1
+    - 1.1.0-pre.2
+    - 1.1.1
+    - 1.1.3
+    - 1.1.4
+    - 1.1.5
+    - 2.0.0-pre.3
+    - 2.0.0-pre.4
+    - 2.0.0
+    compatible:
+    - 1.1.5
+    recommended: 1.1.5
+    deprecated: []
+  dependencies:
+  - name: com.unity.modules.ai
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.modules.ai
+    version: 1.0.0
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 1
+  isAssetStorePackage: 0
+  datePublishedTicks: 638319373850000000
+  documentationUrl: https://docs.unity3d.com/Packages/com.unity.ai.navigation@1.1/manual/index.html
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.cds.internal.unity3d.com/unity/com.unity.ai.navigation.git
+    revision: a905e1ab41c8afae1a75688ceb3b4dfa1686ea75
+    path: 
+  unityLifecycle:
+    version: 1.1.5
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: '{"changelog":"### Fixed\n* Long warning popping up when user starts
+    playmode while editing a prefab that contains NavMesh components ([NAVB-47](https://issuetracker.unity3d.com/product/unity/issues/guid/NAVB-47))"}'
+  assetStore:
+    productId: 
+- packageId: com.unity.ide.rider@3.0.25
+  testable: 0
+  isDirectDependency: 1
+  version: 3.0.25
+  source: 1
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.ide.rider@3.0.25
+  assetPath: Packages/com.unity.ide.rider
+  name: com.unity.ide.rider
+  displayName: JetBrains Rider Editor
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: assets
+  description: The JetBrains Rider Editor package provides an integration for using
+    the JetBrains Rider IDE as a code editor for Unity. It adds support for generating
+    .csproj files for code completion and auto-discovery of installations.
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.2
+    - 1.0.6
+    - 1.0.8
+    - 1.1.0
+    - 1.1.1
+    - 1.1.2-preview
+    - 1.1.2-preview.2
+    - 1.1.3-preview.1
+    - 1.1.4-preview
+    - 1.1.4
+    - 1.2.0-preview
+    - 1.2.1
+    - 2.0.0-preview
+    - 2.0.1
+    - 2.0.2
+    - 2.0.3
+    - 2.0.5
+    - 2.0.7
+    - 3.0.1
+    - 3.0.2
+    - 3.0.3
+    - 3.0.4
+    - 3.0.5
+    - 3.0.6
+    - 3.0.7
+    - 3.0.9
+    - 3.0.10
+    - 3.0.12
+    - 3.0.13
+    - 3.0.14
+    - 3.0.15
+    - 3.0.16
+    - 3.0.17
+    - 3.0.18
+    - 3.0.20
+    - 3.0.21
+    - 3.0.22
+    - 3.0.24
+    - 3.0.25
+    - 3.0.26
+    compatible:
+    - 3.0.25
+    - 3.0.26
+    recommended: 3.0.26
+    deprecated: []
+  dependencies:
+  - name: com.unity.ext.nunit
+    version: 1.0.6
+  resolvedDependencies:
+  - name: com.unity.ext.nunit
+    version: 2.0.3
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 1
+  isAssetStorePackage: 0
+  datePublishedTicks: 638300315270000000
+  documentationUrl: https://docs.unity3d.com/Packages/com.unity.ide.rider@3.0/manual/index.html
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.cds.internal.unity3d.com/unity/com.unity.ide.rider.git
+    revision: e103b4771a884e656407e1b7219e5e3c20222552
+    path: 
+  unityLifecycle:
+    version: 3.0.25
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: '{"changelog":"- unification of functionality to  search JetBrains
+    installations and open solution and file in Rider"}'
+  assetStore:
+    productId: 
+- packageId: com.unity.test-framework@1.3.9
+  testable: 0
+  isDirectDependency: 1
+  version: 1.3.9
+  source: 1
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.test-framework@1.3.9
+  assetPath: Packages/com.unity.test-framework
+  name: com.unity.test-framework
+  displayName: Test Framework
+  author:
+    name: 
+    email: 
+    url: 
+  category: Unity Test Framework
+  type: assets
+  description: Test framework for running Edit mode and Play mode tests in Unity.
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 0.0.4-preview
+    - 0.0.29-preview
+    - 1.0.0
+    - 1.0.7
+    - 1.0.9
+    - 1.0.11
+    - 1.0.12
+    - 1.0.13
+    - 1.0.14
+    - 1.0.16
+    - 1.0.17
+    - 1.0.18
+    - 1.1.0
+    - 1.1.1
+    - 1.1.2
+    - 1.1.3
+    - 1.1.5
+    - 1.1.8
+    - 1.1.9
+    - 1.1.11
+    - 1.1.13
+    - 1.1.14
+    - 1.1.16
+    - 1.1.18
+    - 1.1.19
+    - 1.1.20
+    - 1.1.22
+    - 1.1.24
+    - 1.1.26
+    - 1.1.27
+    - 1.1.29
+    - 1.1.30
+    - 1.1.31
+    - 1.1.33
+    - 1.3.0
+    - 1.3.1
+    - 1.3.2
+    - 1.3.3
+    - 1.3.4
+    - 1.3.5
+    - 1.3.7
+    - 1.3.8
+    - 1.3.9
+    - 2.0.1-exp.1
+    - 2.0.1-exp.2
+    - 2.0.1-pre.12
+    - 2.0.1-pre.18
+    compatible:
+    - 1.3.9
+    - 2.0.1-exp.1
+    - 2.0.1-exp.2
+    - 2.0.1-pre.12
+    - 2.0.1-pre.18
+    recommended: 1.3.9
+    deprecated: []
+  dependencies:
+  - name: com.unity.ext.nunit
+    version: 2.0.3
+  - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.ext.nunit
+    version: 2.0.3
+  - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  keywords:
+  - Test
+  - TestFramework
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 1
+  isAssetStorePackage: 0
+  datePublishedTicks: 638283169810000000
+  documentationUrl: https://docs.unity3d.com/Packages/com.unity.test-framework@1.3/manual/index.html
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.com/Unity-Technologies/com.unity.test-framework.git
+    revision: 5c8a1448cee4d7607be0d60dceb66703b0cfe016
+    path: 
+  unityLifecycle:
+    version: 1.3.9
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: '{"changelog":"- By using the editor command line new argument `-randomOrderSeed
+    x` you can run the tests in a randomized order, where x is an integer different
+    from 0. If a new test is added in the project the random order passing the same
+    seed will be kept, and the new test will be placed in the random list accordigly.\n-
+    Fix for WebGL platform target to close the browser tab when the run is completed.
+    \n- Added TestFileReferences.json to be generated on build step of the player,
+    so can be consumed later by Test runners to enrich data for run part."}'
+  assetStore:
+    productId: 
+- packageId: com.unity.test-framework.performance@2.8.0-preview
+  testable: 1
+  isDirectDependency: 1
+  version: 2.8.0-preview
+  source: 1
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.test-framework.performance@2.8.0-preview
+  assetPath: Packages/com.unity.test-framework.performance
+  name: com.unity.test-framework.performance
+  displayName: Performance testing API
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: asset
+  description: Extension to the Unity Test framework package. Adds performance testing
+    capabilities and collects configuration metadata.
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 0.1.27-preview
+    - 0.1.29-preview
+    - 0.1.31-preview
+    - 0.1.33-preview
+    - 0.1.34-preview
+    - 0.1.36-preview
+    - 0.1.37-preview
+    - 0.1.39-preview
+    - 0.1.40-preview
+    - 0.1.41-preview
+    - 0.1.42-preview
+    - 0.1.44-preview
+    - 0.1.45-preview
+    - 0.1.47-preview
+    - 0.1.48-preview
+    - 0.1.49-preview
+    - 0.1.50-preview
+    - 1.0.4-preview
+    - 1.0.6-preview
+    - 1.0.9-preview
+    - 1.1.2-preview
+    - 1.2.0-preview
+    - 1.2.1-preview
+    - 1.2.3-preview
+    - 1.2.5-preview
+    - 1.2.6-preview
+    - 1.3.0-preview
+    - 1.3.1-preview
+    - 1.3.2-preview
+    - 1.3.3-preview
+    - 2.0.1-preview
+    - 2.0.2-preview
+    - 2.0.3-preview
+    - 2.0.6-preview
+    - 2.0.7-preview
+    - 2.0.8-preview
+    - 2.0.9-preview
+    - 2.1.0-preview
+    - 2.2.0-preview
+    - 2.3.1-preview
+    - 2.4.1-preview
+    - 2.5.1-preview
+    - 2.6.0-preview
+    - 2.7.0-preview
+    - 2.8.0-preview
+    - 2.8.1-preview
+    - 3.0.0-pre.1
+    - 3.0.0-pre.2
+    - 3.0.1
+    - 3.0.2
+    - 3.0.3
+    compatible:
+    - 1.3.3-preview
+    - 2.0.1-preview
+    - 2.0.2-preview
+    - 2.0.3-preview
+    - 2.0.6-preview
+    - 2.0.7-preview
+    - 2.0.8-preview
+    - 2.0.9-preview
+    - 2.1.0-preview
+    - 2.2.0-preview
+    - 2.3.1-preview
+    - 2.4.1-preview
+    - 2.5.1-preview
+    - 2.6.0-preview
+    - 2.7.0-preview
+    - 2.8.0-preview
+    - 2.8.1-preview
+    - 3.0.0-pre.1
+    - 3.0.0-pre.2
+    - 3.0.1
+    - 3.0.2
+    - 3.0.3
+    recommended: 
+    deprecated: []
+  dependencies:
+  - name: com.unity.test-framework
+    version: 1.1.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.test-framework
+    version: 1.3.9
+  - name: com.unity.ext.nunit
+    version: 2.0.3
+  - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  keywords:
+  - performance
+  - test
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 1
+  isAssetStorePackage: 0
+  datePublishedTicks: 637514829010000000
+  documentationUrl: 
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.cds.internal.unity3d.com/unity/com.unity.test-framework.performance.git
+    revision: ed41cff119cdf700f111dbfd9150391bcc7da9e2
+    path: 
+  unityLifecycle:
+    version: 
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.ugui@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.ugui@1.0.0
+  assetPath: Packages/com.unity.ugui
+  name: com.unity.ugui
+  displayName: Unity UI
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: 
+  description: "Unity UI is a set of tools for developing user interfaces for games
+    and applications. It is a GameObject-based UI system that uses Components and
+    the Game View to arrange, position, and style user interfaces. \u200B You cannot
+    use Unity UI to create or change user interfaces in the Unity Editor."
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    - 3.0.0-exp.1
+    - 3.0.0-exp.3
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies:
+  - name: com.unity.modules.ui
+    version: 1.0.0
+  - name: com.unity.modules.imgui
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.modules.ui
+    version: 1.0.0
+  - name: com.unity.modules.imgui
+    version: 1.0.0
+  keywords:
+  - UI
+  - ugui
+  - Unity UI
+  - Canvas
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: jp.hadashikick.vcontainer@file:/Users/hadashi/dev/VContainer/VContainer/Assets/VContainer
+  testable: 0
+  isDirectDependency: 1
+  version: 1.13.2
+  source: 4
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer/Assets/VContainer
+  assetPath: Packages/jp.hadashikick.vcontainer
+  name: jp.hadashikick.vcontainer
+  displayName: VContainer
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: 
+  description: The extra fast DI (Dependency Injection) for Unity
+  status: 0
+  errors: []
+  versions:
+    all: []
+    compatible: []
+    recommended: 
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords:
+  - DI
+  - Dependency Injection
+  - DI Container
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: https://vcontainer.hadashikick.jp/
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.animation@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.animation@1.0.0
+  assetPath: Packages/com.unity.modules.animation
+  name: com.unity.modules.animation
+  displayName: Animation
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The Animation module implements Unity''s animation system. Scripting
+    API: https://docs.unity3d.com/ScriptReference/UnityEngine.AnimationModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.assetbundle@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.assetbundle@1.0.0
+  assetPath: Packages/com.unity.modules.assetbundle
+  name: com.unity.modules.assetbundle
+  displayName: Asset Bundle
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The AssetBundle module implements the AssetBundle class and related
+    APIs to load data from AssetBundles. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.AssetBundleModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.audio@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.audio@1.0.0
+  assetPath: Packages/com.unity.modules.audio
+  name: com.unity.modules.audio
+  displayName: Audio
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The Audio module implements Unity''s audio system. Scripting API:
+    https://docs.unity3d.com/ScriptReference/UnityEngine.AudioModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.imageconversion@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.imageconversion@1.0.0
+  assetPath: Packages/com.unity.modules.imageconversion
+  name: com.unity.modules.imageconversion
+  displayName: Image Conversion
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The ImageConversion module implements the ImageConversion class which
+    provides helper methods for converting image data. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.ImageConversionModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.imgui@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.imgui@1.0.0
+  assetPath: Packages/com.unity.modules.imgui
+  name: com.unity.modules.imgui
+  displayName: IMGUI
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The IMGUI module provides Unity''s immediate mode GUI solution for
+    creating in-game and editor user interfaces. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.IMGUIModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.jsonserialize@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.jsonserialize@1.0.0
+  assetPath: Packages/com.unity.modules.jsonserialize
+  name: com.unity.modules.jsonserialize
+  displayName: JSONSerialize
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The JSONSerialize module provides the JsonUtility class which lets
+    you serialize Unity Objects to JSON format. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.JSONSerializeModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.physics@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.physics@1.0.0
+  assetPath: Packages/com.unity.modules.physics
+  name: com.unity.modules.physics
+  displayName: Physics
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The Physics module implements 3D physics in Unity. Scripting API:
+    https://docs.unity3d.com/ScriptReference/UnityEngine.PhysicsModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.ui@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.ui@1.0.0
+  assetPath: Packages/com.unity.modules.ui
+  name: com.unity.modules.ui
+  displayName: UI
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The UI module implements basic components required for Unity''s UI
+    system Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.UIModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.uielements@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.uielements@1.0.0
+  assetPath: Packages/com.unity.modules.uielements
+  name: com.unity.modules.uielements
+  displayName: UIElements
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The UIElements module implements the UIElements retained mode UI
+    framework. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.UIElementsModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies:
+  - name: com.unity.modules.ui
+    version: 1.0.0
+  - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.modules.ui
+    version: 1.0.0
+  - name: com.unity.modules.imgui
+    version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.unitywebrequest@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.unitywebrequest@1.0.0
+  assetPath: Packages/com.unity.modules.unitywebrequest
+  name: com.unity.modules.unitywebrequest
+  displayName: Unity Web Request
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The UnityWebRequest module lets you communicate with http services.
+    Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.UnityWebRequestModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.vr@1.0.0
+  testable: 0
+  isDirectDependency: 1
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.vr@1.0.0
+  assetPath: Packages/com.unity.modules.vr
+  name: com.unity.modules.vr
+  displayName: VR
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The VR module implements support for virtual reality devices in Unity.
+    Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.VRModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies:
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  - name: com.unity.modules.physics
+    version: 1.0.0
+  - name: com.unity.modules.xr
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  - name: com.unity.modules.physics
+    version: 1.0.0
+  - name: com.unity.modules.xr
+    version: 1.0.0
+  - name: com.unity.modules.subsystems
+    version: 1.0.0
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.xr@1.0.0
+  testable: 0
+  isDirectDependency: 0
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.xr@1.0.0
+  assetPath: Packages/com.unity.modules.xr
+  name: com.unity.modules.xr
+  displayName: XR
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The XR module contains the VR and AR related platform support functionality.
+    Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.XRModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies:
+  - name: com.unity.modules.physics
+    version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  - name: com.unity.modules.subsystems
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.modules.physics
+    version: 1.0.0
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  - name: com.unity.modules.subsystems
+    version: 1.0.0
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.ext.nunit@2.0.3
+  testable: 0
+  isDirectDependency: 0
+  version: 2.0.3
+  source: 1
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.ext.nunit@2.0.3
+  assetPath: Packages/com.unity.ext.nunit
+  name: com.unity.ext.nunit
+  displayName: Custom NUnit
+  author:
+    name: 
+    email: 
+    url: 
+  category: Libraries
+  type: asset
+  description: A custom version of NUnit used by Unity Test Framework. Based on NUnit
+    version 3.5 and works with all platforms, il2cpp and Mono AOT.
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 0.1.5-preview
+    - 0.1.6-preview
+    - 0.1.9-preview
+    - 1.0.0
+    - 1.0.5
+    - 1.0.6
+    - 2.0.2
+    - 2.0.3
+    - 2.0.4
+    - 2.0.5
+    compatible:
+    - 2.0.3
+    - 2.0.4
+    - 2.0.5
+    recommended: 2.0.5
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords:
+  - nunit
+  - unittest
+  - test
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 1
+  isAssetStorePackage: 0
+  datePublishedTicks: 637920402200000000
+  documentationUrl: 
+  hasRepository: 1
+  repository:
+    type: git
+    url: https://github.cds.internal.unity3d.com/unity/com.unity.ext.nunit.git
+    revision: 2e41147762790f2a221103bff840a0138ca01b57
+    path: 
+  unityLifecycle:
+    version: 2.0.3
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: '{"changelog":"- Added unique test ID for repeated tests\r\n- Added
+    ContainKey and ContainValue constaints for dictionaries\r\n- Fixed unexpected
+    null exception when using EmptyConstraint with a null object"}'
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.ai@1.0.0
+  testable: 0
+  isDirectDependency: 0
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.ai@1.0.0
+  assetPath: Packages/com.unity.modules.ai
+  name: com.unity.modules.ai
+  displayName: AI
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The AI module implements the path finding features in Unity. Scripting
+    API: https://docs.unity3d.com/ScriptReference/UnityEngine.AIModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies: []
+  resolvedDependencies: []
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 1.0.0
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 
+- packageId: com.unity.modules.subsystems@1.0.0
+  testable: 0
+  isDirectDependency: 0
+  version: 1.0.0
+  source: 2
+  resolvedPath: /Users/hadashi/dev/VContainer/VContainer.Benchmark/Library/PackageCache/com.unity.modules.subsystems@1.0.0
+  assetPath: Packages/com.unity.modules.subsystems
+  name: com.unity.modules.subsystems
+  displayName: Subsystems
+  author:
+    name: 
+    email: 
+    url: 
+  category: 
+  type: module
+  description: 'The Subsystem module contains the definitions and runtime support
+    for general subsystems in Unity. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.SubsystemsModule.html'
+  status: 0
+  errors: []
+  versions:
+    all:
+    - 1.0.0
+    compatible:
+    - 1.0.0
+    recommended: 1.0.0
+    deprecated: []
+  dependencies:
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  resolvedDependencies:
+  - name: com.unity.modules.jsonserialize
+    version: 1.0.0
+  keywords: []
+  registry:
+    id: main
+    name: 
+    url: https://packages.unity.com
+    scopes: []
+    isDefault: 1
+    capabilities: 7
+    configSource: 0
+  hideInEditor: 1
+  entitlements:
+    licensingModel: 0
+  isAssetStorePackage: 0
+  datePublishedTicks: 0
+  documentationUrl: 
+  hasRepository: 0
+  repository:
+    type: 
+    url: 
+    revision: 
+    path: 
+  unityLifecycle:
+    version: 
+    nextVersion: 
+    recommendedVersion: 
+    isDeprecated: 0
+    deprecationMessage: 
+  isDeprecated: 0
+  deprecationMessage: 
+  git:
+    hash: 
+    revision: 
+  upmReserved: 
+  assetStore:
+    productId: 

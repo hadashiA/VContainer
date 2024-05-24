@@ -1,0 +1,31 @@
+{
+    "name": "UnityEditor.TestRunner",
+    "references": [
+        "UnityEngine.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll",
+        "Mono.Cecil.dll",
+        "Mono.Cecil.Pdb.dll",
+        "Mono.Cecil.Mdb.dll",
+        "Mono.Cecil.Rocks.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_TESTS_FRAMEWORK"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.test-framework",
+            "expression": "",
+            "define": "UNITY_TESTS_FRAMEWORK"
+        }
+    ],
+    "noEngineReferences": false
+}
