@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="..\VContainer\Assets\VContainer\Runtime\**\*.cs" Exclude="&#xA;..\VContainer\Assets\VContainer\Runtime\Unity\**\*.cs;&#xA;" />
+        <Compile Include="..\VContainer\Assets\VContainer\Runtime\**\*.cs"
+                 Exclude="&#xA;..\VContainer\Assets\VContainer\Runtime\Unity\**\*.cs;&#xA;" />
     </ItemGroup>
 </Project>

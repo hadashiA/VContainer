@@ -1,0 +1,10 @@
+{
+    "name": "com.unity.modules.assetbundle",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "Asset Bundle",
+    "description": "The AssetBundle module implements the AssetBundle class and related APIs to load data from AssetBundles. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.AssetBundleModule.html",
+    "dependencies": {
+
+    }
+}

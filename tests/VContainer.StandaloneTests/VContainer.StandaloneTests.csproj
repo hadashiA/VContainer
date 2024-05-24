@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <DefineConstants>VCONTAINER_SOURCE_GENERATOR</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\..\VContainer\Assets\Tests\**\*.cs"
+                 Exclude="&#xA;..\..\VContainer\Assets\Tests\Unity\**\*.cs;&#xA;" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="nunit" Version="3.12.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\VContainer.Standalone\VContainer.Standalone.csproj" />
+      <ProjectReference Include="..\..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj" />
+      <ProjectReference Include="..\..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj">
+        <OutputItemType>Analyzer</OutputItemType>
+        <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      </ProjectReference>
+    </ItemGroup>
+
+</Project>

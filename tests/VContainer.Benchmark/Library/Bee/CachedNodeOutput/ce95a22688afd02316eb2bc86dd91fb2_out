@@ -1,0 +1,1 @@
+/Users/hadashi/dev/VContainer/VContainer/Assets/VContainer/Runtime/Unity/LifetimeScope.cs(115,34): warning CS0618: 'Object.FindObjectOfType(Type)' is obsolete: 'Object.FindObjectOfType has been deprecated. Use Object.FindFirstObjectByType instead or if finding any instance is acceptable the faster Object.FindAnyObjectByType'

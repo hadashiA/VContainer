@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 030df50ef7a3d40deaa58109d30100c4
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_ViewDataDictionary: {instanceID: 0}
+  - converterEditorAsset: {fileID: 9197481963319205126, guid: cd1eb3c3c695c494d855ea678fe7395b,
+      type: 3}
+  - converterListAsset: {fileID: 9197481963319205126, guid: aaa3e510761864dac9b71f85526490d6,
+      type: 3}
+  - converterItem: {fileID: 9197481963319205126, guid: d6de7697d63d64fabbfb31425d93541e,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,11 @@
+{
+    "name": "com.unity.modules.physics",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "Physics",
+    "description": "The Physics module implements 3D physics in Unity. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.PhysicsModule.html",
+    "icon": ".icon.png",
+    "dependencies": {
+
+    }
+}

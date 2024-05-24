@@ -1,0 +1,10 @@
+{
+  "name": "com.svermeulen.extenject",
+  "displayName": "Extenject",
+  "version": "9.2.0-stcf3",
+  "description": "Dependency Injection Framework for Unity3D",
+  "dependencies": {},
+  "publishConfig": {
+    "registry": "https://package.openupm.com"
+  }
+}

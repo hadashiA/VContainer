@@ -1,0 +1,10 @@
+{
+    "name": "com.unity.modules.subsystems",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "Subsystems",
+    "description": "The Subsystem module contains the definitions and runtime support for general subsystems in Unity. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.SubsystemsModule.html",
+    "dependencies": {
+        "com.unity.modules.jsonserialize": "1.0.0"
+    }
+}

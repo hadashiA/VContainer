@@ -1,0 +1,11 @@
+{
+    "name": "com.unity.modules.imgui",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "IMGUI",
+    "description": "The IMGUI module provides Unity's immediate mode GUI solution for creating in-game and editor user interfaces. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.IMGUIModule.html",
+    "icon": ".icon.png",
+    "dependencies": {
+
+    }
+}

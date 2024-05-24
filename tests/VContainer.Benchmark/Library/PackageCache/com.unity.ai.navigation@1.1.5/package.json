@@ -1,0 +1,30 @@
+{
+  "name": "com.unity.ai.navigation",
+  "displayName": "AI Navigation",
+  "version": "1.1.5",
+  "unity": "2022.2",
+  "unityRelease": "0a16",
+  "description": "High-level NavMesh components for building and using NavMeshes at runtime and at edit time.",
+  "dependencies": {
+    "com.unity.modules.ai": "1.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Build And Connect NavMesh Surfaces",
+      "description": "A set of examples on how to build and use a dynamic navigation space made of NavMesh surfaces and segment-to-segment connections.",
+      "path": "Samples~"
+    }
+  ],
+  "_upm": {
+    "changelog": "### Fixed\n* Long warning popping up when user starts playmode while editing a prefab that contains NavMesh components ([NAVB-47](https://issuetracker.unity3d.com/product/unity/issues/guid/NAVB-47))"
+  },
+  "upmCi": {
+    "footprint": "dc776759d09fcac9d8e5fc2c4e57c920ef56522a"
+  },
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.ai.navigation@1.1/manual/index.html",
+  "repository": {
+    "url": "https://github.cds.internal.unity3d.com/unity/com.unity.ai.navigation.git",
+    "type": "git",
+    "revision": "a905e1ab41c8afae1a75688ceb3b4dfa1686ea75"
+  }
+}

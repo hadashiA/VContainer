@@ -1,0 +1,10 @@
+{
+    "name": "com.unity.modules.unitywebrequest",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "Unity Web Request",
+    "description": "The UnityWebRequest module lets you communicate with http services. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.UnityWebRequestModule.html",
+    "dependencies": {
+
+    }
+}
