@@ -1,13 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <DefineConstants>VCONTAINER_SOURCE_GENERATOR</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="..\VContainer\Assets\Tests\**\*.cs" Exclude="&#xA;..\VContainer\Assets\Tests\Unity\**\*.cs;&#xA;" />
+        <Compile Include="..\..\VContainer\Assets\Tests\**\*.cs"
+                 Exclude="&#xA;..\..\VContainer\Assets\Tests\Unity\**\*.cs;&#xA;" />
     </ItemGroup>
 
     <ItemGroup>
@@ -17,9 +18,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\VContainer.Standalone\VContainer.Standalone.csproj" />
-      <ProjectReference Include="..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj" />
-      <ProjectReference Include="..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj">
+      <ProjectReference Include="..\..\VContainer.Standalone\VContainer.Standalone.csproj" />
+      <ProjectReference Include="..\..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj" />
+      <ProjectReference Include="..\..\VContainer.SourceGenerator\VContainer.SourceGenerator.csproj">
         <OutputItemType>Analyzer</OutputItemType>
         <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       </ProjectReference>

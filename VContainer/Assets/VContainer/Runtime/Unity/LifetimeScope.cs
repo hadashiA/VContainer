@@ -217,7 +217,7 @@ namespace VContainer.Unity
             AwakeWaitingChildren(this);
         }
 
-        private void SetContainer(IObjectResolver container)
+        void SetContainer(IObjectResolver container)
         {
             Container = container;
             AutoInjectAll();
