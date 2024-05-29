@@ -7,7 +7,6 @@ namespace VContainer.SourceGenerator;
 
 class TypeMeta
 {
-    public TypeDeclarationSyntax Syntax { get; }
     public INamedTypeSymbol Symbol { get; }
     public string TypeName { get; }
     public string FullTypeName { get; }
@@ -21,13 +20,14 @@ class TypeMeta
 
     public bool IsGenerics => Symbol.Arity > 0;
 
-    ReferenceSymbols references;
+    readonly ReferenceSymbols references;
+    readonly TypeDeclarationSyntax? syntax;
 
-    public TypeMeta(TypeDeclarationSyntax syntax, INamedTypeSymbol symbol, ReferenceSymbols references)
+    public TypeMeta(INamedTypeSymbol symbol, ReferenceSymbols references, TypeDeclarationSyntax? syntax = null)
     {
-        Syntax = syntax;
         Symbol = symbol;
         this.references = references;
+        this.syntax = syntax;
 
         TypeName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         FullTypeName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
@@ -42,6 +42,13 @@ class TypeMeta
                              InjectFields.Count > 0 ||
                              InjectProperties.Count > 0 ||
                              InjectMethods.Count > 0;
+    }
+
+    public Location GetLocation()
+    {
+        return syntax?.Identifier.GetLocation() ??
+               Symbol.Locations.FirstOrDefault() ??
+               Location.None;
     }
 
     public bool InheritsFrom(INamedTypeSymbol baseSymbol)
@@ -109,6 +116,6 @@ class TypeMeta
 
     public bool IsNested()
     {
-        return Syntax.Parent is TypeDeclarationSyntax;
+        return Symbol.ContainingType != null;
     }
 }
