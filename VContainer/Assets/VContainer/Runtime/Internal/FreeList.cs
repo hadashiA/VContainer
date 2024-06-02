@@ -21,7 +21,7 @@ namespace VContainer.Internal
     {
         public bool IsDisposed => lastIndex == -2;
 
-        readonly object gate = new();
+        readonly object gate = new object();
         T?[] values;
         int lastIndex = -1;
 
