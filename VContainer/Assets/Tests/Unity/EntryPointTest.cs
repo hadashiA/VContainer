@@ -209,5 +209,24 @@ namespace VContainer.Tests.Unity
             Assert.That(childEntryPoint.InitializeCalled, Is.EqualTo(1));
             Assert.That(childEntryPoint.StartCalled, Is.EqualTo(1));
         }
+
+#if UNITY_2023_1_OR_NEWER
+        [UnityTest]
+        public IEnumerator AsyncStartableExceptionHandler()
+        {
+            var handled = 0;
+
+            LifetimeScope.Create(builder =>
+            {
+                builder.RegisterEntryPoint<AsyncStartableThrowable>();
+                builder.RegisterEntryPointExceptionHandler(_ => { handled += 1; });
+            });
+
+            yield return null;
+            yield return null;
+
+            Assert.That(handled, Is.EqualTo(1));
+        }
     }
+#endif
 }

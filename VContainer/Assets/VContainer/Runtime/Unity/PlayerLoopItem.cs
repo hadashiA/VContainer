@@ -308,17 +308,31 @@ namespace VContainer.Unity
             if (disposed) return false;
             foreach (var x in entries)
             {
-                var task = x.StartAsync(cts.Token);
 #if VCONTAINER_UNITASK_INTEGRATION
+                var task = x.StartAsync(cts.Token);
                 if (exceptionHandler != null)
                     task.Forget(ex => exceptionHandler.Publish(ex));
                 else
                     task.Forget();
 #else
-                var _ = AwaitableHelper.Forget(task, exceptionHandler);
+                ExecuteAsyncStartable(x);
 #endif
             }
             return false;
+        }
+
+        private void ExecuteAsyncStartable(IAsyncStartable x)
+        {
+            try
+            {
+                var task = x.StartAsync(cts.Token);
+                var _ = AwaitableHelper.Forget(task, exceptionHandler);
+            }
+            catch (Exception ex)
+            {
+                if (exceptionHandler == null) throw;
+                exceptionHandler.Publish(ex);
+            }
         }
 
         public void Dispose()

@@ -1,3 +1,5 @@
+using System.Threading;
+using UnityEngine;
 using VContainer.Unity;
 
 namespace VContainer.Tests.Unity
@@ -151,4 +153,12 @@ namespace VContainer.Tests.Unity
             throw new System.NotImplementedException();
         }
     }
+
+#if UNITY_2023_1_OR_NEWER
+    public class AsyncStartableThrowable : IAsyncStartable
+    {
+        public Awaitable StartAsync(CancellationToken cancellation)
+            => throw new System.NotImplementedException();
+    }
+#endif
 }

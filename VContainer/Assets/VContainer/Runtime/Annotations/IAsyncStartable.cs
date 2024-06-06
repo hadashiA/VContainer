@@ -18,7 +18,7 @@ namespace VContainer.Unity
 {
     public interface IAsyncStartable
     {
-        Awaitable StartAsync(CancellationToken cancellation);
+        Awaitable StartAsync(CancellationToken cancellation = default);
     }
 
     static class AwaitableHelper

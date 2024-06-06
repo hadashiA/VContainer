@@ -120,7 +120,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
 
-#if VCONTAINER_UNITASK_INTEGRATION
+#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2023_1_OR_NEWER
             var asyncStartables = container.Resolve<ContainerLocal<IReadOnlyList<IAsyncStartable>>>().Value;
             if (asyncStartables.Count > 0)
             {
