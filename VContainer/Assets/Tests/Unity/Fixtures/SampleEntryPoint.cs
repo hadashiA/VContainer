@@ -1,6 +1,10 @@
 using System.Threading;
-using UnityEngine;
 using VContainer.Unity;
+#if UNITY_2023_1_OR_NEWER
+using UnityEngine;
+#else
+using Awaitable = System.Threading.Tasks.Task;
+#endif
 
 namespace VContainer.Tests.Unity
 {
@@ -154,7 +158,7 @@ namespace VContainer.Tests.Unity
         }
     }
 
-#if UNITY_2023_1_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
     public class AsyncStartableThrowable : IAsyncStartable
     {
         public Awaitable StartAsync(CancellationToken cancellation)

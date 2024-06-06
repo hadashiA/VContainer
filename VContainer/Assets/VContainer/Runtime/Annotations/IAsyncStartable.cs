@@ -9,9 +9,13 @@ namespace VContainer.Unity
         UniTask StartAsync(CancellationToken cancellation);
     }
 }
-#elif UNITY_2023_1_OR_NEWER
+#elif UNITY_2021_3_OR_NEWER
 using System.Threading;
+#if UNITY_2023_1_OR_NEWER
 using UnityEngine;
+#else
+using Awaitable = System.Threading.Tasks.Task;
+#endif
 
 namespace VContainer.Unity
 {

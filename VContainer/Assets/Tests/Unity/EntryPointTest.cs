@@ -210,7 +210,7 @@ namespace VContainer.Tests.Unity
             Assert.That(childEntryPoint.StartCalled, Is.EqualTo(1));
         }
 
-#if UNITY_2023_1_OR_NEWER
+#if UNITY_2021_3_OR_NEWER
         [UnityTest]
         public IEnumerator AsyncStartableExceptionHandler()
         {

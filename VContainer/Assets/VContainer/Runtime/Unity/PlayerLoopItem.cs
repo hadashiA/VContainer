@@ -287,7 +287,7 @@ namespace VContainer.Unity
         public void Dispose() => disposed = true;
     }
 
-#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2023_1_OR_NEWER
+#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2021_3_OR_NEWER
     sealed class AsyncStartableLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IAsyncStartable> entries;
