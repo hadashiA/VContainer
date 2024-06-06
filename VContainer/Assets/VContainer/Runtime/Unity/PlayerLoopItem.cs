@@ -315,18 +315,18 @@ namespace VContainer.Unity
                 else
                     task.Forget();
 #else
-                ExecuteAsyncStartable(x);
+                InvokeStartAsync(x);
 #endif
             }
             return false;
         }
 
-        private void ExecuteAsyncStartable(IAsyncStartable x)
+        private void InvokeStartAsync(IAsyncStartable x)
         {
             try
             {
                 var task = x.StartAsync(cts.Token);
-                var _ = AwaitableHelper.Forget(task, exceptionHandler);
+                _ = task.Forget(exceptionHandler);
             }
             catch (Exception ex)
             {
