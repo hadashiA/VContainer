@@ -227,6 +227,6 @@ namespace VContainer.Tests.Unity
 
             Assert.That(handled, Is.EqualTo(1));
         }
-    }
 #endif
+    }
 }
