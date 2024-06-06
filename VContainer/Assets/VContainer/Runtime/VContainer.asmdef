@@ -1,6 +1,6 @@
 {
     "name": "VContainer",
-    "rootNamespace": "",
+    "rootNamespace": "VContainer",
     "references": [
         "Unity.Collections",
         "Unity.Entities",
