@@ -1,46 +1,16 @@
-#if VCONTAINER_UNITASK_INTEGRATION
 using System.Threading;
-using Cysharp.Threading.Tasks;
-
-namespace VContainer.Unity
-{
-    public interface IAsyncStartable
-    {
-        UniTask StartAsync(CancellationToken cancellation);
-    }
-}
-#elif UNITY_2023_1_OR_NEWER
-using System;
-using System.Threading;
+#if UNITY_2023_1_OR_NEWER
 using UnityEngine;
+#elif VCONTAINER_UNITASK_INTEGRATION
+using Awaitable = Cysharp.Threading.Tasks.UniTask;
+#else
+using Awaitable = System.Threading.Tasks.Task;
+#endif
 
 namespace VContainer.Unity
 {
     public interface IAsyncStartable
     {
-        Awaitable StartAsync(CancellationToken cancellation);
-    }
-
-    static class AwaitableHelper
-    {
-        public static async Awaitable Forget(Awaitable awaitable, EntryPointExceptionHandler exceptionHandler)
-        {
-            try
-            {
-                await awaitable;
-            }
-            catch (Exception ex)
-            {
-                if (exceptionHandler != null)
-                {
-                    exceptionHandler.Publish(ex);
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
+        Awaitable StartAsync(CancellationToken cancellation = default);
     }
 }
-#endif

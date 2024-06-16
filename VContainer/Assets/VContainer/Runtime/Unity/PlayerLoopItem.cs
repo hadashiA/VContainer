@@ -287,7 +287,7 @@ namespace VContainer.Unity
         public void Dispose() => disposed = true;
     }
 
-#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2023_1_OR_NEWER
+#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2021_3_OR_NEWER
     sealed class AsyncStartableLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IAsyncStartable> entries;
@@ -308,17 +308,31 @@ namespace VContainer.Unity
             if (disposed) return false;
             foreach (var x in entries)
             {
-                var task = x.StartAsync(cts.Token);
 #if VCONTAINER_UNITASK_INTEGRATION
+                var task = x.StartAsync(cts.Token);
                 if (exceptionHandler != null)
                     task.Forget(ex => exceptionHandler.Publish(ex));
                 else
                     task.Forget();
 #else
-                var _ = AwaitableHelper.Forget(task, exceptionHandler);
+                InvokeStartAsync(x);
 #endif
             }
             return false;
+        }
+
+        private void InvokeStartAsync(IAsyncStartable x)
+        {
+            try
+            {
+                var task = x.StartAsync(cts.Token);
+                _ = task.Forget(exceptionHandler);
+            }
+            catch (Exception ex)
+            {
+                if (exceptionHandler == null) throw;
+                exceptionHandler.Publish(ex);
+            }
         }
 
         public void Dispose()

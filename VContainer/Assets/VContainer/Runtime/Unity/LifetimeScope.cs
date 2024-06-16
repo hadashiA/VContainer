@@ -114,7 +114,7 @@ namespace VContainer.Unity
 
         static LifetimeScope Find(Type type)
         {
-#if UNITY_2020_4_OR_NEWER || UNITY_2021_4_OR_NEWER || UNITY_2022_3_OR_NEWER || UNITY_2023_1_OR_NEWER
+#if UNITY_2020_4_OR_NEWER || UNITY_2021_4_OR_NEWER || UNITY_2022_3_OR_NEWER || UNITY_2021_3_OR_NEWER
             return (LifetimeScope)FindAnyObjectByType(type);
 #else
             return (LifetimeScope)FindObjectOfType(type);
