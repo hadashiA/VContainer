@@ -30,6 +30,7 @@ namespace VContainer.Internal
             values = new T[initialCapacity];
         }
 
+#if NETSTANDARD2_1
         public ReadOnlySpan<T?> AsSpan()
         {
             if (lastIndex < 0)
@@ -38,6 +39,7 @@ namespace VContainer.Internal
             }
             return values.AsSpan(0, lastIndex + 1);
         }
+#endif
 
         public T? this[int index] => values[index];
 

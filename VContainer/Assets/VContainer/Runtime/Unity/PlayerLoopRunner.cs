@@ -20,7 +20,12 @@ namespace VContainer.Unity
 
         public void Run()
         {
-            var span = runners.AsSpan();
+            var span =
+#if NETSTANDARD2_1
+                runners.AsSpan();
+#else
+                runners;
+#endif
             for (var i = 0; i < span.Length; i++)
             {
                 var item = span[i];
