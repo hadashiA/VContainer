@@ -57,31 +57,36 @@ namespace VContainer.Internal
         {
             if (resolver is IScopedObjectResolver scope)
             {
-                var entirelyRegistrations = CollectFromParentScopes(scope);
-                return SpawnInstance(resolver, entirelyRegistrations);
+                using (ListPool<Registration>.Get(out var entirelyRegistrations))
+                {
+                    CollectFromParentScopes(scope, entirelyRegistrations);
+                    return SpawnInstance(resolver, entirelyRegistrations);;
+                }
             }
             return SpawnInstance(resolver, registrations);
         }
 
         internal object SpawnInstance(
             IObjectResolver resolver,
-            IReadOnlyList<Registration> registrations)
+            IReadOnlyList<Registration> entirelyRegistrations)
         {
-            var array = Array.CreateInstance(ElementType, registrations.Count);
-            for (var i = 0; i < registrations.Count; i++)
+            var array = Array.CreateInstance(ElementType, entirelyRegistrations.Count);
+            for (var i = 0; i < entirelyRegistrations.Count; i++)
             {
-                array.SetValue(resolver.Resolve(registrations[i]), i);
+                array.SetValue(resolver.Resolve(entirelyRegistrations[i]), i);
             }
             return array;
         }
 
-        internal List<Registration> CollectFromParentScopes(
+        internal void CollectFromParentScopes(
             IScopedObjectResolver scope,
+            List<Registration> registrationsBuffer,
             bool localScopeOnly = false)
         {
             if (scope.Parent == null)
             {
-                return registrations;
+                registrationsBuffer.AddRange(registrations);
+                return;
             }
 
             var finderType = InterfaceTypes[0];
@@ -93,11 +98,8 @@ namespace VContainer.Internal
                 if (scope.TryGetRegistration(finderType, out var registration) &&
                     registration.Provider is CollectionInstanceProvider parentCollection)
                 {
-                    if (mergedRegistrations == null)
-                    {
-                        // TODO: object pooling
-                        mergedRegistrations = new List<Registration>(registrations);
-                    }
+                    mergedRegistrations ??= ListPool<Registration>.Get();
+                    mergedRegistrations.AddRange(registrations);
 
                     if (localScopeOnly)
                     {
@@ -116,7 +118,16 @@ namespace VContainer.Internal
                 }
                 scope = scope.Parent;
             }
-            return mergedRegistrations ?? registrations;
+
+            if (mergedRegistrations == null)
+            {
+                registrationsBuffer.AddRange(registrations);
+            }
+            else
+            {
+                registrationsBuffer.AddRange(mergedRegistrations);
+                ListPool<Registration>.Release(mergedRegistrations);
+            }
         }
     }
 }

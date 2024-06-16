@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
@@ -10,7 +11,7 @@ namespace VContainer.Unity
             {
                 if (current == null) return;
 
-                using (UnityEngineObjectListBuffer<MonoBehaviour>.Get(out var buffer))
+                using (ListPool<MonoBehaviour>.Get(out var buffer))
                 {
                     buffer.Clear();
                     current.GetComponents(buffer);

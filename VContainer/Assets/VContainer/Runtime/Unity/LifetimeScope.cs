@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer.Diagnostics;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
@@ -101,7 +102,7 @@ namespace VContainer.Unity
 
         static LifetimeScope Find(Type type, Scene scene)
         {
-            using (UnityEngineObjectListBuffer<GameObject>.Get(out var buffer))
+            using (ListPool<GameObject>.Get(out var buffer))
             {
                 scene.GetRootGameObjects(buffer);
                 foreach (var gameObject in buffer)
