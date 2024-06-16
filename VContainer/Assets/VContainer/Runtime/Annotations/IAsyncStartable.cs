@@ -1,8 +1,8 @@
 using System.Threading;
-#if UNITY_2023_1_OR_NEWER
-using UnityEngine;
-#elif VCONTAINER_UNITASK_INTEGRATION
+#if VCONTAINER_UNITASK_INTEGRATION
 using Awaitable = Cysharp.Threading.Tasks.UniTask;
+#elif UNITY_2023_1_OR_NEWER
+using UnityEngine;
 #else
 using Awaitable = System.Threading.Tasks.Task;
 #endif
