@@ -9,6 +9,7 @@
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <DevelopmentDependency>true</DevelopmentDependency>
         <IsRoslynComponent>true</IsRoslynComponent>
+        <DefineConstants>ROSLYN3</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
