@@ -311,28 +311,27 @@ namespace VContainer.Unity
 #if VCONTAINER_UNITASK_INTEGRATION
                 var task = x.StartAsync(cts.Token);
                 if (exceptionHandler != null)
+                {
                     task.Forget(ex => exceptionHandler.Publish(ex));
+                }
                 else
+                {
                     task.Forget();
+                }
 #else
-                InvokeStartAsync(x);
+                try
+                {
+                    var task = x.StartAsync(cts.Token);
+                    _ = task.Forget(exceptionHandler);
+                }
+                catch (Exception ex)
+                {
+                    if (exceptionHandler == null) throw;
+                    exceptionHandler.Publish(ex);
+                }
 #endif
             }
             return false;
-        }
-
-        private void InvokeStartAsync(IAsyncStartable x)
-        {
-            try
-            {
-                var task = x.StartAsync(cts.Token);
-                _ = task.Forget(exceptionHandler);
-            }
-            catch (Exception ex)
-            {
-                if (exceptionHandler == null) throw;
-                exceptionHandler.Publish(ex);
-            }
         }
 
         public void Dispose()
