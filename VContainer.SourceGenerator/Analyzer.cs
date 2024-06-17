@@ -21,12 +21,16 @@ static class Analyzer
         {
             return null;
         }
-        if (typeSymbol.IsAbstract || typeSymbol.IsStatic)
+        if (typeSymbol.IsAbstract || typeSymbol.IsStatic || typeSymbol.SpecialType != SpecialType.None)
         {
             return null;
         }
 
-        if (typeSymbol.ContainingModule.Name is "VContainer" or "VContainer.Standalone")
+        var moduleName = typeSymbol.ContainingModule.Name;
+        if (moduleName is "VContainer" or "VContainer.Standalone" ||
+            moduleName.StartsWith("Unity.") ||
+            moduleName.StartsWith("UnityEngine.") ||
+            moduleName.StartsWith("System."))
         {
             return null;
         }
