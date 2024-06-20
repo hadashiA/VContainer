@@ -40,7 +40,7 @@ namespace VContainer.Unity
             }
             else if (scene.IsValid())
             {
-                using (UnityEngineObjectListBuffer<GameObject>.Get(out var gameObjectBuffer))
+                using (ListPool<GameObject>.Get(out var gameObjectBuffer))
                 {
                     scene.GetRootGameObjects(gameObjectBuffer);
                     foreach (var gameObject in gameObjectBuffer)
