@@ -191,7 +191,7 @@ If you want the container to manage the created instances, consider using the fo
 - [RegisterComponent(...)](./register-monobehaviour)
 :::
 
-##  Register instance as interface
+## Register instance as interface
 
 Use `As*` declarations.
 
@@ -223,7 +223,6 @@ builder.Register<SomeService>(Lifetime.Singleton)
 
 It can resolve like this:
 
-
 ```csharp
 class SomeService
 {
@@ -240,3 +239,28 @@ class OtherClass
     public OtherClass(string hogehoge) { /* ... */ }
 }
 ```
+
+## Register Open Generics
+
+```csharp
+class GenericType<T>
+{
+    // ...
+}
+```
+
+```csharp
+builder.Register(typeof(GenericType<>), Lifetime.Singleton);
+```
+
+It can resolve like this:
+
+```csharp
+class SomeService
+{
+    public SomeService(GenericType<int> closedGenericType) { /* ... */ }
+}
+```
+
+In this case, the concrete type is constructed at runtime.
+We have confirmed that this works with IL2CPP from Unity 2022.1 onwards, but older versions may not support dynamic typedefs.

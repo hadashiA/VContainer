@@ -46,10 +46,17 @@ See more information:
 
 ## Which classes are target to code generation?
 
-By default, classes in the assembly that reference VContainer.asmdef are target to code generation.
+Classes that meet the following conditions are eligible for code generation.
 
-If you want to exclude a target for reasons such as wanting to suppress unnecessary code generation, please add the [InjectIgnore] attribute to the type.
+- 1. Classes in assemblies that reference VContainer.asmdef.
+- 2. And classes with `[InjectIgnoere]` attribute are excluded.
+- 3. And one of the following is satisfied.
+    - `[Inject]` attribute is attached to.
+    - the type specified as a parameter of the any `Register*` method.
 
+If you want to explicitly add it to the target, you can control it by granting the `[Inject]` attribute, if you want to explicitly exclude it from the target, you can control it by granting the `[InjectIgnore]` attribute.
+
+Note that classes that are targeted for code generation are `[Preserve]` and therefore not subject to code-stripping by IL2CPP.
 
 ### Limitation
 
