@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
@@ -11,78 +9,35 @@ namespace VContainer.Unity
 
     sealed class PlayerLoopRunner
     {
-        readonly Queue<IPlayerLoopItem> runningQueue = new Queue<IPlayerLoopItem>();
-        readonly Queue<IPlayerLoopItem> waitingQueue = new Queue<IPlayerLoopItem>();
-
-        readonly object runningGate = new object();
-        readonly object waitingGate = new object();
+        readonly FreeList<IPlayerLoopItem> runners = new FreeList<IPlayerLoopItem>(16);
 
         int running;
 
         public void Dispatch(IPlayerLoopItem item)
         {
-            if (Interlocked.CompareExchange(ref running, 1, 1) == 1)
-            {
-                lock (waitingGate)
-                {
-                    waitingQueue.Enqueue(item);
-                    return;
-                }
-            }
-
-            lock (runningGate)
-            {
-                runningQueue.Enqueue(item);
-            }
+            runners.Add(item);
         }
 
         public void Run()
         {
-            Interlocked.Exchange(ref running, 1);
-
-            lock (runningGate)
-            lock (waitingGate)
+            var span =
+#if NETSTANDARD2_1
+                runners.AsSpan();
+#else
+                runners;
+#endif
+            for (var i = 0; i < span.Length; i++)
             {
-                while (waitingQueue.Count > 0)
+                var item = span[i];
+                if (item != null)
                 {
-                    var waitingItem = waitingQueue.Dequeue();
-                    runningQueue.Enqueue(waitingItem);
-                }
-            }
-
-            IPlayerLoopItem item;
-            lock (runningGate)
-            {
-                item = runningQueue.Count > 0 ? runningQueue.Dequeue() : null;
-            }
-
-            while (item != null)
-            {
-                var continuous = false;
-                try
-                {
-                    continuous = item.MoveNext();
-                }
-                catch (Exception ex)
-                {
-                    UnityEngine.Debug.LogException(ex);
-                }
-
-                if (continuous)
-                {
-                    lock (waitingGate)
+                    var continued = item.MoveNext();
+                    if (!continued)
                     {
-                        waitingQueue.Enqueue(item);
+                        runners.RemoveAt(i);
                     }
                 }
-
-                lock (runningGate)
-                {
-                    item = runningQueue.Count > 0 ? runningQueue.Dequeue() : null;
-                }
             }
-
-            Interlocked.Exchange(ref running, 0);
         }
     }
 }
