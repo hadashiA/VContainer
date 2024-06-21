@@ -1,28 +1,18 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+#if UNITY_2021_3_OR_NEWER
+using Unity.Collections.LowLevel.Unsafe;
+#endif
 
 namespace VContainer.Internal
 {
-    static class UnsafeHelper
-    {
-        public static ref TTo As<TFrom, TTo>(ref TFrom from)
-        {
-#if UNITY_2021_3_OR_NEWER
-            return ref global::Unity.Collections.LowLevel.Unsafe.UnsafeUtility.As<TFrom, TTo>(ref from);
-#else
-            return ref System.Runtime.CompilerServices.Unsafe.As<TFrom, TTo>(ref from);
-#endif
-        }
-    }
-
     class FreeList<T> where T : class
     {
         public bool IsDisposed => lastIndex == -2;
+        public int Length => lastIndex + 1;
 
         readonly object gate = new object();
-        T?[] values;
+        T[] values;
         int lastIndex = -1;
 
         public FreeList(int initialCapacity)
@@ -31,17 +21,17 @@ namespace VContainer.Internal
         }
 
 #if NETSTANDARD2_1
-        public ReadOnlySpan<T?> AsSpan()
+        public ReadOnlySpan<T> AsSpan()
         {
             if (lastIndex < 0)
             {
-                return ReadOnlySpan<T?>.Empty;
+                return ReadOnlySpan<T>.Empty;
             }
             return values.AsSpan(0, lastIndex + 1);
         }
 #endif
 
-        public T? this[int index] => values[index];
+        public T this[int index] => values[index];
 
         public void Add(T item)
         {
@@ -94,10 +84,9 @@ namespace VContainer.Internal
                 if (lastIndex < 0) return false;
 
                 var index = -1;
-                var span = values.AsSpan(0, lastIndex + 1);
-                for (var i = 0; i < span.Length; i++)
+                for (var i = 0; i < values.Length; i++)
                 {
-                    if (span[i] == value)
+                    if (values[i] == value)
                     {
                         index = i;
                         break;
@@ -110,6 +99,7 @@ namespace VContainer.Internal
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -119,7 +109,7 @@ namespace VContainer.Internal
             {
                 if (lastIndex > 0)
                 {
-                    values.AsSpan(0, lastIndex + 1).Clear();
+                    Array.Clear(values, 0, lastIndex + 1);
                     lastIndex = -1;
                 }
             }
@@ -141,9 +131,10 @@ namespace VContainer.Internal
             }
         }
 
-        static unsafe int FindNullIndex(T?[] target)
+#if UNITY_2021_3_OR_NEWER
+        static unsafe int FindNullIndex(T[] target)
         {
-            ref var head = ref UnsafeHelper.As<T?, IntPtr>(ref MemoryMarshal.GetReference(target.AsSpan()));
+            ref var head = ref UnsafeUtility.As<T, IntPtr>(ref MemoryMarshal.GetReference(target.AsSpan()));
             fixed (void* p = &head)
             {
                 var span = new ReadOnlySpan<IntPtr>(p, target.Length);
@@ -160,9 +151,9 @@ namespace VContainer.Internal
             }
         }
 
-        static unsafe int FindLastNonNullIndex(T?[] target, int lastIndex)
+        static unsafe int FindLastNonNullIndex(T[] target, int lastIndex)
         {
-            ref var head = ref UnsafeHelper.As<T?, IntPtr>(ref MemoryMarshal.GetReference(target.AsSpan()));
+            ref var head = ref UnsafeUtility.As<T, IntPtr>(ref MemoryMarshal.GetReference(target.AsSpan()));
             fixed (void* p = &head)
             {
                 var span = new ReadOnlySpan<IntPtr>(p, lastIndex); // without lastIndexed value.
@@ -175,5 +166,24 @@ namespace VContainer.Internal
                 return -1;
             }
         }
+#else
+        static int FindNullIndex(T[] target)
+        {
+            for (var i = 0; i < target.Length; i++)
+            {
+                if (target[i] == null) return i;
+            }
+            return -1;
+        }
+
+        static int FindLastNonNullIndex(T[] target, int lastIndex)
+        {
+            for (var i = lastIndex; i >= 0; i--)
+            {
+                if (target[i] != null) return i;
+            }
+            return -1;
+        }
+#endif
     }
 }
