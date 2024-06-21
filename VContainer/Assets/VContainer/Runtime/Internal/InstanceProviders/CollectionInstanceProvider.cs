@@ -98,7 +98,7 @@ namespace VContainer.Internal
                 if (scope.TryGetRegistration(finderType, out var registration) &&
                     registration.Provider is CollectionInstanceProvider parentCollection)
                 {
-                    mergedRegistrations ??= ListPool<Registration>.Get();
+                    mergedRegistrations = mergedRegistrations ?? ListPool<Registration>.Get();
                     mergedRegistrations.AddRange(registrations);
 
                     if (localScopeOnly)
