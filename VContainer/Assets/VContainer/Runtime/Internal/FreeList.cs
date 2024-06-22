@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 #if UNITY_2021_3_OR_NEWER
+using System.Runtime.InteropServices;
 using Unity.Collections.LowLevel.Unsafe;
 #endif
 
