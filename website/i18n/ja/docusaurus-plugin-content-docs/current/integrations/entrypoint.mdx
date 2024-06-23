@@ -6,7 +6,7 @@ VContainer allows plain C# to be the starting point for application processing.
 Using it instead of MonoBehaviour, which has a lot of features, can help you build a simple control flow.
 
 ```csharp
-clas FooController : IStartable
+class FooController : IStartable
 {
     void IStartable.Start()
     {
@@ -30,11 +30,12 @@ Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: 
 
 ## Available interfaces
 
-| VContaienr entry point                | Timing |
+| VContainer entry point                | Timing |
 |:--------------------------------------|:----------------------------------|
 | `IInitializable.Initialize()`         | Immediately after building the container |
 | `IPostInitializable.PostInitialize()` | Late `IInitializable.Initialize()`  |
 | `IStartable.Start()`                  | Nearly `MonoBehaviour.Start()`    |
+| `IAsyncStartable.StartAsync()`        | Nearly `MonoBehaviour.Start()`    |
 | `IPostStartable.PostStart()`          | After `MonoBehaviour.Start()`     |
 | `IFixedTickable.FixedTick()`          | Nearly `MonoBehaviour.FixedUpdate()` |
 | `IPostFixedTickable.PostFixedTick()`  | After `MonoBehaviour.FixedUpdate()` |
@@ -53,6 +54,14 @@ And
 [Unity - Manual: Order of Execution for Event Functions](https://docs.unity3d.com/Manual/ExecutionOrder.html)
 :::
 
+### async
+
+`IAsyncStartable` is available as a variant of IStartable.
+It has the same timing as IStartable, but `async Awaitable StartAsync()` is available.
+
+If you are a UniTask user, you can also choose the UniTask version of StartAsync.
+[UniTask integration](../integrations/unitask)
+
 ## Handle of the exception that was not caught
 
 On the application side, exceptions thrown in processes such as Start() and Tick() cannot be caught outside.
@@ -70,7 +79,3 @@ builder.RegisterEntryPointExceptionHandler(ex =>
 :::caution
 Default error logging will be skipped if you are using the RegisterEntryPointExceptionHandler.
 :::
-
-## UniTask
-
-If you are using UniTask, you can use `IAsyncStartable`. see also [UniTask Integration](../integrations/unitask)

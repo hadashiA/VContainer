@@ -45,10 +45,17 @@ RoslynAnalyzer というasset labelを付与することで、Unityはこのdll�
 
 ## コード生成対象になるクラス
 
-デフォルトでは、VContainer.asmdef の参照があるアセンブリ内のクラスはコード生成の対象になります。
+以下の条件を満たすクラスは、コード生成の対象になります。
 
-無駄なコード生成を抑制したい等の理由で、対象から除外したい場合は、型に対して `[InjectIgnore]` アトリビュートを付与してください。
+- 1. VContainer.asmdef を参照しているアセンブリ内のクラス。
+- 2. かつ、`[InjectIgnoere]` attributeがついたクラスは除く。
+- 3. かつ、以下のいずれかを満たす。
+    - `[Inject]` attributeが付与されている
+    - `IContainerBuilder.Register*` メソッドのパラメータとして指定されている型
 
+もし、明示的に対象に加えたい場合は`[Inject]` attribute を、明示的に対象外にしたい場合は`[InjectIgnore]` attributeを付与することでコントロールできます。
+
+尚、コード生成の対象になったクラスは、`[Preserve]` されるため、IL2CPPによるコードstrippingの対象になりません。
 
 ## 制限事項
 

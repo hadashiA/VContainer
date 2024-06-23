@@ -35,6 +35,7 @@ Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: 
 | `IInitializable.Initialize()`         | Immediately after building the container |
 | `IPostInitializable.PostInitialize()` | Late `IInitializable.Initialize()`  |
 | `IStartable.Start()`                  | Nearly `MonoBehaviour.Start()`    |
+| `IAsyncStartable.StartAsync()`        | Nearly `MonoBehaviour.Start()`    |
 | `IPostStartable.PostStart()`          | After `MonoBehaviour.Start()`     |
 | `IFixedTickable.FixedTick()`          | Nearly `MonoBehaviour.FixedUpdate()` |
 | `IPostFixedTickable.PostFixedTick()`  | After `MonoBehaviour.FixedUpdate()` |
@@ -78,7 +79,3 @@ builder.RegisterEntryPointExceptionHandler(ex =>
 :::caution
 Default error logging will be skipped if you are using the RegisterEntryPointExceptionHandler.
 :::
-
-## UniTask
-
-If you are using UniTask, you can use `IAsyncStartable`. see also [UniTask Integration](../integrations/unitask)
