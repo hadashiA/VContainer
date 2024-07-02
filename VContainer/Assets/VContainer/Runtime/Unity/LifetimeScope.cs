@@ -307,6 +307,9 @@ namespace VContainer.Unity
             EntryPointsBuilder.EnsureDispatcherRegistered(builder);
         }
 
+        protected virtual LifetimeScope FindParent(Type type) => 
+            Find(type);
+
         LifetimeScope GetRuntimeParent()
         {
             if (IsRoot) return null;
@@ -317,7 +320,7 @@ namespace VContainer.Unity
             // Find in scene via type
             if (parentReference.Type != null && parentReference.Type != GetType())
             {
-                var found = Find(parentReference.Type);
+                var found = FindParent(parentReference.Type);
                 if (found != null && found.Container != null)
                 {
                     return found;
