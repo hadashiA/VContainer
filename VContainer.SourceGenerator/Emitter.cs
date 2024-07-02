@@ -132,7 +132,7 @@ static class Emitter
             // verify property
             foreach (var propSymbol in typeMeta.InjectProperties)
             {
-                if (!propSymbol.CanBeCallFromInternal())
+                if (propSymbol.SetMethod == null || !propSymbol.SetMethod.IsInitOnly || !propSymbol.SetMethod.CanBeCallFromInternal())
                 {
                     context.ReportDiagnostic(Diagnostic.Create(
                         DiagnosticDescriptors.PrivatePropertyNotSupported,
