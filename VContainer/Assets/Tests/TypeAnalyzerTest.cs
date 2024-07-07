@@ -1,5 +1,8 @@
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
+using UnityEngine;
 using VContainer.Internal;
 
 namespace VContainer.Tests
@@ -64,6 +67,31 @@ namespace VContainer.Tests
     }
     #endif
 
+    class DuplicateInjectionBaseClass
+    {
+        [Inject] private readonly int _someValue;
+    }
+
+    class DuplicateInjectionIntChildClass : DuplicateInjectionBaseClass
+    {
+        [Inject] private readonly int _someValue;
+    }
+
+    class DuplicateInjectionFloatChildClass : DuplicateInjectionBaseClass
+    {
+        [Inject] private readonly float _someValue;
+    }
+
+    class DuplicateInjectionStructChildClass : DuplicateInjectionBaseClass
+    {
+        [Inject] private readonly Vector3 _someValue;
+    }
+
+    class DuplicateInjectionGenericChildClass : DuplicateInjectionBaseClass
+    {
+        [Inject] private readonly List<bool> _someValue;
+    }
+    
     [TestFixture]
     public class TypeAnalyzerTest
     {
@@ -113,6 +141,15 @@ namespace VContainer.Tests
         {
             var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasStaticConstructor));
             Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.IsStatic, Is.False);
+        }
+        
+        [TestCase(typeof(DuplicateInjectionIntChildClass))]
+        [TestCase(typeof(DuplicateInjectionFloatChildClass))]
+        [TestCase(typeof(DuplicateInjectionStructChildClass))]
+        [TestCase(typeof(DuplicateInjectionGenericChildClass))]
+        public void ShouldThrowDuplicateInjectionException(Type type)
+        {
+            Assert.Throws<VContainerException>(() => { TypeAnalyzer.Analyze(type); });
         }
     }
 }

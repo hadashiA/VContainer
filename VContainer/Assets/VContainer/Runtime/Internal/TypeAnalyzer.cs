@@ -248,11 +248,10 @@ namespace VContainer.Internal
                         }
                         else
                         {
-                            // Skip if already exists
-                            foreach (var x in injectFields)
+                            if (Contains(injectFields, fieldInfo))
                             {
-                                if (x.Name == fieldInfo.Name)
-                                    goto EndField;
+                                var message = $"Duplicate injection found for field: {fieldInfo}";
+                                throw new VContainerException(type, message);
                             }
 
                             if (injectFields.Any(x => x.Name == fieldInfo.Name))
@@ -260,10 +259,10 @@ namespace VContainer.Internal
                                 continue;
                             }
                         }
+
                         injectFields.Add(fieldInfo);
                     }
                 }
-                EndField:
 
                 // Properties, [Inject] only
                 var props = type.GetProperties(bindingFlags);
@@ -297,6 +296,20 @@ namespace VContainer.Internal
                 injectMethods,
                 injectFields,
                 injectProperties);
+        }
+
+        private static bool Contains(List<FieldInfo> fields, FieldInfo field)
+        {
+            for (var i = 0; i < fields.Count; i++)
+            {
+                var x = fields[i];
+                if (x.Name == field.Name)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static void CheckCircularDependency(IReadOnlyList<Registration> registrations, Registry registry)
