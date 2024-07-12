@@ -307,12 +307,24 @@ namespace VContainer.Unity
             EntryPointsBuilder.EnsureDispatcherRegistered(builder);
         }
 
+        protected virtual LifetimeScope FindParent() => null;
+
         LifetimeScope GetRuntimeParent()
         {
             if (IsRoot) return null;
 
             if (parentReference.Object != null)
                 return parentReference.Object;
+            
+            // Find via implementation
+            var implParent = FindParent();
+            if (implParent != null)
+            {
+                if (parentReference.Type != null && parentReference.Type != implParent.GetType()) {
+                    UnityEngine.Debug.LogWarning($"FindParent returned {implParent.GetType()} but parent reference type is {parentReference.Type}. This may be unintentional.");
+                }
+                return implParent;
+            }
 
             // Find in scene via type
             if (parentReference.Type != null && parentReference.Type != GetType())
