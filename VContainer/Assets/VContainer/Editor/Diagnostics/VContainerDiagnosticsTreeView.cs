@@ -212,10 +212,16 @@ namespace VContainer.Editor.Diagnostics
 
         protected override void RowGUI(RowGUIArgs args)
         {
+            const string indentStr = "     ";
+            const int scopeIndents = 1;
+
             var item = args.item as DiagnosticsInfoTreeViewItem;
             if (item is null)
             {
-                base.RowGUI(args);
+                // base.RowGUI(args);
+                var labelStyle = args.selected ? EditorStyles.whiteLabel : EditorStyles.label;
+                labelStyle.alignment = TextAnchor.MiddleLeft;
+                EditorGUI.LabelField(args.GetCellRect(0), RepeatStrBuilder(indentStr, scopeIndents) + args.label, labelStyle);
                 return;
             }
 
@@ -231,7 +237,8 @@ namespace VContainer.Editor.Diagnostics
                 switch (columnIndex)
                 {
                     case 0:
-                        base.RowGUI(args);
+                        // base.RowGUI(args);
+                        EditorGUI.LabelField(cellRect, RepeatStrBuilder(indentStr, item.depth + scopeIndents) + item.TypeSummary, labelStyle);
                         break;
                     case 1:
                         EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
@@ -254,6 +261,15 @@ namespace VContainer.Editor.Diagnostics
                     default:
                         throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, null);
                 }
+            }
+
+            return;
+
+            static string RepeatStrBuilder(string text, int n)
+            {
+                return new System.Text.StringBuilder(text.Length * n)
+                    .Insert(0, text, n)
+                    .ToString();
             }
         }
 
