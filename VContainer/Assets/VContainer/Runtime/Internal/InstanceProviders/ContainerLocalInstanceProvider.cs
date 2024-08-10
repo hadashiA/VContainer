@@ -23,7 +23,7 @@ namespace VContainer.Internal
                 using (ListPool<RegistrationElement>.Get(out var entirelyRegistrations))
                 {
                     collectionProvider.CollectFromParentScopes(scope, entirelyRegistrations, localScopeOnly: true);
-                    value = collectionProvider.SpawnInstance(resolver, entirelyRegistrations);
+                    value = collectionProvider.SpawnInstance(scope, entirelyRegistrations);
                 }
             }
             else

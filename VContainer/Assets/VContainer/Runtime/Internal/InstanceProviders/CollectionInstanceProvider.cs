@@ -84,15 +84,16 @@ namespace VContainer.Internal
             return array;
         }
 
-        internal object SpawnInstance(
-            IObjectResolver resolver,
-            IReadOnlyList<RegistrationElement> entirelyRegistrations)
+        internal object SpawnInstance(IObjectResolver currentScope, IReadOnlyList<RegistrationElement> entirelyRegistrations)
         {
             var array = Array.CreateInstance(ElementType, entirelyRegistrations.Count);
             for (var i = 0; i < entirelyRegistrations.Count; i++)
             {
                 var x = entirelyRegistrations[i];
-                array.SetValue(x.RegisteredContainer.Resolve(x.Registration), i);
+                var resolver = x.Registration.Lifetime == Lifetime.Singleton
+                    ? x.RegisteredContainer
+                    : currentScope;
+                array.SetValue(resolver.Resolve(x.Registration), i);
             }
             return array;
         }
