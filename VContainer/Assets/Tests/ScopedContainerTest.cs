@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -262,6 +261,29 @@ namespace VContainer.Tests
             var scopedService = childContainer.Resolve<IReadOnlyList<I1>>();
             var moreScopedService = childContainer.Resolve<IReadOnlyList<I1>>();
             Assert.That(moreScopedService.Count(), Is.EqualTo(4));
+        }
+
+        [Test]
+        public void ResolveCollection_ElementRepeatedly()
+        {
+            HasInstanceId.ResetId();
+
+            var parentBuilder = new ContainerBuilder();
+            parentBuilder.Register<HasInstanceId>(Lifetime.Singleton);
+
+            var parentContainer = parentBuilder.Build();
+
+            var childContainer = parentContainer.CreateScope(childBuilder =>
+            {
+                childBuilder.Register<HasInstanceId>(Lifetime.Singleton);
+            });
+
+            var a1 = parentContainer.Resolve<HasInstanceId>();
+            Assert.That(a1.Id, Is.EqualTo(1));
+
+            var collection = childContainer.Resolve<IReadOnlyList<HasInstanceId>>();
+            Assert.That(collection.Count, Is.EqualTo(2));
+            Assert.That(collection.Any(x => x.Id == 1), Is.True);
         }
 
         [Test]

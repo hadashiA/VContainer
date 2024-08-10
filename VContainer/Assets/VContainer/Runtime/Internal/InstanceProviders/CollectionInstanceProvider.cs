@@ -5,6 +5,18 @@ using System.Runtime.CompilerServices;
 
 namespace VContainer.Internal
 {
+    struct RegistrationElement
+    {
+        public Registration Registration;
+        public IObjectResolver RegisteredContainer;
+
+        public RegistrationElement(Registration registration, IObjectResolver registeredContainer)
+        {
+            Registration = registration;
+            RegisteredContainer = registeredContainer;
+        }
+    }
+
     sealed class CollectionInstanceProvider : IInstanceProvider, IEnumerable<Registration>
     {
         public static bool Match(Type openGenericType) => openGenericType == typeof(IEnumerable<>) ||
@@ -57,79 +69,61 @@ namespace VContainer.Internal
         {
             if (resolver is IScopedObjectResolver scope)
             {
-                using (ListPool<Registration>.Get(out var entirelyRegistrations))
+                using (ListPool<RegistrationElement>.Get(out var entirelyRegistrations))
                 {
                     CollectFromParentScopes(scope, entirelyRegistrations);
-                    return SpawnInstance(resolver, entirelyRegistrations);;
+                    return SpawnInstance(resolver, entirelyRegistrations);
                 }
             }
-            return SpawnInstance(resolver, registrations);
+
+            var array = Array.CreateInstance(ElementType, registrations.Count);
+            for (var i = 0; i < registrations.Count; i++)
+            {
+                array.SetValue(resolver.Resolve(registrations[i]), i);
+            }
+            return array;
         }
 
         internal object SpawnInstance(
             IObjectResolver resolver,
-            IReadOnlyList<Registration> entirelyRegistrations)
+            IReadOnlyList<RegistrationElement> entirelyRegistrations)
         {
             var array = Array.CreateInstance(ElementType, entirelyRegistrations.Count);
             for (var i = 0; i < entirelyRegistrations.Count; i++)
             {
-                array.SetValue(resolver.Resolve(entirelyRegistrations[i]), i);
+                var x = entirelyRegistrations[i];
+                array.SetValue(x.RegisteredContainer.Resolve(x.Registration), i);
             }
             return array;
         }
 
         internal void CollectFromParentScopes(
             IScopedObjectResolver scope,
-            List<Registration> registrationsBuffer,
+            List<RegistrationElement> registrationsBuffer,
             bool localScopeOnly = false)
         {
-            if (scope.Parent == null)
+            foreach (var registration in registrations)
             {
-                registrationsBuffer.AddRange(registrations);
-                return;
+                registrationsBuffer.Add(new RegistrationElement(registration, scope));
             }
 
             var finderType = InterfaceTypes[0];
-            List<Registration> mergedRegistrations = null;
-
             scope = scope.Parent;
+
             while (scope != null)
             {
                 if (scope.TryGetRegistration(finderType, out var registration) &&
                     registration.Provider is CollectionInstanceProvider parentCollection)
                 {
-                    if (mergedRegistrations == null)
+                    foreach (var x in parentCollection.registrations)
                     {
-                        mergedRegistrations = ListPool<Registration>.Get();
-                        mergedRegistrations.AddRange(registrations);
-                    }
-
-                    if (localScopeOnly)
-                    {
-                        foreach (var x in parentCollection.registrations)
+                        if (!localScopeOnly || x.Lifetime != Lifetime.Singleton)
                         {
-                            if (x.Lifetime != Lifetime.Singleton)
-                            {
-                                mergedRegistrations.Add(x);
-                            }
+                            registrationsBuffer.Add(new RegistrationElement(x, scope));
                         }
-                    }
-                    else
-                    {
-                        mergedRegistrations.AddRange(parentCollection.registrations);
                     }
                 }
                 scope = scope.Parent;
-            }
-
-            if (mergedRegistrations == null)
-            {
-                registrationsBuffer.AddRange(registrations);
-            }
-            else
-            {
-                registrationsBuffer.AddRange(mergedRegistrations);
-                ListPool<Registration>.Release(mergedRegistrations);
             }
         }
     }
