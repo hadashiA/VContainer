@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using NUnit.Framework;
-using UnityEngine;
 using VContainer.Internal;
 
 namespace VContainer.Tests
@@ -67,31 +66,42 @@ namespace VContainer.Tests
     }
     #endif
 
+    struct StructA
+    {
+        public int X;
+        public int Y;
+    }
+
     class DuplicateInjectionBaseClass
     {
-        [Inject] private readonly int _someValue;
+        [Inject]
+        readonly int someValue;
     }
 
     class DuplicateInjectionIntChildClass : DuplicateInjectionBaseClass
     {
-        [Inject] private readonly int _someValue;
+        [Inject]
+        readonly int someValue;
     }
 
     class DuplicateInjectionFloatChildClass : DuplicateInjectionBaseClass
     {
-        [Inject] private readonly float _someValue;
+        [Inject]
+        readonly float someValue;
     }
 
     class DuplicateInjectionStructChildClass : DuplicateInjectionBaseClass
     {
-        [Inject] private readonly Vector3 _someValue;
+        [Inject]
+        readonly StructA someValue;
     }
 
     class DuplicateInjectionGenericChildClass : DuplicateInjectionBaseClass
     {
-        [Inject] private readonly List<bool> _someValue;
+        [Inject]
+        readonly List<bool> someValue = default!;
     }
-    
+
     [TestFixture]
     public class TypeAnalyzerTest
     {
@@ -142,7 +152,7 @@ namespace VContainer.Tests
             var injectTypeInfo = TypeAnalyzer.Analyze(typeof(HasStaticConstructor));
             Assert.That(injectTypeInfo.InjectConstructor.ConstructorInfo.IsStatic, Is.False);
         }
-        
+
         [TestCase(typeof(DuplicateInjectionIntChildClass))]
         [TestCase(typeof(DuplicateInjectionFloatChildClass))]
         [TestCase(typeof(DuplicateInjectionStructChildClass))]
