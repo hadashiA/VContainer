@@ -99,7 +99,7 @@ namespace VContainer.Tests
     class DuplicateInjectionGenericChildClass : DuplicateInjectionBaseClass
     {
         [Inject]
-        readonly List<bool> someValue = default!;
+        readonly List<bool> someValue;
     }
 
     [TestFixture]
