@@ -273,7 +273,6 @@ namespace VContainer
         public bool TryGetRegistration(Type type, out Registration registration)
             => registry.TryGet(type, out registration);
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace VContainer.Tests
 {
@@ -429,5 +430,17 @@ namespace VContainer.Tests
 
     class SampleAttribute : Attribute
     {
+    }
+
+    class HasInstanceId
+    {
+        public static void ResetId()
+        {
+            Interlocked.Exchange(ref instanceCount, 0);
+        }
+
+        static int instanceCount;
+
+        public readonly int Id = Interlocked.Increment(ref instanceCount);
     }
 }
