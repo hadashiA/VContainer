@@ -68,9 +68,17 @@ namespace VContainer.Editor.Diagnostics
 
                 try
                 {
-                    var value = prop.GetValue(instance);
-                    var displayName = $"{prop.Name} = ({TypeNameHelper.GetTypeAlias(prop.PropertyType)}) {Stringify(value)}";
-                    parent.AddChild(new TreeViewItem(NextId(), parent.depth + 1, displayName));
+                    if (prop.CanRead)
+                    {
+                        var value = prop.GetValue(instance);
+                        var displayName = $"{prop.Name} = ({TypeNameHelper.GetTypeAlias(prop.PropertyType)}) {Stringify(value)}";
+                        parent.AddChild(new TreeViewItem(NextId(), parent.depth + 1, displayName));
+                    }
+                    else
+                    {
+                        var displayName = $"{prop.Name} = (write-only {TypeNameHelper.GetTypeAlias(prop.PropertyType)})";
+                        parent.AddChild(new TreeViewItem(NextId(), parent.depth + 1, displayName));
+                    }
                 }
                 catch (MissingReferenceException)
                 {
