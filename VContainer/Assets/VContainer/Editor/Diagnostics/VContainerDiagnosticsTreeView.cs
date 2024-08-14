@@ -215,7 +215,13 @@ namespace VContainer.Editor.Diagnostics
             var item = args.item as DiagnosticsInfoTreeViewItem;
             if (item is null)
             {
-                base.RowGUI(args);
+                var cellRect = args.GetCellRect(0);
+                GUI.BeginGroup(cellRect);
+                {
+                    args.rowRect = new Rect(0, 0, cellRect.width, cellRect.height);
+                    base.RowGUI(args);
+                }
+                GUI.EndGroup();
                 return;
             }
 
@@ -231,7 +237,12 @@ namespace VContainer.Editor.Diagnostics
                 switch (columnIndex)
                 {
                     case 0:
-                        base.RowGUI(args);
+                        GUI.BeginGroup(cellRect);
+                        {
+                            args.rowRect = new Rect(0, 0, cellRect.width, cellRect.height);
+                            base.RowGUI(args);
+                        }
+                        GUI.EndGroup();
                         break;
                     case 1:
                         EditorGUI.LabelField(cellRect, item.ContractTypesSummary, labelStyle);
