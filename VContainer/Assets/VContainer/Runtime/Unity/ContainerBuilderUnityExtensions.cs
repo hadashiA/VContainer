@@ -106,6 +106,16 @@ namespace VContainer.Unity
             return builder.Register<T>(lifetime).AsImplementedInterfaces();
         }
 
+        public static RegistrationBuilder RegisterEntryPoint<TInterface>(
+            this IContainerBuilder builder,
+            Func<IObjectResolver, TInterface> implementationConfiguration,
+            Lifetime lifetime)
+        {
+            EntryPointsBuilder.EnsureDispatcherRegistered(builder);
+            return builder.Register(new FuncRegistrationBuilder(container => implementationConfiguration(container),
+                typeof(TInterface), lifetime)).AsImplementedInterfaces();
+        }
+
         public static void RegisterEntryPointExceptionHandler(
             this IContainerBuilder builder,
             Action<Exception> exceptionHandler)
