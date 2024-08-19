@@ -10,7 +10,7 @@ namespace VContainer
         protected internal readonly Lifetime Lifetime;
 
         protected internal List<Type> InterfaceTypes;
-        protected internal List<IInjectParameter> Parameters;
+        protected List<IInjectParameter> Parameters;
 
         public RegistrationBuilder(Type implementationType, Lifetime lifetime)
         {
