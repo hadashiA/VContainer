@@ -118,10 +118,22 @@ namespace VContainer.Unity
         static LifetimeScope Find(Type type)
         {
 #if UNITY_2022_1_OR_NEWER
-            return (LifetimeScope)FindAnyObjectByType(type);
+            var objects = FindObjectsByType(type, FindObjectsInactive.Exclude, FindObjectsSortMode.None);
 #else
-            return (LifetimeScope)FindObjectOfType(type);
+            var objects = FindObjectsOfType(type);
 #endif
+            if (objects.Length > 1)
+            {
+                foreach (var obj in objects)
+                {
+                    if (obj is LifetimeScope lifetimeScope
+                        && lifetimeScope.gameObject.scene.name == "DontDestroyOnLoad")
+                    {
+                        return lifetimeScope;
+                    }
+                }
+            }
+            return (LifetimeScope)objects[0];
         }
 
         public IObjectResolver Container { get; private set; }
