@@ -20,10 +20,10 @@ namespace VContainer.Internal
             if (resolver is ScopedContainer scope &&
                 valueRegistration.Provider is CollectionInstanceProvider collectionProvider)
             {
-                using (ListPool<Registration>.Get(out var entirelyRegistrations))
+                using (ListPool<RegistrationElement>.Get(out var entirelyRegistrations))
                 {
                     collectionProvider.CollectFromParentScopes(scope, entirelyRegistrations, localScopeOnly: true);
-                    value = collectionProvider.SpawnInstance(resolver, entirelyRegistrations);
+                    value = collectionProvider.SpawnInstance(scope, entirelyRegistrations);
                 }
             }
             else

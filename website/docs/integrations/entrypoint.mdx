@@ -42,7 +42,7 @@ Since it uses PlayerLoopSystem, it works even if you register at any time (e.g: 
 | `ITickable.Tick()`                    | Nearly `MonoBehaviour.Update()` |
 | `IPostTickable.PostTick()`            | After `MonoBehaviour.Update()` |
 | `ILateTickable.LateTick()`            | Nearly `MonoBehaviour.LateUpdate()` |
-| `IPostLateTickable.LateTick()`        | After `MonoBehaviour.LateUpdate()` |
+| `IPostLateTickable.PostLateTick()`        | After `MonoBehaviour.LateUpdate()` |
 
 And
 
