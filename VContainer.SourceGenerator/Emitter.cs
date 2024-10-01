@@ -231,7 +231,7 @@ static class Emitter
         ReferenceSymbols references,
         in SourceProductionContext context)
     {
-        if (typeMeta.ExplictInjectConstructors.Count > 1)
+        if (typeMeta.ExplicitInjectConstructors.Count > 1)
         {
             context.ReportDiagnostic(Diagnostic.Create(
                 DiagnosticDescriptors.MultipleCtorAttributeNotSupported,
@@ -240,29 +240,35 @@ static class Emitter
             return false;
         }
 
-        var constructorSymbol = typeMeta.ExplictInjectConstructors.Count == 1
-            ? typeMeta.ExplictInjectConstructors.First()
-            : typeMeta.Constructors.OrderByDescending(ctor => ctor.Parameters.Length).FirstOrDefault();
+        var constructorSymbol = typeMeta.ExplicitInjectConstructors.Count == 1
+            ? typeMeta.ExplicitInjectConstructors.First()
+            : typeMeta.ExplicitConstructors.OrderByDescending(ctor => ctor.Parameters.Length).FirstOrDefault();
 
-        if (constructorSymbol != null)
+        // Use implicit empty ctor
+        constructorSymbol ??= typeMeta.Symbol.InstanceConstructors
+            .FirstOrDefault(x => x.IsImplicitlyDeclared && x.Parameters.Length == 0);
+
+        if (constructorSymbol == null)
         {
-            if (!constructorSymbol.CanBeCallFromInternal())
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.PrivateConstructorNotSupported,
-                    typeMeta.GetLocation(),
-                    typeMeta.TypeName));
-                return false;
-            }
+            return false;
+        }
 
-            if (constructorSymbol.Arity > 0)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    DiagnosticDescriptors.GenericsNotSupported,
-                    typeMeta.GetLocation(),
-                    typeMeta.TypeName));
-                return false;
-            }
+        if (!constructorSymbol.CanBeCallFromInternal())
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.PrivateConstructorNotSupported,
+                typeMeta.GetLocation(),
+                typeMeta.TypeName));
+            return false;
+        }
+
+        if (constructorSymbol.Arity > 0)
+        {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.GenericsNotSupported,
+                typeMeta.GetLocation(),
+                typeMeta.TypeName));
+            return false;
         }
 
         using (codeWriter.BeginBlockScope("public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
@@ -271,13 +277,6 @@ static class Emitter
                 typeMeta.InheritsFrom(references.UnityEngineComponent))
             {
                 codeWriter.AppendLine($"throw new NotSupportedException(\"UnityEngine.Component:{typeMeta.TypeName} cannot be `new`\");");
-                return true;
-            }
-            if (constructorSymbol is null)
-            {
-                codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}();");
-                codeWriter.AppendLine("Inject(__instance, resolver, parameters);");
-                codeWriter.AppendLine("return __instance;");
                 return true;
             }
             var parameters = constructorSymbol.Parameters
