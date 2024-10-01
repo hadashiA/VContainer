@@ -250,6 +250,10 @@ static class Emitter
 
         if (constructorSymbol == null)
         {
+            context.ReportDiagnostic(Diagnostic.Create(
+                DiagnosticDescriptors.ConstructorNotFound,
+                typeMeta.GetLocation(),
+                typeMeta.TypeName));
             return false;
         }
 
