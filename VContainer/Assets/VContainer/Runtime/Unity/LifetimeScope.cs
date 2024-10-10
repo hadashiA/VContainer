@@ -76,8 +76,8 @@ namespace VContainer.Unity
             return newScope;
         }
 
-        public static LifetimeScope Create(Action<IContainerBuilder> configuration)
-            => Create(new ActionInstaller(configuration));
+        public static LifetimeScope Create(Action<IContainerBuilder> configuration, string name = null)
+            => Create(new ActionInstaller(configuration), name);
 
         public static ParentOverrideScope EnqueueParent(LifetimeScope parent)
             => new ParentOverrideScope(parent);
