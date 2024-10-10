@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using NUnit.Framework;
 using UnityEngine.TestTools;
@@ -224,6 +225,60 @@ namespace VContainer.Tests.Unity
             Assert.That(child != null, Is.True);
             Assert.That(child.Parent, Is.EqualTo(parent));
         }
+
+        [Test]
+        public void CreateWithName()
+        {
+            var names = Enumerable.Range(0, 6).Select(_ => GenerateRandomString()).ToArray();
+
+            var parentScopes = new[]
+            {
+                LifetimeScope.Create(builder => { builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf(); },
+                    names[0]),
+
+                LifetimeScope.Create(
+                    new DummyInstaller(),
+                    names[1])
+            };
+
+            var childScopes = new[]
+            {
+                parentScopes[0].CreateChild(builder => { builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf(); },
+                    names[2]),
+
+                parentScopes[0].CreateChild(
+                new DummyInstaller(),
+                names[3]),
+
+                parentScopes[0].CreateChild<LifetimeScope>(builder => { builder.RegisterEntryPoint<SampleEntryPoint>().AsSelf(); },
+                    names[4]),
+
+                parentScopes[0].CreateChild<LifetimeScope>(
+                    new DummyInstaller(),
+                    names[5])
+            };
+
+            for (var i = 0; i < parentScopes.Length; i++)
+            {
+                Assert.AreEqual(names[i], parentScopes[i].name);
+            }
+                
+            for (var i = 0; i < childScopes.Length; i++)
+            {
+                Assert.AreEqual(names[i + parentScopes.Length], childScopes[i].name);
+            }
+        }
+        
+        private class DummyInstaller : IInstaller
+        {
+            public void Install(IContainerBuilder builder)
+            {
+                /* NOOP */
+            }
+        }
+
+        private static string GenerateRandomString(int size = 10) =>
+            string.Join(string.Empty, Enumerable.Range(0, size).Select(_ => (char)Random.Range(97, 123)));
 
         // [Test]
         // public void ParentTypeReferenceInvalid()
