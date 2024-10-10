@@ -63,7 +63,7 @@ namespace VContainer.Unity
         static readonly Stack<IInstaller> GlobalExtraInstallers = new Stack<IInstaller>();
         static readonly object SyncRoot = new object();
 
-        static LifetimeScope Create(IInstaller installer = null, string name = null)
+        public static LifetimeScope Create(IInstaller installer = null, string name = null)
         {
             var gameObject = new GameObject(name ?? "LifetimeScope");
             gameObject.SetActive(false);
