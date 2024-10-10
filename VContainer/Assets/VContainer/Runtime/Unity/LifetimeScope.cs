@@ -63,9 +63,9 @@ namespace VContainer.Unity
         static readonly Stack<IInstaller> GlobalExtraInstallers = new Stack<IInstaller>();
         static readonly object SyncRoot = new object();
 
-        static LifetimeScope Create(IInstaller installer = null)
+        static LifetimeScope Create(IInstaller installer = null, string name = null)
         {
-            var gameObject = new GameObject("LifetimeScope");
+            var gameObject = new GameObject(name ?? "LifetimeScope");
             gameObject.SetActive(false);
             var newScope = gameObject.AddComponent<LifetimeScope>();
             if (installer != null)
@@ -226,10 +226,10 @@ namespace VContainer.Unity
             AutoInjectAll();
         }
 
-        public TScope CreateChild<TScope>(IInstaller installer = null)
+        public TScope CreateChild<TScope>(IInstaller installer = null, string childScopeName = null)
             where TScope : LifetimeScope
         {
-            var childGameObject = new GameObject("LifetimeScope (Child)");
+            var childGameObject = new GameObject(childScopeName ?? "LifetimeScope (Child)");
             childGameObject.SetActive(false);
             if (IsRoot)
             {
@@ -249,15 +249,15 @@ namespace VContainer.Unity
             return child;
         }
 
-        public LifetimeScope CreateChild(IInstaller installer = null)
-            => CreateChild<LifetimeScope>(installer);
+        public LifetimeScope CreateChild(IInstaller installer = null, string childScopeName = null)
+            => CreateChild<LifetimeScope>(installer, childScopeName);
 
-        public TScope CreateChild<TScope>(Action<IContainerBuilder> installation)
+        public TScope CreateChild<TScope>(Action<IContainerBuilder> installation, string childScopeName = null)
             where TScope : LifetimeScope
-            => CreateChild<TScope>(new ActionInstaller(installation));
+            => CreateChild<TScope>(new ActionInstaller(installation), childScopeName);
 
-        public LifetimeScope CreateChild(Action<IContainerBuilder> installation)
-            => CreateChild<LifetimeScope>(new ActionInstaller(installation));
+        public LifetimeScope CreateChild(Action<IContainerBuilder> installation, string childScopeName = null)
+            => CreateChild<LifetimeScope>(new ActionInstaller(installation), childScopeName);
 
         public TScope CreateChildFromPrefab<TScope>(TScope prefab, IInstaller installer = null)
             where TScope : LifetimeScope
