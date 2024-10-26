@@ -24,14 +24,14 @@ jobs:
 
   build-unity:
     needs: [update-version-number]
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       UNITY_LICENSE_FILE: ./tmp/ulf
       UNITY_BIN: /opt/Unity/Editor/Unity
     container:
       image: gableroux/unity3d:2020.1.13f1-linux-il2cpp
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - uses: actions/cache@v3
       with:
