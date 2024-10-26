@@ -35,13 +35,13 @@ on:
     outputs:
       sha:
         description: "Git commit sha has changed."
-        value: ${{ jobs.update-packagejson.outputs.sha }}
+        value: ${{ jobs.update-version-number.outputs.sha }}
       branch-name:
         description: Git branch name created.
-        value: ${{ jobs.update-packagejson.outputs.branch-name }}
+        value: ${{ jobs.update-version-number.outputs.branch-name }}
       is-branch-created:
         description: Indicate is Git branch created or not.
-        value: ${{ jobs.update-packagejson.outputs.is-branch-created }}
+        value: ${{ jobs.update-version-number.outputs.is-branch-created }}
 
 jobs:
   update-version-number:
