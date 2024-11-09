@@ -176,7 +176,7 @@ namespace VContainer.Unity
         static GameObject Instantiate(this LifetimeScope scope, GameObject prefab, Vector3 position, Quaternion rotation)
         {
             var wasActive = prefab.activeSelf;
-            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+            using var dirtyScope = new PrefabDirtyScope(prefab);
 
             prefab.SetActive(false);
 
@@ -216,7 +216,7 @@ namespace VContainer.Unity
         public static GameObject Instantiate(this IObjectResolver resolver, GameObject prefab, Transform parent, bool worldPositionStays = false)
         {
             var wasActive = prefab.activeSelf;
-            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+            using var dirtyScope = new PrefabDirtyScope(prefab);
 
             prefab.SetActive(false);
 
@@ -257,7 +257,7 @@ namespace VContainer.Unity
             Transform parent)
         {
             var wasActive = prefab.activeSelf;
-            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+            using var dirtyScope = new PrefabDirtyScope(prefab);
 
             prefab.SetActive(false);
 
