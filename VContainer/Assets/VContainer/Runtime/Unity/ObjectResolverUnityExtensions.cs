@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using VContainer.Internal;
 
@@ -5,6 +6,31 @@ namespace VContainer.Unity
 {
     public static class ObjectResolverUnityExtensions
     {
+        public readonly struct PrefabDirtyScope : IDisposable
+        {
+            private readonly GameObject _prefab;
+            private readonly bool _madeDirty;
+
+            public PrefabDirtyScope(GameObject prefab)
+            {
+                _prefab = prefab;
+
+#if UNITY_EDITOR
+                _madeDirty = prefab.activeSelf && !UnityEditor.EditorUtility.IsDirty(_prefab);
+#endif
+            }
+
+            public void Dispose()
+            {
+#if UNITY_EDITOR
+                if (_madeDirty)
+                {
+                    UnityEditor.EditorUtility.ClearDirty(_prefab);
+                }
+#endif
+            }
+        }
+        
         public static void InjectGameObject(this IObjectResolver resolver, GameObject gameObject)
         {
             void InjectGameObjectRecursive(GameObject current)
@@ -45,6 +71,8 @@ namespace VContainer.Unity
             where T : Component
         {
             var wasActive = prefab.gameObject.activeSelf;
+            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+            
             prefab.gameObject.SetActive(false);
 
             var instance = UnityEngine.Object.Instantiate(prefab, parent, worldPositionStays);
@@ -88,6 +116,8 @@ namespace VContainer.Unity
             where T : Component
         {
             var wasActive = prefab.gameObject.activeSelf;
+            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+
             prefab.gameObject.SetActive(false);
 
             var instance = UnityEngine.Object.Instantiate(prefab, position, rotation, parent);
@@ -111,6 +141,8 @@ namespace VContainer.Unity
             where T : Component
         {
             var wasActive = prefab.gameObject.activeSelf;
+            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+
             prefab.gameObject.SetActive(false);
 
             T instance;
@@ -144,6 +176,8 @@ namespace VContainer.Unity
         static GameObject Instantiate(this LifetimeScope scope, GameObject prefab, Vector3 position, Quaternion rotation)
         {
             var wasActive = prefab.activeSelf;
+            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+
             prefab.SetActive(false);
 
             GameObject instance;
@@ -182,6 +216,8 @@ namespace VContainer.Unity
         public static GameObject Instantiate(this IObjectResolver resolver, GameObject prefab, Transform parent, bool worldPositionStays = false)
         {
             var wasActive = prefab.activeSelf;
+            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+
             prefab.SetActive(false);
 
             GameObject instance = null;
@@ -221,6 +257,8 @@ namespace VContainer.Unity
             Transform parent)
         {
             var wasActive = prefab.activeSelf;
+            using var dirtyScope = new PrefabDirtyScope(prefab.gameObject);
+
             prefab.SetActive(false);
 
             var instance = UnityEngine.Object.Instantiate(prefab, position, rotation, parent);
