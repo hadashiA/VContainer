@@ -15,14 +15,14 @@ namespace VContainer.Unity
             {
                 _prefab = prefab;
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR && UNITY_2020_1_OR_NEWER
                 _madeDirty = prefab.activeSelf && !UnityEditor.EditorUtility.IsDirty(_prefab);
 #endif
             }
 
             public void Dispose()
             {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && UNITY_2020_1_OR_NEWER
                 if (_madeDirty)
                 {
                     UnityEditor.EditorUtility.ClearDirty(_prefab);
