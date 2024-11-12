@@ -263,6 +263,8 @@ namespace VContainer.Unity
             where TScope : LifetimeScope
         {
             var wasActive = prefab.gameObject.activeSelf;
+            using var dirtyScope = new ObjectResolverUnityExtensions.PrefabDirtyScope(prefab.gameObject);
+
             if (wasActive)
             {
                 prefab.gameObject.SetActive(false);

@@ -29,6 +29,8 @@ namespace VContainer.Unity
             var parent = destination.GetParent(resolver);
             
             var wasActive = prefab.gameObject.activeSelf;
+            using var dirtyScope = new ObjectResolverUnityExtensions.PrefabDirtyScope(prefab.gameObject);
+            
             if (wasActive)
             {
                 prefab.gameObject.SetActive(false);
