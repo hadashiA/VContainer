@@ -8,8 +8,8 @@ namespace VContainer.Unity
     {
         public readonly struct PrefabDirtyScope : IDisposable
         {
-            private readonly GameObject _prefab;
-            private readonly bool _madeDirty;
+            readonly GameObject _prefab;
+            readonly bool _madeDirty;
 
             public PrefabDirtyScope(GameObject prefab)
             {
@@ -17,6 +17,8 @@ namespace VContainer.Unity
 
 #if UNITY_EDITOR && UNITY_2020_1_OR_NEWER
                 _madeDirty = prefab.activeSelf && !UnityEditor.EditorUtility.IsDirty(_prefab);
+#else
+                _madeDirty = false;
 #endif
             }
 
