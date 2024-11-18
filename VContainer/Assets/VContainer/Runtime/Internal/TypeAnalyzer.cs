@@ -168,7 +168,7 @@ namespace VContainer.Internal
             var analyzedType = type;
             var typeInfo = type.GetTypeInfo();
 
-            // Constructor, single [Inject] constructor -> single most parameters constuctor
+            // Constructor, single [Inject] constructor -> single most parameters constructor
             var annotatedConstructorCount = 0;
             var maxParameters = -1;
             foreach (var constructorInfo in typeInfo.GetConstructors(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
