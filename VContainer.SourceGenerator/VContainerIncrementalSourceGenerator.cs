@@ -112,7 +112,7 @@ public class VContainerIncrementalSourceGenerator : IIncrementalGenerator
                 var typeMetas = typeDeclarationCandidates
                     .Select(x => x.Analyze(references))
                     .Where(x => x != null &&
-                                (x.ExplictInjectConstructors.Count > 0 ||
+                                (x.ExplicitInjectConstructors.Count > 0 ||
                                  x.InjectFields.Count > 0 ||
                                  x.InjectProperties.Count > 0 ||
                                  x.InjectMethods.Count > 0));
