@@ -12,8 +12,8 @@ class TypeMeta
     public string FullTypeName { get; }
     public bool ExplicitInjectable { get; }
 
-    public IReadOnlyList<IMethodSymbol> Constructors { get; }
-    public IReadOnlyList<IMethodSymbol> ExplictInjectConstructors { get; }
+    public IReadOnlyList<IMethodSymbol> ExplicitConstructors { get; }
+    public IReadOnlyList<IMethodSymbol> ExplicitInjectConstructors { get; }
     public IReadOnlyList<IFieldSymbol> InjectFields { get; }
     public IReadOnlyList<IPropertySymbol> InjectProperties { get; }
     public IReadOnlyList<IMethodSymbol> InjectMethods { get; }
@@ -32,13 +32,13 @@ class TypeMeta
         TypeName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         FullTypeName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        Constructors = GetConstructors();
-        ExplictInjectConstructors = GetExplicitInjectConstructors();
+        ExplicitConstructors = GetConstructors();
+        ExplicitInjectConstructors = GetExplicitInjectConstructors();
         InjectFields = GetInjectFields();
         InjectProperties = GetInjectProperties();
         InjectMethods = GetInjectMethods();
 
-        ExplicitInjectable = ExplictInjectConstructors.Count > 0 ||
+        ExplicitInjectable = ExplicitInjectConstructors.Count > 0 ||
                              InjectFields.Count > 0 ||
                              InjectProperties.Count > 0 ||
                              InjectMethods.Count > 0;
@@ -73,7 +73,7 @@ class TypeMeta
 
     IReadOnlyList<IMethodSymbol> GetExplicitInjectConstructors()
     {
-        return Constructors.Where(ctor =>
+        return ExplicitConstructors.Where(ctor =>
         {
             return ctor.GetAttributes().Any(attr =>
                 SymbolEqualityComparer.Default.Equals(attr.AttributeClass, references.VContainerInjectAttribute));

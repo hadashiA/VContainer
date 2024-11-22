@@ -19,10 +19,10 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register(
             this IContainerBuilder builder,
-            Type interfacetType,
+            Type interfaceType,
             Type implementationType,
             Lifetime lifetime) =>
-            builder.Register(implementationType, lifetime).As(interfacetType);
+            builder.Register(implementationType, lifetime).As(interfaceType);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register<T>(

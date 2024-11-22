@@ -85,5 +85,13 @@ namespace VContainer.SourceGenerator
             category: Category,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
+
+        public static readonly DiagnosticDescriptor ConstructorNotFound = new(
+            id: "VCON0011",
+            title: "The any callbale constructor is not found. Cannot support to code generation.",
+            messageFormat: "Cannot find any constructor of '{0}' that can be called from internal. It cannot support source generator.",
+            category: Category,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
     }
 }

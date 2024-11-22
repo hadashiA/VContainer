@@ -99,7 +99,7 @@ builder.UseComponents(components =>
 {
     components.AddInstance(yourBehaviour);
     components.AddInHierarchy<YourBehaviour>();
-    components.AddFromNewPrefab(prefab, Lifetime.Scoped);
+    components.AddInNewPrefab(prefab, Lifetime.Scoped);
     components.AddOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
 });
 ```
@@ -109,7 +109,7 @@ This is the same as:
 ```csharp
 builder.RegisterComponent(yourBehaviour);
 builder.RegisterComponentInHierarchy<YourBehaviour>();
-builder.RegisterComponentFromNewPrefab(prefab, Lifetime.Scoped);
+builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
 builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
 ```
 
@@ -122,7 +122,7 @@ builder.UseComponents(parentTransform, components =>
     components.AddInHierarchy<YourBehaviour>();
 
     // Instantiate under `parentTransform`
-    components.AddFromNewPrefab(prefab, Lifetime.Scoped);
+    components.AddInNewPrefab(prefab, Lifetime.Scoped);
     components.AddOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name");
 })
 ```
@@ -133,7 +133,7 @@ This is the same as:
 builder.RegisterComponentInHierarchy<YourBehaviour>()
     .UnderTransform(parentTransform);
 
-builder.RegisterComponentFromNewPrefab(prefab, Lifetime.Scoped)
+builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped)
     .UnderTransform(parentTransform);
 builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name")
     .UnderTransform(parentTransform);

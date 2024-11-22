@@ -27,35 +27,37 @@ namespace VContainer.Unity
         {
             var prefab = prefabFinder(resolver);
             var parent = destination.GetParent(resolver);
-            
+
             var wasActive = prefab.gameObject.activeSelf;
-            if (wasActive)
-            {
-                prefab.gameObject.SetActive(false);
-            }
-            
-            var component = parent != null
-                ? UnityEngine.Object.Instantiate(prefab, parent)
-                : UnityEngine.Object.Instantiate(prefab);
-
-            if (VContainerSettings.Instance != null && VContainerSettings.Instance.RemoveClonePostfix)
-                component.name = prefab.name;
-
-            try
-            {
-                injector.Inject(component, resolver, customParameters);
-                destination.ApplyDontDestroyOnLoadIfNeeded(component);
-            }
-            finally
+            using (new ObjectResolverUnityExtensions.PrefabDirtyScope(prefab.gameObject))
             {
                 if (wasActive)
                 {
-                    prefab.gameObject.SetActive(true);
-                    component.gameObject.SetActive(true);
+                    prefab.gameObject.SetActive(false);
                 }
-            }
 
-            return component;
+                var component = parent != null
+                    ? UnityEngine.Object.Instantiate(prefab, parent)
+                    : UnityEngine.Object.Instantiate(prefab);
+
+                if (VContainerSettings.Instance != null && VContainerSettings.Instance.RemoveClonePostfix)
+                    component.name = prefab.name;
+
+                try
+                {
+                    injector.Inject(component, resolver, customParameters);
+                    destination.ApplyDontDestroyOnLoadIfNeeded(component);
+                }
+                finally
+                {
+                    if (wasActive)
+                    {
+                        prefab.gameObject.SetActive(true);
+                        component.gameObject.SetActive(true);
+                    }
+                }
+                return component;
+            }
         }
     }
 }

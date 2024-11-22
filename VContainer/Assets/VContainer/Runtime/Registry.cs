@@ -46,7 +46,7 @@ namespace VContainer.Internal
 
         static void AddToBuildBuffer(IDictionary<Type, Registration> buf, Type service, Registration registration)
         {
-            if (buf.TryGetValue(service, out var exists))
+            if (buf.TryGetValue(service, out var exists) && exists != null)
             {
                 CollectionInstanceProvider collection;
                 if (buf.TryGetValue(RuntimeTypeCache.EnumerableTypeOf(service), out var found) &&

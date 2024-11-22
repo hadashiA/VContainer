@@ -263,22 +263,25 @@ namespace VContainer.Unity
             where TScope : LifetimeScope
         {
             var wasActive = prefab.gameObject.activeSelf;
-            if (wasActive)
+            using (new ObjectResolverUnityExtensions.PrefabDirtyScope(prefab.gameObject))
             {
-                prefab.gameObject.SetActive(false);
+                if (wasActive)
+                {
+                    prefab.gameObject.SetActive(false);
+                }
+                var child = Instantiate(prefab, transform, false);
+                if (installer != null)
+                {
+                    child.localExtraInstallers.Add(installer);
+                }
+                child.parentReference.Object = this;
+                if (wasActive)
+                {
+                    prefab.gameObject.SetActive(true);
+                    child.gameObject.SetActive(true);
+                }
+                return child;
             }
-            var child = Instantiate(prefab, transform, false);
-            if (installer != null)
-            {
-                child.localExtraInstallers.Add(installer);
-            }
-            child.parentReference.Object = this;
-            if (wasActive)
-            {
-                prefab.gameObject.SetActive(true);
-                child.gameObject.SetActive(true);
-            }
-            return child;
         }
 
         public TScope CreateChildFromPrefab<TScope>(TScope prefab, Action<IContainerBuilder> installation)
@@ -315,7 +318,7 @@ namespace VContainer.Unity
 
             if (parentReference.Object != null)
                 return parentReference.Object;
-            
+
             // Find via implementation
             var implParent = FindParent();
             if (implParent != null)
