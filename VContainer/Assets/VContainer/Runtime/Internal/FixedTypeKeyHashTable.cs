@@ -79,7 +79,7 @@ namespace VContainer.Internal
             }
 
             ERROR:
-            throw new KeyNotFoundException("Type was not dound, Type: " + type.FullName);
+            throw new KeyNotFoundException("Type was not found, Type: " + type.FullName);
         }
 
         public bool TryGet(Type type, out TValue value)
