@@ -143,8 +143,15 @@ namespace VContainer
 
         public static void RegisterDisposeCallback(this IContainerBuilder builder, Action<IObjectResolver> callback)
         {
-            builder.Register(container => new BuilderCallbackDisposable(callback, container), Lifetime.Scoped);
-            builder.RegisterBuildCallback(container => container.Resolve<IReadOnlyList<BuilderCallbackDisposable>>());
+            if (!builder.Exists(typeof(BuilderCallbackDisposable)))
+            {
+                builder.Register<BuilderCallbackDisposable>(Lifetime.Singleton);
+            }
+            builder.RegisterBuildCallback(container =>
+            {
+                var disposable = container.Resolve<BuilderCallbackDisposable>();
+                disposable.Disposing += callback;
+            });
         }
 
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]

@@ -618,6 +618,31 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void OnContainerDisposeCallback_ParentChild()
+        {
+            var parentDisposeCalled = false;
+            var childDisposeCalled = false;
+
+            var builder = new ContainerBuilder();
+            builder.Register<NoDependencyServiceA>(Lifetime.Scoped);
+
+            builder.RegisterDisposeCallback(x => parentDisposeCalled = true);
+
+            var container = builder.Build();
+
+            var childContainer = container.CreateScope(childBuilder =>
+            {
+                childBuilder.Register<NoDependencyServiceB>(Lifetime.Scoped);
+                childBuilder.RegisterDisposeCallback(x => childDisposeCalled = true);
+            });
+
+            childContainer.Dispose();
+
+            Assert.That(childDisposeCalled, Is.True);
+            Assert.That(parentDisposeCalled, Is.False);
+        }
+
+        [Test]
         public void TryResolveTransient()
         {
             var builder = new ContainerBuilder();

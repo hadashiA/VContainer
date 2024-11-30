@@ -2,20 +2,19 @@ using System;
 
 namespace VContainer.Internal
 {
-    readonly struct BuilderCallbackDisposable : IDisposable
+    class BuilderCallbackDisposable : IDisposable
     {
-        readonly Action<IObjectResolver> callback;
+        public event Action<IObjectResolver> Disposing;
         readonly IObjectResolver container;
 
-        public BuilderCallbackDisposable(Action<IObjectResolver> callback, IObjectResolver container)
+        public BuilderCallbackDisposable(IObjectResolver container)
         {
-            this.callback = callback;
             this.container = container;
         }
 
         public void Dispose()
         {
-            callback.Invoke(container);
+            if (Disposing != null) Disposing.Invoke(container);
         }
     }
 }
