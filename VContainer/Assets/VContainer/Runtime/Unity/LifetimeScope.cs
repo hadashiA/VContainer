@@ -140,7 +140,6 @@ namespace VContainer.Unity
             }
             try
             {
-                Parent = GetRuntimeParent();
                 if (autoRun)
                 {
                     Build();
