@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine.TestTools.Constraints;
 using VContainer.Unity;
@@ -8,7 +9,7 @@ namespace VContainer.Tests.Unity
 {
     public class PlayerLoopItemTest
     {
-        private class Ticker : ITickable, IPostTickable, IPostLateTickable, IFixedTickable, IPostFixedTickable
+        class Ticker : ITickable, IPostTickable, IPostLateTickable, IFixedTickable, IPostFixedTickable
         {
             public void Tick() { }
             public void FixedTick() { }
@@ -17,84 +18,101 @@ namespace VContainer.Tests.Unity
             public void PostFixedTick() { }
         }
 
-        private class TickableLoopItemTest
+        class TestStartable : IStartable
         {
-            [Test]
-            public void MoveNextWithoutAllocation()
+            public int Executed { get; private set; }
+
+            public void Start()
             {
-                var list = new List<ITickable> { new Ticker(), new Ticker() };
-                var exceptionHandler = new EntryPointExceptionHandler(exception => { });
-                var tickableLoopItem = new TickableLoopItem(list, exceptionHandler);
-                
-                Assert.That(() =>
-                {
-                    tickableLoopItem.MoveNext();
-                }, Is.Not.AllocatingGCMemory());
+                Executed++;
             }
         }
-        
-        private class PostTickableLoopItemTest
+
+        class ThrowStartable : IStartable
         {
-            [Test]
-            public void MoveNextWithoutAllocation()
+            public int Executed { get; private set; }
+
+            public void Start()
             {
-                var list = new List<IPostTickable> { new Ticker(), new Ticker() };
-                var exceptionHandler = new EntryPointExceptionHandler(exception => { });
-                var tickableLoopItem = new PostTickableLoopItem(list, exceptionHandler);
-                
-                Assert.That(() =>
-                {
-                    tickableLoopItem.MoveNext();
-                }, Is.Not.AllocatingGCMemory());
+                Executed++;
+                throw new InvalidOperationException("OOPS");
             }
         }
-        
-        private class PostLateTickableLoopItemTest
+
+        [Test]
+        public void Start_Throw()
         {
-            [Test]
-            public void MoveNextWithoutAllocation()
-            {
-                var list = new List<IPostLateTickable> { new Ticker(), new Ticker() };
-                var exceptionHandler = new EntryPointExceptionHandler(exception => { });
-                var tickableLoopItem = new PostLateTickableLoopItem(list, exceptionHandler);
-                
-                Assert.That(() =>
-                {
-                    tickableLoopItem.MoveNext();
-                }, Is.Not.AllocatingGCMemory());
-            }
+            var item = new TestStartable();
+            var thrownItem = new ThrowStartable();
+            var exceptionHandler = new EntryPointExceptionHandler(ex => { });
+            var loopItem = new StartableLoopItem(new IStartable[] { thrownItem, item }, exceptionHandler);
+
+            Assert.That(loopItem.MoveNext(), Is.False);
         }
-        
-        private class FixedTickableLoopItemTest
+
+        [Test]
+        public void Tick_MoveNextWithoutAllocation()
         {
-            [Test]
-            public void MoveNextWithoutAllocation()
+            var list = new List<ITickable> { new Ticker(), new Ticker() };
+            var exceptionHandler = new EntryPointExceptionHandler(exception => { });
+            var tickableLoopItem = new TickableLoopItem(list, exceptionHandler);
+
+            Assert.That(() =>
             {
-                var list = new List<IFixedTickable> { new Ticker(), new Ticker() };
-                var exceptionHandler = new EntryPointExceptionHandler(exception => { });
-                var tickableLoopItem = new FixedTickableLoopItem(list, exceptionHandler);
-                
-                Assert.That(() =>
-                {
-                    tickableLoopItem.MoveNext();
-                }, Is.Not.AllocatingGCMemory());
-            }
+                tickableLoopItem.MoveNext();
+            }, Is.Not.AllocatingGCMemory());
         }
-        
-        private class PostFixedTickableLoopItemTest
+
+        [Test]
+        public void PostTick_MoveNextWithoutAllocation()
         {
-            [Test]
-            public void MoveNextWithoutAllocation()
+            var list = new List<IPostTickable> { new Ticker(), new Ticker() };
+            var exceptionHandler = new EntryPointExceptionHandler(exception => { });
+            var tickableLoopItem = new PostTickableLoopItem(list, exceptionHandler);
+
+            Assert.That(() =>
             {
-                var list = new List<IPostFixedTickable> { new Ticker(), new Ticker() };
-                var exceptionHandler = new EntryPointExceptionHandler(exception => { });
-                var tickableLoopItem = new PostFixedTickableLoopItem(list, exceptionHandler);
-                
-                Assert.That(() =>
-                {
-                    tickableLoopItem.MoveNext();
-                }, Is.Not.AllocatingGCMemory());
-            }
+                tickableLoopItem.MoveNext();
+            }, Is.Not.AllocatingGCMemory());
+        }
+
+        [Test]
+        public void LateTick_MoveNextWithoutAllocation()
+        {
+            var list = new List<IPostLateTickable> { new Ticker(), new Ticker() };
+            var exceptionHandler = new EntryPointExceptionHandler(exception => { });
+            var tickableLoopItem = new PostLateTickableLoopItem(list, exceptionHandler);
+
+            Assert.That(() =>
+            {
+                tickableLoopItem.MoveNext();
+            }, Is.Not.AllocatingGCMemory());
+        }
+
+        [Test]
+        public void FixedTick_MoveNextWithoutAllocation()
+        {
+            var list = new List<IFixedTickable> { new Ticker(), new Ticker() };
+            var exceptionHandler = new EntryPointExceptionHandler(exception => { });
+            var tickableLoopItem = new FixedTickableLoopItem(list, exceptionHandler);
+
+            Assert.That(() =>
+            {
+                tickableLoopItem.MoveNext();
+            }, Is.Not.AllocatingGCMemory());
+        }
+
+        [Test]
+        public void PostFixedTick_MoveNextWithoutAllocation()
+        {
+            var list = new List<IPostFixedTickable> { new Ticker(), new Ticker() };
+            var exceptionHandler = new EntryPointExceptionHandler(exception => { });
+            var tickableLoopItem = new PostFixedTickableLoopItem(list, exceptionHandler);
+
+            Assert.That(() =>
+            {
+                tickableLoopItem.MoveNext();
+            }, Is.Not.AllocatingGCMemory());
         }
     }
 }
