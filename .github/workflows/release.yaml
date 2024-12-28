@@ -25,27 +25,8 @@ jobs:
   build-unity:
     needs: [update-version-number]
     runs-on: ubuntu-latest
-    env:
-      UNITY_LICENSE_FILE: ./tmp/ulf
-      UNITY_BIN: /opt/Unity/Editor/Unity
-    container:
-      image: gableroux/unity3d:2020.1.13f1-linux-il2cpp
     steps:
     - uses: actions/checkout@v4
-
-    - uses: actions/cache@v3
-      with:
-        path: Library
-        key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-        restore-keys: |
-          Library-
-
-    - name: Decode Unity License File
-      run: |
-        mkdir ./tmp
-        echo -n ${{ secrets.UNITY_LICENSE_2020_1_BASE64 }} | base64 --decode > $UNITY_LICENSE_FILE
-   
-    - run: $UNITY_BIN -quit -batchmode -nographics -silent-crashes -logFile -manualLicenseFile $UNITY_LICENSE_FILE || exit 0
 
     - uses: actions/setup-dotnet@v3
       with:
@@ -57,15 +38,10 @@ jobs:
         dotnet build -c Release ./VContainer.SourceGenerator /p:Version=${{ env.GIT_TAG }}
         dotnet build -c Release ./VContainer.SourceGenerator.Roslyn3 /p:Version=${{ env.GIT_TAG }}
 
-    - name: Export unitypackage
-      run: $UNITY_BIN -quit -batchmode -nographics -logFile /dev/stdout -exportPackage Assets/VContainer/Runtime Assets/VContainer/Editor VContainer.${{ env.GIT_TAG }}.unitypackage -projectPath ./
-      working-directory: VContainer
-
     - uses: actions/upload-artifact@v3
       with:
         name: VContainer.${{ env.GIT_TAG }}
         path: |
-          ./VContainer/VContainer.${{ env.GIT_TAG }}.unitypackage
           ./VContainer.SourceGenerator/bin/Release/netstandard2.0/VContainer.SourceGenerator.dll
           ./VContainer.SourceGenerator.Roslyn3/bin/Release/netstandard2.0/VContainer.SourceGenerator.Roslyn3.dll
 
@@ -87,7 +63,6 @@ jobs:
         prerelease: false
         generate_release_notes: true
         files: |
-          ./VContainer/VContainer.${{ env.GIT_TAG }}.unitypackage
           ./VContainer.SourceGenerator/bin/Release/netstandard2.0/VContainer.SourceGenerator.dll
           ./VContainer.SourceGenerator.Roslyn3/bin/Release/netstandard2.0/VContainer.SourceGenerator.Roslyn3.dll
        
