@@ -14,7 +14,8 @@ namespace VContainer.Editor
         {
             return new List<string> { "None" }
                 .Concat(TypeCache.GetTypesDerivedFrom<LifetimeScope>()
-                    .Select(type => type.FullName))
+                .Where(type => !type.IsAbstract)
+                .Select(type => type.FullName))
                 .ToArray();
         }
 
