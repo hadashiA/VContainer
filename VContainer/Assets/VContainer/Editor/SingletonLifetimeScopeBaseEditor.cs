@@ -3,6 +3,7 @@ using VContainer.Unity.Extensions;
 
 namespace VContainer.Editor
 {
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(SingletonLifetimeScopeBase), true)]
     public sealed class SingletonLifetimeScopeBaseEditor : UnityEditor.Editor
     {
