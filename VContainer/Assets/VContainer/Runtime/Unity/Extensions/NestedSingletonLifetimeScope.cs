@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace VContainer.Unity.Extensions
 {
-    public abstract class NestedSingletonLifetimeScope<T> : LifetimeScope where T : SingletonLifetimeScope<T>
+    public abstract class NestedSingletonLifetimeScope<T> : SingletonLifetimeScopeBase where T : SingletonLifetimeScope<T>
     {
         protected void OnValidate()
         {

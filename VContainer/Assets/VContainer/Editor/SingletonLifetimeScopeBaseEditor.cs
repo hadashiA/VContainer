@@ -1,8 +1,10 @@
 using UnityEditor;
+using VContainer.Unity.Extensions;
 
 namespace VContainer.Editor
 {
-    public abstract class ReadOnlyParentReferenceEditor : UnityEditor.Editor
+    [CustomEditor(typeof(SingletonLifetimeScopeBase), true)]
+    public sealed class SingletonLifetimeScopeBaseEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {

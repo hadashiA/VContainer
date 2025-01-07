@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace VContainer.Unity.Extensions
 {
-    public abstract class SingletonLifetimeScope<T> : LifetimeScope where T : SingletonLifetimeScope<T>
+    public abstract class SingletonLifetimeScope<T> : SingletonLifetimeScopeBase where T : SingletonLifetimeScope<T>
     {
         static T s_instance;
         
