@@ -75,6 +75,7 @@ namespace VContainer.Unity
                 RootLifetimeScope.gameObject.SetActive(false);
 
                 rootLifetimeScopeInstance = Instantiate(RootLifetimeScope);
+                SetName(rootLifetimeScopeInstance, RootLifetimeScope);
                 DontDestroyOnLoad(rootLifetimeScopeInstance);
                 rootLifetimeScopeInstance.gameObject.SetActive(true);
 
@@ -119,6 +120,12 @@ namespace VContainer.Unity
                 GetOrCreateRootLifetimeScopeInstance();
             }
             SceneManager.sceneLoaded -= OnFirstSceneLoaded;
+        }
+        
+        static void SetName(Object instance, Object prefab)
+        {
+            if (Instance != null && Instance.RemoveClonePostfix)
+                instance.name = prefab.name;
         }
     }
 }
