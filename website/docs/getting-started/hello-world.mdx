@@ -37,7 +37,7 @@ Next, let's write a setting that can auto-wiring the class.
 - Name it `GameLifetimeScope.cs`.
 
 :::note
-VContainer will automatically a template for C# scripts ending in *LifetimeScope.
+VContainer will automatically overwrite the default template for C# scripts ending in *LifetimeScope.
 :::
 
 You instruct `builder` and register the class above.
@@ -100,7 +100,7 @@ builder.Register<HelloWorldService>(Lifetime.Singleton);
 + builder.Register<GamePresenter>(Lifetime.Singleton);
 ```
 
-**5. Execute your registerd object on PlayerLoopSystem**
+**5. Execute your registered object on PlayerLoopSystem**
 
 To write an application in Unity, we have to interrupt Unity's lifecycle events.
 (Typically MonoBehaviour's Start / Update / OnDestroy / etc..)
