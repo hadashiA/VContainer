@@ -10,7 +10,7 @@ namespace VContainer.Internal
     {
         public readonly ConstructorInfo ConstructorInfo;
         public readonly ParameterInfo[] ParameterInfos;
-        public readonly string[] ParameterIds;
+        public readonly object[] ParameterIds;
 
         public InjectConstructorInfo(ConstructorInfo constructorInfo)
         {
@@ -26,9 +26,9 @@ namespace VContainer.Internal
             ParameterIds = ExtractParameterIds(parameterInfos);
         }
         
-        private static string[] ExtractParameterIds(ParameterInfo[] parameters)
+        private static object[] ExtractParameterIds(ParameterInfo[] parameters)
         {
-            var ids = new string[parameters.Length];
+            var ids = new object[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
                 var param = parameters[i];
@@ -47,7 +47,7 @@ namespace VContainer.Internal
     {
         public readonly MethodInfo MethodInfo;
         public readonly ParameterInfo[] ParameterInfos;
-        public readonly string[] ParameterIds;
+        public readonly object[] ParameterIds;
 
         public InjectMethodInfo(MethodInfo methodInfo)
         {
@@ -56,9 +56,9 @@ namespace VContainer.Internal
             ParameterIds = ExtractParameterIds(ParameterInfos);
         }
         
-        private static string[] ExtractParameterIds(ParameterInfo[] parameters)
+        private static object[] ExtractParameterIds(ParameterInfo[] parameters)
         {
-            var ids = new string[parameters.Length];
+            var ids = new object[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
                 var attr = parameters[i].GetCustomAttribute<InjectWithIdAttribute>();
@@ -74,7 +74,7 @@ namespace VContainer.Internal
     sealed class InjectFieldInfo
     {
         public readonly FieldInfo FieldInfo;
-        public readonly string Id;
+        public readonly object Id;
         
         public InjectFieldInfo(FieldInfo fieldInfo)
         {
@@ -95,7 +95,7 @@ namespace VContainer.Internal
     sealed class InjectPropertyInfo
     {
         public readonly PropertyInfo PropertyInfo;
-        public readonly string Id;
+        public readonly object Id;
         
         public InjectPropertyInfo(PropertyInfo propertyInfo)
         {

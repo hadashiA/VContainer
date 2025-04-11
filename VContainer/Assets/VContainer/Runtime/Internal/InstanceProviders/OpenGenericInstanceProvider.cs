@@ -9,9 +9,9 @@ namespace VContainer.Internal
         class TypeParametersKey
         {
             public readonly Type[] TypeParameters;
-            public readonly string Identifier;
+            public readonly object Identifier;
 
-            public TypeParametersKey(Type[] typeParameters, string identifier)
+            public TypeParametersKey(Type[] typeParameters, object identifier)
             {
                 TypeParameters = typeParameters;
                 Identifier = identifier;
@@ -64,7 +64,7 @@ namespace VContainer.Internal
             createRegistrationFunc = CreateRegistration;
         }
 
-        public Registration GetClosedRegistration(Type closedInterfaceType, Type[] typeParameters, string identifier = null)
+        public Registration GetClosedRegistration(Type closedInterfaceType, Type[] typeParameters, object identifier = null)
         {
             var key = new TypeParametersKey(typeParameters, identifier);
             return constructedRegistrations.GetOrAdd(key, createRegistrationFunc);

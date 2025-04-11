@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 #if ROSLYN3
@@ -215,27 +216,25 @@ static class Emitter
     /// <param name="symbol">The symbol to check for attributes</param>
     /// <param name="references">The reference symbols containing the InjectWithIdAttribute type</param>
     /// <returns>The ID object if the attribute is present with a value, otherwise null</returns>
-    static object ExtractIdFromInjectWithIdAttribute(ISymbol symbol, ReferenceSymbols references)
-    {
-        // If the InjectWithIdAttribute is not available, we can't have any ID
-        if (references.VContainerInjectWithIdAttribute == null)
-            return null;
-            
+    static object? ExtractIdFromInjectWithIdAttribute(ISymbol symbol, ReferenceSymbols references)
+    {   
         foreach (var attribute in symbol.GetAttributes())
         {
             if (attribute.AttributeClass == null)
                 continue;
                 
             // Check if this is an InjectWithIdAttribute using symbol comparison
-            bool isInjectWithIdAttribute = SymbolEqualityComparer.Default.Equals(
+            var isInjectWithIdAttribute = SymbolEqualityComparer.Default.Equals(
                 attribute.AttributeClass, 
                 references.VContainerInjectWithIdAttribute);
-            
-            if (isInjectWithIdAttribute && attribute.ConstructorArguments.Length > 0)
+
+            if (!isInjectWithIdAttribute || attribute.ConstructorArguments.Length <= 0)
             {
-                var value = attribute.ConstructorArguments[0].Value;
-                return value;
+                continue;
             }
+            
+            var value = attribute.ConstructorArguments[0].Value;
+            return value;
         }
         
         return null;
@@ -245,14 +244,10 @@ static class Emitter
     {
         var id = ExtractIdFromInjectWithIdAttribute(memberSymbol, references);
 
-        if (id == null)
-        {
-            codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters);");
-        }
-        else
-        {
-            codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", {EmitIdValue(id)}, parameters);");
-        }
+        codeWriter.AppendLine(id == null
+            ? $"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters);"
+            : $"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", {EmitIdValue(id)}, parameters);"
+        );
     }
 
     static void EmitFieldInjection(CodeWriter codeWriter, IFieldSymbol field, ReferenceSymbols references)
@@ -282,7 +277,7 @@ static class Emitter
         return code;
     }
 
-    static string EmitIdValue(object id)
+    static object EmitIdValue(object? id)
     {
         if (id == null)
             return "null";
@@ -297,25 +292,31 @@ static class Emitter
             return id.ToString();
         
         // For Enum values, use the fully qualified name
-        if (id is TypedConstant typedConstant && typedConstant.Value != null)
+        if (id is not TypedConstant typedConstant || typedConstant.Value == null)
         {
-            if (typedConstant.Kind == TypedConstantKind.Enum)
-            {
-                var enumType = typedConstant.Type;
-                var enumValue = typedConstant.Value;
-                return $"({enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}){enumValue}";
-            }
-            else if (typedConstant.Kind == TypedConstantKind.Primitive)
-            {
-                var value = typedConstant.Value;
-                if (value is string strValue)
-                    return $"\"{strValue}\"";
-                return value.ToString();
-            }
+            return id.ToString();
         }
         
-        // Default fallback
-        return id.ToString();
+        if (typedConstant.Kind == TypedConstantKind.Enum)
+        {
+            var enumType = typedConstant.Type;
+            var enumValue = typedConstant.Value;
+            return $"({enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}){enumValue}";
+        }
+
+        if (typedConstant.Kind != TypedConstantKind.Primitive)
+        {
+            return id.ToString();
+        }
+        
+        var value = typedConstant.Value;
+        
+        if (value is string strValue)
+        {
+            return $"\"{strValue}\"";
+        }
+        
+        return value.ToString();
     }
 
     static void EmitParameterizedMethodCall(CodeWriter codeWriter, IMethodSymbol methodSymbol, ReferenceSymbols references)

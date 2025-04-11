@@ -41,7 +41,7 @@ namespace VContainer.Internal
                     var parameterInfo = parameterInfos[i];
                     var id = parameterIds[i];
                     
-                    if (!string.IsNullOrEmpty(id))
+                    if (id != null)
                     {
                         parameterValues[i] = resolver.ResolveOrParameter(
                             parameterInfo.ParameterType,
@@ -78,7 +78,7 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectFields)
             {
-                var fieldValue = !string.IsNullOrEmpty(x.Id) 
+                var fieldValue = x.Id != null
                     ? resolver.ResolveOrParameter(x.FieldType, x.Name, x.Id, parameters) 
                     : resolver.ResolveOrParameter(x.FieldType, x.Name, parameters);
                 
@@ -93,7 +93,7 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectProperties)
             {
-                if (!string.IsNullOrEmpty(x.Id))
+                if (x.Id != null)
                 {
                     var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, x.Id, parameters);
                     x.SetValue(obj, propValue);
@@ -123,7 +123,7 @@ namespace VContainer.Internal
                         var parameterInfo = parameterInfos[i];
                         var id = parameterIds[i];
                         
-                        if (!string.IsNullOrEmpty(id))
+                        if (id != null)
                         {
                             parameterValues[i] = resolver.ResolveOrParameter(
                                 parameterInfo.ParameterType,
