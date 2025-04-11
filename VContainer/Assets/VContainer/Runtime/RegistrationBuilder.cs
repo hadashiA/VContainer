@@ -11,7 +11,7 @@ namespace VContainer
 
         protected internal List<Type> InterfaceTypes;
         protected internal List<IInjectParameter> Parameters;
-        protected internal string Identifier;
+        protected internal object Identifier;
 
         public RegistrationBuilder(Type implementationType, Lifetime lifetime)
         {
@@ -130,6 +130,24 @@ namespace VContainer
         }
 
         public RegistrationBuilder WithId(string identifier)
+        {
+            Identifier = identifier;
+            return this;
+        }
+
+        public RegistrationBuilder WithId(int identifier)
+        {
+            Identifier = identifier;
+            return this;
+        }
+
+        public RegistrationBuilder WithId(Enum identifier)
+        {
+            Identifier = identifier;
+            return this;
+        }
+
+        public RegistrationBuilder WithId(object identifier)
         {
             Identifier = identifier;
             return this;

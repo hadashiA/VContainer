@@ -10,7 +10,7 @@ namespace VContainer
         public static T Resolve<T>(this IObjectResolver resolver) => (T)resolver.Resolve(typeof(T));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Resolve<T>(this IObjectResolver resolver, string id) => (T)resolver.Resolve(typeof(T), id);
+        public static T Resolve<T>(this IObjectResolver resolver, object id) => (T)resolver.Resolve(typeof(T), id);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryResolve<T>(this IObjectResolver resolver, out T resolved)
@@ -26,7 +26,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryResolve<T>(this IObjectResolver resolver, string id, out T resolved)
+        public static bool TryResolve<T>(this IObjectResolver resolver, object id, out T resolved)
         {
             if (resolver.TryResolve(typeof(T), id, out var r))
             {
@@ -50,7 +50,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T ResolveOrDefault<T>(this IObjectResolver resolver, string id, T defaultValue = default)
+        public static T ResolveOrDefault<T>(this IObjectResolver resolver, object id, T defaultValue = default)
         {
             if (resolver.TryResolve(typeof(T), id, out var value))
             {
@@ -67,7 +67,7 @@ namespace VContainer
 
         [Preserve]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object ResolveNonGeneric(this IObjectResolver resolve, Type type, string id) => resolve.Resolve(type, id);
+        public static object ResolveNonGeneric(this IObjectResolver resolve, Type type, object id) => resolve.Resolve(type, id);
 
         public static object ResolveOrParameter(
             this IObjectResolver resolver,
@@ -82,7 +82,7 @@ namespace VContainer
             this IObjectResolver resolver,
             Type parameterType,
             string parameterName,
-            string id,
+            object id,
             IReadOnlyList<IInjectParameter> parameters)
         {            
             if (parameters != null)
@@ -98,7 +98,7 @@ namespace VContainer
                 }
             }
             
-            return !string.IsNullOrEmpty(id) ?
+            return id != null ?
                 resolver.Resolve(parameterType, id) :
                 resolver.Resolve(parameterType);
         }

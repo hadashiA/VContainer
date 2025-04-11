@@ -25,7 +25,7 @@ namespace VContainer
         /// <remarks>
         /// This version of resolve looks for all of scopes
         /// </remarks>
-        object Resolve(Type type, string id);
+        object Resolve(Type type, object id);
 
         /// <summary>
         /// Try resolve from type
@@ -43,7 +43,7 @@ namespace VContainer
         /// This version of resolve looks for all of scopes
         /// </remarks>
         /// <returns>Successfully resolved</returns>
-        bool TryResolve(Type type, string id, out object resolved);
+        bool TryResolve(Type type, object id, out object resolved);
 
         /// <summary>
         /// Resolve from meta with registration
@@ -57,7 +57,7 @@ namespace VContainer
 
         void Inject(object instance);
         bool TryGetRegistration(Type type, out Registration registration);
-        bool TryGetRegistration(Type type, string id, out Registration registration);
+        bool TryGetRegistration(Type type, object id, out Registration registration);
     }
 
     public interface IScopedObjectResolver : IObjectResolver
@@ -112,7 +112,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(Type type, string id)
+        public object Resolve(Type type, object id)
         {
             if (TryFindRegistration(type, id, out var registration))
             {
@@ -133,7 +133,7 @@ namespace VContainer
             return false;
         }
 
-        public bool TryResolve(Type type, string id, out object resolved)
+        public bool TryResolve(Type type, object id, out object resolved)
         {
             if (TryFindRegistration(type, id, out var registration))
             {
@@ -178,7 +178,7 @@ namespace VContainer
             => registry.TryGet(type, out registration);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetRegistration(Type type, string id, out Registration registration)
+        public bool TryGetRegistration(Type type, object id, out Registration registration)
             => registry.TryGet(type, id, out registration);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -228,7 +228,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool TryFindRegistration(Type type, string id, out Registration registration)
+        internal bool TryFindRegistration(Type type, object id, out Registration registration)
         {
             IScopedObjectResolver scope = this;
             while (scope != null)
@@ -280,7 +280,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(Type type, string id)
+        public object Resolve(Type type, object id)
         {
             if (TryGetRegistration(type, id, out var registration))
             {
@@ -303,7 +303,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryResolve(Type type, string id, out object resolved)
+        public bool TryResolve(Type type, object id, out object resolved)
         {
             if (TryGetRegistration(type, id, out var registration))
             {
@@ -341,7 +341,7 @@ namespace VContainer
             => registry.TryGet(type, out registration);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetRegistration(Type type, string id, out Registration registration)
+        public bool TryGetRegistration(Type type, object id, out Registration registration)
             => registry.TryGet(type, id, out registration);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

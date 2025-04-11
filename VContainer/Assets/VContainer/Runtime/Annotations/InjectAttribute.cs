@@ -20,9 +20,9 @@ namespace VContainer
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class InjectWithIdAttribute : InjectAttribute
     {
-        public string Id { get; }
+        public object Id { get; }
 
-        public InjectWithIdAttribute(string id)
+        public InjectWithIdAttribute(object id)
         {
             Id = id;
         }

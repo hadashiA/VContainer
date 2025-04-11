@@ -10,10 +10,10 @@ namespace VContainer.Internal
         static IDictionary<Type, Registration> buildBuffer = new Dictionary<Type, Registration>(128);
 
         [ThreadStatic]
-        static IDictionary<(Type, string), Registration> buildBufferWithId = new Dictionary<(Type, string), Registration>(128);
+        static IDictionary<(Type, object), Registration> buildBufferWithId = new Dictionary<(Type, object), Registration>(128);
 
         readonly FixedTypeKeyHashtable<Registration> hashTable;
-        readonly IDictionary<(Type, string), Registration> identifiedRegistrations;
+        readonly IDictionary<(Type, object), Registration> identifiedRegistrations;
 
         public static Registry Build(Registration[] registrations)
         {
@@ -23,7 +23,7 @@ namespace VContainer.Internal
             buildBuffer.Clear();
 
             if (buildBufferWithId == null)
-                buildBufferWithId = new Dictionary<(Type, string), Registration>(128);
+                buildBufferWithId = new Dictionary<(Type, object), Registration>(128);
             buildBufferWithId.Clear();
 
             foreach (var registration in registrations)
@@ -37,7 +37,7 @@ namespace VContainer.Internal
                     }
 
                     // Mark the ImplementationType with a guard because we need to check if it exists later.
-                    if (!string.IsNullOrEmpty(registration.Identifier))
+                    if (registration.Identifier != null)
                     {
                         var key = (registration.ImplementationType, registration.Identifier);
                         if (!buildBufferWithId.ContainsKey(key))
@@ -62,11 +62,11 @@ namespace VContainer.Internal
 
         static void AddToBuildBuffer(
             IDictionary<Type, Registration> buf, 
-            IDictionary<(Type, string), Registration> bufWithId, 
+            IDictionary<(Type, object), Registration> bufWithId, 
             Type service, 
             Registration registration)
         {
-            if (!string.IsNullOrEmpty(registration.Identifier))
+            if (registration.Identifier != null)
             {
                 var key = (service, registration.Identifier);
                 if (bufWithId.TryGetValue(key, out var existsWithId) && existsWithId != null)
@@ -115,7 +115,7 @@ namespace VContainer.Internal
 
         static void AddCollectionToBuildBuffer(
             IDictionary<Type, Registration> buf, 
-            IDictionary<(Type, string), Registration> bufWithId, 
+            IDictionary<(Type, object), Registration> bufWithId, 
             Registration collectionRegistration)
         {
             // ReSharper disable once ForCanBeConvertedToForeach
@@ -133,7 +133,7 @@ namespace VContainer.Internal
             }
         }
 
-        Registry(FixedTypeKeyHashtable<Registration> hashTable, IDictionary<(Type, string), Registration> identifiedRegistrations)
+        Registry(FixedTypeKeyHashtable<Registration> hashTable, IDictionary<(Type, object), Registration> identifiedRegistrations)
         {
             this.hashTable = hashTable;
             this.identifiedRegistrations = identifiedRegistrations;
@@ -142,7 +142,7 @@ namespace VContainer.Internal
         public bool TryGet(Type interfaceType, out Registration registration) => 
             TryGet(interfaceType, null, out registration);
 
-        public bool TryGet(Type interfaceType, string identifier, out Registration registration)
+        public bool TryGet(Type interfaceType, object identifier, out Registration registration)
         {
             if (interfaceType == null)
             {
@@ -150,7 +150,7 @@ namespace VContainer.Internal
                 return false;
             }
             
-            if (!string.IsNullOrEmpty(identifier))
+            if (identifier != null)
             {
                 var key = (interfaceType, identifier);
                 if (identifiedRegistrations.TryGetValue(key, out registration))
@@ -179,7 +179,7 @@ namespace VContainer.Internal
             Type interfaceType, 
             Type openGenericType,
             Type[] typeParameters,
-            string identifier,
+            object identifier,
             out Registration registration)
         {
             if (openGenericType == null || typeParameters == null)
@@ -188,7 +188,7 @@ namespace VContainer.Internal
                 return false;
             }
             
-            if (!string.IsNullOrEmpty(identifier))
+            if (identifier != null)
             {
                 var key = (openGenericType, identifier);
                 if (identifiedRegistrations.TryGetValue(key, out var openGenericRegistration) && 
@@ -214,9 +214,9 @@ namespace VContainer.Internal
 
         public bool Exists(Type type) => Exists(type, null);
 
-        public bool Exists(Type type, string identifier)
+        public bool Exists(Type type, object identifier)
         {
-            if (!string.IsNullOrEmpty(identifier))
+            if (identifier != null)
             {
                 var key = (type, identifier);
                 if (identifiedRegistrations.ContainsKey(key))
@@ -230,7 +230,7 @@ namespace VContainer.Internal
             {
                 type = RuntimeTypeCache.OpenGenericTypeOf(type);
 
-                if (!string.IsNullOrEmpty(identifier))
+                if (identifier != null)
                 {
                     var key = (type, identifier);
                     if (identifiedRegistrations.ContainsKey(key))

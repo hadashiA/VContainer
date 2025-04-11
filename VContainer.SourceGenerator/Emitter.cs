@@ -210,13 +210,17 @@ static class Emitter
     }
 
     /// <summary>
-    /// Extracts the ID string from an InjectWithId attribute if present on the symbol
+    /// Extracts the ID object from an InjectWithId attribute if present on the symbol
     /// </summary>
     /// <param name="symbol">The symbol to check for attributes</param>
     /// <param name="references">The reference symbols containing the InjectWithIdAttribute type</param>
-    /// <returns>The ID string if the attribute is present with a value, otherwise null</returns>
-    static string? ExtractIdFromInjectWithIdAttribute(ISymbol symbol, ReferenceSymbols references)
+    /// <returns>The ID object if the attribute is present with a value, otherwise null</returns>
+    static object ExtractIdFromInjectWithIdAttribute(ISymbol symbol, ReferenceSymbols references)
     {
+        // If the InjectWithIdAttribute is not available, we can't have any ID
+        if (references.VContainerInjectWithIdAttribute == null)
+            return null;
+            
         foreach (var attribute in symbol.GetAttributes())
         {
             if (attribute.AttributeClass == null)
@@ -230,7 +234,7 @@ static class Emitter
             if (isInjectWithIdAttribute && attribute.ConstructorArguments.Length > 0)
             {
                 var value = attribute.ConstructorArguments[0].Value;
-                return value?.ToString();
+                return value;
             }
         }
         
@@ -241,13 +245,13 @@ static class Emitter
     {
         var id = ExtractIdFromInjectWithIdAttribute(memberSymbol, references);
 
-        if (string.IsNullOrEmpty(id))
+        if (id == null)
         {
             codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters);");
         }
         else
         {
-            codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", \"{id}\", parameters);");
+            codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", {EmitIdValue(id)}, parameters);");
         }
     }
 
@@ -268,14 +272,50 @@ static class Emitter
         
         var id = ExtractIdFromInjectWithIdAttribute(parameter, references);
 
-        var code = string.IsNullOrEmpty(id) 
+        var code = id == null 
             ? $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters)" 
-            : $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", \"{id}\", parameters)";
+            : $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", {EmitIdValue(id)}, parameters)";
         
         if (includeComma)
             code += ",";
             
         return code;
+    }
+
+    static string EmitIdValue(object id)
+    {
+        if (id == null)
+            return "null";
+        
+        if (id is string str)
+            return $"\"{str}\"";
+            
+        if (id is bool b)
+            return b ? "true" : "false";
+        
+        if (id is IConvertible)
+            return id.ToString();
+        
+        // For Enum values, use the fully qualified name
+        if (id is TypedConstant typedConstant && typedConstant.Value != null)
+        {
+            if (typedConstant.Kind == TypedConstantKind.Enum)
+            {
+                var enumType = typedConstant.Type;
+                var enumValue = typedConstant.Value;
+                return $"({enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}){enumValue}";
+            }
+            else if (typedConstant.Kind == TypedConstantKind.Primitive)
+            {
+                var value = typedConstant.Value;
+                if (value is string strValue)
+                    return $"\"{strValue}\"";
+                return value.ToString();
+            }
+        }
+        
+        // Default fallback
+        return id.ToString();
     }
 
     static void EmitParameterizedMethodCall(CodeWriter codeWriter, IMethodSymbol methodSymbol, ReferenceSymbols references)
