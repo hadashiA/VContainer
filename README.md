@@ -85,6 +85,10 @@ public class GameLifetimeScope : LifetimeScope
         builder.Register<IRouteSearch, AStarRouteSearch>(Lifetime.Singleton);
 
         builder.RegisterComponentInHierarchy<ActorsView>();
+        
+        // Register with string ID
+        builder.Register<IWeapon, Sword>(Lifetime.Singleton).WithId("primary");
+        builder.Register<IWeapon, Bow>(Lifetime.Singleton).WithId("secondary");
     }
 }
 ```
@@ -124,13 +128,19 @@ public class ActorPresenter : IStartable
 {
     readonly CharacterService service;
     readonly ActorsView actorsView;
+    readonly IWeapon primaryWeapon;
+    readonly IWeapon secondaryWeapon;
 
     public ActorPresenter(
         CharacterService service,
-        ActorsView actorsView)
+        ActorsView actorsView,
+        [InjectWithId("primary")] IWeapon primaryWeapon,
+        [InjectWithId("secondary")] IWeapon secondaryWeapon)
     {
         this.service = service;
         this.actorsView = actorsView;
+        this.primaryWeapon = primaryWeapon;
+        this.secondaryWeapon = secondaryWeapon;
     }
 
     void IStartable.Start()
@@ -140,9 +150,24 @@ public class ActorPresenter : IStartable
 }
 ```
 
+You can also resolve with string ID directly from the container:
+
+```csharp
+// Resolve by ID
+var primaryWeapon = container.Resolve<IWeapon>("primary");
+var secondaryWeapon = container.Resolve<IWeapon>("secondary");
+
+// Try resolve with ID
+if (container.TryResolve<IWeapon>("special", out var specialWeapon))
+{
+    // Use specialWeapon
+}
+```
+
 
 - In this example, the routeSearch of CharacterService is automatically set as the instance of AStarRouteSearch when CharacterService is resolved.
 - Further, VContainer can have a Pure C# class as an entry point. (Various timings such as Start, Update, etc. can be specified.) This facilitates "separation of domain logic and presentation".
+- With the `WithId` method and `InjectWithId` attribute, you can register and resolve multiple implementations of the same interface with string identifiers.
 
 ### Flexible Scoping with async
 

@@ -10,17 +10,36 @@ namespace VContainer.Internal
     {
         public readonly ConstructorInfo ConstructorInfo;
         public readonly ParameterInfo[] ParameterInfos;
+        public readonly string[] ParameterIds;
 
         public InjectConstructorInfo(ConstructorInfo constructorInfo)
         {
             ConstructorInfo = constructorInfo;
             ParameterInfos = constructorInfo.GetParameters();
+            ParameterIds = ExtractParameterIds(ParameterInfos);
         }
 
         public InjectConstructorInfo(ConstructorInfo constructorInfo, ParameterInfo[] parameterInfos)
         {
             ConstructorInfo = constructorInfo;
             ParameterInfos = parameterInfos;
+            ParameterIds = ExtractParameterIds(parameterInfos);
+        }
+        
+        private static string[] ExtractParameterIds(ParameterInfo[] parameters)
+        {
+            var ids = new string[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var param = parameters[i];
+                
+                var injectWithId = param.GetCustomAttribute<InjectWithIdAttribute>();
+                if (injectWithId != null)
+                {
+                    ids[i] = injectWithId.Id;
+                }
+            }
+            return ids;
         }
     }
 
@@ -28,52 +47,86 @@ namespace VContainer.Internal
     {
         public readonly MethodInfo MethodInfo;
         public readonly ParameterInfo[] ParameterInfos;
+        public readonly string[] ParameterIds;
 
         public InjectMethodInfo(MethodInfo methodInfo)
         {
             MethodInfo = methodInfo;
             ParameterInfos = methodInfo.GetParameters();
+            ParameterIds = ExtractParameterIds(ParameterInfos);
+        }
+        
+        private static string[] ExtractParameterIds(ParameterInfo[] parameters)
+        {
+            var ids = new string[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var attr = parameters[i].GetCustomAttribute<InjectWithIdAttribute>();
+                if (attr != null)
+                {
+                    ids[i] = attr.Id;
+                }
+            }
+            return ids;
         }
     }
 
-    // sealed class InjectFieldInfo
-    // {
-    //     public readonly Type FieldType;
-    //     public readonly Action<object, object> Setter;
-    //
-    //     public InjectFieldInfo(FieldInfo fieldInfo)
-    //     {
-    //         FieldType = fieldInfo.FieldType;
-    //         Setter = fieldInfo.SetValue;
-    //     }
-    // }
-    //
-    // sealed class InjectPropertyInfo
-    // {
-    //     public readonly Type PropertyType;
-    //     public readonly Action<object, object> Setter;
-    //
-    //     public InjectPropertyInfo(PropertyInfo propertyInfo)
-    //     {
-    //         PropertyType = propertyInfo.PropertyType;
-    //         Setter = propertyInfo.SetValue;
-    //     }
-    // }
+    sealed class InjectFieldInfo
+    {
+        public readonly FieldInfo FieldInfo;
+        public readonly string Id;
+        
+        public InjectFieldInfo(FieldInfo fieldInfo)
+        {
+            FieldInfo = fieldInfo;
+            var attr = fieldInfo.GetCustomAttribute<InjectWithIdAttribute>();
+            if (attr != null)
+            {
+                Id = attr.Id;
+            }
+        }
+        
+        public Type FieldType => FieldInfo.FieldType;
+        public string Name => FieldInfo.Name;
+        
+        public void SetValue(object obj, object value) => FieldInfo.SetValue(obj, value);
+    }
+    
+    sealed class InjectPropertyInfo
+    {
+        public readonly PropertyInfo PropertyInfo;
+        public readonly string Id;
+        
+        public InjectPropertyInfo(PropertyInfo propertyInfo)
+        {
+            PropertyInfo = propertyInfo;
+            var attr = propertyInfo.GetCustomAttribute<InjectWithIdAttribute>();
+            if (attr != null)
+            {
+                Id = attr.Id;
+            }
+        }
+        
+        public Type PropertyType => PropertyInfo.PropertyType;
+        public string Name => PropertyInfo.Name;
+        
+        public void SetValue(object obj, object value) => PropertyInfo.SetValue(obj, value);
+    }
 
     sealed class InjectTypeInfo
     {
         public readonly Type Type;
         public readonly InjectConstructorInfo InjectConstructor;
         public readonly IReadOnlyList<InjectMethodInfo> InjectMethods;
-        public readonly IReadOnlyList<FieldInfo> InjectFields;
-        public readonly IReadOnlyList<PropertyInfo> InjectProperties;
+        public readonly IReadOnlyList<InjectFieldInfo> InjectFields;
+        public readonly IReadOnlyList<InjectPropertyInfo> InjectProperties;
 
         public InjectTypeInfo(
             Type type,
             InjectConstructorInfo injectConstructor,
             IReadOnlyList<InjectMethodInfo> injectMethods,
-            IReadOnlyList<FieldInfo> injectFields,
-            IReadOnlyList<PropertyInfo> injectProperties)
+            IReadOnlyList<InjectFieldInfo> injectFields,
+            IReadOnlyList<InjectPropertyInfo> injectProperties)
         {
             Type = type;
             InjectConstructor = injectConstructor;
@@ -205,8 +258,8 @@ namespace VContainer.Internal
             }
 
             var injectMethods = default(List<InjectMethodInfo>);
-            var injectFields = default(List<FieldInfo>);
-            var injectProperties = default(List<PropertyInfo>);
+            var injectFields = default(List<InjectFieldInfo>);
+            var injectProperties = default(List<InjectPropertyInfo>);
             var bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
             while (type != null && type != typeof(object))
@@ -244,7 +297,7 @@ namespace VContainer.Internal
                     {
                         if (injectFields == null)
                         {
-                            injectFields = new List<FieldInfo>();
+                            injectFields = new List<InjectFieldInfo>();
                         }
                         else
                         {
@@ -260,7 +313,7 @@ namespace VContainer.Internal
                             }
                         }
 
-                        injectFields.Add(fieldInfo);
+                        injectFields.Add(new InjectFieldInfo(fieldInfo));
                     }
                 }
 
@@ -272,7 +325,7 @@ namespace VContainer.Internal
                     {
                         if (injectProperties == null)
                         {
-                            injectProperties = new List<PropertyInfo>();
+                            injectProperties = new List<InjectPropertyInfo>();
                         }
                         else
                         {
@@ -282,7 +335,7 @@ namespace VContainer.Internal
                                     goto EndProperty;
                             }
                         }
-                        injectProperties.Add(propertyInfo);
+                        injectProperties.Add(new InjectPropertyInfo(propertyInfo));
                     }
                 }
                 EndProperty:
@@ -298,7 +351,7 @@ namespace VContainer.Internal
                 injectProperties);
         }
 
-        private static bool Contains(List<FieldInfo> fields, FieldInfo field)
+        private static bool Contains(List<InjectFieldInfo> fields, FieldInfo field)
         {
             for (var i = 0; i < fields.Count; i++)
             {
@@ -385,7 +438,7 @@ namespace VContainer.Internal
                     {
                         if (registry.TryGet(x.FieldType, out var fieldRegistration))
                         {
-                            CheckCircularDependencyRecursive(new DependencyInfo(fieldRegistration, current.Dependency, x), registry, stack);
+                            CheckCircularDependencyRecursive(new DependencyInfo(fieldRegistration, current.Dependency, x.FieldInfo), registry, stack);
                         }
                     }
                 }
@@ -396,7 +449,7 @@ namespace VContainer.Internal
                     {
                         if (registry.TryGet(x.PropertyType, out var propertyRegistration))
                         {
-                            CheckCircularDependencyRecursive(new DependencyInfo(propertyRegistration, current.Dependency, x), registry, stack);
+                            CheckCircularDependencyRecursive(new DependencyInfo(propertyRegistration, current.Dependency, x.PropertyInfo), registry, stack);
                         }
                     }
                 }

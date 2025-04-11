@@ -11,6 +11,7 @@ namespace VContainer
 
         protected internal List<Type> InterfaceTypes;
         protected internal List<IInjectParameter> Parameters;
+        protected internal string Identifier;
 
         public RegistrationBuilder(Type implementationType, Lifetime lifetime)
         {
@@ -26,7 +27,8 @@ namespace VContainer
                 ImplementationType,
                 Lifetime,
                 InterfaceTypes,
-                spawner);
+                spawner,
+                Identifier);
         }
 
         public RegistrationBuilder As<TInterface>()
@@ -125,6 +127,12 @@ namespace VContainer
         public RegistrationBuilder WithParameter<TParam>(Func<TParam> value)
         {
             return WithParameter(typeof(TParam), _ => value());
+        }
+
+        public RegistrationBuilder WithId(string identifier)
+        {
+            Identifier = identifier;
+            return this;
         }
 
         protected virtual void AddInterfaceType(Type interfaceType)

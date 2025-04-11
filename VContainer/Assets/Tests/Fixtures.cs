@@ -33,6 +33,7 @@ namespace VContainer.Tests
 
     interface IGenericService<T>
     {
+        T ParameterService { get; }
     }
 
     interface IGenericService<T1,T2>
@@ -119,7 +120,7 @@ namespace VContainer.Tests
     {
     }
 
-    class NoDependencyServiceB : I3
+    class NoDependencyServiceB : I2, I3
     {
     }
 
@@ -318,18 +319,11 @@ namespace VContainer.Tests
         }
     }
 
-    class GenericsService<T> : IGenericService<T>, IDisposable
+    class GenericsService<T>(T parameterService) : IGenericService<T>, IDisposable
     {
-        public readonly T ParameterService;
-
+        public T ParameterService { get; } = parameterService;
         public bool Disposed { get; private set; }
-
-        public GenericsService(T parameterService)
-        {
-            ParameterService = parameterService;
-            Disposed = false;
-        }
-
+        
         public void Dispose()
         {
             Disposed = true;

@@ -17,6 +17,17 @@ namespace VContainer
     {
     }
 
+    [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
+    public class InjectWithIdAttribute : InjectAttribute
+    {
+        public string Id { get; }
+
+        public InjectWithIdAttribute(string id)
+        {
+            Id = id;
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
     public class InjectIgnoreAttribute : Attribute
     {

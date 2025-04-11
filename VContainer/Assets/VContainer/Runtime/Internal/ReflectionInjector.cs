@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace VContainer.Internal
 {
@@ -31,16 +32,30 @@ namespace VContainer.Internal
         public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
             var parameterInfos = injectTypeInfo.InjectConstructor.ParameterInfos;
+            var parameterIds = injectTypeInfo.InjectConstructor.ParameterIds;
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameterInfos.Length);
             try
             {
                 for (var i = 0; i < parameterInfos.Length; i++)
                 {
                     var parameterInfo = parameterInfos[i];
-                    parameterValues[i] = resolver.ResolveOrParameter(
-                        parameterInfo.ParameterType,
-                        parameterInfo.Name,
-                        parameters);
+                    var id = parameterIds[i];
+                    
+                    if (!string.IsNullOrEmpty(id))
+                    {
+                        parameterValues[i] = resolver.ResolveOrParameter(
+                            parameterInfo.ParameterType,
+                            parameterInfo.Name,
+                            id,
+                            parameters);
+                    }
+                    else
+                    {
+                        parameterValues[i] = resolver.ResolveOrParameter(
+                            parameterInfo.ParameterType,
+                            parameterInfo.Name,
+                            parameters);
+                    }
                 }
                 var instance = injectTypeInfo.InjectConstructor.ConstructorInfo.Invoke(parameterValues);
                 Inject(instance, resolver, parameters);
@@ -63,7 +78,10 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectFields)
             {
-                var fieldValue = resolver.ResolveOrParameter(x.FieldType, x.Name, parameters);
+                var fieldValue = !string.IsNullOrEmpty(x.Id) 
+                    ? resolver.ResolveOrParameter(x.FieldType, x.Name, x.Id, parameters) 
+                    : resolver.ResolveOrParameter(x.FieldType, x.Name, parameters);
+                
                 x.SetValue(obj, fieldValue);
             }
         }
@@ -75,8 +93,16 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectProperties)
             {
-                var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, parameters);
-                x.SetValue(obj, propValue);
+                if (!string.IsNullOrEmpty(x.Id))
+                {
+                    var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, x.Id, parameters);
+                    x.SetValue(obj, propValue);
+                }
+                else
+                {
+                    var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, parameters);
+                    x.SetValue(obj, propValue);
+                }
             }
         }
 
@@ -88,16 +114,30 @@ namespace VContainer.Internal
             foreach (var method in injectTypeInfo.InjectMethods)
             {
                 var parameterInfos = method.ParameterInfos;
+                var parameterIds = method.ParameterIds;
                 var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameterInfos.Length);
                 try
                 {
                     for (var i = 0; i < parameterInfos.Length; i++)
                     {
                         var parameterInfo = parameterInfos[i];
-                        parameterValues[i] = resolver.ResolveOrParameter(
-                            parameterInfo.ParameterType,
-                            parameterInfo.Name,
-                            parameters);
+                        var id = parameterIds[i];
+                        
+                        if (!string.IsNullOrEmpty(id))
+                        {
+                            parameterValues[i] = resolver.ResolveOrParameter(
+                                parameterInfo.ParameterType,
+                                parameterInfo.Name,
+                                id,
+                                parameters);
+                        }
+                        else
+                        {
+                            parameterValues[i] = resolver.ResolveOrParameter(
+                                parameterInfo.ParameterType,
+                                parameterInfo.Name,
+                                parameters);
+                        }
                     }
                     method.MethodInfo.Invoke(obj, parameterValues);
                 }

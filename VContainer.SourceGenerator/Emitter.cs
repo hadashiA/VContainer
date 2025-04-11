@@ -3,6 +3,8 @@ using Microsoft.CodeAnalysis;
 #if ROSLYN3
 using SourceProductionContext = Microsoft.CodeAnalysis.GeneratorExecutionContext;
 #endif
+using System.Text;
+using System.Collections.Generic;
 
 namespace VContainer.SourceGenerator;
 
@@ -190,41 +192,189 @@ static class Emitter
 
             foreach (var fieldSymbol in typeMeta.InjectFields)
             {
-                var fieldTypeName = fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                codeWriter.AppendLine($"__x.{fieldSymbol.Name} = ({fieldTypeName})resolver.ResolveOrParameter(typeof({fieldTypeName}), \"{fieldSymbol.Name}\", parameters);");
+                EmitFieldInjection(codeWriter, fieldSymbol);
             }
 
             foreach (var propSymbol in typeMeta.InjectProperties)
             {
-                var propTypeName = propSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                codeWriter.AppendLine($"__x.{propSymbol.Name} = ({propTypeName})resolver.ResolveOrParameter(typeof({propTypeName}), \"{propSymbol.Name}\", parameters);");
+                EmitPropertyInjection(codeWriter, propSymbol);
             }
 
             foreach (var methodSymbol in typeMeta.InjectMethods)
             {
-                var parameters = methodSymbol.Parameters
-                    .Select(param =>
-                    {
-                        var paramType =
-                            param.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                        var paramName = param.Name;
-                        return (paramType, paramName);
-                    })
-                    .ToArray();
-
-                foreach (var (paramType, paramName) in parameters)
-                {
-                    codeWriter.AppendLine(
-                        $"var __{paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
-                }
-
-                var arguments = parameters.Select(x => $"({x.paramType})__{x.paramName}");
-                codeWriter.AppendLine($"__x.{methodSymbol.Name}({string.Join(", ", arguments)});");
+                EmitParameterizedMethodCall(codeWriter, methodSymbol);
             }
             return true;
         }
+    }
+
+    static void EmitFieldInjection(CodeWriter codeWriter, IFieldSymbol field)
+    {
+        var fieldType = field.Type;
+        var fieldName = field.Name;
+        
+        string id = null;
+        foreach (var attribute in field.GetAttributes())
+        {
+            if (attribute.AttributeClass.Name == "InjectWithIdAttribute" && attribute.ConstructorArguments.Length > 0)
+            {
+                id = attribute.ConstructorArguments[0].Value.ToString();
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(id))
+        {
+            codeWriter.AppendLine($"__x.{fieldName} = ({EmitParamType(fieldType)})resolver.ResolveOrParameter(typeof({EmitParamType(fieldType)}), \"{fieldName}\", parameters);");
+        }
+        else
+        {
+            codeWriter.AppendLine($"__x.{fieldName} = ({EmitParamType(fieldType)})resolver.ResolveOrParameter(typeof({EmitParamType(fieldType)}), \"{fieldName}\", \"{id}\", parameters);");
+        }
+    }
+
+    static void EmitPropertyInjection(CodeWriter codeWriter, IPropertySymbol property)
+    {
+        var propertyType = property.Type;
+        var propertyName = property.Name;
+        
+        string id = null;
+        foreach (var attribute in property.GetAttributes())
+        {
+            if (attribute.AttributeClass.Name == "InjectWithIdAttribute" && attribute.ConstructorArguments.Length > 0)
+            {
+                id = attribute.ConstructorArguments[0].Value.ToString();
+                break;
+            }
+        }
+
+        if (string.IsNullOrEmpty(id))
+        {
+            codeWriter.AppendLine($"__x.{propertyName} = ({EmitParamType(propertyType)})resolver.ResolveOrParameter(typeof({EmitParamType(propertyType)}), \"{propertyName}\", parameters);");
+        }
+        else
+        {
+            codeWriter.AppendLine($"__x.{propertyName} = ({EmitParamType(propertyType)})resolver.ResolveOrParameter(typeof({EmitParamType(propertyType)}), \"{propertyName}\", \"{id}\", parameters);");
+        }
+    }
+
+    static void EmitParameterizedMethodCall(CodeWriter codeWriter, IMethodSymbol methodSymbol)
+    {
+        var parameters = methodSymbol.Parameters;
+        var parameterVariableNames = new List<string>();
+        
+        var methodName = methodSymbol.Name;
+        var methodAccess = methodSymbol.IsStatic ? $"{EmitTypeName(methodSymbol.ContainingType)}" : "__x";
+
+        using (codeWriter.BeginBlockScope())
+        {
+            foreach (var parameter in parameters)
+            {
+                var parameterType = parameter.Type;
+                var parameterName = parameter.Name;
+                var parameterVariableName = "param_" + parameterName;
+                parameterVariableNames.Add(parameterVariableName);
+                
+                string id = null;
+                foreach (var attribute in parameter.GetAttributes())
+                {
+                    if (attribute.AttributeClass.Name == "InjectWithIdAttribute" && attribute.ConstructorArguments.Length > 0)
+                    {
+                        id = attribute.ConstructorArguments[0].Value.ToString();
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(id))
+                {
+                    codeWriter.AppendLine($"var {parameterVariableName} = ({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters);");
+                }
+                else
+                {
+                    codeWriter.AppendLine($"var {parameterVariableName} = ({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", \"{id}\", parameters);");
+                }
+            }
+            if (!methodSymbol.ReturnsVoid)
+            {
+                codeWriter.AppendLine($"var result = {methodAccess}.{methodName}({string.Join(", ", parameterVariableNames)});");
+            }
+            else
+            {
+                codeWriter.AppendLine($"{methodAccess}.{methodName}({string.Join(", ", parameterVariableNames)});");
+            }
+        }
+    }
+
+    static void EmitParameterizedConstructorCall(StringBuilder injectMethodCode, CodeWriter writer, IMethodSymbol constructorSymbol, TypeMeta typeMeta)
+    {
+        injectMethodCode.AppendLine($"var __instance = new {typeMeta.TypeName}(");
+        writer.IncreasaeIndent();
+        writer.IncreasaeIndent();
+
+        var parameters = constructorSymbol.Parameters;
+        for (var i = 0; i < parameters.Length; i++)
+        {
+            var parameter = parameters[i];
+            var parameterType = parameter.Type;
+            var parameterName = parameter.Name;
+            
+            string id = null;
+            foreach (var attribute in parameter.GetAttributes())
+            {
+                if (attribute.AttributeClass.Name == "InjectWithIdAttribute" && attribute.ConstructorArguments.Length > 0)
+                {
+                    id = attribute.ConstructorArguments[0].Value.ToString();
+                    break;
+                }
+            }
+
+            if (i + 1 < parameters.Length)
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    injectMethodCode.AppendLine($"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters),");
+                }
+                else
+                {
+                    injectMethodCode.AppendLine($"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", \"{id}\", parameters),");
+                }
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    injectMethodCode.AppendLine($"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters)");
+                }
+                else
+                {
+                    injectMethodCode.AppendLine($"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", \"{id}\", parameters)");
+                }
+            }
+        }
+
+        writer.DecreaseIndent();
+        writer.DecreaseIndent();
+        injectMethodCode.AppendLine(");");
+    }
+
+    static string EmitParamType(ITypeSymbol type)
+    {
+        return type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    }
+
+    static string EmitTypeName(ITypeSymbol type)
+    {
+        return type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    }
+
+    static string EmitAccessibility(IFieldSymbol field)
+    {
+        return $"__x.{field.Name}";
+    }
+
+    static string EmitAccessibility(IPropertySymbol property)
+    {
+        return $"__x.{property.Name}";
     }
 
     public static bool TryEmitCreateInstanceMethod(
@@ -285,24 +435,61 @@ static class Emitter
                 codeWriter.AppendLine($"throw new NotSupportedException(\"UnityEngine.Component:{typeMeta.TypeName} cannot be `new`\");");
                 return true;
             }
-            var parameters = constructorSymbol.Parameters
-                .Select(param =>
-                {
-                    var paramType =
-                        param.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                    var paramName = param.Name;
-                    return (paramType, paramName);
-                })
-                .ToArray();
-
-            foreach (var (paramType, paramName) in parameters)
+            
+            if (constructorSymbol.Parameters.Length == 0)
             {
-                codeWriter.AppendLine(
-                    $"var __{paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
+                codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}();");
             }
+            else
+            {
+                codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}(");
+                codeWriter.IncreasaeIndent();
+                
+                var parameters = constructorSymbol.Parameters;
+                for (var i = 0; i < parameters.Length; i++)
+                {
+                    var parameter = parameters[i];
+                    var parameterType = parameter.Type;
+                    var parameterName = parameter.Name;
+                    
+                    string id = null;
+                    foreach (var attribute in parameter.GetAttributes())
+                    {
+                        if (attribute.AttributeClass.Name == "InjectWithIdAttribute" && attribute.ConstructorArguments.Length > 0)
+                        {
+                            id = attribute.ConstructorArguments[0].Value.ToString();
+                            break;
+                        }
+                    }
 
-            var arguments = parameters.Select(x => $"({x.paramType})__{x.paramName}");
-            codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}({string.Join(", ", arguments)});");
+                    if (i + 1 < parameters.Length)
+                    {
+                        if (string.IsNullOrEmpty(id))
+                        {
+                            codeWriter.AppendLine($"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters),");
+                        }
+                        else
+                        {
+                            codeWriter.AppendLine($"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", \"{id}\", parameters),");
+                        }
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(id))
+                        {
+                            codeWriter.AppendLine($"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters)");
+                        }
+                        else
+                        {
+                            codeWriter.AppendLine($"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", \"{id}\", parameters)");
+                        }
+                    }
+                }
+                
+                codeWriter.DecreaseIndent();
+                codeWriter.AppendLine(");");
+            }
+            
             codeWriter.AppendLine("Inject(__instance, resolver, parameters);");
             codeWriter.AppendLine("return __instance;");
         }

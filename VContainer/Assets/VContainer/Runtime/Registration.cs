@@ -10,23 +10,27 @@ namespace VContainer
         public readonly IReadOnlyList<Type> InterfaceTypes;
         public readonly Lifetime Lifetime;
         public readonly IInstanceProvider Provider;
+        public readonly string Identifier;
 
         public Registration(
             Type implementationType,
             Lifetime lifetime,
             IReadOnlyList<Type> interfaceTypes,
-            IInstanceProvider provider)
+            IInstanceProvider provider,
+            string identifier = null)
         {
             ImplementationType = implementationType;
             InterfaceTypes = interfaceTypes;
             Lifetime = lifetime;
             Provider = provider;
+            Identifier = identifier;
         }
 
         public override string ToString()
         {
             var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
-            return $"Registration {ImplementationType.Name} ContractTypes=[{contractTypes}] {Lifetime} {Provider}";
+            var idStr = string.IsNullOrEmpty(Identifier) ? "" : $" (ID: {Identifier})";
+            return $"Registration {ImplementationType.Name}{idStr} ContractTypes=[{contractTypes}] {Lifetime} {Provider}";
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
