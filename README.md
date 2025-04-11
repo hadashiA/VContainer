@@ -131,6 +131,7 @@ public class ActorPresenter : IStartable
     readonly IWeapon primaryWeapon;
     readonly IWeapon secondaryWeapon;
 
+    // Use InjectWithId attribute for constructor parameters
     public ActorPresenter(
         CharacterService service,
         ActorsView actorsView,
@@ -164,6 +165,45 @@ if (container.TryResolve<IWeapon>("special", out var specialWeapon))
 }
 ```
 
+The `InjectWithId` attribute works with all injection types:
+
+```csharp
+// Field injection with ID
+public class WeaponHolder
+{
+    [Inject, InjectWithId("primary")]
+    public IWeapon PrimaryWeapon;
+    
+    [Inject, InjectWithId("secondary")]
+    public IWeapon SecondaryWeapon;
+}
+
+// Property injection with ID
+public class EquipmentManager
+{
+    [Inject, InjectWithId("primary")]
+    public IWeapon PrimaryWeapon { get; set; }
+    
+    [Inject, InjectWithId("secondary")]
+    public IWeapon SecondaryWeapon { get; set; }
+}
+
+// Method injection with ID
+public class CharacterEquipment
+{
+    public IWeapon PrimaryWeapon { get; private set; }
+    public IWeapon SecondaryWeapon { get; private set; }
+    
+    [Inject]
+    public void Initialize(
+        [InjectWithId("primary")] IWeapon primaryWeapon,
+        [InjectWithId("secondary")] IWeapon secondaryWeapon)
+    {
+        PrimaryWeapon = primaryWeapon;
+        SecondaryWeapon = secondaryWeapon;
+    }
+}
+```
 
 - In this example, the routeSearch of CharacterService is automatically set as the instance of AStarRouteSearch when CharacterService is resolved.
 - Further, VContainer can have a Pure C# class as an entry point. (Various timings such as Start, Update, etc. can be specified.) This facilitates "separation of domain logic and presentation".

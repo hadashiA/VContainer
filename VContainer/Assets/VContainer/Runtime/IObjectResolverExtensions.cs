@@ -75,19 +75,7 @@ namespace VContainer
             string parameterName,
             IReadOnlyList<IInjectParameter> parameters)
         {
-            if (parameters != null)
-            {
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var i = 0; i < parameters.Count; i++)
-                {
-                    var parameter = parameters[i];
-                    if (parameter.Match(parameterType, parameterName))
-                    {
-                        return parameter.GetValue(resolver);
-                    }
-                }
-            }
-            return resolver.Resolve(parameterType);
+            return ResolveOrParameter(resolver, parameterType, parameterName, null, parameters);
         }
 
         public static object ResolveOrParameter(
@@ -110,8 +98,9 @@ namespace VContainer
                 }
             }
             
-            var result = resolver.Resolve(parameterType, id);
-            return result;
+            return !string.IsNullOrEmpty(id) ?
+                resolver.Resolve(parameterType, id) :
+                resolver.Resolve(parameterType);
         }
     }
 }

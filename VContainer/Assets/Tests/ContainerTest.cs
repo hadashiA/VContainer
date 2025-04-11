@@ -759,7 +759,6 @@ namespace VContainer.Tests
         }
 
         [Test]
-        [Ignore("Constructor injection with ID is not yet fully implemented")]
         public void InjectWithIdAttributeTest()
         {
             var builder = new ContainerBuilder();
@@ -785,7 +784,6 @@ namespace VContainer.Tests
         }
         
         [Test]
-        [Ignore("Field injection with ID is not yet fully implemented")]
         public void InjectFieldWithIdAttributeTest()
         {
             var builder = new ContainerBuilder();
@@ -807,7 +805,6 @@ namespace VContainer.Tests
         }
         
         [Test]
-        [Ignore("Property injection with ID is not yet fully implemented")]
         public void InjectPropertyWithIdAttributeTest()
         {
             var builder = new ContainerBuilder();
