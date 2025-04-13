@@ -233,8 +233,12 @@ static class Emitter
                 continue;
             }
             
-            var value = attribute.ConstructorArguments[0].Value;
-            return value;
+            var constructorArg = attribute.ConstructorArguments[0];
+
+            // For enum values, return the TypedConstant to preserve type information
+            return constructorArg.Kind == TypedConstantKind.Enum 
+                ? constructorArg 
+                : constructorArg.Value;
         }
         
         return null;
@@ -291,7 +295,7 @@ static class Emitter
         if (id is IConvertible)
             return id.ToString();
         
-        // For Enum values, use the fully qualified name
+        // For Enum values from TypedConstant, use the fully qualified name
         if (id is not TypedConstant typedConstant || typedConstant.Value == null)
         {
             return id.ToString();
