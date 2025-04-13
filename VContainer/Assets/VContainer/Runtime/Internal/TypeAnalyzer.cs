@@ -33,7 +33,7 @@ namespace VContainer.Internal
             {
                 var param = parameters[i];
                 
-                var injectWithId = param.GetCustomAttribute<InjectWithIdAttribute>();
+                var injectWithId = param.GetCustomAttribute<InjectAttribute>();
                 if (injectWithId != null)
                 {
                     ids[i] = injectWithId.Id;
@@ -61,7 +61,7 @@ namespace VContainer.Internal
             var ids = new object[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
             {
-                var attr = parameters[i].GetCustomAttribute<InjectWithIdAttribute>();
+                var attr = parameters[i].GetCustomAttribute<InjectAttribute>();
                 if (attr != null)
                 {
                     ids[i] = attr.Id;
@@ -79,7 +79,7 @@ namespace VContainer.Internal
         public InjectFieldInfo(FieldInfo fieldInfo)
         {
             FieldInfo = fieldInfo;
-            var attr = fieldInfo.GetCustomAttribute<InjectWithIdAttribute>();
+            var attr = fieldInfo.GetCustomAttribute<InjectAttribute>();
             if (attr != null)
             {
                 Id = attr.Id;
@@ -100,7 +100,7 @@ namespace VContainer.Internal
         public InjectPropertyInfo(PropertyInfo propertyInfo)
         {
             PropertyInfo = propertyInfo;
-            var attr = propertyInfo.GetCustomAttribute<InjectWithIdAttribute>();
+            var attr = propertyInfo.GetCustomAttribute<InjectAttribute>();
             if (attr != null)
             {
                 Id = attr.Id;

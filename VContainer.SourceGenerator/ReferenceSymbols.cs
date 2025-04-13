@@ -10,16 +10,11 @@ namespace VContainer.SourceGenerator
             if (injectAttribute is null)
                 return null;
 
-            var injectWithIdAttribute = compilation.GetTypeByMetadataName("VContainer.InjectWithIdAttribute");
-            if (injectWithIdAttribute is null)
-                return null;
-
             return new ReferenceSymbols
             {
                 ContainerBuilderInterface = compilation.GetTypeByMetadataName("VContainer.IContainerBuilder")!,
                 VContainerInjectAttribute = injectAttribute,
                 VContainerInjectIgnoreAttribute = compilation.GetTypeByMetadataName("VContainer.InjectIgnoreAttribute")!,
-                VContainerInjectWithIdAttribute = injectWithIdAttribute,
                 AttributeBase = compilation.GetTypeByMetadataName("System.Attribute")!,
                 UnityEngineComponent = compilation.GetTypeByMetadataName("UnityEngine.Component"),
             };
@@ -28,7 +23,6 @@ namespace VContainer.SourceGenerator
         public INamedTypeSymbol ContainerBuilderInterface { get; private set; } = default!;
         public INamedTypeSymbol VContainerInjectAttribute { get; private set; } = default!;
         public INamedTypeSymbol VContainerInjectIgnoreAttribute { get; private set; } = default!;
-        public INamedTypeSymbol VContainerInjectWithIdAttribute { get; private set; } = default!;
         public INamedTypeSymbol AttributeBase { get; private set; } = default!;
         public INamedTypeSymbol? UnityEngineComponent { get; private set; }
     }

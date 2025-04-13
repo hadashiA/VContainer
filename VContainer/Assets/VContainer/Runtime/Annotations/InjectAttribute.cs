@@ -12,17 +12,12 @@ namespace VContainer
         JetBrains.Annotations.ImplicitUseKindFlags.Assign |
         JetBrains.Annotations.ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature)]
 #endif
-    [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public class InjectAttribute : PreserveAttribute
-    {
-    }
-
     [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
-    public class InjectWithIdAttribute : InjectAttribute
+    public class InjectAttribute : PreserveAttribute
     {
         public object Id { get; }
 
-        public InjectWithIdAttribute(object id)
+        public InjectAttribute(object id = null)
         {
             Id = id;
         }

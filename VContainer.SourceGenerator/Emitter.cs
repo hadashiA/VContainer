@@ -211,24 +211,24 @@ static class Emitter
     }
 
     /// <summary>
-    /// Extracts the ID object from an InjectWithId attribute if present on the symbol
+    /// Extracts the ID object from an Inject attribute if present on the symbol
     /// </summary>
     /// <param name="symbol">The symbol to check for attributes</param>
-    /// <param name="references">The reference symbols containing the InjectWithIdAttribute type</param>
+    /// <param name="references">The reference symbols containing the InjectAttribute type</param>
     /// <returns>The ID object if the attribute is present with a value, otherwise null</returns>
-    static object? ExtractIdFromInjectWithIdAttribute(ISymbol symbol, ReferenceSymbols references)
+    static object? ExtractIdFromInjectAttribute(ISymbol symbol, ReferenceSymbols references)
     {   
         foreach (var attribute in symbol.GetAttributes())
         {
             if (attribute.AttributeClass == null)
                 continue;
                 
-            // Check if this is an InjectWithIdAttribute using symbol comparison
-            var isInjectWithIdAttribute = SymbolEqualityComparer.Default.Equals(
+            // Check if this is an InjectAttribute using symbol comparison
+            var isInjectAttribute = SymbolEqualityComparer.Default.Equals(
                 attribute.AttributeClass, 
-                references.VContainerInjectWithIdAttribute);
+                references.VContainerInjectAttribute);
 
-            if (!isInjectWithIdAttribute || attribute.ConstructorArguments.Length <= 0)
+            if (!isInjectAttribute || attribute.ConstructorArguments.Length <= 0)
             {
                 continue;
             }
@@ -242,7 +242,7 @@ static class Emitter
 
     static void EmitMemberInjection(CodeWriter codeWriter, ISymbol memberSymbol, ITypeSymbol memberType, string memberName, ReferenceSymbols references)
     {
-        var id = ExtractIdFromInjectWithIdAttribute(memberSymbol, references);
+        var id = ExtractIdFromInjectAttribute(memberSymbol, references);
 
         codeWriter.AppendLine(id == null
             ? $"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters);"
@@ -265,7 +265,7 @@ static class Emitter
         var parameterType = parameter.Type;
         var parameterName = parameter.Name;
         
-        var id = ExtractIdFromInjectWithIdAttribute(parameter, references);
+        var id = ExtractIdFromInjectAttribute(parameter, references);
 
         var code = id == null 
             ? $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters)" 
