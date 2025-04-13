@@ -216,7 +216,7 @@ static class Emitter
     /// <param name="symbol">The symbol to check for attributes</param>
     /// <param name="references">The reference symbols containing the InjectAttribute type</param>
     /// <returns>The ID object if the attribute is present with a value, otherwise null</returns>
-    static object? ExtractIdFromInjectAttribute(ISymbol symbol, ReferenceSymbols references)
+    private static object? ExtractIdFromInjectAttribute(ISymbol symbol, ReferenceSymbols references)
     {   
         foreach (var attribute in symbol.GetAttributes())
         {
@@ -244,7 +244,7 @@ static class Emitter
         return null;
     }
 
-    static void EmitMemberInjection(CodeWriter codeWriter, ISymbol memberSymbol, ITypeSymbol memberType, string memberName, ReferenceSymbols references)
+    private static void EmitMemberInjection(CodeWriter codeWriter, ISymbol memberSymbol, ITypeSymbol memberType, string memberName, ReferenceSymbols references)
     {
         var id = ExtractIdFromInjectAttribute(memberSymbol, references);
 
@@ -254,17 +254,17 @@ static class Emitter
         );
     }
 
-    static void EmitFieldInjection(CodeWriter codeWriter, IFieldSymbol field, ReferenceSymbols references)
+    private static void EmitFieldInjection(CodeWriter codeWriter, IFieldSymbol field, ReferenceSymbols references)
     {
         EmitMemberInjection(codeWriter, field, field.Type, field.Name, references);
     }
 
-    static void EmitPropertyInjection(CodeWriter codeWriter, IPropertySymbol property, ReferenceSymbols references)
+    private static void EmitPropertyInjection(CodeWriter codeWriter, IPropertySymbol property, ReferenceSymbols references)
     {
         EmitMemberInjection(codeWriter, property, property.Type, property.Name, references);
     }
 
-    static string GenerateParameterInjectionCode(IParameterSymbol parameter, ReferenceSymbols references, bool includeComma = false)
+    private static string GenerateParameterInjectionCode(IParameterSymbol parameter, ReferenceSymbols references, bool includeComma = false)
     {
         var parameterType = parameter.Type;
         var parameterName = parameter.Name;
@@ -281,49 +281,21 @@ static class Emitter
         return code;
     }
 
-    static object EmitIdValue(object? id)
+    private static object EmitIdValue(object? id)
     {
-        if (id == null)
-            return "null";
-        
-        if (id is string str)
-            return $"\"{str}\"";
-            
-        if (id is bool b)
-            return b ? "true" : "false";
-        
-        if (id is IConvertible)
-            return id.ToString();
-        
-        // For Enum values from TypedConstant, use the fully qualified name
-        if (id is not TypedConstant typedConstant || typedConstant.Value == null)
+        return id switch
         {
-            return id.ToString();
-        }
-        
-        if (typedConstant.Kind == TypedConstantKind.Enum)
-        {
-            var enumType = typedConstant.Type;
-            var enumValue = typedConstant.Value;
-            return $"({enumType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}){enumValue}";
-        }
-
-        if (typedConstant.Kind != TypedConstantKind.Primitive)
-        {
-            return id.ToString();
-        }
-        
-        var value = typedConstant.Value;
-        
-        if (value is string strValue)
-        {
-            return $"\"{strValue}\"";
-        }
-        
-        return value.ToString();
+            null => "null",
+            string str => $"\"{str}\"",
+            bool b => b ? bool.TrueString : bool.FalseString,
+            TypedConstant { Kind: TypedConstantKind.Enum, Type: not null } tc => EnumToStringRepresentation(tc),
+            TypedConstant { Kind: TypedConstantKind.Primitive, Value: string strVal } => EmitIdValue(strVal),
+            TypedConstant { Value: not null } tc => tc.Value.ToString(),
+            _ => id.ToString()
+        };
     }
 
-    static void EmitParameterizedMethodCall(CodeWriter codeWriter, IMethodSymbol methodSymbol, ReferenceSymbols references)
+    private static void EmitParameterizedMethodCall(CodeWriter codeWriter, IMethodSymbol methodSymbol, ReferenceSymbols references)
     {
         var parameters = methodSymbol.Parameters;
         var parameterVariableNames = new List<string>();
@@ -334,9 +306,8 @@ static class Emitter
         using (codeWriter.BeginBlockScope())
         {
             // Generate local variables for parameters
-            for (var i = 0; i < parameters.Length; i++)
+            foreach (var parameter in parameters)
             {
-                var parameter = parameters[i];
                 var parameterName = parameter.Name;
                 var parameterVariableName = "param_" + parameterName;
                 parameterVariableNames.Add(parameterVariableName);
@@ -344,7 +315,7 @@ static class Emitter
                 var injectionCode = GenerateParameterInjectionCode(parameter, references);
                 codeWriter.AppendLine($"var {parameterVariableName} = {injectionCode};");
             }
-            
+
             // Call the method with the parameters
             codeWriter.AppendLine(!methodSymbol.ReturnsVoid
                 ? $"var result = {methodAccess}.{methodName}({string.Join(", ", parameterVariableNames)});"
@@ -352,14 +323,19 @@ static class Emitter
         }
     }
     
-    static string EmitParamType(ITypeSymbol type)
+    private static string EmitParamType(ITypeSymbol type)
     {
         return type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
     }
 
-    static string EmitTypeName(ITypeSymbol type)
+    private static string EmitTypeName(ITypeSymbol type)
     {
         return type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    }
+
+    private static string EnumToStringRepresentation(TypedConstant tc)
+    {
+        return $"({tc.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}){tc.Value}";
     }
 
     public static bool TryEmitCreateInstanceMethod(
