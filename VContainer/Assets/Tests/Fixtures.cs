@@ -36,7 +36,7 @@ namespace VContainer.Tests
         T ParameterService { get; }
     }
 
-    interface IGenericService<T1,T2>
+    interface IGenericService<T1, T2>
     {
     }
 
@@ -65,11 +65,9 @@ namespace VContainer.Tests
             set => publicProperty = value;
         }
 
-        [Inject]
-        I4 privateFieldInjectable;
+        [Inject] I4 privateFieldInjectable;
 
-        [Inject]
-        public I5 PublicFieldInjectable;
+        [Inject] public I5 PublicFieldInjectable;
 
         public I6 FromConstructor1;
         public I7 FromConstructor2;
@@ -134,6 +132,7 @@ namespace VContainer.Tests
             {
                 throw new ArgumentNullException(nameof(service2));
             }
+
             Service2 = service2;
         }
     }
@@ -148,6 +147,7 @@ namespace VContainer.Tests
             {
                 throw new ArgumentNullException(nameof(service3));
             }
+
             Service3 = service3;
         }
     }
@@ -209,11 +209,9 @@ namespace VContainer.Tests
 
     class HasDefaultValue
     {
-        [Inject]
-        I2 privateFieldHasDefault = new NoDependencyServiceA();
+        [Inject] I2 privateFieldHasDefault = new NoDependencyServiceA();
 
-        [Inject]
-        I3 privatePropertyHasDefault { get; set; } = new NoDependencyServiceB();
+        [Inject] I3 privatePropertyHasDefault { get; set; } = new NoDependencyServiceB();
 
         public I2 GetPrivateFieldHasDefault() => privateFieldHasDefault;
         public I3 GetPrivatePropertyHasDefault() => privatePropertyHasDefault;
@@ -288,14 +286,12 @@ namespace VContainer.Tests
 
     class HasCircularDependencyMsg3
     {
-        [Inject]
-        public HasCircularDependencyMsg4 Field;
+        [Inject] public HasCircularDependencyMsg4 Field;
     }
 
     class HasCircularDependencyMsg4
     {
-        [Inject]
-        public HasCircularDependencyMsg1 Prop { get; set; }
+        [Inject] public HasCircularDependencyMsg1 Prop { get; set; }
     }
 
     class HasMethodInjection : I1
@@ -323,14 +319,14 @@ namespace VContainer.Tests
     {
         public T ParameterService { get; } = parameterService;
         public bool Disposed { get; private set; }
-        
+
         public void Dispose()
         {
             Disposed = true;
         }
     }
 
-    class GenericsService2<T1,T2> : IGenericService<T1,T2>
+    class GenericsService2<T1, T2> : IGenericService<T1, T2>
     {
         public readonly IGenericService<T2> ParameterService;
 
@@ -436,5 +432,50 @@ namespace VContainer.Tests
         static int instanceCount;
 
         public readonly int Id = Interlocked.Increment(ref instanceCount);
+    }
+
+
+
+    // Test classes for the Inject With ID attribute tests
+
+    enum InjectionId
+    {
+        Primary,
+        Secondary
+    }
+
+    class ConstructorInjectionWithIdClass(
+        [Inject(InjectionId.Primary)] I2 primary,
+        [Inject(InjectionId.Secondary)] I2 secondary)
+    {
+        public I2 Primary { get; } = primary;
+        public I2 Secondary { get; } = secondary;
+    }
+
+    class MethodInjectionWithIdClass
+    {
+        public I2 Primary { get; private set; }
+        public I2 Secondary { get; private set; }
+            
+        [Inject]
+        public void Initialize(
+            [Inject(InjectionId.Primary)] I2 primary,
+            [Inject(InjectionId.Secondary)] I2 secondary)
+        {
+            Primary = primary;
+            Secondary = secondary;
+        }
+    }
+
+    class FieldInjectionWithIdClass
+    {
+        [Inject("field-id")]
+        public I2 Field;
+    }
+
+    class PropertyInjectionWithIdClass
+    {
+        [Inject("prop-id")]
+        public I3 Property { get; set; }
     }
 }
