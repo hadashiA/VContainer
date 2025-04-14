@@ -129,24 +129,6 @@ namespace VContainer
             return WithParameter(typeof(TParam), _ => value());
         }
 
-        public RegistrationBuilder WithId(string identifier)
-        {
-            Identifier = identifier;
-            return this;
-        }
-
-        public RegistrationBuilder WithId(int identifier)
-        {
-            Identifier = identifier;
-            return this;
-        }
-
-        public RegistrationBuilder WithId(Enum identifier)
-        {
-            Identifier = identifier;
-            return this;
-        }
-
         public RegistrationBuilder WithId(object identifier)
         {
             Identifier = identifier;
