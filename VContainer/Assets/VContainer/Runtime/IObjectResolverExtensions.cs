@@ -73,17 +73,8 @@ namespace VContainer
             this IObjectResolver resolver,
             Type parameterType,
             string parameterName,
-            IReadOnlyList<IInjectParameter> parameters)
-        {
-            return ResolveOrParameter(resolver, parameterType, parameterName, null, parameters);
-        }
-
-        public static object ResolveOrParameter(
-            this IObjectResolver resolver,
-            Type parameterType,
-            string parameterName,
-            object id,
-            IReadOnlyList<IInjectParameter> parameters)
+            IReadOnlyList<IInjectParameter> parameters,
+            object id = null)
         {            
             if (parameters != null)
             {

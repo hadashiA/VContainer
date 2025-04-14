@@ -40,22 +40,12 @@ namespace VContainer.Internal
                 {
                     var parameterInfo = parameterInfos[i];
                     var id = parameterIds[i];
-                    
-                    if (id != null)
-                    {
-                        parameterValues[i] = resolver.ResolveOrParameter(
-                            parameterInfo.ParameterType,
-                            parameterInfo.Name,
-                            id,
-                            parameters);
-                    }
-                    else
-                    {
-                        parameterValues[i] = resolver.ResolveOrParameter(
-                            parameterInfo.ParameterType,
-                            parameterInfo.Name,
-                            parameters);
-                    }
+
+                    parameterValues[i] = resolver.ResolveOrParameter(
+                        parameterInfo.ParameterType,
+                        parameterInfo.Name,
+                        parameters,
+                        id);
                 }
                 var instance = injectTypeInfo.InjectConstructor.ConstructorInfo.Invoke(parameterValues);
                 Inject(instance, resolver, parameters);
@@ -78,10 +68,7 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectFields)
             {
-                var fieldValue = x.Id != null
-                    ? resolver.ResolveOrParameter(x.FieldType, x.Name, x.Id, parameters) 
-                    : resolver.ResolveOrParameter(x.FieldType, x.Name, parameters);
-                
+                var fieldValue = resolver.ResolveOrParameter(x.FieldType, x.Name, parameters, x.Id);
                 x.SetValue(obj, fieldValue);
             }
         }
@@ -93,16 +80,8 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectProperties)
             {
-                if (x.Id != null)
-                {
-                    var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, x.Id, parameters);
-                    x.SetValue(obj, propValue);
-                }
-                else
-                {
-                    var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, parameters);
-                    x.SetValue(obj, propValue);
-                }
+                var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, parameters, x.Id);
+                x.SetValue(obj, propValue);
             }
         }
 
@@ -123,21 +102,11 @@ namespace VContainer.Internal
                         var parameterInfo = parameterInfos[i];
                         var id = parameterIds[i];
                         
-                        if (id != null)
-                        {
-                            parameterValues[i] = resolver.ResolveOrParameter(
-                                parameterInfo.ParameterType,
-                                parameterInfo.Name,
-                                id,
-                                parameters);
-                        }
-                        else
-                        {
-                            parameterValues[i] = resolver.ResolveOrParameter(
-                                parameterInfo.ParameterType,
-                                parameterInfo.Name,
-                                parameters);
-                        }
+                        parameterValues[i] = resolver.ResolveOrParameter(
+                            parameterInfo.ParameterType,
+                            parameterInfo.Name,
+                            parameters,
+                            id);
                     }
                     method.MethodInfo.Invoke(obj, parameterValues);
                 }

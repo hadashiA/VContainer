@@ -248,10 +248,7 @@ static class Emitter
     {
         var id = ExtractIdFromInjectAttribute(memberSymbol, references);
 
-        codeWriter.AppendLine(id == null
-            ? $"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters);"
-            : $"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", {EmitIdValue(id)}, parameters);"
-        );
+        codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters, {EmitIdValue(id)});");
     }
 
     private static void EmitFieldInjection(CodeWriter codeWriter, IFieldSymbol field, ReferenceSymbols references)
@@ -271,9 +268,7 @@ static class Emitter
         
         var id = ExtractIdFromInjectAttribute(parameter, references);
 
-        var code = id == null 
-            ? $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters)" 
-            : $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", {EmitIdValue(id)}, parameters)";
+        var code = $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters, {EmitIdValue(id)})";
         
         if (includeComma)
             code += ",";
