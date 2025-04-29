@@ -409,9 +409,13 @@ namespace VContainer.Internal
             {
                 if (injectTypeInfo.InjectConstructor != null)
                 {
-                    foreach (var x in injectTypeInfo.InjectConstructor.ParameterInfos)
+                    for (var paramIndex = 0; paramIndex < injectTypeInfo.InjectConstructor.ParameterInfos.Length; paramIndex++)
                     {
-                        if (registry.TryGet(x.ParameterType, out var parameterRegistration))
+                        var x = injectTypeInfo.InjectConstructor.ParameterInfos[paramIndex];
+                        object id = paramIndex < injectTypeInfo.InjectConstructor.ParameterIds.Length 
+                            ? injectTypeInfo.InjectConstructor.ParameterIds[paramIndex] 
+                            : null;
+                        if (registry.TryGet(x.ParameterType, id, out var parameterRegistration))
                         {
                             CheckCircularDependencyRecursive(new DependencyInfo(parameterRegistration, current.Dependency, injectTypeInfo.InjectConstructor.ConstructorInfo, x), registry, stack);
                         }
@@ -422,9 +426,13 @@ namespace VContainer.Internal
                 {
                     foreach (var methodInfo in injectTypeInfo.InjectMethods)
                     {
-                        foreach (var x in methodInfo.ParameterInfos)
+                        for (var paramIndex = 0; paramIndex < methodInfo.ParameterInfos.Length; paramIndex++)
                         {
-                            if (registry.TryGet(x.ParameterType, out var parameterRegistration))
+                            var x = methodInfo.ParameterInfos[paramIndex];
+                            object id = paramIndex < methodInfo.ParameterIds.Length 
+                                ? methodInfo.ParameterIds[paramIndex] 
+                                : null;
+                            if (registry.TryGet(x.ParameterType, id, out var parameterRegistration))
                             {
                                 CheckCircularDependencyRecursive(new DependencyInfo(parameterRegistration, current.Dependency, methodInfo.MethodInfo, x), registry, stack);
                             }
@@ -436,7 +444,7 @@ namespace VContainer.Internal
                 {
                     foreach (var x in injectTypeInfo.InjectFields)
                     {
-                        if (registry.TryGet(x.FieldType, out var fieldRegistration))
+                        if (registry.TryGet(x.FieldType, x.Id, out var fieldRegistration))
                         {
                             CheckCircularDependencyRecursive(new DependencyInfo(fieldRegistration, current.Dependency, x.FieldInfo), registry, stack);
                         }
@@ -447,7 +455,7 @@ namespace VContainer.Internal
                 {
                     foreach (var x in injectTypeInfo.InjectProperties)
                     {
-                        if (registry.TryGet(x.PropertyType, out var propertyRegistration))
+                        if (registry.TryGet(x.PropertyType, x.Id, out var propertyRegistration))
                         {
                             CheckCircularDependencyRecursive(new DependencyInfo(propertyRegistration, current.Dependency, x.PropertyInfo), registry, stack);
                         }
