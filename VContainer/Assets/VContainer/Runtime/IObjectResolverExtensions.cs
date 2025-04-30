@@ -47,9 +47,7 @@ namespace VContainer
         {
             if (parameters == null)
             {
-                return id != null 
-                    ? resolver.Resolve(parameterType, id) 
-                    : resolver.Resolve(parameterType);
+                return resolver.Resolve(parameterType, id);
             }
             
             // ReSharper disable once ForCanBeConvertedToForeach
