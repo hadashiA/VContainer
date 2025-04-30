@@ -854,15 +854,15 @@ namespace VContainer.Tests
             
             var container = builder.Build();
             
-            var enumerableCollection = container.Resolve<IEnumerable<I2>>();
+            var enumerableCollection = container.Resolve<IEnumerable<I2>>().ToArray();
             var readonlyCollection = container.Resolve<IReadOnlyList<I2>>();
             
-            Assert.That(enumerableCollection.Count(), Is.EqualTo(3));
-            Assert.That(readonlyCollection.Count(), Is.EqualTo(3));
+            Assert.That(enumerableCollection.Length, Is.EqualTo(3));
+            Assert.That(readonlyCollection.Count, Is.EqualTo(3));
             
-            Assert.That(enumerableCollection.ElementAt(0), Is.TypeOf<NoDependencyServiceA>());
-            Assert.That(enumerableCollection.ElementAt(1), Is.TypeOf<NoDependencyServiceB>());
-            Assert.That(enumerableCollection.ElementAt(2), Is.TypeOf<DisposableServiceB>());
+            Assert.That(enumerableCollection[0], Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(enumerableCollection[1], Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(enumerableCollection[2], Is.TypeOf<DisposableServiceB>());
             
             Assert.That(readonlyCollection[0], Is.TypeOf<NoDependencyServiceA>());
             Assert.That(readonlyCollection[1], Is.TypeOf<NoDependencyServiceB>());
