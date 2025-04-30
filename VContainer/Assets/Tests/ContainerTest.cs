@@ -844,6 +844,32 @@ namespace VContainer.Tests
         }
         
         [Test]
+        public void ResolveCollectionWithAndWithoutId()
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).WithId("primary");
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).WithId("secondary");
+            builder.Register<I2, DisposableServiceB>(Lifetime.Singleton);
+            
+            var container = builder.Build();
+            
+            var enumerableCollection = container.Resolve<IEnumerable<I2>>();
+            var readonlyCollection = container.Resolve<IReadOnlyList<I2>>();
+            
+            Assert.That(enumerableCollection.Count(), Is.EqualTo(3));
+            Assert.That(readonlyCollection.Count(), Is.EqualTo(3));
+            
+            Assert.That(enumerableCollection.ElementAt(0), Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(enumerableCollection.ElementAt(1), Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(enumerableCollection.ElementAt(2), Is.TypeOf<DisposableServiceB>());
+            
+            Assert.That(readonlyCollection[0], Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(readonlyCollection[1], Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(readonlyCollection[2], Is.TypeOf<DisposableServiceB>());
+        }
+        
+        [Test]
         public void InjectWithIdMethodTest()
         {
             var builder = new ContainerBuilder();
