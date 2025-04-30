@@ -30,13 +30,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.nuget.mono-cecil": {
-      "version": "1.10.1",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
     "com.unity.test-framework": {
       "version": "1.1.30",
       "depth": 0,
@@ -68,12 +61,10 @@
       }
     },
     "jp.hadashikick.vcontainer": {
-      "version": "file:../../VContainer/Assets/VContainer",
+      "version": "file:../../../VContainer/Assets/VContainer",
       "depth": 0,
       "source": "local",
-      "dependencies": {
-        "com.unity.nuget.mono-cecil": "1.10.1"
-      }
+      "dependencies": {}
     },
     "com.unity.modules.animation": {
       "version": "1.0.0",
