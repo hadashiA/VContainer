@@ -105,6 +105,20 @@ record struct RegisterInvocationCandidate(InvocationExpressionSyntax Syntax, Sem
                     }
                 }
             }
+            else if (SymbolEqualityComparer.Default.Equals(typeSymbol, referenceSymbols.EntryPointsBuilderType))
+            {
+                if (methodSymbol.Arity > 0)
+                {
+                    foreach (var typeArgument in methodSymbol.TypeArguments)
+                    {
+                        var typeMeta = Analyzer.AnalyzeTypeSymbol(typeArgument, referenceSymbols, cancellation: cancellation);
+                        if (typeMeta != null)
+                        {
+                            yield return typeMeta;
+                        }
+                    }
+                }
+            }
         }
     }
 }
