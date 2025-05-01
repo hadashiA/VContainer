@@ -53,6 +53,10 @@ public class VContainerIncrementalSourceGenerator : IIncrementalGenerator
                             {
                                 return true;
                             }
+                            if (memberAccess.Name.Identifier.Text == "Add")
+                            {
+                                return true;
+                            }
                         }
                     }
                     return false;
