@@ -56,7 +56,7 @@ namespace VContainer.Internal
         {
             foreach (var x in registrations)
             {
-                if (x.Lifetime == Lifetime.Singleton && x.ImplementationType == registration.ImplementationType)
+                if (x.Lifetime == Lifetime.Singleton && x.ImplementationType == registration.ImplementationType && x.Identifier == registration.Identifier)
                 {
                     throw new VContainerException(registration.ImplementationType, $"Conflict implementation type : {registration}");
                 }
