@@ -10,7 +10,7 @@ Here is an example of combining VContainer entry points with UniRx.
 ```csharp
 public class FooController : IStartable, IDisposable
 {
-    readonly CompositeDisposable disposable = new CompositeDisposable;
+    readonly CompositeDisposable disposable = new CompositeDisposable();
 
     void IStartable.Start()
     {
