@@ -6,7 +6,7 @@
     "com.unity.test-framework": "1.1.30",
     "com.unity.test-framework.performance": "2.8.0-preview",
     "com.unity.ugui": "1.0.0",
-    "jp.hadashikick.vcontainer": "file:../../VContainer/Assets/VContainer",
+    "jp.hadashikick.vcontainer": "file:../../../VContainer/Assets/VContainer",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.assetbundle": "1.0.0",
     "com.unity.modules.audio": "1.0.0",

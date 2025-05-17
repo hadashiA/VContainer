@@ -85,6 +85,11 @@ public class GameLifetimeScope : LifetimeScope
         builder.Register<IRouteSearch, AStarRouteSearch>(Lifetime.Singleton);
 
         builder.RegisterComponentInHierarchy<ActorsView>();
+        
+        // Register with enum IDs
+        builder.Register<IWeapon, Sword>(Lifetime.Singleton).WithId(WeaponType.Primary);
+        builder.Register<IWeapon, Bow>(Lifetime.Singleton).WithId(WeaponType.Secondary);
+        builder.Register<IWeapon, MagicStaff>(Lifetime.Singleton).WithId(WeaponType.Special);
     }
 }
 ```
@@ -92,6 +97,14 @@ public class GameLifetimeScope : LifetimeScope
 Where definitions of classes are
 
 ```csharp
+// Define an enum for weapon types
+public enum WeaponType
+{
+    Primary,
+    Secondary,
+    Special
+}
+
 public interface IRouteSearch
 {
 }
@@ -124,13 +137,22 @@ public class ActorPresenter : IStartable
 {
     readonly CharacterService service;
     readonly ActorsView actorsView;
+    readonly IWeapon primaryWeapon;
+    readonly IWeapon secondaryWeapon;
+    readonly IWeapon specialWeapon;
 
     public ActorPresenter(
         CharacterService service,
-        ActorsView actorsView)
+        ActorsView actorsView,
+        [InjectWithId(WeaponType.Primary)] IWeapon primaryWeapon,
+        [InjectWithId(WeaponType.Secondary)] IWeapon secondaryWeapon,
+        [InjectWithId(WeaponType.Special)] IWeapon specialWeapon)
     {
         this.service = service;
         this.actorsView = actorsView;
+        this.primaryWeapon = primaryWeapon;
+        this.secondaryWeapon = secondaryWeapon;
+        this.specialWeapon = specialWeapon;
     }
 
     void IStartable.Start()
@@ -140,9 +162,69 @@ public class ActorPresenter : IStartable
 }
 ```
 
+You can also resolve with object-based ID directly from the container:
+
+```csharp
+// Resolve by ID
+var primaryWeapon = container.Resolve<IWeapon>(WeaponType.Primary);
+var secondaryWeapon = container.Resolve<IWeapon>(WeaponType.Secondary);
+
+// Try resolve with ID
+if (container.TryResolve<IWeapon>(WeaponType.Special, out var specialWeapon))
+{
+    // Use specialWeapon
+}
+
+// Other supported ID types include strings and integers
+builder.Register<IEnemy, Goblin>(Lifetime.Singleton).WithId(1);  // Integer ID
+builder.Register<IEnemy, Orc>(Lifetime.Singleton).WithId("boss");  // String ID
+var goblin = container.Resolve<IEnemy>(1);
+var boss = container.Resolve<IEnemy>("boss");
+```
+
+The `InjectWithId` attribute works with all injection types:
+
+```csharp
+// Field injection with ID
+public class WeaponHolder
+{
+    [InjectWithId(WeaponType.Primary)]
+    public IWeapon PrimaryWeapon;
+    
+    [InjectWithId(WeaponType.Secondary)]
+    public IWeapon SecondaryWeapon;
+}
+
+// Property injection with ID
+public class EquipmentManager
+{
+    [InjectWithId(WeaponType.Primary)]
+    public IWeapon PrimaryWeapon { get; set; }
+    
+    [InjectWithId(WeaponType.Secondary)]
+    public IWeapon SecondaryWeapon { get; set; }
+}
+
+// Method injection with ID
+public class CharacterEquipment
+{
+    public IWeapon PrimaryWeapon { get; private set; }
+    public IWeapon SecondaryWeapon { get; private set; }
+    
+    [Inject]
+    public void Initialize(
+        [InjectWithId(WeaponType.Primary)] IWeapon primaryWeapon,
+        [InjectWithId(WeaponType.Secondary)] IWeapon secondaryWeapon)
+    {
+        PrimaryWeapon = primaryWeapon;
+        SecondaryWeapon = secondaryWeapon;
+    }
+}
+```
 
 - In this example, the routeSearch of CharacterService is automatically set as the instance of AStarRouteSearch when CharacterService is resolved.
 - Further, VContainer can have a Pure C# class as an entry point. (Various timings such as Start, Update, etc. can be specified.) This facilitates "separation of domain logic and presentation".
+- With the `WithId` method and `InjectWithId` attribute, you can register and resolve multiple implementations of the same interface with object-based identifiers (including enums, strings, and integers).
 
 ### Flexible Scoping with async
 
