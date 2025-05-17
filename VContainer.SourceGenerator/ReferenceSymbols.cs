@@ -13,6 +13,7 @@ namespace VContainer.SourceGenerator
             return new ReferenceSymbols
             {
                 ContainerBuilderInterface = compilation.GetTypeByMetadataName("VContainer.IContainerBuilder")!,
+                EntryPointsBuilderType = compilation.GetTypeByMetadataName("VContainer.Unity.EntryPointsBuilder")!,
                 VContainerInjectAttribute = injectAttribute,
                 VContainerInjectIgnoreAttribute = compilation.GetTypeByMetadataName("VContainer.InjectIgnoreAttribute")!,
                 AttributeBase = compilation.GetTypeByMetadataName("System.Attribute")!,
@@ -21,6 +22,7 @@ namespace VContainer.SourceGenerator
         }
 
         public INamedTypeSymbol ContainerBuilderInterface { get; private set; } = default!;
+        public INamedTypeSymbol? EntryPointsBuilderType { get; private set; }
         public INamedTypeSymbol VContainerInjectAttribute { get; private set; } = default!;
         public INamedTypeSymbol VContainerInjectIgnoreAttribute { get; private set; } = default!;
         public INamedTypeSymbol AttributeBase { get; private set; } = default!;
