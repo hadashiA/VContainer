@@ -144,9 +144,9 @@ public class ActorPresenter : IStartable
     public ActorPresenter(
         CharacterService service,
         ActorsView actorsView,
-        [InjectWithId(WeaponType.Primary)] IWeapon primaryWeapon,
-        [InjectWithId(WeaponType.Secondary)] IWeapon secondaryWeapon,
-        [InjectWithId(WeaponType.Special)] IWeapon specialWeapon)
+        [Inject(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Inject(WeaponType.Secondary)] IWeapon secondaryWeapon,
+        [Inject(WeaponType.Special)] IWeapon specialWeapon)
     {
         this.service = service;
         this.actorsView = actorsView;
