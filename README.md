@@ -182,26 +182,26 @@ var goblin = container.Resolve<IEnemy>(1);
 var boss = container.Resolve<IEnemy>("boss");
 ```
 
-The `InjectWithId` attribute works with all injection types:
+The `Inject` attribute supports injection with identifiers. You can use it in the constructor, method, or property:
 
 ```csharp
 // Field injection with ID
 public class WeaponHolder
 {
-    [InjectWithId(WeaponType.Primary)]
+    [Inject(WeaponType.Primary)]
     public IWeapon PrimaryWeapon;
     
-    [InjectWithId(WeaponType.Secondary)]
+    [Inject(WeaponType.Secondary)]
     public IWeapon SecondaryWeapon;
 }
 
 // Property injection with ID
 public class EquipmentManager
 {
-    [InjectWithId(WeaponType.Primary)]
+    [Inject(WeaponType.Primary)]
     public IWeapon PrimaryWeapon { get; set; }
     
-    [InjectWithId(WeaponType.Secondary)]
+    [Inject(WeaponType.Secondary)]
     public IWeapon SecondaryWeapon { get; set; }
 }
 
@@ -213,8 +213,8 @@ public class CharacterEquipment
     
     [Inject]
     public void Initialize(
-        [InjectWithId(WeaponType.Primary)] IWeapon primaryWeapon,
-        [InjectWithId(WeaponType.Secondary)] IWeapon secondaryWeapon)
+        [Inject(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Inject(WeaponType.Secondary)] IWeapon secondaryWeapon)
     {
         PrimaryWeapon = primaryWeapon;
         SecondaryWeapon = secondaryWeapon;
@@ -224,7 +224,7 @@ public class CharacterEquipment
 
 - In this example, the routeSearch of CharacterService is automatically set as the instance of AStarRouteSearch when CharacterService is resolved.
 - Further, VContainer can have a Pure C# class as an entry point. (Various timings such as Start, Update, etc. can be specified.) This facilitates "separation of domain logic and presentation".
-- With the `WithId` method and `InjectWithId` attribute, you can register and resolve multiple implementations of the same interface with object-based identifiers (including enums, strings, and integers).
+- With the `WithId` method and overloaded `Inject` attribute, you can register and resolve multiple implementations of the same interface with object-based identifiers (including enums, strings, and integers).
 
 ### Flexible Scoping with async
 
