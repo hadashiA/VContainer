@@ -58,11 +58,15 @@ namespace VContainer.Internal
             }
         }
 
-        private int GetHashCode(Type type, object identifier)
+        private int GetHashCode(Type type, object identifier = null)
         {
-            // Combine the hash codes of Type and identifier
             var typeHash = RuntimeHelpers.GetHashCode(type);
-            var identifierHash = identifier?.GetHashCode() ?? 0;
+            
+            if(identifier == null)
+                return typeHash;
+            
+            // Combine the hash codes of Type and identifier
+            var identifierHash = identifier.GetHashCode();
             return (typeHash * 397) ^ identifierHash; // FNV-style combination
         }
 
@@ -73,21 +77,27 @@ namespace VContainer.Internal
 
             if (buckets == null) goto END;
 
-            if (buckets[0].Type == type && Equals(buckets[0].Identifier, identifier))
+            if (buckets[0].Type == type)
             {
-                value = buckets[0].Value;
-                return true;
+                if (identifier == null || Equals(buckets[0].Identifier, identifier))
+                {
+                    value = buckets[0].Value;
+                    return true;
+                }
             }
 
             for (var i = 1; i < buckets.Length; i++)
             {
-                if (buckets[i].Type != type || !Equals(buckets[i].Identifier, identifier))
+                if (buckets[i].Type != type)
                 {
                     continue;
                 }
                 
-                value = buckets[i].Value;
-                return true;
+                if (identifier == null || Equals(buckets[i].Identifier, identifier))
+                {
+                    value = buckets[i].Value;
+                    return true;
+                }
             }
 
             END:
@@ -96,3 +106,4 @@ namespace VContainer.Internal
         }
     }
 }
+
