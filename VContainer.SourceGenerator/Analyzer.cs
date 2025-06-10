@@ -1,12 +1,40 @@
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace VContainer.SourceGenerator;
 
 static class Analyzer
 {
+    public static bool IsRegisterSyntaxCandidate(SyntaxNode syntax)
+    {
+        if (syntax.IsKind(SyntaxKind.InvocationExpression))
+        {
+            if (syntax is InvocationExpressionSyntax
+                {
+                    Expression: MemberAccessExpressionSyntax
+                    {
+                        Expression: IdentifierNameSyntax
+                    } memberAccess
+                } invocation)
+            {
+                if (memberAccess.Name.Identifier.Text.StartsWith("Register"))
+                {
+                    return true;
+                }
+                if (memberAccess.Name is GenericNameSyntax &&
+                    memberAccess.Name.Identifier.Text == "Add" &&
+                    invocation.ArgumentList.Arguments.Count == 0)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static TypeMeta? AnalyzeTypeSymbol(
         ITypeSymbol symbol,
         ReferenceSymbols referenceSymbols,
