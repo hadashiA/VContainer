@@ -1,12 +1,40 @@
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace VContainer.SourceGenerator;
 
 static class Analyzer
 {
+    public static bool IsRegisterSyntaxCandidate(SyntaxNode syntax)
+    {
+        if (syntax.IsKind(SyntaxKind.InvocationExpression))
+        {
+            if (syntax is InvocationExpressionSyntax
+                {
+                    Expression: MemberAccessExpressionSyntax
+                    {
+                        Expression: IdentifierNameSyntax
+                    } memberAccess
+                } invocation)
+            {
+                if (memberAccess.Name.Identifier.Text.StartsWith("Register"))
+                {
+                    return true;
+                }
+                if (memberAccess.Name is GenericNameSyntax &&
+                    memberAccess.Name.Identifier.Text == "Add" &&
+                    invocation.ArgumentList.Arguments.Count == 0)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static TypeMeta? AnalyzeTypeSymbol(
         ITypeSymbol symbol,
         ReferenceSymbols referenceSymbols,
@@ -98,6 +126,20 @@ record struct RegisterInvocationCandidate(InvocationExpressionSyntax Syntax, Sem
                     foreach (var p in methodSymbol.Parameters)
                     {
                         var typeMeta = Analyzer.AnalyzeTypeSymbol(p.Type, referenceSymbols, cancellation: cancellation);
+                        if (typeMeta != null)
+                        {
+                            yield return typeMeta;
+                        }
+                    }
+                }
+            }
+            else if (SymbolEqualityComparer.Default.Equals(typeSymbol, referenceSymbols.EntryPointsBuilderType))
+            {
+                if (methodSymbol.Arity > 0)
+                {
+                    foreach (var typeArgument in methodSymbol.TypeArguments)
+                    {
+                        var typeMeta = Analyzer.AnalyzeTypeSymbol(typeArgument, referenceSymbols, cancellation: cancellation);
                         if (typeMeta != null)
                         {
                             yield return typeMeta;

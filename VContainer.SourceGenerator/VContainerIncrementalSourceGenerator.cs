@@ -37,26 +37,7 @@ public class VContainerIncrementalSourceGenerator : IIncrementalGenerator
         // Find Types based on Register* methods
         var registerInvocations = context.SyntaxProvider
             .CreateSyntaxProvider(
-                (s, cancellation) =>
-                {
-                    if (s.IsKind(SyntaxKind.InvocationExpression))
-                    {
-                        if (s is InvocationExpressionSyntax
-                            {
-                                Expression: MemberAccessExpressionSyntax
-                                {
-                                    Expression: IdentifierNameSyntax
-                                } memberAccess
-                            })
-                        {
-                            if (memberAccess.Name.Identifier.Text.StartsWith("Register"))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                },
+                (s, cancellation) => Analyzer.IsRegisterSyntaxCandidate(s),
                 (ctx, cancellation) => ctx)
             .Combine(vcontainerReferenceValueProvider)
             .Where(tuple => tuple.Right)

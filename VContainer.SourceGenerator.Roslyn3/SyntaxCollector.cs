@@ -26,18 +26,9 @@ class SyntaxCollector : ISyntaxReceiver
         }
         else if (syntaxNode.IsKind(SyntaxKind.InvocationExpression))
         {
-            if (syntaxNode is InvocationExpressionSyntax
-                {
-                    Expression: MemberAccessExpressionSyntax
-                    {
-                        Expression: IdentifierNameSyntax
-                    } memberAccess
-                } invocationExpressionSyntax)
+            if (Analyzer.IsRegisterSyntaxCandidate(syntaxNode))
             {
-                if (memberAccess.Name.Identifier.Text.StartsWith("Register"))
-                {
-                    WorkItems.Add(new WorkItem(invocationExpressionSyntax));
-                }
+                WorkItems.Add(new WorkItem((InvocationExpressionSyntax)syntaxNode));
             }
         }
     }
