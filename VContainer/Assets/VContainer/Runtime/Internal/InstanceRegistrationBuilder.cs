@@ -16,7 +16,7 @@ namespace VContainer.Internal
         public override Registration Build()
         {
             var spawner = new ExistingInstanceProvider(implementationInstance);
-            return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, spawner, Identifier);
         }
     }
 }

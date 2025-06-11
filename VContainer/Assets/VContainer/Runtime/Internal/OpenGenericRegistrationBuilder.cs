@@ -15,7 +15,7 @@ namespace VContainer.Internal
         public override Registration Build()
         {
             var provider = new OpenGenericInstanceProvider(ImplementationType, Lifetime, Parameters);
-            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider, Identifier);
         }
 
         public override RegistrationBuilder AsImplementedInterfaces()
