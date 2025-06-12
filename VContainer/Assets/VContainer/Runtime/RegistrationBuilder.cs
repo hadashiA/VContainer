@@ -41,6 +41,18 @@ namespace VContainer
         public RegistrationBuilder As<TInterface1, TInterface2, TInterface3, TInterface4>()
             => As(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3), typeof(TInterface4));
 
+        public RegistrationBuilder TryAs<TInterface>()
+            => TryAs(typeof(TInterface));
+
+        public RegistrationBuilder TryAs<TInterface1, TInterface2>()
+            => TryAs(typeof(TInterface1), typeof(TInterface2));
+
+        public RegistrationBuilder TryAs<TInterface1, TInterface2, TInterface3>()
+            => TryAs(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3));
+
+        public RegistrationBuilder TryAs<TInterface1, TInterface2, TInterface3, TInterface4>()
+            => TryAs(typeof(TInterface1), typeof(TInterface2), typeof(TInterface3), typeof(TInterface4));
+
         public RegistrationBuilder AsSelf()
         {
             AddInterfaceType(ImplementationType);
@@ -80,6 +92,36 @@ namespace VContainer
             foreach (var interfaceType in interfaceTypes)
             {
                 AddInterfaceType(interfaceType);
+            }
+            return this;
+        }
+
+        public RegistrationBuilder TryAs(Type interfaceType)
+        {
+            AddInterfaceType(interfaceType, false);
+            return this;
+        }
+
+        public RegistrationBuilder TryAs(Type interfaceType1, Type interfaceType2)
+        {
+            AddInterfaceType(interfaceType1, false);
+            AddInterfaceType(interfaceType2, false);
+            return this;
+        }
+
+        public RegistrationBuilder TryAs(Type interfaceType1, Type interfaceType2, Type interfaceType3)
+        {
+            AddInterfaceType(interfaceType1, false);
+            AddInterfaceType(interfaceType2, false);
+            AddInterfaceType(interfaceType3, false);
+            return this;
+        }
+        
+        public RegistrationBuilder TryAs(params Type[] interfaceTypes)
+        {
+            foreach (var interfaceType in interfaceTypes)
+            {
+                AddInterfaceType(interfaceType, false);
             }
             return this;
         }
@@ -127,11 +169,16 @@ namespace VContainer
             return WithParameter(typeof(TParam), _ => value());
         }
 
-        protected virtual void AddInterfaceType(Type interfaceType)
+        protected virtual void AddInterfaceType(Type interfaceType, bool throwException = true)
         {
             if (!interfaceType.IsAssignableFrom(ImplementationType))
             {
-                throw new VContainerException(interfaceType, $"{ImplementationType} is not assignable from {interfaceType}");
+                if (throwException)
+                {
+                    throw new VContainerException(interfaceType, $"{ImplementationType} is not assignable from {interfaceType}");
+                }
+
+                return;
             }
             InterfaceTypes = InterfaceTypes ?? new List<Type>();
             if (!InterfaceTypes.Contains(interfaceType))

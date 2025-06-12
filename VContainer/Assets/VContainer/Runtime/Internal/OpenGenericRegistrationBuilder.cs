@@ -31,7 +31,7 @@ namespace VContainer.Internal
             return this;
         }
 
-        protected override void AddInterfaceType(Type interfaceType)
+        protected override void AddInterfaceType(Type interfaceType, bool throwException = true)
         {
             if (interfaceType.IsConstructedGenericType)
                 throw new VContainerException(interfaceType, "Type is not open generic type.");
@@ -52,7 +52,7 @@ namespace VContainer.Internal
                 return;
             }
 
-            base.AddInterfaceType(interfaceType);
+            base.AddInterfaceType(interfaceType, throwException);
         }
     }
 }
