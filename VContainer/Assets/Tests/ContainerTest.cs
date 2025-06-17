@@ -697,5 +697,234 @@ namespace VContainer.Tests
 
             Assert.That(obj1.Disposed, Is.True);
         }
+
+        [Test]
+        public void RegisterAndResolveWithStringId()
+        {
+            var builder = new ContainerBuilder();
+            
+            // Register services with IDs
+            builder.Register<NoDependencyServiceA>(Lifetime.Singleton).WithId("Service1");
+            builder.Register<NoDependencyServiceA>(Lifetime.Transient).WithId("Service2");
+            builder.Register<NoDependencyServiceB>(Lifetime.Scoped).WithId("Service1");
+            
+            // Register one without ID
+            builder.Register<NoDependencyServiceA>(Lifetime.Singleton);
+            
+            var container = builder.Build();
+            
+            // Resolve by ID
+            var service1 = container.Resolve<NoDependencyServiceA>("Service1");
+            var service2 = container.Resolve<NoDependencyServiceA>("Service2");
+            var service1B = container.Resolve<NoDependencyServiceB>("Service1");
+            var defaultService = container.Resolve<NoDependencyServiceA>();
+            
+            // References should be correct
+            Assert.That(service1, Is.Not.SameAs(service2));
+            Assert.That(service1, Is.Not.SameAs(defaultService));
+            Assert.That(service2, Is.Not.SameAs(defaultService));
+            
+            // Test service1 is a singleton
+            Assert.That(container.Resolve<NoDependencyServiceA>("Service1"), Is.SameAs(service1));
+            
+            // Test service2 is transient
+            Assert.That(container.Resolve<NoDependencyServiceA>("Service2"), Is.Not.SameAs(service2));
+        }
+        
+        // Injection with ID Tests
+        
+        [Test]
+        public void InjectWithIdAttributeTest()
+        {
+            var builder = new ContainerBuilder();
+            
+            // Register dependencies with IDs
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).WithId(InjectionId.Primary);
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).WithId(InjectionId.Secondary);
+            
+            // Register default I2 - needed to avoid ambiguity errors
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+            
+            // Register and resolve the test class
+            builder.Register<ConstructorInjectionWithIdClass>(Lifetime.Transient);
+            
+            var container = builder.Build();
+            
+            // Test constructor injection with ID
+            var ctorTest = container.Resolve<ConstructorInjectionWithIdClass>();
+            
+            // Verify constructor injection (the feature should work but isn't fully implemented yet)
+            Assert.That(ctorTest.Primary, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(ctorTest.Secondary, Is.TypeOf<NoDependencyServiceB>());
+        }
+        
+        [Test]
+        public void InjectFieldWithIdAttributeTest()
+        {
+            var builder = new ContainerBuilder();
+            
+            // Register dependencies with IDs
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).WithId("field-id");
+            
+            // Register default I2 without ID
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton);
+            
+            // Register and resolve
+            builder.Register<FieldInjectionWithIdClass>(Lifetime.Transient);
+            
+            var container = builder.Build();
+            var fieldTest = container.Resolve<FieldInjectionWithIdClass>();
+            
+            // Verify field injection - should get NoDependencyServiceA from the ID registration
+            Assert.That(fieldTest.Field, Is.TypeOf<NoDependencyServiceA>());
+        }
+        
+        [Test]
+        public void InjectPropertyWithIdAttributeTest()
+        {
+            var builder = new ContainerBuilder();
+            
+            // Register dependencies with IDs
+            builder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton).WithId("prop-id");
+            
+            // Register default services without ID
+            builder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton);
+            
+            // Register and resolve
+            builder.Register<PropertyInjectionWithIdClass>(Lifetime.Transient);
+            
+            var container = builder.Build();
+            var propTest = container.Resolve<PropertyInjectionWithIdClass>();
+            
+            // Verify property injection
+            Assert.That(propTest.Property, Is.TypeOf<NoDependencyServiceB>());
+        }
+
+        [Test]
+        public void ResolveWithStringId()
+        {
+            var builder = new ContainerBuilder();
+            
+            // Register dependencies with IDs
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).WithId("primary");
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).WithId("secondary");
+            
+            var container = builder.Build();
+            
+            // Test we can resolve by ID
+            var primary = container.Resolve<I2>("primary");
+            var secondary = container.Resolve<I2>("secondary");
+            
+            Assert.That(primary, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(secondary, Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(primary, Is.Not.SameAs(secondary));
+        }
+
+        [Test]
+        public void ResolveWithObjectId()
+        {
+            var builder = new ContainerBuilder();
+            
+            var first = new { Id = "primary" };
+            var second = new { Id = "secondary" };
+            
+            // Register dependencies with IDs
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).WithId(first);
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).WithId(second);
+            
+            var container = builder.Build();
+            
+            // Test we can resolve by ID
+            var primary = container.Resolve<I2>(first);
+            var secondary = container.Resolve<I2>(second);
+            
+            Assert.That(primary, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(secondary, Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(primary, Is.Not.SameAs(secondary));
+        }
+        
+        [Test]
+        public void ResolveCollectionWithAndWithoutId()
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).WithId("primary");
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).WithId("secondary");
+            builder.Register<I2, DisposableServiceB>(Lifetime.Singleton);
+            
+            var container = builder.Build();
+            
+            var enumerableCollection = container.Resolve<IEnumerable<I2>>().ToArray();
+            var readonlyCollection = container.Resolve<IReadOnlyList<I2>>();
+            
+            Assert.That(enumerableCollection.Length, Is.EqualTo(3));
+            Assert.That(readonlyCollection.Count, Is.EqualTo(3));
+            
+            Assert.That(enumerableCollection[0], Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(enumerableCollection[1], Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(enumerableCollection[2], Is.TypeOf<DisposableServiceB>());
+            
+            Assert.That(readonlyCollection[0], Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(readonlyCollection[1], Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(readonlyCollection[2], Is.TypeOf<DisposableServiceB>());
+        }
+        
+        [Test]
+        public void InjectWithIdMethodTest()
+        {
+            var builder = new ContainerBuilder();
+            
+            // Register with IDs
+            var primaryInstance = new NoDependencyServiceA();
+            var secondaryInstance = new NoDependencyServiceB();
+            
+            builder.RegisterInstance(primaryInstance).As<I2>().WithId(InjectionId.Primary);
+            builder.RegisterInstance(secondaryInstance).As<I2>().WithId(InjectionId.Secondary);
+            
+            // Register the test class that uses method injection with ID
+            builder.Register<MethodInjectionWithIdClass>(Lifetime.Transient);
+            
+            var container = builder.Build();
+            var instance = container.Resolve<MethodInjectionWithIdClass>();
+            
+            // Verify that the correct instances were injected based on ID
+            Assert.That(instance.Primary, Is.SameAs(primaryInstance));
+            Assert.That(instance.Secondary, Is.SameAs(secondaryInstance));
+        }
+        
+        [Test]
+        public void InjectWithIdMixedScopeTest()
+        {
+            var rootBuilder = new ContainerBuilder();
+            
+            // Register in root container with IDs
+            var rootPrimary = new NoDependencyServiceA();
+            var rootSecondary = new NoDependencyServiceB();
+            
+            rootBuilder.RegisterInstance(rootPrimary).As<I2>().WithId(InjectionId.Primary);
+            rootBuilder.RegisterInstance(rootSecondary).As<I2>().WithId(InjectionId.Secondary);
+            
+            var rootContainer = rootBuilder.Build();
+            
+            // Create a child scope with a different registration for secondary
+            var childSecondary = new NoDependencyServiceB();
+            var childScope = rootContainer.CreateScope(childBuilder => {
+                // Re-register primary from parent (required for scoping to work)
+                childBuilder.RegisterInstance(rootPrimary).As<I2>().WithId(InjectionId.Primary);
+                
+                // Override secondary
+                childBuilder.RegisterInstance(childSecondary).As<I2>().WithId(InjectionId.Secondary);
+                
+                // Register test class
+                childBuilder.Register<ConstructorInjectionWithIdClass>(Lifetime.Transient);
+            });
+            
+            var instance = childScope.Resolve<ConstructorInjectionWithIdClass>();
+            
+            // Primary should come from root container (same instance), Secondary from child scope
+            Assert.That(instance.Primary, Is.SameAs(rootPrimary));
+            Assert.That(instance.Secondary, Is.SameAs(childSecondary));
+            Assert.That(instance.Secondary, Is.Not.SameAs(rootSecondary));
+        }
     }
 }
