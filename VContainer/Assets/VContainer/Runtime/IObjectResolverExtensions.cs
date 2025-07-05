@@ -7,12 +7,12 @@ namespace VContainer
     public static class IObjectResolverExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Resolve<T>(this IObjectResolver resolver, object id = null) => (T)resolver.Resolve(typeof(T), id);
+        public static T Resolve<T>(this IObjectResolver resolver, object key = null) => (T)resolver.Resolve(typeof(T), key);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryResolve<T>(this IObjectResolver resolver, out T resolved, object id = null)
+        public static bool TryResolve<T>(this IObjectResolver resolver, out T resolved, object key = null)
         {
-            if (resolver.TryResolve(typeof(T), out var r, id))
+            if (resolver.TryResolve(typeof(T), out var r, key))
             {
                 resolved = (T)r;
                 return true;
@@ -23,9 +23,9 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T ResolveOrDefault<T>(this IObjectResolver resolver, T defaultValue = default, object id = null)
+        public static T ResolveOrDefault<T>(this IObjectResolver resolver, T defaultValue = default, object key = null)
         {
-            if (resolver.TryResolve(typeof(T), out var value, id))
+            if (resolver.TryResolve(typeof(T), out var value, key))
             {
                 return (T)value;
             }
@@ -36,18 +36,18 @@ namespace VContainer
         // Using from CodeGen
         [Preserve]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object ResolveNonGeneric(this IObjectResolver resolve, Type type, object id = null) => resolve.Resolve(type, id);
+        public static object ResolveNonGeneric(this IObjectResolver resolve, Type type, object key = null) => resolve.Resolve(type, key);
 
         public static object ResolveOrParameter(
             this IObjectResolver resolver,
             Type parameterType,
             string parameterName,
             IReadOnlyList<IInjectParameter> parameters,
-            object id = null)
+            object key = null)
         {
             if (parameters == null)
             {
-                return resolver.Resolve(parameterType, id);
+                return resolver.Resolve(parameterType, key);
             }
             
             // ReSharper disable once ForCanBeConvertedToForeach
@@ -60,8 +60,8 @@ namespace VContainer
                 }
             }
 
-            return id != null ?
-                resolver.Resolve(parameterType, id) :
+            return key != null ?
+                resolver.Resolve(parameterType, key) :
                 resolver.Resolve(parameterType);
         }
     }

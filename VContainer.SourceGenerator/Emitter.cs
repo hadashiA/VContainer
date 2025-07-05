@@ -249,9 +249,9 @@ static class Emitter
 
     private static void EmitMemberInjection(CodeWriter codeWriter, ISymbol memberSymbol, ITypeSymbol memberType, string memberName, ReferenceSymbols references)
     {
-        var id = ExtractIdFromInjectAttribute(memberSymbol, references);
+        var key = ExtractIdFromInjectAttribute(memberSymbol, references);
 
-        codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters, {EmitIdValue(id)});");
+        codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters, {EmitKeyValue(key)});");
     }
 
     private static void EmitFieldInjection(CodeWriter codeWriter, IFieldSymbol field, ReferenceSymbols references)
@@ -269,9 +269,9 @@ static class Emitter
         var parameterType = parameter.Type;
         var parameterName = parameter.Name;
         
-        var id = ExtractIdFromInjectAttribute(parameter, references);
+        var key = ExtractIdFromInjectAttribute(parameter, references);
 
-        var code = $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters, {EmitIdValue(id)})";
+        var code = $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters, {EmitKeyValue(key)})";
         
         if (includeComma)
             code += ",";
@@ -279,17 +279,17 @@ static class Emitter
         return code;
     }
 
-    private static object EmitIdValue(object? id)
+    private static object EmitKeyValue(object? key)
     {
-        return id switch
+        return key switch
         {
             null => "null",
             string str => $"\"{str}\"",
             bool b => b ? bool.TrueString : bool.FalseString,
             TypedConstant { Kind: TypedConstantKind.Enum, Type: not null } tc => EnumToStringRepresentation(tc),
-            TypedConstant { Kind: TypedConstantKind.Primitive, Value: string strVal } => EmitIdValue(strVal),
+            TypedConstant { Kind: TypedConstantKind.Primitive, Value: string strVal } => EmitKeyValue(strVal),
             TypedConstant { Value: not null } tc => tc.Value.ToString(),
-            _ => id.ToString()
+            _ => key.ToString()
         };
     }
 

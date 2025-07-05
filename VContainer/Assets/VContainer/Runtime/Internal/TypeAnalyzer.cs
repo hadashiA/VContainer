@@ -412,10 +412,10 @@ namespace VContainer.Internal
                     for (var paramIndex = 0; paramIndex < injectTypeInfo.InjectConstructor.ParameterInfos.Length; paramIndex++)
                     {
                         var x = injectTypeInfo.InjectConstructor.ParameterInfos[paramIndex];
-                        object id = paramIndex < injectTypeInfo.InjectConstructor.ParameterKeys.Length 
+                        object key = paramIndex < injectTypeInfo.InjectConstructor.ParameterKeys.Length 
                             ? injectTypeInfo.InjectConstructor.ParameterKeys[paramIndex] 
                             : null;
-                        if (registry.TryGet(x.ParameterType, id, out var parameterRegistration))
+                        if (registry.TryGet(x.ParameterType, key, out var parameterRegistration))
                         {
                             CheckCircularDependencyRecursive(new DependencyInfo(parameterRegistration, current.Dependency, injectTypeInfo.InjectConstructor.ConstructorInfo, x), registry, stack);
                         }
@@ -429,10 +429,10 @@ namespace VContainer.Internal
                         for (var paramIndex = 0; paramIndex < methodInfo.ParameterInfos.Length; paramIndex++)
                         {
                             var x = methodInfo.ParameterInfos[paramIndex];
-                            object id = paramIndex < methodInfo.ParameterKeys.Length 
+                            object key = paramIndex < methodInfo.ParameterKeys.Length 
                                 ? methodInfo.ParameterKeys[paramIndex] 
                                 : null;
-                            if (registry.TryGet(x.ParameterType, id, out var parameterRegistration))
+                            if (registry.TryGet(x.ParameterType, key, out var parameterRegistration))
                             {
                                 CheckCircularDependencyRecursive(new DependencyInfo(parameterRegistration, current.Dependency, methodInfo.MethodInfo, x), registry, stack);
                             }

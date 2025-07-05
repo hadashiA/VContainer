@@ -441,7 +441,7 @@ namespace VContainer.Tests
 
 
 
-    // Test classes for the Inject With ID attribute tests
+    // Test classes for the Inject with Key attribute tests
 
     enum InjectionKey
     {
