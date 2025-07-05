@@ -86,10 +86,10 @@ public class GameLifetimeScope : LifetimeScope
 
         builder.RegisterComponentInHierarchy<ActorsView>();
         
-        // Register with enum IDs
-        builder.Register<IWeapon, Sword>(Lifetime.Singleton).WithId(WeaponType.Primary);
-        builder.Register<IWeapon, Bow>(Lifetime.Singleton).WithId(WeaponType.Secondary);
-        builder.Register<IWeapon, MagicStaff>(Lifetime.Singleton).WithId(WeaponType.Special);
+        // Register with enum Keys
+        builder.Register<IWeapon, Sword>(Lifetime.Singleton).Keyed(WeaponType.Primary);
+        builder.Register<IWeapon, Bow>(Lifetime.Singleton).Keyed(WeaponType.Secondary);
+        builder.Register<IWeapon, MagicStaff>(Lifetime.Singleton).Keyed(WeaponType.Special);
     }
 }
 ```
@@ -144,9 +144,9 @@ public class ActorPresenter : IStartable
     public ActorPresenter(
         CharacterService service,
         ActorsView actorsView,
-        [Inject(WeaponType.Primary)] IWeapon primaryWeapon,
-        [Inject(WeaponType.Secondary)] IWeapon secondaryWeapon,
-        [Inject(WeaponType.Special)] IWeapon specialWeapon)
+        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Key(WeaponType.Secondary)] IWeapon secondaryWeapon,
+        [Key(WeaponType.Special)] IWeapon specialWeapon)
     {
         this.service = service;
         this.actorsView = actorsView;
@@ -162,50 +162,50 @@ public class ActorPresenter : IStartable
 }
 ```
 
-You can also resolve with object-based ID directly from the container:
+You can also resolve with object-based Key directly from the container:
 
 ```csharp
-// Resolve by ID
+// Resolve by Key
 var primaryWeapon = container.Resolve<IWeapon>(WeaponType.Primary);
 var secondaryWeapon = container.Resolve<IWeapon>(WeaponType.Secondary);
 
-// Try resolve with ID
+// Try resolve with Key
 if (container.TryResolve<IWeapon>(WeaponType.Special, out var specialWeapon))
 {
     // Use specialWeapon
 }
 
-// Other supported ID types include strings and integers
-builder.Register<IEnemy, Goblin>(Lifetime.Singleton).WithId(1);  // Integer ID
-builder.Register<IEnemy, Orc>(Lifetime.Singleton).WithId("boss");  // String ID
+// Other supported Key types include strings and integers
+builder.Register<IEnemy, Goblin>(Lifetime.Singleton).Keyed(1);  // Integer Key
+builder.Register<IEnemy, Orc>(Lifetime.Singleton).Keyed("boss");  // String Key
 var goblin = container.Resolve<IEnemy>(1);
 var boss = container.Resolve<IEnemy>("boss");
 ```
 
-The `Inject` attribute supports injection with identifiers. You can use it in the constructor, method, or property:
+The `Key` attribute supports injection with identifiers. You can use it in the constructor, method, or property:
 
 ```csharp
-// Field injection with ID
+// Field injection with Key
 public class WeaponHolder
 {
-    [Inject(WeaponType.Primary)]
+    [Inject, Key(WeaponType.Primary)]
     public IWeapon PrimaryWeapon;
     
-    [Inject(WeaponType.Secondary)]
+    [Inject, Key(WeaponType.Secondary)]
     public IWeapon SecondaryWeapon;
 }
 
-// Property injection with ID
+// Property injection with Key
 public class EquipmentManager
 {
-    [Inject(WeaponType.Primary)]
+    [Inject, Key(WeaponType.Primary)]
     public IWeapon PrimaryWeapon { get; set; }
     
-    [Inject(WeaponType.Secondary)]
+    [Inject, Key(WeaponType.Secondary)]
     public IWeapon SecondaryWeapon { get; set; }
 }
 
-// Method injection with ID
+// Method injection with Key
 public class CharacterEquipment
 {
     public IWeapon PrimaryWeapon { get; private set; }
@@ -213,8 +213,8 @@ public class CharacterEquipment
     
     [Inject]
     public void Initialize(
-        [Inject(WeaponType.Primary)] IWeapon primaryWeapon,
-        [Inject(WeaponType.Secondary)] IWeapon secondaryWeapon)
+        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Key(WeaponType.Secondary)] IWeapon secondaryWeapon)
     {
         PrimaryWeapon = primaryWeapon;
         SecondaryWeapon = secondaryWeapon;
@@ -224,7 +224,7 @@ public class CharacterEquipment
 
 - In this example, the routeSearch of CharacterService is automatically set as the instance of AStarRouteSearch when CharacterService is resolved.
 - Further, VContainer can have a Pure C# class as an entry point. (Various timings such as Start, Update, etc. can be specified.) This facilitates "separation of domain logic and presentation".
-- With the `WithId` method and overloaded `Inject` attribute, you can register and resolve multiple implementations of the same interface with object-based identifiers (including enums, strings, and integers).
+- With the `Keyed` method and `Key` attribute, you can register and resolve multiple implementations of the same interface with object-based identifiers (including enums, strings, and integers).
 
 ### Flexible Scoping with async
 
