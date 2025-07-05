@@ -62,6 +62,33 @@ Use constructors and `readonly` fields for injection whenever possible. Here's w
 - Class dependencies are made obvious. It also becomes easy to tell when a class has too many responsibilities (because its constructor will be too big).
 :::
 
+## Key Attribute {#key-attribute}
+
+When you have multiple implementations of the same interface or type registered with different keys, you can use the `Key` attribute to specify which implementation to inject.
+
+```csharp
+class TestClass
+{
+    private readonly IWeapon _primaryWeapon;
+    private readonly IEnemy _goblin;
+    private readonly ILevel _level1;
+
+    public TestClass(
+        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Key("goblin")] IEnemy goblin,
+        [Key(1)] ILevel level1)
+    {
+        _primaryWeapon = primaryWeapon;
+        _goblin = goblin;
+        _level1 = level1;
+    }
+}
+```
+
+:::note
+The `Key` attribute must be used with types that have been registered with the corresponding key using the `.Keyed()` method. See the [Register with Keys](../registering/register-type#register-with-keys) section for more information.
+:::
+
 ## `MonoBehaviour`
 
 [`MonoBehaviour`s](https://docs.unity3d.com/ScriptReference/MonoBehaviour) don't support constructors. Use [method injection](./method-injection) or [property/field injection](./property-field-injection) instead.

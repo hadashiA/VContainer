@@ -20,4 +20,48 @@ public class SomeBehaviour : MonoBehaviour
 
 The `[Inject]`-annotated method can have any name and any accessibility level.
 
+## Method Injection with Keys
+
+When you have multiple implementations of the same interface or type registered with different keys, you can use the `Key` attribute on method parameters to specify which implementation to inject:
+
+```csharp
+public class WeaponController : MonoBehaviour
+{
+    private IWeapon _primaryWeapon;
+    private IWeapon _secondaryWeapon;
+
+    [Inject]
+    public void Initialize(
+        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Key(WeaponType.Secondary)] IWeapon secondaryWeapon)
+    {
+        _primaryWeapon = primaryWeapon;
+        _secondaryWeapon = secondaryWeapon;
+    }
+}
+```
+
+The `Key` attribute also supports other key types like strings and integers:
+
+```csharp
+public class GameController : MonoBehaviour
+{
+    private IEnemy _enemy;
+    private ILevel _level;
+
+    [Inject]
+    public void Setup(
+        [Key("goblin")] IEnemy enemy,
+        [Key(1)] ILevel level)
+    {
+        _enemy = enemy;
+        _level = level;
+    }
+}
+```
+
+:::note
+The `Key` attribute must be used with types that have been registered with the corresponding key using the `.Keyed()` method. See the [Register with Keys](../registering/register-type#register-with-keys) section for more information.
+:::
+
 For more information about managing `MonoBehaviour`s and `GameObject`s, see [Injecting into MonoBehaviours](gameobject-injection).
