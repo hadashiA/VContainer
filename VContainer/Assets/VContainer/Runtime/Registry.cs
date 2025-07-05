@@ -22,7 +22,7 @@ namespace VContainer.Internal
 
             foreach (var registration in registrations)
             {
-                var key = (registration.ImplementationType, Identifier: registration.Key);
+                var key = (registration.ImplementationType, key: registration.Key);
                 
                 if (registration.InterfaceTypes is IReadOnlyList<Type> interfaceTypes)
                 {
@@ -50,7 +50,7 @@ namespace VContainer.Internal
 
         static void AddToBuildBuffer(IDictionary<(Type, object), Registration> buf, Type service, Registration registration)
         {
-            var key = (service, Identifier: registration.Key);
+            var key = (service, key: registration.Key);
             var collectionKey = (service, AnyKey);
 
             if (buf.TryGetValue(collectionKey, out var exists) && exists != null)
@@ -109,27 +109,27 @@ namespace VContainer.Internal
             this.hashTable = hashTable;
         }
 
-        public bool TryGet(Type interfaceType, object identifier, out Registration registration)
+        public bool TryGet(Type interfaceType, object key, out Registration registration)
         {
-            if (hashTable.TryGet(interfaceType, identifier, out registration))
+            if (hashTable.TryGet(interfaceType, key, out registration))
                 return registration != null;
 
             if (interfaceType.IsConstructedGenericType)
             {
                 var openGenericType = RuntimeTypeCache.OpenGenericTypeOf(interfaceType);
                 var typeParameters = RuntimeTypeCache.GenericTypeParametersOf(interfaceType);
-                return TryGetClosedGenericRegistration(interfaceType, identifier, openGenericType, typeParameters, out registration) ||
+                return TryGetClosedGenericRegistration(interfaceType, key, openGenericType, typeParameters, out registration) ||
                        TryFallbackToSingleElementCollection(interfaceType, openGenericType, typeParameters, out registration) ||
-                       TryFallbackToContainerLocal(interfaceType, openGenericType, identifier, typeParameters, out registration);
+                       TryFallbackToContainerLocal(interfaceType, openGenericType, key, typeParameters, out registration);
             }
             return false;
         }
 
-        bool TryGetClosedGenericRegistration(Type interfaceType, object identifier, Type openGenericType,
+        bool TryGetClosedGenericRegistration(Type interfaceType, object key, Type openGenericType,
             Type[] typeParameters,
             out Registration registration)
         {
-            if (hashTable.TryGet(openGenericType, identifier, out var openGenericRegistration))
+            if (hashTable.TryGet(openGenericType, key, out var openGenericRegistration))
             {
                 if (openGenericRegistration.Provider is OpenGenericInstanceProvider implementationRegistration)
                 {
@@ -142,9 +142,9 @@ namespace VContainer.Internal
             return false;
         }
 
-        public bool Exists(Type type, object identifier)
+        public bool Exists(Type type, object key)
         {
-            if (hashTable.TryGet(type, identifier, out _))
+            if (hashTable.TryGet(type, key, out _))
                 return true;
 
             if (type.IsConstructedGenericType)
@@ -152,20 +152,20 @@ namespace VContainer.Internal
                 type = RuntimeTypeCache.OpenGenericTypeOf(type);
             }
 
-            return hashTable.TryGet(type, identifier, out _);
+            return hashTable.TryGet(type, key, out _);
         }
 
         bool TryFallbackToContainerLocal(
             Type closedGenericType,
             Type openGenericType, 
-            object identifier,
+            object key,
             IReadOnlyList<Type> typeParameters,
             out Registration newRegistration)
         {
             if (openGenericType == typeof(ContainerLocal<>))
             {
                 var valueType = typeParameters[0];
-                if (TryGet(valueType, identifier, out var valueRegistration))
+                if (TryGet(valueType, key, out var valueRegistration))
                 {
                     var spawner = new ContainerLocalInstanceProvider(closedGenericType, valueRegistration);
                     newRegistration = new Registration(closedGenericType, Lifetime.Scoped, null, spawner);

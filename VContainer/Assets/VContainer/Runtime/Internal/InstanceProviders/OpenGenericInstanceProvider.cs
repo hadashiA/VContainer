@@ -64,10 +64,10 @@ namespace VContainer.Internal
             createRegistrationFunc = CreateRegistration;
         }
 
-        public Registration GetClosedRegistration(Type closedInterfaceType, Type[] typeParameters, object identifier = null)
+        public Registration GetClosedRegistration(Type closedInterfaceType, Type[] typeParameters, object key = null)
         {
-            var key = new TypeParametersKey(typeParameters, identifier);
-            return constructedRegistrations.GetOrAdd(key, createRegistrationFunc);
+            var typeParametersKey = new TypeParametersKey(typeParameters, key);
+            return constructedRegistrations.GetOrAdd(typeParametersKey, createRegistrationFunc);
         }
 
         Registration CreateRegistration(TypeParametersKey key)

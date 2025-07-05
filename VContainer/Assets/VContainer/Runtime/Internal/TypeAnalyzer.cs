@@ -58,16 +58,16 @@ namespace VContainer.Internal
         
         private static object[] ExtractParameterKeys(ParameterInfo[] parameters)
         {
-            var ids = new object[parameters.Length];
+            var keys = new object[parameters.Length];
             for (var i = 0; i < parameters.Length; i++)
             {
                 var attr = parameters[i].GetCustomAttribute<KeyAttribute>();
                 if (attr != null)
                 {
-                    ids[i] = attr.Key;
+                    keys[i] = attr.Key;
                 }
             }
-            return ids;
+            return keys;
         }
     }
 

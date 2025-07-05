@@ -216,7 +216,7 @@ static class Emitter
     /// <param name="symbol">The symbol to check for attributes</param>
     /// <param name="references">The reference symbols containing the KeyAttribute type</param>
     /// <returns>The key object if the attribute is present with a value, otherwise null</returns>
-    private static object? ExtractIdFromInjectAttribute(ISymbol symbol, ReferenceSymbols references)
+    private static object? ExtractKeyFromAttribute(ISymbol symbol, ReferenceSymbols references)
     {
         if (references.VContainerKeyAttribute == null)
         {
@@ -249,7 +249,7 @@ static class Emitter
 
     private static void EmitMemberInjection(CodeWriter codeWriter, ISymbol memberSymbol, ITypeSymbol memberType, string memberName, ReferenceSymbols references)
     {
-        var key = ExtractIdFromInjectAttribute(memberSymbol, references);
+        var key = ExtractKeyFromAttribute(memberSymbol, references);
 
         codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters, {EmitKeyValue(key)});");
     }
@@ -269,7 +269,7 @@ static class Emitter
         var parameterType = parameter.Type;
         var parameterName = parameter.Name;
         
-        var key = ExtractIdFromInjectAttribute(parameter, references);
+        var key = ExtractKeyFromAttribute(parameter, references);
 
         var code = $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters, {EmitKeyValue(key)})";
         

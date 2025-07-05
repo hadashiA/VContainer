@@ -58,28 +58,28 @@ namespace VContainer.Internal
             }
         }
 
-        private int GetHashCode(Type type, object identifier = null)
+        private int GetHashCode(Type type, object key = null)
         {
             var typeHash = RuntimeHelpers.GetHashCode(type);
             
-            if(identifier == null)
+            if(key == null)
                 return typeHash;
             
-            // Combine the hash codes of Type and identifier
-            var identifierHash = identifier.GetHashCode();
-            return (typeHash * 397) ^ identifierHash; // FNV-style combination
+            // Combine the hash codes of Type and Key
+            var keyHash = key.GetHashCode();
+            return (typeHash * 397) ^ keyHash; // FNV-style combination
         }
 
-        public bool TryGet(Type type, object identifier, out TValue value)
+        public bool TryGet(Type type, object key, out TValue value)
         {
-            var hashCode = GetHashCode(type, identifier);
+            var hashCode = GetHashCode(type, key);
             var buckets = table[hashCode & indexFor];
 
             if (buckets == null) goto END;
 
             if (buckets[0].Type == type)
             {
-                if (identifier == null || Equals(buckets[0].Key, identifier))
+                if (key == null || Equals(buckets[0].Key, key))
                 {
                     value = buckets[0].Value;
                     return true;
@@ -93,7 +93,7 @@ namespace VContainer.Internal
                     continue;
                 }
                 
-                if (identifier == null || Equals(buckets[i].Key, identifier))
+                if (key == null || Equals(buckets[i].Key, key))
                 {
                     value = buckets[i].Value;
                     return true;
