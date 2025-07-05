@@ -315,10 +315,15 @@ namespace VContainer.Tests
         }
     }
 
-    class GenericsService<T>(T parameterService) : IGenericService<T>, IDisposable
+    class GenericsService<T> : IGenericService<T>, IDisposable
     {
-        public T ParameterService { get; } = parameterService;
+        public T ParameterService { get; }
         public bool Disposed { get; private set; }
+
+        public GenericsService(T parameterService)
+        {
+            ParameterService = parameterService;
+        }
 
         public void Dispose()
         {
@@ -444,12 +449,17 @@ namespace VContainer.Tests
         Secondary
     }
 
-    class KeyedConstructorInjectionClass(
-        [Inject(InjectionKey.Primary)] I2 primary,
-        [Inject(InjectionKey.Secondary)] I2 secondary)
+    class KeyedConstructorInjectionClass
     {
-        public I2 Primary { get; } = primary;
-        public I2 Secondary { get; } = secondary;
+        public I2 Primary { get; }
+        public I2 Secondary { get; }
+
+        public KeyedConstructorInjectionClass([Inject(InjectionKey.Primary)] I2 primary,
+            [Inject(InjectionKey.Secondary)] I2 secondary)
+        {
+            Primary = primary;
+            Secondary = secondary;
+        }
     }
 
     class KeyedMethodInjectionClass
