@@ -29,8 +29,8 @@ namespace VContainer
         public override string ToString()
         {
             var contractTypes = InterfaceTypes != null ? string.Join(", ", InterfaceTypes) : "";
-            var idStr = Key == null ? "" : $" (Key: {Key})";
-            return $"Registration {ImplementationType.Name}{idStr} ContractTypes=[{contractTypes}] {Lifetime} {Provider}";
+            var keyStr = Key == null ? "" : $" (Key: {Key})";
+            return $"Registration {ImplementationType.Name}{keyStr} ContractTypes=[{contractTypes}] {Lifetime} {Provider}";
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
