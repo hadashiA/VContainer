@@ -9,13 +9,13 @@ namespace VContainer.Internal
         readonly struct HashEntry
         {
             public readonly Type Type;
-            public readonly object Identifier;
+            public readonly object Key;
             public readonly TValue Value;
 
-            public HashEntry(Type type, object identifier, TValue value)
+            public HashEntry(Type type, object key, TValue value)
             {
                 Type = type;
-                Identifier = identifier;
+                Key = key;
                 Value = value;
             }
         }
@@ -79,7 +79,7 @@ namespace VContainer.Internal
 
             if (buckets[0].Type == type)
             {
-                if (identifier == null || Equals(buckets[0].Identifier, identifier))
+                if (identifier == null || Equals(buckets[0].Key, identifier))
                 {
                     value = buckets[0].Value;
                     return true;
@@ -93,7 +93,7 @@ namespace VContainer.Internal
                     continue;
                 }
                 
-                if (identifier == null || Equals(buckets[i].Identifier, identifier))
+                if (identifier == null || Equals(buckets[i].Key, identifier))
                 {
                     value = buckets[i].Value;
                     return true;

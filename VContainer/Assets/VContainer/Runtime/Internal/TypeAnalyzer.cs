@@ -10,23 +10,23 @@ namespace VContainer.Internal
     {
         public readonly ConstructorInfo ConstructorInfo;
         public readonly ParameterInfo[] ParameterInfos;
-        public readonly object[] ParameterIds;
+        public readonly object[] ParameterKeys;
 
         public InjectConstructorInfo(ConstructorInfo constructorInfo)
         {
             ConstructorInfo = constructorInfo;
             ParameterInfos = constructorInfo.GetParameters();
-            ParameterIds = ExtractParameterIds(ParameterInfos);
+            ParameterKeys = ExtractParameterKeys(ParameterInfos);
         }
 
         public InjectConstructorInfo(ConstructorInfo constructorInfo, ParameterInfo[] parameterInfos)
         {
             ConstructorInfo = constructorInfo;
             ParameterInfos = parameterInfos;
-            ParameterIds = ExtractParameterIds(parameterInfos);
+            ParameterKeys = ExtractParameterKeys(parameterInfos);
         }
         
-        private static object[] ExtractParameterIds(ParameterInfo[] parameters)
+        private static object[] ExtractParameterKeys(ParameterInfo[] parameters)
         {
             var ids = new object[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
@@ -47,16 +47,16 @@ namespace VContainer.Internal
     {
         public readonly MethodInfo MethodInfo;
         public readonly ParameterInfo[] ParameterInfos;
-        public readonly object[] ParameterIds;
+        public readonly object[] ParameterKeys;
 
         public InjectMethodInfo(MethodInfo methodInfo)
         {
             MethodInfo = methodInfo;
             ParameterInfos = methodInfo.GetParameters();
-            ParameterIds = ExtractParameterIds(ParameterInfos);
+            ParameterKeys = ExtractParameterKeys(ParameterInfos);
         }
         
-        private static object[] ExtractParameterIds(ParameterInfo[] parameters)
+        private static object[] ExtractParameterKeys(ParameterInfo[] parameters)
         {
             var ids = new object[parameters.Length];
             for (int i = 0; i < parameters.Length; i++)
@@ -74,7 +74,7 @@ namespace VContainer.Internal
     sealed class InjectFieldInfo
     {
         public readonly FieldInfo FieldInfo;
-        public readonly object Id;
+        public readonly object Key;
         
         public InjectFieldInfo(FieldInfo fieldInfo)
         {
@@ -82,7 +82,7 @@ namespace VContainer.Internal
             var attr = fieldInfo.GetCustomAttribute<InjectAttribute>();
             if (attr != null)
             {
-                Id = attr.Id;
+                Key = attr.Id;
             }
         }
         
@@ -95,7 +95,7 @@ namespace VContainer.Internal
     sealed class InjectPropertyInfo
     {
         public readonly PropertyInfo PropertyInfo;
-        public readonly object Id;
+        public readonly object Key;
         
         public InjectPropertyInfo(PropertyInfo propertyInfo)
         {
@@ -103,7 +103,7 @@ namespace VContainer.Internal
             var attr = propertyInfo.GetCustomAttribute<InjectAttribute>();
             if (attr != null)
             {
-                Id = attr.Id;
+                Key = attr.Id;
             }
         }
         
@@ -412,8 +412,8 @@ namespace VContainer.Internal
                     for (var paramIndex = 0; paramIndex < injectTypeInfo.InjectConstructor.ParameterInfos.Length; paramIndex++)
                     {
                         var x = injectTypeInfo.InjectConstructor.ParameterInfos[paramIndex];
-                        object id = paramIndex < injectTypeInfo.InjectConstructor.ParameterIds.Length 
-                            ? injectTypeInfo.InjectConstructor.ParameterIds[paramIndex] 
+                        object id = paramIndex < injectTypeInfo.InjectConstructor.ParameterKeys.Length 
+                            ? injectTypeInfo.InjectConstructor.ParameterKeys[paramIndex] 
                             : null;
                         if (registry.TryGet(x.ParameterType, id, out var parameterRegistration))
                         {
@@ -429,8 +429,8 @@ namespace VContainer.Internal
                         for (var paramIndex = 0; paramIndex < methodInfo.ParameterInfos.Length; paramIndex++)
                         {
                             var x = methodInfo.ParameterInfos[paramIndex];
-                            object id = paramIndex < methodInfo.ParameterIds.Length 
-                                ? methodInfo.ParameterIds[paramIndex] 
+                            object id = paramIndex < methodInfo.ParameterKeys.Length 
+                                ? methodInfo.ParameterKeys[paramIndex] 
                                 : null;
                             if (registry.TryGet(x.ParameterType, id, out var parameterRegistration))
                             {
@@ -444,7 +444,7 @@ namespace VContainer.Internal
                 {
                     foreach (var x in injectTypeInfo.InjectFields)
                     {
-                        if (registry.TryGet(x.FieldType, x.Id, out var fieldRegistration))
+                        if (registry.TryGet(x.FieldType, x.Key, out var fieldRegistration))
                         {
                             CheckCircularDependencyRecursive(new DependencyInfo(fieldRegistration, current.Dependency, x.FieldInfo), registry, stack);
                         }
@@ -455,7 +455,7 @@ namespace VContainer.Internal
                 {
                     foreach (var x in injectTypeInfo.InjectProperties)
                     {
-                        if (registry.TryGet(x.PropertyType, x.Id, out var propertyRegistration))
+                        if (registry.TryGet(x.PropertyType, x.Key, out var propertyRegistration))
                         {
                             CheckCircularDependencyRecursive(new DependencyInfo(propertyRegistration, current.Dependency, x.PropertyInfo), registry, stack);
                         }

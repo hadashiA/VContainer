@@ -19,7 +19,7 @@ namespace VContainer.Unity
         public override Registration Build()
         {
             var provider = new WorldInstanceProvider(name, initialization);
-            return new Registration(typeof(World), Lifetime, null, provider, Identifier);
+            return new Registration(typeof(World), Lifetime, null, provider, Key);
         }
     }
 }

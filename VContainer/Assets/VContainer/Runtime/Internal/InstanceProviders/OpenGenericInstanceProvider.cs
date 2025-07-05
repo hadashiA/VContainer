@@ -9,19 +9,19 @@ namespace VContainer.Internal
         class TypeParametersKey
         {
             public readonly Type[] TypeParameters;
-            public readonly object Identifier;
+            public readonly object Key;
 
-            public TypeParametersKey(Type[] typeParameters, object identifier)
+            public TypeParametersKey(Type[] typeParameters, object key)
             {
                 TypeParameters = typeParameters;
-                Identifier = identifier;
+                Key = key;
             }
 
             public override bool Equals(object obj)
             {
                 if (obj is TypeParametersKey other)
                 {
-                    if (Identifier != other.Identifier)
+                    if (Key != other.Key)
                         return false;
 
                     if (TypeParameters.Length != other.TypeParameters.Length)
@@ -44,7 +44,7 @@ namespace VContainer.Internal
                 {
                     hash = ((hash << 5) + hash) ^ typeParameter.GetHashCode();
                 }
-                hash = ((hash << 5) + hash) ^ (Identifier?.GetHashCode() ?? 0);
+                hash = ((hash << 5) + hash) ^ (Key?.GetHashCode() ?? 0);
                 return hash;
             }
         }
@@ -75,7 +75,7 @@ namespace VContainer.Internal
             var newType = implementationType.MakeGenericType(key.TypeParameters);
             var injector = InjectorCache.GetOrBuild(newType);
             var spawner = new InstanceProvider(injector, customParameters);
-            return new Registration(newType, lifetime, new List<Type>(1) { newType }, spawner, key.Identifier);
+            return new Registration(newType, lifetime, new List<Type>(1) { newType }, spawner, key.Key);
         }
 
         public object SpawnInstance(IObjectResolver resolver)

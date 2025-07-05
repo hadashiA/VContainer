@@ -438,42 +438,42 @@ namespace VContainer.Tests
 
     // Test classes for the Inject With ID attribute tests
 
-    enum InjectionId
+    enum InjectionKey
     {
         Primary,
         Secondary
     }
 
-    class ConstructorInjectionWithIdClass(
-        [Inject(InjectionId.Primary)] I2 primary,
-        [Inject(InjectionId.Secondary)] I2 secondary)
+    class KeyedConstructorInjectionClass(
+        [Inject(InjectionKey.Primary)] I2 primary,
+        [Inject(InjectionKey.Secondary)] I2 secondary)
     {
         public I2 Primary { get; } = primary;
         public I2 Secondary { get; } = secondary;
     }
 
-    class MethodInjectionWithIdClass
+    class KeyedMethodInjectionClass
     {
         public I2 Primary { get; private set; }
         public I2 Secondary { get; private set; }
             
         [Inject]
         public void Initialize(
-            [Inject(InjectionId.Primary)] I2 primary,
-            [Inject(InjectionId.Secondary)] I2 secondary)
+            [Inject(InjectionKey.Primary)] I2 primary,
+            [Inject(InjectionKey.Secondary)] I2 secondary)
         {
             Primary = primary;
             Secondary = secondary;
         }
     }
 
-    class FieldInjectionWithIdClass
+    class KeyedFieldInjectionClass
     {
         [Inject("field-id")]
         public I2 Field;
     }
 
-    class PropertyInjectionWithIdClass
+    class KeyedPropertyInjectionClass
     {
         [Inject("prop-id")]
         public I3 Property { get; set; }

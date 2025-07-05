@@ -32,20 +32,20 @@ namespace VContainer.Internal
         public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
             var parameterInfos = injectTypeInfo.InjectConstructor.ParameterInfos;
-            var parameterIds = injectTypeInfo.InjectConstructor.ParameterIds;
+            var parameterKeys = injectTypeInfo.InjectConstructor.ParameterKeys;
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameterInfos.Length);
             try
             {
                 for (var i = 0; i < parameterInfos.Length; i++)
                 {
                     var parameterInfo = parameterInfos[i];
-                    var id = parameterIds[i];
+                    var key = parameterKeys[i];
 
                     parameterValues[i] = resolver.ResolveOrParameter(
                         parameterInfo.ParameterType,
                         parameterInfo.Name,
                         parameters,
-                        id);
+                        key);
                 }
                 var instance = injectTypeInfo.InjectConstructor.ConstructorInfo.Invoke(parameterValues);
                 Inject(instance, resolver, parameters);
@@ -68,7 +68,7 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectFields)
             {
-                var fieldValue = resolver.ResolveOrParameter(x.FieldType, x.Name, parameters, x.Id);
+                var fieldValue = resolver.ResolveOrParameter(x.FieldType, x.Name, parameters, x.Key);
                 x.SetValue(obj, fieldValue);
             }
         }
@@ -80,7 +80,7 @@ namespace VContainer.Internal
 
             foreach (var x in injectTypeInfo.InjectProperties)
             {
-                var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, parameters, x.Id);
+                var propValue = resolver.ResolveOrParameter(x.PropertyType, x.Name, parameters, x.Key);
                 x.SetValue(obj, propValue);
             }
         }
@@ -93,20 +93,20 @@ namespace VContainer.Internal
             foreach (var method in injectTypeInfo.InjectMethods)
             {
                 var parameterInfos = method.ParameterInfos;
-                var parameterIds = method.ParameterIds;
+                var parameterKeys = method.ParameterKeys;
                 var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameterInfos.Length);
                 try
                 {
                     for (var i = 0; i < parameterInfos.Length; i++)
                     {
                         var parameterInfo = parameterInfos[i];
-                        var id = parameterIds[i];
+                        var key = parameterKeys[i];
                         
                         parameterValues[i] = resolver.ResolveOrParameter(
                             parameterInfo.ParameterType,
                             parameterInfo.Name,
                             parameters,
-                            id);
+                            key);
                     }
                     method.MethodInfo.Invoke(obj, parameterValues);
                 }

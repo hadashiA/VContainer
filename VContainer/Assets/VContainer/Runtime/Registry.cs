@@ -6,7 +6,7 @@ namespace VContainer.Internal
 {
     public sealed class Registry
     {
-        private static readonly object AnyIdentifier = new { Any = true };
+        private static readonly object AnyKey = new { Any = true };
         
         [ThreadStatic]
         static IDictionary<(Type, object), Registration> buildBuffer = new Dictionary<(Type, object), Registration>(256);
@@ -22,7 +22,7 @@ namespace VContainer.Internal
 
             foreach (var registration in registrations)
             {
-                var key = (registration.ImplementationType, registration.Identifier);
+                var key = (registration.ImplementationType, Identifier: registration.Key);
                 
                 if (registration.InterfaceTypes is IReadOnlyList<Type> interfaceTypes)
                 {
@@ -50,8 +50,8 @@ namespace VContainer.Internal
 
         static void AddToBuildBuffer(IDictionary<(Type, object), Registration> buf, Type service, Registration registration)
         {
-            var key = (service, registration.Identifier);
-            var collectionKey = (service, AnyIdentifier);
+            var key = (service, Identifier: registration.Key);
+            var collectionKey = (service, AnyKey);
 
             if (buf.TryGetValue(collectionKey, out var exists) && exists != null)
             {
@@ -187,7 +187,7 @@ namespace VContainer.Internal
                 var elementType = typeParameters[0];
                 var collection = new CollectionInstanceProvider(elementType);
                 
-                if (hashTable.TryGet(elementType, AnyIdentifier, out var elementRegistration) && elementRegistration != null)
+                if (hashTable.TryGet(elementType, AnyKey, out var elementRegistration) && elementRegistration != null)
                 {
                     collection.Add(elementRegistration);
                 }
