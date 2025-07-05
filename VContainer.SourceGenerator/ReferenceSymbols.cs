@@ -14,6 +14,7 @@ namespace VContainer.SourceGenerator
             {
                 ContainerBuilderInterface = compilation.GetTypeByMetadataName("VContainer.IContainerBuilder")!,
                 VContainerInjectAttribute = injectAttribute,
+                VContainerKeyAttribute = compilation.GetTypeByMetadataName("VContainer.KeyAttribute"),
                 VContainerInjectIgnoreAttribute = compilation.GetTypeByMetadataName("VContainer.InjectIgnoreAttribute")!,
                 AttributeBase = compilation.GetTypeByMetadataName("System.Attribute")!,
                 UnityEngineComponent = compilation.GetTypeByMetadataName("UnityEngine.Component"),
@@ -22,6 +23,7 @@ namespace VContainer.SourceGenerator
 
         public INamedTypeSymbol ContainerBuilderInterface { get; private set; } = default!;
         public INamedTypeSymbol VContainerInjectAttribute { get; private set; } = default!;
+        public INamedTypeSymbol? VContainerKeyAttribute { get; private set; }
         public INamedTypeSymbol VContainerInjectIgnoreAttribute { get; private set; } = default!;
         public INamedTypeSymbol AttributeBase { get; private set; } = default!;
         public INamedTypeSymbol? UnityEngineComponent { get; private set; }

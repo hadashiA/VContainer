@@ -211,36 +211,39 @@ static class Emitter
     }
 
     /// <summary>
-    /// Extracts the ID object from an Inject attribute if present on the symbol
+    /// Extracts the key object from a Key attribute if present on the symbol
     /// </summary>
     /// <param name="symbol">The symbol to check for attributes</param>
-    /// <param name="references">The reference symbols containing the InjectAttribute type</param>
-    /// <returns>The ID object if the attribute is present with a value, otherwise null</returns>
+    /// <param name="references">The reference symbols containing the KeyAttribute type</param>
+    /// <returns>The key object if the attribute is present with a value, otherwise null</returns>
     private static object? ExtractIdFromInjectAttribute(ISymbol symbol, ReferenceSymbols references)
-    {   
+    {
+        if (references.VContainerKeyAttribute == null)
+        {
+            return null;
+        }
+        
         foreach (var attribute in symbol.GetAttributes())
         {
             if (attribute.AttributeClass == null)
                 continue;
-                
-            // Check if this is an InjectAttribute using symbol comparison
-            var isInjectAttribute = SymbolEqualityComparer.Default.Equals(
+            
+            var isKeyAttribute = SymbolEqualityComparer.Default.Equals(
                 attribute.AttributeClass, 
-                references.VContainerInjectAttribute);
+                references.VContainerKeyAttribute);
 
-            if (!isInjectAttribute || attribute.ConstructorArguments.Length <= 0)
+            if (!isKeyAttribute || attribute.ConstructorArguments.Length <= 0)
             {
                 continue;
             }
             
             var constructorArg = attribute.ConstructorArguments[0];
 
-            // For enum values, return the TypedConstant to preserve type information
             return constructorArg.Kind == TypedConstantKind.Enum 
                 ? constructorArg 
                 : constructorArg.Value;
         }
-        
+
         return null;
     }
 
