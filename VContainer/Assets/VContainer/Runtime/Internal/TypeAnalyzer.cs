@@ -28,18 +28,18 @@ namespace VContainer.Internal
         
         private static object[] ExtractParameterKeys(ParameterInfo[] parameters)
         {
-            var ids = new object[parameters.Length];
-            for (int i = 0; i < parameters.Length; i++)
+            var keys = new object[parameters.Length];
+            for (var i = 0; i < parameters.Length; i++)
             {
                 var param = parameters[i];
                 
-                var injectWithId = param.GetCustomAttribute<InjectAttribute>();
-                if (injectWithId != null)
+                var keyAttribute = param.GetCustomAttribute<KeyAttribute>();
+                if (keyAttribute != null)
                 {
-                    ids[i] = injectWithId.Id;
+                    keys[i] = keyAttribute.Key;
                 }
             }
-            return ids;
+            return keys;
         }
     }
 
@@ -59,12 +59,12 @@ namespace VContainer.Internal
         private static object[] ExtractParameterKeys(ParameterInfo[] parameters)
         {
             var ids = new object[parameters.Length];
-            for (int i = 0; i < parameters.Length; i++)
+            for (var i = 0; i < parameters.Length; i++)
             {
-                var attr = parameters[i].GetCustomAttribute<InjectAttribute>();
+                var attr = parameters[i].GetCustomAttribute<KeyAttribute>();
                 if (attr != null)
                 {
-                    ids[i] = attr.Id;
+                    ids[i] = attr.Key;
                 }
             }
             return ids;
@@ -79,10 +79,10 @@ namespace VContainer.Internal
         public InjectFieldInfo(FieldInfo fieldInfo)
         {
             FieldInfo = fieldInfo;
-            var attr = fieldInfo.GetCustomAttribute<InjectAttribute>();
+            var attr = fieldInfo.GetCustomAttribute<KeyAttribute>();
             if (attr != null)
             {
-                Key = attr.Id;
+                Key = attr.Key;
             }
         }
         
@@ -100,10 +100,10 @@ namespace VContainer.Internal
         public InjectPropertyInfo(PropertyInfo propertyInfo)
         {
             PropertyInfo = propertyInfo;
-            var attr = propertyInfo.GetCustomAttribute<InjectAttribute>();
+            var attr = propertyInfo.GetCustomAttribute<KeyAttribute>();
             if (attr != null)
             {
-                Key = attr.Id;
+                Key = attr.Key;
             }
         }
         

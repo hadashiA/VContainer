@@ -9,5 +9,8 @@
         <Compile Update="..\VContainer\Assets\VContainer\Runtime\Internal\FixedTypeObjectKeyHashtable.cs">
           <Link>Internal\FixedTypeObjectKeyHashtable.cs</Link>
         </Compile>
+        <Compile Update="..\VContainer\Assets\VContainer\Runtime\Annotations\KeyAttribute.cs">
+          <Link>Annotations\KeyAttribute.cs</Link>
+        </Compile>
     </ItemGroup>
 </Project>

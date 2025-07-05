@@ -454,8 +454,8 @@ namespace VContainer.Tests
         public I2 Primary { get; }
         public I2 Secondary { get; }
 
-        public KeyedConstructorInjectionClass([Inject(InjectionKey.Primary)] I2 primary,
-            [Inject(InjectionKey.Secondary)] I2 secondary)
+        public KeyedConstructorInjectionClass([Key(InjectionKey.Primary)] I2 primary,
+            [Key(InjectionKey.Secondary)] I2 secondary)
         {
             Primary = primary;
             Secondary = secondary;
@@ -469,8 +469,8 @@ namespace VContainer.Tests
             
         [Inject]
         public void Initialize(
-            [Inject(InjectionKey.Primary)] I2 primary,
-            [Inject(InjectionKey.Secondary)] I2 secondary)
+            [Key(InjectionKey.Primary)] I2 primary,
+            [Key(InjectionKey.Secondary)] I2 secondary)
         {
             Primary = primary;
             Secondary = secondary;
@@ -479,13 +479,13 @@ namespace VContainer.Tests
 
     class KeyedFieldInjectionClass
     {
-        [Inject("field-id")]
+        [Inject, Key("field-id")]
         public I2 Field;
     }
 
     class KeyedPropertyInjectionClass
     {
-        [Inject("prop-id")]
+        [Inject, Key("prop-id")]
         public I3 Property { get; set; }
     }
 }
