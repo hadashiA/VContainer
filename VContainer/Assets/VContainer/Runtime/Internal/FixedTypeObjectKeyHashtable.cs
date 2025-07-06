@@ -51,7 +51,7 @@ namespace VContainer.Internal
                     var newArray = new HashEntry[array.Length + 1];
                     Array.Copy(array, newArray, array.Length);
                     array = newArray;
-                    array[^1] = new HashEntry(item.Key.Item1, item.Key.Item2, item.Value);
+                    array[array.Length - 1] = new HashEntry(item.Key.Item1, item.Key.Item2, item.Value);
                 }
 
                 table[hash & indexFor] = array;
