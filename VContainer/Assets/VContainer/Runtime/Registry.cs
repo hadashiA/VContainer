@@ -6,20 +6,24 @@ namespace VContainer.Internal
 {
     public sealed class Registry
     {
+        private static readonly object AnyKey = new { Any = true };
+        
         [ThreadStatic]
-        static IDictionary<Type, Registration> buildBuffer = new Dictionary<Type, Registration>(128);
+        static IDictionary<(Type, object), Registration> buildBuffer = new Dictionary<(Type, object), Registration>(256);
 
-        readonly FixedTypeKeyHashtable<Registration> hashTable;
+        readonly FixedTypeObjectKeyHashtable<Registration> hashTable;
 
         public static Registry Build(Registration[] registrations)
         {
             // ThreadStatic
             if (buildBuffer == null)
-                buildBuffer = new Dictionary<Type, Registration>(128);
+                buildBuffer = new Dictionary<(Type, object), Registration>(256);
             buildBuffer.Clear();
 
             foreach (var registration in registrations)
             {
+                var key = (registration.ImplementationType, key: registration.Key);
+                
                 if (registration.InterfaceTypes is IReadOnlyList<Type> interfaceTypes)
                 {
                     // ReSharper disable once ForCanBeConvertedToForeach
@@ -29,9 +33,9 @@ namespace VContainer.Internal
                     }
 
                     // Mark the ImplementationType with a guard because we need to check if it exists later.
-                    if (!buildBuffer.ContainsKey(registration.ImplementationType))
+                    if (!buildBuffer.ContainsKey(key))
                     {
-                        buildBuffer.Add(registration.ImplementationType, null);
+                        buildBuffer.Add(key, null);
                     }
                 }
                 else
@@ -40,16 +44,19 @@ namespace VContainer.Internal
                 }
             }
 
-            var hashTable = new FixedTypeKeyHashtable<Registration>(buildBuffer.ToArray());
+            var hashTable = new FixedTypeObjectKeyHashtable<Registration>(buildBuffer.ToArray());
             return new Registry(hashTable);
         }
 
-        static void AddToBuildBuffer(IDictionary<Type, Registration> buf, Type service, Registration registration)
+        static void AddToBuildBuffer(IDictionary<(Type, object), Registration> buf, Type service, Registration registration)
         {
-            if (buf.TryGetValue(service, out var exists) && exists != null)
+            var key = (service, key: registration.Key);
+            var collectionKey = (service, AnyKey);
+
+            if (buf.TryGetValue(collectionKey, out var exists) && exists != null)
             {
                 CollectionInstanceProvider collection;
-                if (buf.TryGetValue(RuntimeTypeCache.EnumerableTypeOf(service), out var found) &&
+                if (buf.TryGetValue((RuntimeTypeCache.EnumerableTypeOf(service), null), out var found) &&
                     found.Provider is CollectionInstanceProvider foundCollection)
                 {
                     collection = foundCollection;
@@ -70,15 +77,17 @@ namespace VContainer.Internal
                 collection.Add(registration);
 
                 // Overwritten by the later registration
-                buf[service] = registration;
+                buf[collectionKey] = registration;
+                buf[key] = registration;
             }
             else
             {
-                buf.Add(service, registration);
+                buf.Add(key, registration);
+                buf.Add(collectionKey, registration);
             }
         }
 
-        static void AddCollectionToBuildBuffer(IDictionary<Type, Registration> buf, Registration collectionRegistration)
+        static void AddCollectionToBuildBuffer(IDictionary<(Type, object), Registration> buf, Registration collectionRegistration)
         {
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var i = 0; i < collectionRegistration.InterfaceTypes.Count; i++)
@@ -86,7 +95,7 @@ namespace VContainer.Internal
                 var collectionType = collectionRegistration.InterfaceTypes[i];
                 try
                 {
-                    buf.Add(collectionType, collectionRegistration);
+                    buf.Add((collectionType, null), collectionRegistration);
                 }
                 catch (ArgumentException)
                 {
@@ -95,32 +104,32 @@ namespace VContainer.Internal
             }
         }
 
-        Registry(FixedTypeKeyHashtable<Registration> hashTable)
+        Registry(FixedTypeObjectKeyHashtable<Registration> hashTable)
         {
             this.hashTable = hashTable;
         }
 
-        public bool TryGet(Type interfaceType, out Registration registration)
+        public bool TryGet(Type interfaceType, object key, out Registration registration)
         {
-            if (hashTable.TryGet(interfaceType, out registration))
+            if (hashTable.TryGet(interfaceType, key, out registration))
                 return registration != null;
 
             if (interfaceType.IsConstructedGenericType)
             {
                 var openGenericType = RuntimeTypeCache.OpenGenericTypeOf(interfaceType);
                 var typeParameters = RuntimeTypeCache.GenericTypeParametersOf(interfaceType);
-                return TryGetClosedGenericRegistration(interfaceType, openGenericType, typeParameters, out registration) ||
+                return TryGetClosedGenericRegistration(interfaceType, key, openGenericType, typeParameters, out registration) ||
                        TryFallbackToSingleElementCollection(interfaceType, openGenericType, typeParameters, out registration) ||
-                       TryFallbackToContainerLocal(interfaceType, openGenericType, typeParameters, out registration);
+                       TryFallbackToContainerLocal(interfaceType, openGenericType, key, typeParameters, out registration);
             }
             return false;
         }
 
-        bool TryGetClosedGenericRegistration(Type interfaceType, Type openGenericType,
+        bool TryGetClosedGenericRegistration(Type interfaceType, object key, Type openGenericType,
             Type[] typeParameters,
             out Registration registration)
         {
-            if (hashTable.TryGet(openGenericType, out var openGenericRegistration))
+            if (hashTable.TryGet(openGenericType, key, out var openGenericRegistration))
             {
                 if (openGenericRegistration.Provider is OpenGenericInstanceProvider implementationRegistration)
                 {
@@ -133,9 +142,9 @@ namespace VContainer.Internal
             return false;
         }
 
-        public bool Exists(Type type)
+        public bool Exists(Type type, object key)
         {
-            if (hashTable.TryGet(type, out _))
+            if (hashTable.TryGet(type, key, out _))
                 return true;
 
             if (type.IsConstructedGenericType)
@@ -143,19 +152,20 @@ namespace VContainer.Internal
                 type = RuntimeTypeCache.OpenGenericTypeOf(type);
             }
 
-            return hashTable.TryGet(type, out _);
+            return hashTable.TryGet(type, key, out _);
         }
 
         bool TryFallbackToContainerLocal(
             Type closedGenericType,
-            Type openGenericType,
+            Type openGenericType, 
+            object key,
             IReadOnlyList<Type> typeParameters,
             out Registration newRegistration)
         {
             if (openGenericType == typeof(ContainerLocal<>))
             {
                 var valueType = typeParameters[0];
-                if (TryGet(valueType, out var valueRegistration))
+                if (TryGet(valueType, key, out var valueRegistration))
                 {
                     var spawner = new ContainerLocalInstanceProvider(closedGenericType, valueRegistration);
                     newRegistration = new Registration(closedGenericType, Lifetime.Scoped, null, spawner);
@@ -168,7 +178,7 @@ namespace VContainer.Internal
 
         bool TryFallbackToSingleElementCollection(
             Type closedGenericType,
-            Type openGenericType,
+            Type openGenericType, 
             IReadOnlyList<Type> typeParameters,
             out Registration newRegistration)
         {
@@ -176,8 +186,8 @@ namespace VContainer.Internal
             {
                 var elementType = typeParameters[0];
                 var collection = new CollectionInstanceProvider(elementType);
-                // ReSharper disable once InconsistentlySynchronizedField
-                if (hashTable.TryGet(elementType, out var elementRegistration) && elementRegistration != null)
+                
+                if (hashTable.TryGet(elementType, AnyKey, out var elementRegistration) && elementRegistration != null)
                 {
                     collection.Add(elementRegistration);
                 }

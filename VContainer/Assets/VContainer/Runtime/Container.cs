@@ -12,21 +12,21 @@ namespace VContainer
         DiagnosticsCollector Diagnostics { get; set; }
 
         /// <summary>
-        /// Resolve from type
+        /// Resolve from type with or without key
         /// </summary>
         /// <remarks>
         /// This version of resolve looks for all of scopes
         /// </remarks>
-        object Resolve(Type type);
+        object Resolve(Type type, object key = null);
 
         /// <summary>
-        /// Try resolve from type
+        /// Try resolve from type with or without key
         /// </summary>
         /// <remarks>
         /// This version of resolve looks for all of scopes
         /// </remarks>
         /// <returns>Successfully resolved</returns>
-        bool TryResolve(Type type, out object resolved);
+        bool TryResolve(Type type, out object resolved, object key = null);
 
         /// <summary>
         /// Resolve from meta with registration
@@ -39,7 +39,7 @@ namespace VContainer
         IScopedObjectResolver CreateScope(Action<IContainerBuilder> installation = null);
 
         void Inject(object instance);
-        bool TryGetRegistration(Type type, out Registration registration);
+        bool TryGetRegistration(Type type, out Registration registration, object key = null);
     }
 
     public interface IScopedObjectResolver : IObjectResolver
@@ -84,18 +84,18 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(Type type)
+        public object Resolve(Type type, object key = null)
         {
-            if (TryFindRegistration(type, out var registration))
+            if (TryFindRegistration(type, key, out var registration))
             {
                 return Resolve(registration);
             }
-            throw new VContainerException(type, $"No such registration of type: {type}");
+            throw new VContainerException(type, $"No such registration of type: {type} {(key == null ? string.Empty : $"with Key: {key}")}");
         }
 
-        public bool TryResolve(Type type, out object resolved)
+        public bool TryResolve(Type type, out object resolved, object key = null)
         {
-            if (TryFindRegistration(type, out var registration))
+            if (TryFindRegistration(type, key, out var registration))
             {
                 resolved = Resolve(registration);
                 return true;
@@ -134,8 +134,8 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetRegistration(Type type, out Registration registration)
-            => registry.TryGet(type, out registration);
+        public bool TryGetRegistration(Type type, out Registration registration, object key = null)
+            => registry.TryGet(type, key, out registration);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
@@ -157,7 +157,7 @@ namespace VContainer
                     if (Parent is null)
                         return Root.Resolve(registration);
 
-                    if (!registry.Exists(registration.ImplementationType))
+                    if (!registry.Exists(registration.ImplementationType, registration.Key))
                         return Parent.Resolve(registration);
 
                     return CreateTrackedInstance(registration);
@@ -184,12 +184,12 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool TryFindRegistration(Type type, out Registration registration)
+        internal bool TryFindRegistration(Type type, object key, out Registration registration)
         {
             IScopedObjectResolver scope = this;
             while (scope != null)
             {
-                if (scope.TryGetRegistration(type, out registration))
+                if (scope.TryGetRegistration(type, out registration, key))
                 {
                     return true;
                 }
@@ -226,19 +226,19 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(Type type)
+        public object Resolve(Type type, object key = null)
         {
-            if (TryGetRegistration(type, out var registration))
+            if (TryGetRegistration(type, out var registration, key))
             {
                 return Resolve(registration);
             }
-            throw new VContainerException(type, $"No such registration of type: {type}");
+            throw new VContainerException(type, $"No such registration of type: {type} with Key: {key}");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryResolve(Type type, out object resolved)
+        public bool TryResolve(Type type, out object resolved, object key = null)
         {
-            if (TryGetRegistration(type, out var registration))
+            if (TryGetRegistration(type, out var registration, key))
             {
                 resolved = Resolve(registration);
                 return true;
@@ -270,8 +270,8 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetRegistration(Type type, out Registration registration)
-            => registry.TryGet(type, out registration);
+        public bool TryGetRegistration(Type type, out Registration registration, object key = null)
+            => registry.TryGet(type, key, out registration);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()

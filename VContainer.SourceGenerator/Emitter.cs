@@ -1,8 +1,11 @@
+using System;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 #if ROSLYN3
 using SourceProductionContext = Microsoft.CodeAnalysis.GeneratorExecutionContext;
 #endif
+using System.Text;
+using System.Collections.Generic;
 
 namespace VContainer.SourceGenerator;
 
@@ -73,7 +76,7 @@ static class Emitter
 
             codeWriter.AppendLine();
 
-            if (!TryEmitInjectMethod(typeMeta, codeWriter, in context))
+            if (!TryEmitInjectMethod(typeMeta, codeWriter, references, in context))
             {
                 return false;
             }
@@ -90,6 +93,7 @@ static class Emitter
     static bool TryEmitInjectMethod(
         TypeMeta typeMeta,
         CodeWriter codeWriter,
+        ReferenceSymbols references,
         in SourceProductionContext context)
     {
         using (codeWriter.BeginBlockScope(
@@ -190,41 +194,146 @@ static class Emitter
 
             foreach (var fieldSymbol in typeMeta.InjectFields)
             {
-                var fieldTypeName = fieldSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                codeWriter.AppendLine($"__x.{fieldSymbol.Name} = ({fieldTypeName})resolver.ResolveOrParameter(typeof({fieldTypeName}), \"{fieldSymbol.Name}\", parameters);");
+                EmitFieldInjection(codeWriter, fieldSymbol, references);
             }
 
             foreach (var propSymbol in typeMeta.InjectProperties)
             {
-                var propTypeName = propSymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                codeWriter.AppendLine($"__x.{propSymbol.Name} = ({propTypeName})resolver.ResolveOrParameter(typeof({propTypeName}), \"{propSymbol.Name}\", parameters);");
+                EmitPropertyInjection(codeWriter, propSymbol, references);
             }
 
             foreach (var methodSymbol in typeMeta.InjectMethods)
             {
-                var parameters = methodSymbol.Parameters
-                    .Select(param =>
-                    {
-                        var paramType =
-                            param.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                        var paramName = param.Name;
-                        return (paramType, paramName);
-                    })
-                    .ToArray();
-
-                foreach (var (paramType, paramName) in parameters)
-                {
-                    codeWriter.AppendLine(
-                        $"var __{paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
-                }
-
-                var arguments = parameters.Select(x => $"({x.paramType})__{x.paramName}");
-                codeWriter.AppendLine($"__x.{methodSymbol.Name}({string.Join(", ", arguments)});");
+                EmitParameterizedMethodCall(codeWriter, methodSymbol, references);
             }
             return true;
         }
+    }
+
+    /// <summary>
+    /// Extracts the key object from a Key attribute if present on the symbol
+    /// </summary>
+    /// <param name="symbol">The symbol to check for attributes</param>
+    /// <param name="references">The reference symbols containing the KeyAttribute type</param>
+    /// <returns>The key object if the attribute is present with a value, otherwise null</returns>
+    private static object? ExtractKeyFromAttribute(ISymbol symbol, ReferenceSymbols references)
+    {
+        if (references.VContainerKeyAttribute == null)
+        {
+            return null;
+        }
+        
+        foreach (var attribute in symbol.GetAttributes())
+        {
+            if (attribute.AttributeClass == null)
+                continue;
+            
+            var isKeyAttribute = SymbolEqualityComparer.Default.Equals(
+                attribute.AttributeClass, 
+                references.VContainerKeyAttribute);
+
+            if (!isKeyAttribute || attribute.ConstructorArguments.Length <= 0)
+            {
+                continue;
+            }
+            
+            var constructorArg = attribute.ConstructorArguments[0];
+
+            return constructorArg.Kind == TypedConstantKind.Enum 
+                ? constructorArg 
+                : constructorArg.Value;
+        }
+
+        return null;
+    }
+
+    private static void EmitMemberInjection(CodeWriter codeWriter, ISymbol memberSymbol, ITypeSymbol memberType, string memberName, ReferenceSymbols references)
+    {
+        var key = ExtractKeyFromAttribute(memberSymbol, references);
+
+        codeWriter.AppendLine($"__x.{memberName} = ({EmitParamType(memberType)})resolver.ResolveOrParameter(typeof({EmitParamType(memberType)}), \"{memberName}\", parameters, {EmitKeyValue(key)});");
+    }
+
+    private static void EmitFieldInjection(CodeWriter codeWriter, IFieldSymbol field, ReferenceSymbols references)
+    {
+        EmitMemberInjection(codeWriter, field, field.Type, field.Name, references);
+    }
+
+    private static void EmitPropertyInjection(CodeWriter codeWriter, IPropertySymbol property, ReferenceSymbols references)
+    {
+        EmitMemberInjection(codeWriter, property, property.Type, property.Name, references);
+    }
+
+    private static string GenerateParameterInjectionCode(IParameterSymbol parameter, ReferenceSymbols references, bool includeComma = false)
+    {
+        var parameterType = parameter.Type;
+        var parameterName = parameter.Name;
+        
+        var key = ExtractKeyFromAttribute(parameter, references);
+
+        var code = $"({EmitParamType(parameterType)})resolver.ResolveOrParameter(typeof({EmitParamType(parameterType)}), \"{parameterName}\", parameters, {EmitKeyValue(key)})";
+        
+        if (includeComma)
+            code += ",";
+            
+        return code;
+    }
+
+    private static object EmitKeyValue(object? key)
+    {
+        return key switch
+        {
+            null => "null",
+            string str => $"\"{str}\"",
+            bool b => b ? bool.TrueString : bool.FalseString,
+            TypedConstant { Kind: TypedConstantKind.Enum, Type: not null } tc => EnumToStringRepresentation(tc),
+            TypedConstant { Kind: TypedConstantKind.Primitive, Value: string strVal } => EmitKeyValue(strVal),
+            TypedConstant { Value: not null } tc => tc.Value.ToString(),
+            _ => key.ToString()
+        };
+    }
+
+    private static void EmitParameterizedMethodCall(CodeWriter codeWriter, IMethodSymbol methodSymbol, ReferenceSymbols references)
+    {
+        var parameters = methodSymbol.Parameters;
+        var parameterVariableNames = new List<string>();
+        
+        var methodName = methodSymbol.Name;
+        var methodAccess = methodSymbol.IsStatic ? $"{EmitTypeName(methodSymbol.ContainingType)}" : "__x";
+
+        using (codeWriter.BeginBlockScope())
+        {
+            // Generate local variables for parameters
+            foreach (var parameter in parameters)
+            {
+                var parameterName = parameter.Name;
+                var parameterVariableName = "param_" + parameterName;
+                parameterVariableNames.Add(parameterVariableName);
+                
+                var injectionCode = GenerateParameterInjectionCode(parameter, references);
+                codeWriter.AppendLine($"var {parameterVariableName} = {injectionCode};");
+            }
+
+            // Call the method with the parameters
+            codeWriter.AppendLine(!methodSymbol.ReturnsVoid
+                ? $"var result = {methodAccess}.{methodName}({string.Join(", ", parameterVariableNames)});"
+                : $"{methodAccess}.{methodName}({string.Join(", ", parameterVariableNames)});");
+        }
+    }
+    
+    private static string EmitParamType(ITypeSymbol type)
+    {
+        return type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    }
+
+    private static string EmitTypeName(ITypeSymbol type)
+    {
+        return type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+    }
+
+    private static string EnumToStringRepresentation(TypedConstant tc)
+    {
+        return $"({tc.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)}){tc.Value}";
     }
 
     public static bool TryEmitCreateInstanceMethod(
@@ -279,33 +388,42 @@ static class Emitter
 
         using (codeWriter.BeginBlockScope("public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
         {
+            // Handle Unity components - they shouldn't be instantiated with 'new'
             if (references.UnityEngineComponent != null &&
                 typeMeta.InheritsFrom(references.UnityEngineComponent))
             {
                 codeWriter.AppendLine($"throw new NotSupportedException(\"UnityEngine.Component:{typeMeta.TypeName} cannot be `new`\");");
                 return true;
             }
-            var parameters = constructorSymbol.Parameters
-                .Select(param =>
-                {
-                    var paramType =
-                        param.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                    var paramName = param.Name;
-                    return (paramType, paramName);
-                })
-                .ToArray();
-
-            foreach (var (paramType, paramName) in parameters)
+            
+            // Handle parameterless constructor
+            if (constructorSymbol.Parameters.Length == 0)
             {
-                codeWriter.AppendLine(
-                    $"var __{paramName} = resolver.ResolveOrParameter(typeof({paramType}), \"{paramName}\", parameters);");
+                codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}();");
             }
-
-            var arguments = parameters.Select(x => $"({x.paramType})__{x.paramName}");
-            codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}({string.Join(", ", arguments)});");
+            else
+            {
+                codeWriter.AppendLine($"var __instance = new {typeMeta.TypeName}(");
+                codeWriter.IncreasaeIndent();
+                
+                // Generate parameter list
+                var parameters = constructorSymbol.Parameters;
+                for (var i = 0; i < parameters.Length; i++)
+                {
+                    var parameter = parameters[i];
+                    bool isLastParameter = (i + 1 >= parameters.Length);
+                    var injectionCode = GenerateParameterInjectionCode(parameter, references, !isLastParameter);
+                    codeWriter.AppendLine(injectionCode);
+                }
+                
+                codeWriter.DecreaseIndent();
+                codeWriter.AppendLine(");");
+            }
+            
             codeWriter.AppendLine("Inject(__instance, resolver, parameters);");
             codeWriter.AppendLine("return __instance;");
         }
         return true;
     }
 }
+

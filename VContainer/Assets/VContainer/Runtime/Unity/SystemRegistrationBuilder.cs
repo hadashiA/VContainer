@@ -31,7 +31,7 @@ namespace VContainer.Unity {
 
 			Type type = typeof(SystemInstanceProvider<>).MakeGenericType(ImplementationType);
 			var provider = (IInstanceProvider)Activator.CreateInstance(type, parameters);
-			return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
+			return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider, Key);
 		}
 
 		public SystemRegistrationBuilder IntoGroup<T>() where T : ComponentSystemGroup {

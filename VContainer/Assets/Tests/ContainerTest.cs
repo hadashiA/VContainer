@@ -697,5 +697,191 @@ namespace VContainer.Tests
 
             Assert.That(obj1.Disposed, Is.True);
         }
+
+        [Test]
+        public void RegisterAndResolveWithStringKey()
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.Register<NoDependencyServiceA>(Lifetime.Singleton).Keyed("Service1");
+            builder.Register<NoDependencyServiceA>(Lifetime.Transient).Keyed("Service2");
+            builder.Register<NoDependencyServiceB>(Lifetime.Scoped).Keyed("Service1");
+            builder.Register<NoDependencyServiceA>(Lifetime.Singleton);
+            
+            var container = builder.Build();
+            
+            var service1 = container.Resolve<NoDependencyServiceA>("Service1");
+            var service2 = container.Resolve<NoDependencyServiceA>("Service2");
+            var service1B = container.Resolve<NoDependencyServiceB>("Service1");
+            var defaultService = container.Resolve<NoDependencyServiceA>();
+            
+            Assert.That(service1, Is.Not.SameAs(service2));
+            Assert.That(service1, Is.Not.SameAs(defaultService));
+            Assert.That(service2, Is.Not.SameAs(defaultService));
+            
+            Assert.That(container.Resolve<NoDependencyServiceA>("Service1"), Is.SameAs(service1));
+            Assert.That(container.Resolve<NoDependencyServiceA>("Service2"), Is.Not.SameAs(service2));
+        }
+        
+        // Injection with Key Tests
+        
+        [Test]
+        public void InjectConstructorKeyAttributeTest()
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).Keyed(InjectionKey.Primary);
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).Keyed(InjectionKey.Secondary);
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton);
+            builder.Register<KeyedConstructorInjectionClass>(Lifetime.Transient);
+            
+            var container = builder.Build();
+            var ctorTest = container.Resolve<KeyedConstructorInjectionClass>();
+            
+            Assert.That(ctorTest.Primary, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(ctorTest.Secondary, Is.TypeOf<NoDependencyServiceB>());
+        }
+        
+        [Test]
+        public void InjectFieldKeyAttributeTest()
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).Keyed("field-id");
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton);
+            builder.Register<KeyedFieldInjectionClass>(Lifetime.Transient);
+            
+            var container = builder.Build();
+            var fieldTest = container.Resolve<KeyedFieldInjectionClass>();
+            
+            Assert.That(fieldTest.Field, Is.TypeOf<NoDependencyServiceA>());
+        }
+        
+        [Test]
+        public void InjectPropertyKeyAttributeTest()
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton).Keyed("prop-id");
+            builder.Register<I3, NoDependencyServiceB>(Lifetime.Singleton);
+            builder.Register<KeyedPropertyInjectionClass>(Lifetime.Transient);
+            
+            var container = builder.Build();
+            var propTest = container.Resolve<KeyedPropertyInjectionClass>();
+            
+            Assert.That(propTest.Property, Is.TypeOf<NoDependencyServiceB>());
+        }
+
+        [Test]
+        public void ResolveWithStringKey()
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).Keyed("primary");
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).Keyed("secondary");
+            
+            var container = builder.Build();
+            
+            var primary = container.Resolve<I2>("primary");
+            var secondary = container.Resolve<I2>("secondary");
+            
+            Assert.That(primary, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(secondary, Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(primary, Is.Not.SameAs(secondary));
+        }
+
+        [Test]
+        public void ResolveWithObjectKey()
+        {
+            var builder = new ContainerBuilder();
+            
+            var first = new { Key = "primary" };
+            var second = new { Key = "secondary" };
+            
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).Keyed(first);
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).Keyed(second);
+            
+            var container = builder.Build();
+            
+            var primary = container.Resolve<I2>(first);
+            var secondary = container.Resolve<I2>(second);
+            
+            Assert.That(primary, Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(secondary, Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(primary, Is.Not.SameAs(secondary));
+        }
+        
+        [Test]
+        public void ResolveCollectionWithAndWithoutKey()
+        {
+            var builder = new ContainerBuilder();
+            
+            builder.Register<I2, NoDependencyServiceA>(Lifetime.Singleton).Keyed("primary");
+            builder.Register<I2, NoDependencyServiceB>(Lifetime.Singleton).Keyed("secondary");
+            builder.Register<I2, DisposableServiceB>(Lifetime.Singleton);
+            
+            var container = builder.Build();
+            
+            var enumerableCollection = container.Resolve<IEnumerable<I2>>().ToArray();
+            var readonlyCollection = container.Resolve<IReadOnlyList<I2>>();
+            
+            Assert.That(enumerableCollection.Length, Is.EqualTo(3));
+            Assert.That(readonlyCollection.Count, Is.EqualTo(3));
+            
+            Assert.That(enumerableCollection[0], Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(enumerableCollection[1], Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(enumerableCollection[2], Is.TypeOf<DisposableServiceB>());
+            
+            Assert.That(readonlyCollection[0], Is.TypeOf<NoDependencyServiceA>());
+            Assert.That(readonlyCollection[1], Is.TypeOf<NoDependencyServiceB>());
+            Assert.That(readonlyCollection[2], Is.TypeOf<DisposableServiceB>());
+        }
+        
+        [Test]
+        public void InjectKeyedMethodTest()
+        {
+            var builder = new ContainerBuilder();
+            
+            var primaryInstance = new NoDependencyServiceA();
+            var secondaryInstance = new NoDependencyServiceB();
+            
+            builder.RegisterInstance(primaryInstance).As<I2>().Keyed(InjectionKey.Primary);
+            builder.RegisterInstance(secondaryInstance).As<I2>().Keyed(InjectionKey.Secondary);
+            
+            builder.Register<KeyedMethodInjectionClass>(Lifetime.Transient);
+            
+            var container = builder.Build();
+            var instance = container.Resolve<KeyedMethodInjectionClass>();
+            
+            Assert.That(instance.Primary, Is.SameAs(primaryInstance));
+            Assert.That(instance.Secondary, Is.SameAs(secondaryInstance));
+        }
+        
+        [Test]
+        public void InjectKeyedMixedScopeTest()
+        {
+            var rootBuilder = new ContainerBuilder();
+            
+            var rootPrimary = new NoDependencyServiceA();
+            var rootSecondary = new NoDependencyServiceB();
+            
+            rootBuilder.RegisterInstance(rootPrimary).As<I2>().Keyed(InjectionKey.Primary);
+            rootBuilder.RegisterInstance(rootSecondary).As<I2>().Keyed(InjectionKey.Secondary);
+            
+            var rootContainer = rootBuilder.Build();
+            
+            var childSecondary = new NoDependencyServiceB();
+            var childScope = rootContainer.CreateScope(childBuilder => {
+                childBuilder.RegisterInstance(rootPrimary).As<I2>().Keyed(InjectionKey.Primary);
+                childBuilder.RegisterInstance(childSecondary).As<I2>().Keyed(InjectionKey.Secondary);
+                childBuilder.Register<KeyedConstructorInjectionClass>(Lifetime.Transient);
+            });
+            
+            var instance = childScope.Resolve<KeyedConstructorInjectionClass>();
+            
+            Assert.That(instance.Primary, Is.SameAs(rootPrimary));
+            Assert.That(instance.Secondary, Is.SameAs(childSecondary));
+            Assert.That(instance.Secondary, Is.Not.SameAs(rootSecondary));
+        }
     }
 }
