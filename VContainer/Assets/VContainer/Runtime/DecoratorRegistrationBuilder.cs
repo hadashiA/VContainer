@@ -12,7 +12,9 @@ namespace VContainer.Runtime
                 var interfaceTypes = builder[i].InterfaceTypes;
                 if (interfaceTypes != null && interfaceTypes.Contains(typeof(TInterface)))
                 {
-                    return new DecoratorRegistrationBuilder(builder[i], typeof(TDecorator));
+                    var decoratorBuilder = new DecoratorRegistrationBuilder(builder[i], typeof(TDecorator));
+                    builder.Register(decoratorBuilder);
+                    return decoratorBuilder;
                 }
             }
             throw new VContainerException(typeof(TInterface), $"No such decorator target: {typeof(TInterface)}");
@@ -27,7 +29,9 @@ namespace VContainer.Runtime
                 var interfaceTypes = builder[i].InterfaceTypes;
                 if (interfaceTypes != null && interfaceTypes.Contains(typeof(TInterface)))
                 {
-                    return new FuncDecoratorRegistrationBuilder<TInterface, TDecorator>(builder[i], factory);
+                    var decoratorBuilder = new FuncDecoratorRegistrationBuilder<TInterface, TDecorator>(builder[i], factory);
+                    builder.Register(decoratorBuilder);
+                    return decoratorBuilder;
                 }
             }
             throw new VContainerException(typeof(TInterface), $"No such decorator target: {typeof(TInterface)}");
