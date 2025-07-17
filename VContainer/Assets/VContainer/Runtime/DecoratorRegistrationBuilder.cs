@@ -40,8 +40,8 @@ namespace VContainer.Runtime
 
     public class DecoratorRegistrationBuilder : RegistrationBuilder
     {
-        readonly RegistrationBuilder inner;
-        readonly Type interfaceType;
+        protected readonly RegistrationBuilder inner;
+        protected readonly Type interfaceType;
 
         public DecoratorRegistrationBuilder(RegistrationBuilder inner, Type decoratorType)
             : base(decoratorType, inner.Lifetime)
@@ -71,8 +71,6 @@ namespace VContainer.Runtime
 
     public class FuncDecoratorRegistrationBuilder<TInner, TDecorator> : DecoratorRegistrationBuilder
     {
-        readonly RegistrationBuilder inner;
-        readonly Type interfaceType;
         readonly Func<TInner, IObjectResolver, TDecorator> factory;
 
         public FuncDecoratorRegistrationBuilder(RegistrationBuilder inner, Func<TInner, IObjectResolver, TDecorator> factory)
