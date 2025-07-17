@@ -7,7 +7,7 @@ namespace VContainer.Runtime
     {
         public static DecoratorRegistrationBuilder RegisterDecorator<TInterface, TDecorator>(this IContainerBuilder builder)
         {
-            for (var i = 0; i < builder.Count; i++)
+            for (var i = builder.Count - 1; i >= 0; i--)
             {
                 var interfaceTypes = builder[i].InterfaceTypes;
                 if (interfaceTypes != null && interfaceTypes.Contains(typeof(TInterface)))
@@ -24,7 +24,7 @@ namespace VContainer.Runtime
             this IContainerBuilder builder,
             Func<TInterface, IObjectResolver, TDecorator> factory)
         {
-            for (var i = 0; i < builder.Count; i++)
+            for (var i = builder.Count - 1; i >= 0; i--)
             {
                 var interfaceTypes = builder[i].InterfaceTypes;
                 if (interfaceTypes != null && interfaceTypes.Contains(typeof(TInterface)))
