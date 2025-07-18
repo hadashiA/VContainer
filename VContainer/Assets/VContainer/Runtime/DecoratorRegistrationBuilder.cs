@@ -112,13 +112,25 @@ namespace VContainer.Runtime
             
             var provider = new FuncInstanceProvider(container =>
             {
-                var innerInstance = container.Resolve(innerRegistration);
-                var parameters = new IInjectParameter[Parameters == null ? 1 : Parameters.Count];
-                Parameters?.CopyTo(parameters);
-                parameters[parameters.Length - 1] = new TypedParameter(typeof(TInner), innerInstance);
-                return injector.CreateInstance(container, parameters);
+                var innerInstance = (TInner)container.Resolve(innerRegistration);
+                return injector.CreateInstance(container, GetInstantiationParameters(innerInstance));
             });
             return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
+        }
+
+        private IReadOnlyList<IInjectParameter> GetInstantiationParameters(TInner innerInstance)
+        {
+            var innerParam = new TypedParameter(typeof(TInner), innerInstance);
+            
+            if (Parameters == null)
+                return new IInjectParameter[] { innerParam };
+            
+            var parameters = new IInjectParameter[Parameters.Count + 1];
+            parameters[0] = innerParam;
+            for (int i = 1; i < parameters.Length; i++)
+                parameters[i] = Parameters[i - 1];
+            
+            return parameters;
         }
     }
 

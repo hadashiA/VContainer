@@ -146,6 +146,40 @@ namespace VContainer.Tests
             Assert.That(inner, Is.TypeOf<Mocks.DecoratedType>());
         }
 
+        [Test]
+        public void Decorator_Supports_Additional_Parameters_Before_Inner_Type_In_Constructor()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<Mocks.IDecoratedType, Mocks.DecoratedType>(Lifetime.Singleton);
+            builder.RegisterDecorator<Mocks.IDecoratedType, Mocks.DecoratorWithAdditionalDependencyBeforeDecorated>()
+                .WithParameter(1);
+            
+            using var container = builder.Build();
+            var instance = container.Resolve<Mocks.IDecoratedType>();
+            Assert.That(instance, Is.TypeOf<Mocks.DecoratorWithAdditionalDependencyBeforeDecorated>());
+            
+            var concreteInstance = (Mocks.DecoratorWithAdditionalDependencyBeforeDecorated)instance;
+            Assert.That(concreteInstance.Inner, Is.TypeOf<Mocks.DecoratedType>());
+            Assert.That(concreteInstance.Value, Is.EqualTo(1));
+        }
+        
+        [Test]
+        public void Decorator_Supports_Additional_Parameters_After_Inner_Type_In_Constructor()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<Mocks.IDecoratedType, Mocks.DecoratedType>(Lifetime.Singleton);
+            builder.RegisterDecorator<Mocks.IDecoratedType, Mocks.DecoratorWithAdditionalDependencyAfterDecorated>()
+                .WithParameter(1);
+            
+            using var container = builder.Build();
+            var instance = container.Resolve<Mocks.IDecoratedType>();
+            Assert.That(instance, Is.TypeOf<Mocks.DecoratorWithAdditionalDependencyAfterDecorated>());
+            
+            var concreteInstance = (Mocks.DecoratorWithAdditionalDependencyAfterDecorated)instance;
+            Assert.That(concreteInstance.Inner, Is.TypeOf<Mocks.DecoratedType>());
+            Assert.That(concreteInstance.Value, Is.EqualTo(1));
+        }
+
 
         private static class Mocks
         {
@@ -174,6 +208,30 @@ namespace VContainer.Tests
                 public Decorator2(IDecoratedType inner)
                 {
                     Inner = inner;
+                }
+            }
+
+            public class DecoratorWithAdditionalDependencyBeforeDecorated : IDecoratedType
+            {
+                public readonly IDecoratedType Inner;
+                public readonly int Value;
+                
+                public DecoratorWithAdditionalDependencyBeforeDecorated(int value, IDecoratedType inner)
+                {
+                    Inner = inner;
+                    Value = value;
+                }
+            }
+
+            public class DecoratorWithAdditionalDependencyAfterDecorated : IDecoratedType
+            {
+                public readonly IDecoratedType Inner;
+                public readonly int Value;
+                
+                public DecoratorWithAdditionalDependencyAfterDecorated(IDecoratedType inner, int value)
+                {
+                    Inner = inner;
+                    Value = value;
                 }
             }
             
