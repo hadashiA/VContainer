@@ -4,47 +4,94 @@ using VContainer.Internal;
 
 namespace VContainer.Runtime
 {
-    public static class ConatinerBuilderDecoratorExtensions
+    public static class ContainerBuilderDecoratorExtensions
     {
-        public static DecoratorRegistrationBuilder<TInner, TDecorator> RegisterDecorator<TInner, TDecorator>(this IContainerBuilder builder)
+        public static RegistrationBuilder RegisterDecorator<TInner, TDecorator>(this IContainerBuilder builder)
         {
-            for (var i = builder.Count - 1; i >= 0; i--)
-            {
-                var interfaceTypes = builder[i].InterfaceTypes;
-                if (interfaceTypes != null && interfaceTypes.Contains(typeof(TInner)))
-                {
-                    var decoratorBuilder = new DecoratorRegistrationBuilder<TInner, TDecorator>(builder[i]);
-                    builder.Register(decoratorBuilder);
-                    return decoratorBuilder;
-                }
-            }
-            throw new VContainerException(typeof(TInner), $"No such decorator target: {typeof(TInner)}");
+            var innerRegistrationBuilder = FindInnerRegistration(builder, typeof(TInner));
+            var decoratorBuilder = new DecoratorRegistrationBuilder<TInner>(innerRegistrationBuilder, typeof(TDecorator));
+            builder.Register(decoratorBuilder);
+            return decoratorBuilder;
         }
 
-        public static FuncDecoratorRegistrationBuilder<TInner, TDecorator> RegisterDecorator<TInner, TDecorator>(
+        public static RegistrationBuilder RegisterDecorator<TInner, TDecorator>(
             this IContainerBuilder builder,
             Func<TInner, IObjectResolver, TDecorator> factory)
         {
+            var innerRegistrationBuilder = FindInnerRegistration(builder, typeof(TInner));
+            var decoratorBuilder = new FuncDecoratorRegistrationBuilder<TInner,TDecorator>(innerRegistrationBuilder, factory);
+            builder.Register(decoratorBuilder);
+            return decoratorBuilder;
+        }
+
+        private static IInnerRegistrationProvider FindInnerRegistration(IContainerBuilder builder, Type innerType)
+        {
             for (var i = builder.Count - 1; i >= 0; i--)
             {
                 var interfaceTypes = builder[i].InterfaceTypes;
-                if (interfaceTypes != null && interfaceTypes.Contains(typeof(TInner)))
-                {
-                    var decoratorBuilder = new FuncDecoratorRegistrationBuilder<TInner, TDecorator>(builder[i], factory);
-                    builder.Register(decoratorBuilder);
-                    return decoratorBuilder;
-                }
+                if (interfaceTypes != null && interfaceTypes.Contains(innerType))
+                    return new BuilderInnerRegistrationProvider(builder[i]);
             }
-            throw new VContainerException(typeof(TInner), $"No such decorator target: {typeof(TInner)}");
+            
+            if (builder is ScopedContainerBuilder scopedBuilder)
+            {
+                var registration = scopedBuilder.parent.FindRegistration(innerType);
+                return new CachedInnerRegistrationProvider(registration);
+            }
+            
+            throw new VContainerException(innerType, $"No such decorator target: {innerType}");
         }
     }
 
-    public class DecoratorRegistrationBuilder<TInner, TDecorator> : RegistrationBuilder
+    interface IInnerRegistrationProvider
     {
-        readonly RegistrationBuilder inner;
+        Type ImplementationType { get; }
+        Lifetime Lifetime { get; }
+        IReadOnlyList<Type> InterfaceTypes { get; }
 
-        public DecoratorRegistrationBuilder(RegistrationBuilder inner)
-            : base(typeof(TDecorator), inner.Lifetime)
+        Registration Get();
+    }
+
+    sealed class CachedInnerRegistrationProvider : IInnerRegistrationProvider
+    {
+        readonly Registration registration;
+        
+        public Type ImplementationType => registration.ImplementationType;
+        public Lifetime Lifetime => registration.Lifetime;
+        public IReadOnlyList<Type> InterfaceTypes => registration.InterfaceTypes;
+
+        public CachedInnerRegistrationProvider(Registration registration)
+        {
+            this.registration = registration;
+        }
+
+        public Registration Get() => 
+            registration;
+    }
+
+    sealed class BuilderInnerRegistrationProvider : IInnerRegistrationProvider
+    {
+        readonly RegistrationBuilder builder;
+        
+        public Type ImplementationType => builder.ImplementationType;
+        public Lifetime Lifetime => builder.Lifetime;
+        public IReadOnlyList<Type> InterfaceTypes => builder.InterfaceTypes;
+
+        public BuilderInnerRegistrationProvider(RegistrationBuilder builder)
+        {
+            this.builder = builder;
+        }
+        
+        public Registration Get() => 
+            builder.Build();
+    }
+
+    class DecoratorRegistrationBuilder<TInner> : RegistrationBuilder
+    {
+        protected readonly IInnerRegistrationProvider inner;
+        
+        public DecoratorRegistrationBuilder(IInnerRegistrationProvider inner, Type implementationType) 
+            : base(implementationType, inner.Lifetime)
         {
             this.inner = inner;
             
@@ -57,12 +104,12 @@ namespace VContainer.Runtime
             
             As<TInner>();
         }
-
+        
         public override Registration Build()
         {
             var injector = InjectorCache.GetOrBuild(ImplementationType);
-            var innerRegistration = inner.Build();
-
+            var innerRegistration = inner.Get();
+            
             var provider = new FuncInstanceProvider(container =>
             {
                 var innerInstance = container.Resolve(innerRegistration);
@@ -75,30 +122,19 @@ namespace VContainer.Runtime
         }
     }
 
-    public class FuncDecoratorRegistrationBuilder<TInner, TDecorator> : RegistrationBuilder
+    class FuncDecoratorRegistrationBuilder<TInner, TDecorator> : DecoratorRegistrationBuilder<TInner>
     {
-        readonly RegistrationBuilder inner;
         readonly Func<TInner, IObjectResolver, TDecorator> factory;
-
-        public FuncDecoratorRegistrationBuilder(RegistrationBuilder inner, Func<TInner, IObjectResolver, TDecorator> factory)
-            : base(typeof(TDecorator), inner.Lifetime)
+        
+        public FuncDecoratorRegistrationBuilder(IInnerRegistrationProvider inner, Func<TInner, IObjectResolver, TDecorator> factory)
+            : base(inner, typeof(TDecorator))
         {
-            this.inner = inner;
             this.factory = factory;
-            
-            InterfaceTypes = new List<Type>();
-            for (int i = 0; i < inner.InterfaceTypes.Count; i++)
-            {
-                if (inner.InterfaceTypes[i].IsAssignableFrom(typeof(TInner)))
-                    InterfaceTypes.Add(inner.InterfaceTypes[i]);
-            }
-            
-            As<TInner>();
         }
 
         public override Registration Build()
         {
-            var innerRegistration = inner.Build();
+            var innerRegistration = inner.Get();
             var provider = new FuncInstanceProvider(container =>
             {
                 var innerInstance = container.Resolve(innerRegistration);

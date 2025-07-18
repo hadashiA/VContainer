@@ -78,7 +78,7 @@ namespace VContainer.Tests
         }
 
         [Test]
-        public void Decorate_Does_Not_Bind_To_Non_Related_Interfaces_Of_Decorated_Type()
+        public void Decorate_Does_Not_Register_To_Non_Related_Interfaces_Of_Decorated_Type()
         {
             var builder = new ContainerBuilder();
             builder.Register<Mocks.DecoratedTypeWithNonRelatedInterface>(Lifetime.Singleton)
@@ -95,7 +95,7 @@ namespace VContainer.Tests
         }
 
         [Test]
-        public void Decorate_Supports_Binding_To_Additional_Interfaces()
+        public void Decorate_Supports_Registration_To_Additional_Interfaces()
         {
             var builder = new ContainerBuilder();
             builder.Register<Mocks.IDecoratedType, Mocks.DecoratedType>(Lifetime.Singleton);
@@ -111,7 +111,7 @@ namespace VContainer.Tests
         }
 
         [Test]
-        public void Decorate_Automatically_Binds_To_All_Bound_Base_Interfaces()
+        public void Decorate_Automatically_Registers_To_All_Bound_Base_Interfaces()
         {
             var builder = new ContainerBuilder();
             builder.Register<Mocks.ExtendedDecoratedType>(Lifetime.Singleton)
@@ -125,6 +125,25 @@ namespace VContainer.Tests
             
             var baseInstance = container.Resolve<Mocks.IDecoratedType>();
             Assert.That(baseInstance, Is.TypeOf<Mocks.ExtendedDecorator>());
+        }
+
+        [Test]
+        public void Decorate_Parent_Registration()
+        {
+            var parentBuilder = new ContainerBuilder();
+            parentBuilder.Register<Mocks.IDecoratedType, Mocks.DecoratedType>(Lifetime.Singleton);
+
+            using var parentContainer = parentBuilder.Build();
+            using var childContainer = parentContainer.CreateScope(builder =>
+            {
+                builder.RegisterDecorator<Mocks.IDecoratedType, Mocks.Decorator1>();
+            });
+            
+            var instance = childContainer.Resolve<Mocks.IDecoratedType>();
+            Assert.That(instance, Is.TypeOf<Mocks.Decorator1>());
+            
+            var inner = ((Mocks.Decorator1)instance).Inner;
+            Assert.That(inner, Is.TypeOf<Mocks.DecoratedType>());
         }
 
 

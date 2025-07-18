@@ -73,7 +73,7 @@ namespace VContainer
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object Resolve(Type type) => Resolve(FindRegistration(type));
+        public object Resolve(Type type) => Resolve(this.FindRegistration(type));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Resolve(Registration registration)
@@ -152,11 +152,14 @@ namespace VContainer
             }
             return instance;
         }
+    }
 
+    public static class ScopedResolverExtensions
+    {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Registration FindRegistration(Type type)
+        internal static Registration FindRegistration(this IScopedObjectResolver container, Type type)
         {
-            IScopedObjectResolver scope = this;
+            IScopedObjectResolver scope = container;
             while (scope != null)
             {
                 if (scope.TryGetRegistration(type, out var registration))
