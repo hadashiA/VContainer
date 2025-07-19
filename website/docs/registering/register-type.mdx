@@ -205,62 +205,6 @@ builder.RegisterInstance(serviceA)
     .AsImplementedInterfaces();
 ```
 
-## Register with Keys
-
-When you need to register multiple implementations of the same interface or type, you can use keys to distinguish them. VContainer supports keys of any type.
-
-```csharp
-// Register with enum keys
-public enum WeaponType
-{
-    Primary,
-    Secondary,
-    Special
-}
-
-builder.Register<IWeapon, Sword>(Lifetime.Singleton)
-    .Keyed(WeaponType.Primary);
-
-builder.Register<IWeapon, Bow>(Lifetime.Singleton)
-    .Keyed(WeaponType.Secondary);
-
-builder.Register<IWeapon, MagicStaff>(Lifetime.Singleton)
-    .Keyed(WeaponType.Special);
-```
-
-```csharp
-// Register with string keys
-builder.Register<IEnemy, Goblin>(Lifetime.Singleton)
-    .Keyed("goblin");
-
-builder.Register<IEnemy, Orc>(Lifetime.Singleton)
-    .Keyed("orc");
-```
-
-```csharp
-// Register with integer keys
-builder.Register<ILevel, Level1>(Lifetime.Singleton)
-    .Keyed(1);
-
-builder.Register<ILevel, Level2>(Lifetime.Singleton)
-    .Keyed(2);
-```
-
-To resolve keyed registrations, use the `Key` attribute in injection or the container API directly:
-
-```csharp
-class WeaponSystem
-{
-    public WeaponSystem(
-        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
-        [Key(WeaponType.Secondary)] IWeapon secondaryWeapon)
-    {
-        // ...
-    }
-}
-```
-
-See the [Key Attribute](../resolving/constructor-injection#key-attribute) section for more information on using keys in injection.
 
 ## Register type-specific parameters
 
