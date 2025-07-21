@@ -6,9 +6,9 @@ namespace VContainer.Runtime
 {
     public static class ContainerBuilderDecoratorExtensions
     {
-        public static RegistrationBuilder RegisterDecorator<TInner, TDecorator>(this IContainerBuilder builder)
+        public static RegistrationBuilder RegisterDecorator<TInner, TDecorator>(this IContainerBuilder builder, object key = null)
         {
-            var innerRegistrationBuilder = FindInnerRegistration(builder, typeof(TInner));
+            var innerRegistrationBuilder = FindInnerRegistration(builder, typeof(TInner), key);
             var decoratorBuilder = new DecoratorRegistrationBuilder<TInner>(innerRegistrationBuilder, typeof(TDecorator));
             builder.Register(decoratorBuilder);
             return decoratorBuilder;
@@ -16,25 +16,29 @@ namespace VContainer.Runtime
 
         public static RegistrationBuilder RegisterDecorator<TInner, TDecorator>(
             this IContainerBuilder builder,
-            Func<TInner, IObjectResolver, TDecorator> factory)
+            Func<TInner, IObjectResolver, TDecorator> factory, 
+            object key = null)
         {
-            var innerRegistrationBuilder = FindInnerRegistration(builder, typeof(TInner));
+            var innerRegistrationBuilder = FindInnerRegistration(builder, typeof(TInner), key);
             var decoratorBuilder = new FuncDecoratorRegistrationBuilder<TInner,TDecorator>(innerRegistrationBuilder, factory);
             builder.Register(decoratorBuilder);
             return decoratorBuilder;
         }
 
-        private static IInnerRegistrationProvider FindInnerRegistration(IContainerBuilder builder, Type innerType)
+        private static IInnerRegistrationProvider FindInnerRegistration(IContainerBuilder builder, Type innerType, object key)
         {
             for (var i = builder.Count - 1; i >= 0; i--)
             {
-                var interfaceTypes = builder[i].InterfaceTypes;
-                if (interfaceTypes != null && interfaceTypes.Contains(innerType))
-                    return new BuilderInnerRegistrationProvider(builder[i]);
+                if (builder[i].Key == key)
+                {
+                    var interfaceTypes = builder[i].InterfaceTypes;
+                    if (interfaceTypes != null && interfaceTypes.Contains(innerType))
+                        return new BuilderInnerRegistrationProvider(builder[i]);
+                }
             }
             
             if (builder is ScopedContainerBuilder scopedBuilder && 
-                scopedBuilder.parent.TryGetRegistration(innerType, out var registration))
+                scopedBuilder.parent.TryGetRegistration(innerType, out var registration, key))
             {
                 return new CachedInnerRegistrationProvider(registration);
             }
@@ -115,7 +119,7 @@ namespace VContainer.Runtime
                 var innerInstance = (TInner)container.Resolve(innerRegistration);
                 return injector.CreateInstance(container, GetInstantiationParameters(innerInstance));
             });
-            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider, Key);
         }
 
         private IReadOnlyList<IInjectParameter> GetInstantiationParameters(TInner innerInstance)
@@ -152,7 +156,7 @@ namespace VContainer.Runtime
                 var innerInstance = container.Resolve(innerRegistration);
                 return factory((TInner)innerInstance, container);
             });
-            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider, Key);
         }
     }
 }

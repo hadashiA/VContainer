@@ -180,6 +180,37 @@ namespace VContainer.Tests
             Assert.That(concreteInstance.Value, Is.EqualTo(1));
         }
 
+        [Test]
+        public void Decorator_Supports_Keyed_Registration()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<Mocks.IDecoratedType, Mocks.DecoratedType>(Lifetime.Singleton);
+            builder.RegisterDecorator<Mocks.IDecoratedType, Mocks.Decorator1>().Keyed("key");
+
+            using var container = builder.Build();
+            var instanceNonKeyed = container.Resolve<Mocks.IDecoratedType>();
+            Assert.That(instanceNonKeyed, Is.TypeOf<Mocks.DecoratedType>());
+
+            var instanceKeyed = container.Resolve<Mocks.IDecoratedType>("key");
+            Assert.That(instanceKeyed, Is.TypeOf<Mocks.Decorator1>());
+        }
+
+        [Test]
+        public void Decorator_Supports_Keyed_Decorated_Registration()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<Mocks.IDecoratedType, Mocks.DecoratedType>(Lifetime.Singleton);
+            builder.RegisterDecorator<Mocks.IDecoratedType, Mocks.Decorator1>().Keyed("key");
+            builder.RegisterDecorator<Mocks.IDecoratedType, Mocks.Decorator2>("key");
+            
+            using var container = builder.Build();
+            var instance = container.Resolve<Mocks.IDecoratedType>();
+            Assert.That(instance, Is.TypeOf<Mocks.Decorator2>());
+            
+            var decoratorInstance = (Mocks.Decorator2)instance;
+            Assert.That(decoratorInstance.Inner, Is.TypeOf<Mocks.Decorator1>());
+        }
+
 
         private static class Mocks
         {
