@@ -104,7 +104,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -140,7 +139,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -176,7 +174,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -212,7 +209,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -248,7 +244,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -284,7 +279,6 @@ namespace VContainer.Unity
                 {
                     if (exceptionHandler == null) throw;
                     exceptionHandler.Publish(ex);
-                    return false;
                 }
             }
             return !disposed;
@@ -293,7 +287,7 @@ namespace VContainer.Unity
         public void Dispose() => disposed = true;
     }
 
-#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2023_1_OR_NEWER
+#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2021_3_OR_NEWER
     sealed class AsyncStartableLoopItem : IPlayerLoopItem, IDisposable
     {
         readonly IEnumerable<IAsyncStartable> entries;
@@ -314,14 +308,27 @@ namespace VContainer.Unity
             if (disposed) return false;
             foreach (var x in entries)
             {
-                var task = x.StartAsync(cts.Token);
 #if VCONTAINER_UNITASK_INTEGRATION
+                var task = x.StartAsync(cts.Token);
                 if (exceptionHandler != null)
+                {
                     task.Forget(ex => exceptionHandler.Publish(ex));
+                }
                 else
+                {
                     task.Forget();
+                }
 #else
-                var _ = AwaitableHelper.Forget(task, exceptionHandler);
+                try
+                {
+                    var task = x.StartAsync(cts.Token);
+                    _ = task.Forget(exceptionHandler);
+                }
+                catch (Exception ex)
+                {
+                    if (exceptionHandler == null) throw;
+                    exceptionHandler.Publish(ex);
+                }
 #endif
             }
             return false;

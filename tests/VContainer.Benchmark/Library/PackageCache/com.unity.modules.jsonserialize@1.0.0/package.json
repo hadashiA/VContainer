@@ -1,0 +1,10 @@
+{
+    "name": "com.unity.modules.jsonserialize",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "JSONSerialize",
+    "description": "The JSONSerialize module provides the JsonUtility class which lets you serialize Unity Objects to JSON format. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.JSONSerializeModule.html",
+    "dependencies": {
+
+    }
+}

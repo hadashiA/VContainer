@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace VContainer.Tests
 {
@@ -32,9 +33,10 @@ namespace VContainer.Tests
 
     interface IGenericService<T>
     {
+        T ParameterService { get; }
     }
 
-    interface IGenericService<T1,T2>
+    interface IGenericService<T1, T2>
     {
     }
 
@@ -63,11 +65,9 @@ namespace VContainer.Tests
             set => publicProperty = value;
         }
 
-        [Inject]
-        I4 privateFieldInjectable;
+        [Inject] I4 privateFieldInjectable;
 
-        [Inject]
-        public I5 PublicFieldInjectable;
+        [Inject] public I5 PublicFieldInjectable;
 
         public I6 FromConstructor1;
         public I7 FromConstructor2;
@@ -118,7 +118,7 @@ namespace VContainer.Tests
     {
     }
 
-    class NoDependencyServiceB : I3
+    class NoDependencyServiceB : I2, I3
     {
     }
 
@@ -132,6 +132,7 @@ namespace VContainer.Tests
             {
                 throw new ArgumentNullException(nameof(service2));
             }
+
             Service2 = service2;
         }
     }
@@ -146,6 +147,7 @@ namespace VContainer.Tests
             {
                 throw new ArgumentNullException(nameof(service3));
             }
+
             Service3 = service3;
         }
     }
@@ -207,11 +209,9 @@ namespace VContainer.Tests
 
     class HasDefaultValue
     {
-        [Inject]
-        I2 privateFieldHasDefault = new NoDependencyServiceA();
+        [Inject] I2 privateFieldHasDefault = new NoDependencyServiceA();
 
-        [Inject]
-        I3 privatePropertyHasDefault { get; set; } = new NoDependencyServiceB();
+        [Inject] I3 privatePropertyHasDefault { get; set; } = new NoDependencyServiceB();
 
         public I2 GetPrivateFieldHasDefault() => privateFieldHasDefault;
         public I3 GetPrivatePropertyHasDefault() => privatePropertyHasDefault;
@@ -286,14 +286,12 @@ namespace VContainer.Tests
 
     class HasCircularDependencyMsg3
     {
-        [Inject]
-        public HasCircularDependencyMsg4 Field;
+        [Inject] public HasCircularDependencyMsg4 Field;
     }
 
     class HasCircularDependencyMsg4
     {
-        [Inject]
-        public HasCircularDependencyMsg1 Prop { get; set; }
+        [Inject] public HasCircularDependencyMsg1 Prop { get; set; }
     }
 
     class HasMethodInjection : I1
@@ -319,14 +317,12 @@ namespace VContainer.Tests
 
     class GenericsService<T> : IGenericService<T>, IDisposable
     {
-        public readonly T ParameterService;
-
+        public T ParameterService { get; }
         public bool Disposed { get; private set; }
 
         public GenericsService(T parameterService)
         {
             ParameterService = parameterService;
-            Disposed = false;
         }
 
         public void Dispose()
@@ -335,7 +331,7 @@ namespace VContainer.Tests
         }
     }
 
-    class GenericsService2<T1,T2> : IGenericService<T1,T2>
+    class GenericsService2<T1, T2> : IGenericService<T1, T2>
     {
         public readonly IGenericService<T2> ParameterService;
 
@@ -429,5 +425,67 @@ namespace VContainer.Tests
 
     class SampleAttribute : Attribute
     {
+    }
+
+    class HasInstanceId
+    {
+        public static void ResetId()
+        {
+            Interlocked.Exchange(ref instanceCount, 0);
+        }
+
+        static int instanceCount;
+
+        public readonly int Id = Interlocked.Increment(ref instanceCount);
+    }
+
+
+
+    // Test classes for the Inject with Key attribute tests
+
+    enum InjectionKey
+    {
+        Primary,
+        Secondary
+    }
+
+    class KeyedConstructorInjectionClass
+    {
+        public I2 Primary { get; }
+        public I2 Secondary { get; }
+
+        public KeyedConstructorInjectionClass([Key(InjectionKey.Primary)] I2 primary,
+            [Key(InjectionKey.Secondary)] I2 secondary)
+        {
+            Primary = primary;
+            Secondary = secondary;
+        }
+    }
+
+    class KeyedMethodInjectionClass
+    {
+        public I2 Primary { get; private set; }
+        public I2 Secondary { get; private set; }
+            
+        [Inject]
+        public void Initialize(
+            [Key(InjectionKey.Primary)] I2 primary,
+            [Key(InjectionKey.Secondary)] I2 secondary)
+        {
+            Primary = primary;
+            Secondary = secondary;
+        }
+    }
+
+    class KeyedFieldInjectionClass
+    {
+        [Inject, Key("field-id")]
+        public I2 Field;
+    }
+
+    class KeyedPropertyInjectionClass
+    {
+        [Inject, Key("prop-id")]
+        public I3 Property { get; set; }
     }
 }

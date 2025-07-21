@@ -1,0 +1,27 @@
+{
+  "displayName": "Custom NUnit",
+  "name": "com.unity.ext.nunit",
+  "version": "2.0.3",
+  "unity": "2019.4",
+  "description": "A custom version of NUnit used by Unity Test Framework. Based on NUnit version 3.5 and works with all platforms, il2cpp and Mono AOT.",
+  "keywords": [
+    "nunit",
+    "unittest",
+    "test"
+  ],
+  "category": "Libraries",
+  "repository": {
+    "url": "https://github.cds.internal.unity3d.com/unity/com.unity.ext.nunit.git",
+    "type": "git",
+    "revision": "2e41147762790f2a221103bff840a0138ca01b57"
+  },
+  "_upm": {
+    "changelog": "- Added unique test ID for repeated tests\r\n- Added ContainKey and ContainValue constaints for dictionaries\r\n- Fixed unexpected null exception when using EmptyConstraint with a null object"
+  },
+  "relatedPackages": {
+    "com.unity.ext.nunit.tests": "2.0.3"
+  },
+  "upmCi": {
+    "footprint": "dcf96beed55ea2628ad5a54493afff0c0d3b84b7"
+  }
+}

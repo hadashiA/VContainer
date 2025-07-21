@@ -1,8 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="..\VContainer\Assets\VContainer\Runtime\**\*.cs" Exclude="&#xA;..\VContainer\Assets\VContainer\Runtime\Unity\**\*.cs;&#xA;" />
+        <Compile Include="..\VContainer\Assets\VContainer\Runtime\**\*.cs"
+                 Exclude="&#xA;..\VContainer\Assets\VContainer\Runtime\Unity\**\*.cs;&#xA;" />
+        <Compile Update="..\VContainer\Assets\VContainer\Runtime\Internal\FixedTypeObjectKeyHashtable.cs">
+          <Link>Internal\FixedTypeObjectKeyHashtable.cs</Link>
+        </Compile>
+        <Compile Update="..\VContainer\Assets\VContainer\Runtime\Annotations\KeyAttribute.cs">
+          <Link>Annotations\KeyAttribute.cs</Link>
+        </Compile>
     </ItemGroup>
 </Project>

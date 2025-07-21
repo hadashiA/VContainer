@@ -52,7 +52,7 @@ Visit [vcontainer.hadashikick.jp](https://vcontainer.hadashikick.jp) to view the
 1. Navigate to your project's Packages folder and open the manifest.json file.
 2. Add this line below the "dependencies": { line
     - ```json title="Packages/manifest.json"
-      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.14.0",
+      "jp.hadashikick.vcontainer": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.16.9",
       ```
 3. UPM should now install the package.
 
@@ -85,6 +85,11 @@ public class GameLifetimeScope : LifetimeScope
         builder.Register<IRouteSearch, AStarRouteSearch>(Lifetime.Singleton);
 
         builder.RegisterComponentInHierarchy<ActorsView>();
+        
+        // Register with enum Keys
+        builder.Register<IWeapon, Sword>(Lifetime.Singleton).Keyed(WeaponType.Primary);
+        builder.Register<IWeapon, Bow>(Lifetime.Singleton).Keyed(WeaponType.Secondary);
+        builder.Register<IWeapon, MagicStaff>(Lifetime.Singleton).Keyed(WeaponType.Special);
     }
 }
 ```
@@ -92,6 +97,14 @@ public class GameLifetimeScope : LifetimeScope
 Where definitions of classes are
 
 ```csharp
+// Define an enum for weapon types
+public enum WeaponType
+{
+    Primary,
+    Secondary,
+    Special
+}
+
 public interface IRouteSearch
 {
 }
@@ -124,13 +137,22 @@ public class ActorPresenter : IStartable
 {
     readonly CharacterService service;
     readonly ActorsView actorsView;
+    readonly IWeapon primaryWeapon;
+    readonly IWeapon secondaryWeapon;
+    readonly IWeapon specialWeapon;
 
     public ActorPresenter(
         CharacterService service,
-        ActorsView actorsView)
+        ActorsView actorsView,
+        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Key(WeaponType.Secondary)] IWeapon secondaryWeapon,
+        [Key(WeaponType.Special)] IWeapon specialWeapon)
     {
         this.service = service;
         this.actorsView = actorsView;
+        this.primaryWeapon = primaryWeapon;
+        this.secondaryWeapon = secondaryWeapon;
+        this.specialWeapon = specialWeapon;
     }
 
     void IStartable.Start()
@@ -140,9 +162,69 @@ public class ActorPresenter : IStartable
 }
 ```
 
+You can also resolve with object-based Key directly from the container:
+
+```csharp
+// Resolve by Key
+var primaryWeapon = container.Resolve<IWeapon>(WeaponType.Primary);
+var secondaryWeapon = container.Resolve<IWeapon>(WeaponType.Secondary);
+
+// Try resolve with Key
+if (container.TryResolve<IWeapon>(WeaponType.Special, out var specialWeapon))
+{
+    // Use specialWeapon
+}
+
+// Other supported Key types include strings and integers
+builder.Register<IEnemy, Goblin>(Lifetime.Singleton).Keyed(1);  // Integer Key
+builder.Register<IEnemy, Orc>(Lifetime.Singleton).Keyed("boss");  // String Key
+var goblin = container.Resolve<IEnemy>(1);
+var boss = container.Resolve<IEnemy>("boss");
+```
+
+The `Key` attribute supports injection with identifiers. You can use it in the constructor, method, or property:
+
+```csharp
+// Field injection with Key
+public class WeaponHolder
+{
+    [Inject, Key(WeaponType.Primary)]
+    public IWeapon PrimaryWeapon;
+    
+    [Inject, Key(WeaponType.Secondary)]
+    public IWeapon SecondaryWeapon;
+}
+
+// Property injection with Key
+public class EquipmentManager
+{
+    [Inject, Key(WeaponType.Primary)]
+    public IWeapon PrimaryWeapon { get; set; }
+    
+    [Inject, Key(WeaponType.Secondary)]
+    public IWeapon SecondaryWeapon { get; set; }
+}
+
+// Method injection with Key
+public class CharacterEquipment
+{
+    public IWeapon PrimaryWeapon { get; private set; }
+    public IWeapon SecondaryWeapon { get; private set; }
+    
+    [Inject]
+    public void Initialize(
+        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Key(WeaponType.Secondary)] IWeapon secondaryWeapon)
+    {
+        PrimaryWeapon = primaryWeapon;
+        SecondaryWeapon = secondaryWeapon;
+    }
+}
+```
 
 - In this example, the routeSearch of CharacterService is automatically set as the instance of AStarRouteSearch when CharacterService is resolved.
 - Further, VContainer can have a Pure C# class as an entry point. (Various timings such as Start, Update, etc. can be specified.) This facilitates "separation of domain logic and presentation".
+- With the `Keyed` method and `Key` attribute, you can register and resolve multiple implementations of the same interface with object-based identifiers (including enums, strings, and integers).
 
 ### Flexible Scoping with async
 

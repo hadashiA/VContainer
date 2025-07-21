@@ -1,0 +1,11 @@
+{
+    "name": "com.unity.modules.ui",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "UI",
+    "description": "The UI module implements basic components required for Unity's UI system Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.UIModule.html",
+    "icon": ".icon.png",
+    "dependencies": {
+
+    }
+}

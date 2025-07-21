@@ -1,0 +1,11 @@
+{
+    "name": "com.unity.modules.imageconversion",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "Image Conversion",
+    "description": "The ImageConversion module implements the ImageConversion class which provides helper methods for converting image data. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.ImageConversionModule.html",
+    "icon": ".icon.png",
+    "dependencies": {
+
+    }
+}

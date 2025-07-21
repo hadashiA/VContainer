@@ -7,8 +7,9 @@ namespace VContainer.Unity
     public sealed class VContainerSettings : ScriptableObject
     {
         public static VContainerSettings Instance { get; private set; }
-
         public static bool DiagnosticsEnabled => Instance != null && Instance.EnableDiagnostics;
+
+        static LifetimeScope rootLifetimeScopeInstance;
 
         [SerializeField]
         [Tooltip("Set the Prefab to be the parent of the entire Project.")]
@@ -53,8 +54,7 @@ namespace VContainer.Unity
             var preloadAsset = UnityEditor.PlayerSettings.GetPreloadedAssets().FirstOrDefault(x => x is VContainerSettings);
             if (preloadAsset is VContainerSettings instance)
             {
-                if (instance.RootLifetimeScope != null)
-                    instance.RootLifetimeScope.DisposeCore();
+                instance.OnDisable();
                 instance.OnEnable();
             }
         }
@@ -67,15 +67,30 @@ namespace VContainer.Unity
         }
 #endif
 
+        public LifetimeScope GetOrCreateRootLifetimeScopeInstance()
+        {
+            if (RootLifetimeScope != null && rootLifetimeScopeInstance == null)
+            {
+                var activeBefore = RootLifetimeScope.gameObject.activeSelf;
+                RootLifetimeScope.gameObject.SetActive(false);
+
+                rootLifetimeScopeInstance = Instantiate(RootLifetimeScope);
+                SetName(rootLifetimeScopeInstance, RootLifetimeScope);
+                DontDestroyOnLoad(rootLifetimeScopeInstance);
+                rootLifetimeScopeInstance.gameObject.SetActive(true);
+
+                RootLifetimeScope.gameObject.SetActive(activeBefore);
+            }
+            return rootLifetimeScopeInstance;
+        }
+
+        public bool IsRootLifetimeScopeInstance(LifetimeScope lifetimeScope) =>
+            RootLifetimeScope == lifetimeScope || rootLifetimeScopeInstance == lifetimeScope;
+
         void OnEnable()
         {
             if (Application.isPlaying)
             {
-                if (RootLifetimeScope != null)
-                {
-                    RootLifetimeScope.IsRoot = true;
-                }
-
                 Instance = this;
 
                 var activeScene = SceneManager.GetActiveScene();
@@ -88,37 +103,29 @@ namespace VContainer.Unity
                     SceneManager.sceneLoaded -= OnFirstSceneLoaded;
                     SceneManager.sceneLoaded += OnFirstSceneLoaded;
                 }
-
-                Application.quitting -= OnApplicationQuit;
-                Application.quitting += OnApplicationQuit;
             }
+        }
+
+        void OnDisable()
+        {
+            Instance = null;
         }
 
         void OnFirstSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             if (RootLifetimeScope != null &&
-                RootLifetimeScope.Container == null &&
-                RootLifetimeScope.autoRun)
+                RootLifetimeScope.autoRun &&
+                (rootLifetimeScopeInstance == null || rootLifetimeScopeInstance.Container == null))
             {
-                RootLifetimeScope.Build();
+                GetOrCreateRootLifetimeScopeInstance();
             }
             SceneManager.sceneLoaded -= OnFirstSceneLoaded;
         }
-
-        void OnApplicationQuit()
+        
+        static void SetName(Object instance, Object prefab)
         {
-            if (RootLifetimeScope != null)
-            {
-                if (RootLifetimeScope.Container != null)
-                {
-                    // Execute Dispose once at the slowest possible time.
-                    // However, the GameObject may be destroyed at that time.
-                    PlayerLoopHelper.Dispatch(PlayerLoopTiming.LateUpdate, new AsyncLoopItem(() =>
-                    {
-                        RootLifetimeScope.DisposeCore();
-                    }));
-                }
-            }
+            if (Instance != null && Instance.RemoveClonePostfix)
+                instance.name = prefab.name;
         }
     }
 }

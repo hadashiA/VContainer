@@ -9,7 +9,13 @@
         <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
         <DevelopmentDependency>true</DevelopmentDependency>
         <IsRoslynComponent>true</IsRoslynComponent>
+        <DefineConstants>ROSLYN3</DefineConstants>
     </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="../VContainer.SourceGenerator/**/*.cs"
+                 Exclude="**/obj/**;**/VContainerIncrementalSourceGenerator.cs;**/Shims/**" />
+    </ItemGroup>
 
     <ItemGroup>
         <!-- Mainly used for Unity, Unity 2021.3 has Roslyn 3.9.0(see: Editor\Data\DotNetSdkRoslyn\ -->

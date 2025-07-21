@@ -19,10 +19,10 @@ namespace VContainer
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register(
             this IContainerBuilder builder,
-            Type interfacetType,
+            Type interfaceType,
             Type implementationType,
             Lifetime lifetime) =>
-            builder.Register(implementationType, lifetime).As(interfacetType);
+            builder.Register(implementationType, lifetime).As(interfaceType);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder Register<T>(
@@ -57,7 +57,14 @@ namespace VContainer
             Func<IObjectResolver, TInterface> implementationConfiguration,
             Lifetime lifetime)
             => builder.Register(new FuncRegistrationBuilder(container => implementationConfiguration(container), typeof(TInterface), lifetime));
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder RegisterInstance(
+            this IContainerBuilder builder,
+            object instance,
+            Type implementationType)
+            => builder.Register(new InstanceRegistrationBuilder(instance)).As(implementationType);
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder RegisterInstance<TInterface>(
             this IContainerBuilder builder,
@@ -143,8 +150,15 @@ namespace VContainer
 
         public static void RegisterDisposeCallback(this IContainerBuilder builder, Action<IObjectResolver> callback)
         {
-            builder.Register(container => new BuilderCallbackDisposable(callback, container), Lifetime.Scoped);
-            builder.RegisterBuildCallback(container => container.Resolve<IReadOnlyList<BuilderCallbackDisposable>>());
+            if (!builder.Exists(typeof(BuilderCallbackDisposable)))
+            {
+                builder.Register<BuilderCallbackDisposable>(Lifetime.Singleton);
+            }
+            builder.RegisterBuildCallback(container =>
+            {
+                var disposable = container.Resolve<BuilderCallbackDisposable>();
+                disposable.Disposing += callback;
+            });
         }
 
         [Obsolete("IObjectResolver is registered by default. This method does nothing.")]

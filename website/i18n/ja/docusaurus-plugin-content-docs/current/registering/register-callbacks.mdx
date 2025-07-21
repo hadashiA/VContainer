@@ -17,3 +17,14 @@ builder.RegisterBuildCallback(container =>
 
 - We can use `IObjectResolver` as a callback argument.
 - For more information about `IObjectResolver`, see [Contaienr API](../resolving/container-api)
+
+
+## Container Dispose Callback
+
+```cs
+builder.RegisterDisposeCallback(container =>
+{
+    // Processes you want to perform in which the container is disposed.
+});
+```
+

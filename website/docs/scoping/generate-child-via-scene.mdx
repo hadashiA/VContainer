@@ -79,7 +79,7 @@ class FooInstaller : IInstaller
     }
 }
 
-using (LifetimeScope.Enqueue(fooInstaller)
+using (LifetimeScope.Enqueue(fooInstaller))
 {
     // ... loading scene
 }

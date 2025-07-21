@@ -5,11 +5,12 @@ sidebar_label: UniTask
 
 [UniTask](https://github.com/Cysharp/UniTask) is a library that brings fast and powerful [`async`](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/async)/[`await`](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/operators/await) support to Unity. Its API is nearly identical to that of .NET's standard [Task-based asynchronous pattern](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap), but optimized for Unity's player loop. It also adds `async`/`await` support for Unity's built-in asynchronous operations such as [`UnityWebRequest`](https://docs.unity3d.com/ScriptReference/Networking.UnityWebRequest).
 
-If you have the `com.cysharp.unitask` package installed in your project, the following features will automatically be enabled.
+If you have the `com.cysharp.unitask` package installed in your project,
+The `VCONTAINER_UNITASK_INTEGRATION` compiler symbol is automatically enabled and the following features will automatically be enabled.
 
 ## `IAsyncStartable`
 
-Entry points can use the `IAsyncStartable` phase, which returns a `UniTask`.
+If `VCONTAINER_UNITASK_INTEGRATION` is enabled, `IAsyncStartable` uses UniTask as return value.
 
 ```csharp
 public class FooController : IAsyncStartable
@@ -40,7 +41,6 @@ If you want to schedule the process at different times, you can use UniTask's `P
 ```csharp
 await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
 ```
-
 Note that all `StartAsync` calls will be scheduled for simultaneous execution on the main thread (unless otherwise specified within each implementation), and future `PlayerLoop` phases will *not* wait for them to complete.
 
 See [UniTask's `PlayerLoop` documentation](https://github.com/Cysharp/UniTask#playerloop) for more information.

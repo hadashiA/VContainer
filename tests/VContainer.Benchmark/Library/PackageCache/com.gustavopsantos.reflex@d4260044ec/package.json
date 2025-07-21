@@ -1,0 +1,12 @@
+{
+  "name": "com.gustavopsantos.reflex",
+  "displayName": "Reflex",
+  "version": "1.0.0",
+  "unity": "2019.4",
+  "description": "Minimal dependency injection framework for Unity",
+  "keywords": ["Dependency Injection", "IoC", "DI", "DI Container"],
+  "license": "MIT",
+  "documentationUrl": "https://github.com/gustavopsantos/reflex",
+  "changelogUrl": "https://github.com/gustavopsantos/reflex/releases",
+  "licensesUrl": "https://github.com/gustavopsantos/reflex/blob/main/LICENSE"
+}

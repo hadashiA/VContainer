@@ -1,0 +1,11 @@
+{
+    "name": "com.unity.modules.animation",
+    "version": "1.0.0",
+    "type": "module",
+    "displayName": "Animation",
+    "description": "The Animation module implements Unity's animation system. Scripting API: https://docs.unity3d.com/ScriptReference/UnityEngine.AnimationModule.html",
+    "icon": ".icon.png",
+    "dependencies": {
+
+    }
+}

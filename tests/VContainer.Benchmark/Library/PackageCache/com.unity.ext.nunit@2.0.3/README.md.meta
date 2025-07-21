@@ -1,0 +1,7 @@
+fileFormatVersion: 2
+guid: 5da62a0c1c5218c4aa16b74546a7822d
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

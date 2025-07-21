@@ -33,9 +33,9 @@ namespace VContainer.Runtime
                     return new BuilderInnerRegistrationProvider(builder[i]);
             }
             
-            if (builder is ScopedContainerBuilder scopedBuilder)
+            if (builder is ScopedContainerBuilder scopedBuilder && 
+                scopedBuilder.parent.TryGetRegistration(innerType, out var registration))
             {
-                var registration = scopedBuilder.parent.FindRegistration(innerType);
                 return new CachedInnerRegistrationProvider(registration);
             }
             

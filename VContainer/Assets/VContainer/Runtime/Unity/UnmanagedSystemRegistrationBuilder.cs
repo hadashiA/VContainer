@@ -34,7 +34,7 @@ namespace VContainer.Unity
                 systemGroupType,
                 injector,
                 Parameters);
-            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider);
+            return new Registration(ImplementationType, Lifetime, InterfaceTypes, provider, Key);
         }
 
         public UnmanagedSystemRegistrationBuilder IntoGroup<T>() where T : ComponentSystemGroup

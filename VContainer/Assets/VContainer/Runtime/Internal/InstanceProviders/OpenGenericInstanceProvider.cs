@@ -6,27 +6,45 @@ namespace VContainer.Internal
 {
     public class OpenGenericInstanceProvider : IInstanceProvider
     {
-        class TypeParametersEqualityComparer : IEqualityComparer<Type[]>
+        class TypeParametersKey
         {
-            public bool Equals(Type[] x, Type[] y)
-            {
-                if (x == null || y == null) return x == y;
-                if (x.Length != y.Length) return false;
+            public readonly Type[] TypeParameters;
+            public readonly object Key;
 
-                for (var i = 0; i < x.Length; i++)
-                {
-                    if (x[i] != y[i]) return false;
-                }
-                return true;
+            public TypeParametersKey(Type[] typeParameters, object key)
+            {
+                TypeParameters = typeParameters;
+                Key = key;
             }
 
-            public int GetHashCode(Type[] typeParameters)
+            public override bool Equals(object obj)
+            {
+                if (obj is TypeParametersKey other)
+                {
+                    if (Key != other.Key)
+                        return false;
+
+                    if (TypeParameters.Length != other.TypeParameters.Length)
+                        return false;
+
+                    for (var i = 0; i < TypeParameters.Length; i++)
+                    {
+                        if (TypeParameters[i] != other.TypeParameters[i])
+                            return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+
+            public override int GetHashCode()
             {
                 var hash = 5381;
-                foreach (var typeParameter in typeParameters)
+                foreach (var typeParameter in TypeParameters)
                 {
                     hash = ((hash << 5) + hash) ^ typeParameter.GetHashCode();
                 }
+                hash = ((hash << 5) + hash) ^ (Key?.GetHashCode() ?? 0);
                 return hash;
             }
         }
@@ -35,8 +53,8 @@ namespace VContainer.Internal
         readonly Type implementationType;
         readonly IReadOnlyList<IInjectParameter> customParameters;
 
-        readonly ConcurrentDictionary<Type[], Registration> constructedRegistrations = new ConcurrentDictionary<Type[], Registration>(new TypeParametersEqualityComparer());
-        readonly Func<Type[], Registration> createRegistrationFunc;
+        readonly ConcurrentDictionary<TypeParametersKey, Registration> constructedRegistrations = new ConcurrentDictionary<TypeParametersKey, Registration>();
+        readonly Func<TypeParametersKey, Registration> createRegistrationFunc;
 
         public OpenGenericInstanceProvider(Type implementationType, Lifetime lifetime, List<IInjectParameter> injectParameters)
         {
@@ -46,17 +64,18 @@ namespace VContainer.Internal
             createRegistrationFunc = CreateRegistration;
         }
 
-        public Registration GetClosedRegistration(Type closedInterfaceType, Type[] typeParameters)
+        public Registration GetClosedRegistration(Type closedInterfaceType, Type[] typeParameters, object key = null)
         {
-            return constructedRegistrations.GetOrAdd(typeParameters, createRegistrationFunc);
+            var typeParametersKey = new TypeParametersKey(typeParameters, key);
+            return constructedRegistrations.GetOrAdd(typeParametersKey, createRegistrationFunc);
         }
 
-        Registration CreateRegistration(Type[] typeParameters)
+        Registration CreateRegistration(TypeParametersKey key)
         {
-            var newType = implementationType.MakeGenericType(typeParameters);
+            var newType = implementationType.MakeGenericType(key.TypeParameters);
             var injector = InjectorCache.GetOrBuild(newType);
             var spawner = new InstanceProvider(injector, customParameters);
-            return new Registration(newType, lifetime, new List<Type>(1) { newType }, spawner);
+            return new Registration(newType, lifetime, new List<Type>(1) { newType }, spawner, key.Key);
         }
 
         public object SpawnInstance(IObjectResolver resolver)

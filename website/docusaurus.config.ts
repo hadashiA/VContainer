@@ -73,7 +73,7 @@ const config: Config = {
         },
         {
           href: 'https://github.com/hadashiA/VContainer/releases',
-          label: 'v1.14.0',
+          'label': 'v1.15.0',
           position: 'right',
         },
         {

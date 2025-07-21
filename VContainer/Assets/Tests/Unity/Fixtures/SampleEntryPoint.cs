@@ -1,4 +1,10 @@
+using System.Threading;
 using VContainer.Unity;
+#if UNITY_2023_1_OR_NEWER
+using UnityEngine;
+#else
+using Awaitable = System.Threading.Tasks.Task;
+#endif
 
 namespace VContainer.Tests.Unity
 {
@@ -151,4 +157,12 @@ namespace VContainer.Tests.Unity
             throw new System.NotImplementedException();
         }
     }
+
+#if UNITY_2021_3_OR_NEWER
+    public class AsyncStartableThrowable : IAsyncStartable
+    {
+        public Awaitable StartAsync(CancellationToken cancellation)
+            => throw new System.NotImplementedException();
+    }
+#endif
 }

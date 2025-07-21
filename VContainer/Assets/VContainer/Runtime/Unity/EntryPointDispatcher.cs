@@ -22,14 +22,7 @@ namespace VContainer.Unity
         {
             PlayerLoopHelper.EnsureInitialized();
 
-            EntryPointExceptionHandler exceptionHandler = null;
-            try
-            {
-                exceptionHandler = container.Resolve<EntryPointExceptionHandler>();
-            }
-            catch (VContainerException ex) when (ex.InvalidType == typeof(EntryPointExceptionHandler))
-            {
-            }
+            var exceptionHandler = container.ResolveOrDefault<EntryPointExceptionHandler>();
 
             var initializables = container.Resolve<ContainerLocal<IReadOnlyList<IInitializable>>>().Value;
             for (var i = 0; i < initializables.Count; i++)
@@ -127,7 +120,7 @@ namespace VContainer.Unity
                 PlayerLoopHelper.Dispatch(PlayerLoopTiming.PostLateUpdate, loopItem);
             }
 
-#if VCONTAINER_UNITASK_INTEGRATION
+#if VCONTAINER_UNITASK_INTEGRATION || UNITY_2021_3_OR_NEWER
             var asyncStartables = container.Resolve<ContainerLocal<IReadOnlyList<IAsyncStartable>>>().Value;
             if (asyncStartables.Count > 0)
             {

@@ -7,41 +7,48 @@ namespace VContainer.SourceGenerator;
 
 class TypeMeta
 {
-    public TypeDeclarationSyntax Syntax { get; }
     public INamedTypeSymbol Symbol { get; }
     public string TypeName { get; }
     public string FullTypeName { get; }
     public bool ExplicitInjectable { get; }
 
-    public IReadOnlyList<IMethodSymbol> Constructors { get; }
-    public IReadOnlyList<IMethodSymbol> ExplictInjectConstructors { get; }
+    public IReadOnlyList<IMethodSymbol> ExplicitConstructors { get; }
+    public IReadOnlyList<IMethodSymbol> ExplicitInjectConstructors { get; }
     public IReadOnlyList<IFieldSymbol> InjectFields { get; }
     public IReadOnlyList<IPropertySymbol> InjectProperties { get; }
     public IReadOnlyList<IMethodSymbol> InjectMethods { get; }
 
     public bool IsGenerics => Symbol.Arity > 0;
 
-    ReferenceSymbols references;
+    readonly ReferenceSymbols references;
+    readonly TypeDeclarationSyntax? syntax;
 
-    public TypeMeta(TypeDeclarationSyntax syntax, INamedTypeSymbol symbol, ReferenceSymbols references)
+    public TypeMeta(INamedTypeSymbol symbol, ReferenceSymbols references, TypeDeclarationSyntax? syntax = null)
     {
-        Syntax = syntax;
         Symbol = symbol;
         this.references = references;
+        this.syntax = syntax;
 
         TypeName = symbol.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat);
         FullTypeName = symbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-        Constructors = GetConstructors();
-        ExplictInjectConstructors = GetExplicitInjectConstructors();
+        ExplicitConstructors = GetConstructors();
+        ExplicitInjectConstructors = GetExplicitInjectConstructors();
         InjectFields = GetInjectFields();
         InjectProperties = GetInjectProperties();
         InjectMethods = GetInjectMethods();
 
-        ExplicitInjectable = ExplictInjectConstructors.Count > 0 ||
+        ExplicitInjectable = ExplicitInjectConstructors.Count > 0 ||
                              InjectFields.Count > 0 ||
                              InjectProperties.Count > 0 ||
                              InjectMethods.Count > 0;
+    }
+
+    public Location GetLocation()
+    {
+        return syntax?.Identifier.GetLocation() ??
+               Symbol.Locations.FirstOrDefault() ??
+               Location.None;
     }
 
     public bool InheritsFrom(INamedTypeSymbol baseSymbol)
@@ -66,7 +73,7 @@ class TypeMeta
 
     IReadOnlyList<IMethodSymbol> GetExplicitInjectConstructors()
     {
-        return Constructors.Where(ctor =>
+        return ExplicitConstructors.Where(ctor =>
         {
             return ctor.GetAttributes().Any(attr =>
                 SymbolEqualityComparer.Default.Equals(attr.AttributeClass, references.VContainerInjectAttribute));
@@ -109,6 +116,6 @@ class TypeMeta
 
     public bool IsNested()
     {
-        return Syntax.Parent is TypeDeclarationSyntax;
+        return Symbol.ContainingType != null;
     }
 }

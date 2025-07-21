@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using VContainer.Internal;
 
 namespace VContainer.Unity
 {
@@ -45,22 +46,23 @@ namespace VContainer.Unity
         {
             if (WaitingList.Count <= 0) return;
 
-            var buf = new List<LifetimeScope>();
-
-            for (var i = WaitingList.Count - 1; i >= 0; i--)
+            using (ListPool<LifetimeScope>.Get(out var buffer))
             {
-                var waitingScope = WaitingList[i];
-                if (waitingScope.parentReference.Type == awakenParent.GetType())
+                for (var i = WaitingList.Count - 1; i >= 0; i--)
                 {
-                    waitingScope.parentReference.Object = awakenParent;
-                    WaitingList.RemoveAt(i);
-                    buf.Add(waitingScope);
+                    var waitingScope = WaitingList[i];
+                    if (waitingScope.parentReference.Type == awakenParent.GetType())
+                    {
+                        waitingScope.parentReference.Object = awakenParent;
+                        WaitingList.RemoveAt(i);
+                        buffer.Add(waitingScope);
+                    }
                 }
-            }
 
-            foreach (var waitingScope in buf)
-            {
-                waitingScope.Awake();
+                foreach (var waitingScope in buffer)
+                {
+                    waitingScope.Awake();
+                }
             }
         }
 
@@ -69,21 +71,22 @@ namespace VContainer.Unity
             if (WaitingList.Count <= 0)
                 return;
 
-            var buf = new List<LifetimeScope>();
-
-            for (var i = WaitingList.Count - 1; i >= 0; i--)
+            using (ListPool<LifetimeScope>.Get(out var buffer))
             {
-                var waitingScope = WaitingList[i];
-                if (waitingScope.gameObject.scene == scene)
+                for (var i = WaitingList.Count - 1; i >= 0; i--)
                 {
-                    WaitingList.RemoveAt(i);
-                    buf.Add(waitingScope);
+                    var waitingScope = WaitingList[i];
+                    if (waitingScope.gameObject.scene == scene)
+                    {
+                        WaitingList.RemoveAt(i);
+                        buffer.Add(waitingScope);
+                    }
                 }
-            }
 
-            foreach (var waitingScope in buf)
-            {
-                waitingScope.Awake(); // Re-throw if parent not found
+                foreach (var waitingScope in buffer)
+                {
+                    waitingScope.Awake(); // Re-throw if parent not found
+                }
             }
         }
     }

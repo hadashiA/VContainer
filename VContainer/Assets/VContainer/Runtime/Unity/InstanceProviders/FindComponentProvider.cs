@@ -40,12 +40,14 @@ namespace VContainer.Unity
             }
             else if (scene.IsValid())
             {
-                var gameObjectBuffer = UnityEngineObjectListBuffer<GameObject>.Get();
-                scene.GetRootGameObjects(gameObjectBuffer);
-                foreach (var gameObject in gameObjectBuffer)
+                using (ListPool<GameObject>.Get(out var gameObjectBuffer))
                 {
-                    component = gameObject.GetComponentInChildren(componentType, true);
-                    if (component != null) break;
+                    scene.GetRootGameObjects(gameObjectBuffer);
+                    foreach (var gameObject in gameObjectBuffer)
+                    {
+                        component = gameObject.GetComponentInChildren(componentType, true);
+                        if (component != null) break;
+                    }
                 }
                 if (component == null)
                 {
