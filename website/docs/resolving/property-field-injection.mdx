@@ -29,13 +29,16 @@ When you have multiple implementations of the same interface or type registered 
 ```csharp
 class WeaponHolder
 {
-    [Inject, Key(WeaponType.Primary)]
+    [Inject]
+    [Key(WeaponType.Primary)]
     public IWeapon PrimaryWeapon { get; set; }
     
-    [Inject, Key("orc")]
+    [Inject]
+    [Key("orc")]
     public IEnemy OrcEnemy { get; set; }
     
-    [Inject, Key(2)]
+    [Inject]
+    [Key(2)]
     ILevel nextLevel;
 }
 ```

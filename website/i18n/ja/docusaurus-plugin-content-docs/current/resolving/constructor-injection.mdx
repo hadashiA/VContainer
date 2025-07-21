@@ -62,6 +62,35 @@ IL2CPP環境下では、直接参照のないコンストラクタがビルド�
   - もしもコンストラクタの引数が多すぎるなら、クラスの責務が多すぎると判断することができそうです。
 :::
 
+## Key Attribute {#key-attribute}
+
+同じインターフェイスや型の複数の実装が異なるキーで登録されている場合、`Key`属性を使ってどの実装を注入するかを指定することができます。
+
+```csharp
+class TestClass
+{
+    private readonly IWeapon _primaryWeapon;
+    private readonly IEnemy _goblin;
+    private readonly ILevel _level1;
+
+    public TestClass(
+        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Key("goblin")] IEnemy goblin,
+        [Key(1)] ILevel level1)
+    {
+        _primaryWeapon = primaryWeapon;
+        _goblin = goblin;
+        _level1 = level1;
+    }
+}
+```
+
+:::note
+`[Key]` アトリビュートは、`.Keyed()`メソッドを使用して対応するキーを登録した型に使用する必要があります。詳しくは[Register with Keys](../registering/register-with-keys) セクションを参照してください。
+:::
+
+
+
 ## MonoBehaviour
 
 `MonoBehaviour` はコンストラクタを直接使うことができません。代わりに [Method Injection](/resolving/method-injection) が使えます。
