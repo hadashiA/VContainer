@@ -24,7 +24,7 @@ namespace VContainer
     public sealed class ScopedContainerBuilder : ContainerBuilder
     {
         readonly IObjectResolver root;
-        readonly IScopedObjectResolver parent;
+        internal readonly IScopedObjectResolver parent;
 
         internal ScopedContainerBuilder(IObjectResolver root, IScopedObjectResolver parent)
         {
