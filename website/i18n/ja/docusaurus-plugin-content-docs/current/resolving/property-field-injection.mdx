@@ -25,3 +25,33 @@ It can resolve like this:
     [Inject]
     IServiceA serviceA;
 ```
+
+
+## Property/Field Injection with Keys
+
+同じインターフェイスや型の複数の実装が異なるキーで登録されている場合、`Key` 属性と `Inject` を使用することで、どの実装をインジェクトするかを指定することができます：
+
+```csharp
+class WeaponHolder
+{
+    [Inject]
+    [Key(WeaponType.Primary)]
+    public IWeapon PrimaryWeapon { get; set; }
+    
+    [Inject]
+    [Key("orc")]
+    public IEnemy OrcEnemy { get; set; }
+    
+    [Inject]
+    [Key(2)]
+    ILevel nextLevel;
+}
+```
+
+:::note
+When using keys with property or field injection, you must use both the `Inject` and `Key` attributes. The `Key` attribute alone is not sufficient for property or field injection.
+:::
+
+:::note
+The `Key` attribute must be used with types that have been registered with the corresponding key using the `.Keyed()` method. See the [Register with Keys](../registering/register-type#register-with-keys) section for more information.
+:::

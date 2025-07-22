@@ -21,3 +21,48 @@ public class SomeBehaviour : MonoBehaviour
 ```
 
 `MonoBehaviour` や `GameObject` の管理について詳しくは [MonoBehaviourへのインジェクション](gameobject-injection) を参照して下さい。
+
+
+## Method Injection with Keys
+
+同じインターフェイスや型の複数の実装が異なるキーで登録されている場合、メソッドパラメーターの `Key` 属性を使って、注入する実装を指定することができます：
+
+```csharp
+public class WeaponController : MonoBehaviour
+{
+    private IWeapon _primaryWeapon;
+    private IWeapon _secondaryWeapon;
+
+    [Inject]
+    public void Initialize(
+        [Key(WeaponType.Primary)] IWeapon primaryWeapon,
+        [Key(WeaponType.Secondary)] IWeapon secondaryWeapon)
+    {
+        _primaryWeapon = primaryWeapon;
+        _secondaryWeapon = secondaryWeapon;
+    }
+}
+```
+
+The `Key` attribute also supports other key types like strings and integers:
+
+```csharp
+public class GameController : MonoBehaviour
+{
+    private IEnemy _enemy;
+    private ILevel _level;
+
+    [Inject]
+    public void Setup(
+        [Key("goblin")] IEnemy enemy,
+        [Key(1)] ILevel level)
+    {
+        _enemy = enemy;
+        _level = level;
+    }
+}
+```
+
+:::note
+`[Key]` アトリビュートは、`.Keyed()`メソッドを使用して対応するキーを登録した型に使用する必要があります。詳しくは[Register with Keys](../registering/register-with-keys) セクションを参照してください。
+:::

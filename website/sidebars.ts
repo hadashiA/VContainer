@@ -37,6 +37,7 @@ const sidebars: SidebarsConfig = {
       'registering/register-scriptable-object',
       'registering/register-collection',
       'registering/register-callbacks',
+      'registering/register-with-keys',
     ],
     'Integrations': [
       'integrations/entrypoint',
