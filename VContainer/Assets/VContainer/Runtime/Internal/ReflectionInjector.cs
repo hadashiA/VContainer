@@ -31,6 +31,11 @@ namespace VContainer.Internal
 
         public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
+            if (typeof(UnityEngine.Component).IsAssignableFrom(injectTypeInfo.Type))
+            {
+                throw new NotSupportedException($"UnityEngine.Component:{injectTypeInfo.Type.Name} cannot be `new`");
+            }
+
             var parameterInfos = injectTypeInfo.InjectConstructor.ParameterInfos;
             var parameterKeys = injectTypeInfo.InjectConstructor.ParameterKeys;
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameterInfos.Length);
