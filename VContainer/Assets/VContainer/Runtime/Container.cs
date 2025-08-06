@@ -90,7 +90,7 @@ namespace VContainer
             {
                 return Resolve(registration);
             }
-            throw new VContainerException(type, $"No such registration of type: {type} {(key == null ? string.Empty : $"with Key: {key}")}");
+            throw new VContainerException(type, $"No such registration of type: {type}{(key == null ? string.Empty : $" with Key: {key}")}");
         }
 
         public bool TryResolve(Type type, out object resolved, object key = null)
@@ -232,7 +232,7 @@ namespace VContainer
             {
                 return Resolve(registration);
             }
-            throw new VContainerException(type, $"No such registration of type: {type} with Key: {key}");
+            throw new VContainerException(type, $"No such registration of type: {type}{(key == null ? string.Empty : $" with Key: {key}")}");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
