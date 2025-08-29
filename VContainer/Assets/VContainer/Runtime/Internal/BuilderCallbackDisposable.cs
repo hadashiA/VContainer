@@ -7,6 +7,7 @@ namespace VContainer.Internal
         public event Action<IObjectResolver> Disposing;
         readonly IObjectResolver container;
 
+        [Inject]
         public BuilderCallbackDisposable(IObjectResolver container)
         {
             this.container = container;
