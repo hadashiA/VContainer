@@ -15,7 +15,10 @@ namespace VContainer.Unity
             if (containerBuilder.Exists(typeof(EntryPointDispatcher), false)) return;
             containerBuilder.Register<EntryPointDispatcher>(Lifetime.Scoped);
 
-            containerBuilder.RegisterEntryPointExceptionHandler(UnityEngine.Debug.LogException);
+            if (!containerBuilder.Exists(typeof(EntryPointExceptionHandler)))
+            {
+                containerBuilder.RegisterEntryPointExceptionHandler(UnityEngine.Debug.LogException);
+            }
 
             containerBuilder.RegisterBuildCallback(container =>
             {
