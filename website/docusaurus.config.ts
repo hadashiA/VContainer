@@ -93,7 +93,7 @@ const config: Config = {
       // },
     },
     prism: {
-      additionalLanguages: ['csharp'],
+      additionalLanguages: ['csharp', 'diff'],
       theme: prismThemes.vsDark,
       darkTheme: prismThemes.vsDark,
     },
