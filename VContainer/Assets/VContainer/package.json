@@ -1,6 +1,7 @@
 {
   "name": "jp.hadashikick.vcontainer",
   "displayName": "VContainer",
+  "author": "hadashiA",
   "version": "1.16.2",
   "unity": "2018.4",
   "description": "The extra fast DI (Dependency Injection) for Unity",
@@ -10,4 +11,3 @@
   "changelogUrl": "https://github.com/hadashiA/VContainer/releases",
   "licensesUrl": "https://github.com/hadashiA/VContainer/blob/master/LICENSE"
 }
-
