@@ -78,7 +78,6 @@ namespace VContainer.Unity
                     var waitingScope = WaitingList[i];
                     if (waitingScope.gameObject.scene == scene)
                     {
-                        WaitingList.RemoveAt(i);
                         buffer.Add(waitingScope);
                     }
                 }
