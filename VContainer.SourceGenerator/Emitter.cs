@@ -46,8 +46,6 @@ static class Emitter
             return false; // TODO:
         }
 
-        codeWriter.AppendLine("using System;");
-        codeWriter.AppendLine("using System.Collections.Generic;");
         codeWriter.AppendLine("using VContainer;");
         codeWriter.AppendLine();
 
@@ -65,8 +63,8 @@ static class Emitter
 
         var generateTypeName = $"{typeName}GeneratedInjector";
 
-        codeWriter.AppendLine("[Preserve]");
-        using (codeWriter.BeginBlockScope($"class {generateTypeName} : IInjector"))
+        codeWriter.AppendLine("[global::VContainer.Preserve]");
+        using (codeWriter.BeginBlockScope($"class {generateTypeName} : global::VContainer.IInjector"))
         {
             codeWriter.AppendLine();
             if (!TryEmitCreateInstanceMethod(typeMeta, codeWriter, references, in context))
@@ -97,7 +95,7 @@ static class Emitter
         in SourceProductionContext context)
     {
         using (codeWriter.BeginBlockScope(
-                   "public void Inject(object instance, IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
+                   "public void Inject(object instance, global::VContainer.IObjectResolver resolver, global::System.Collections.Generic.IReadOnlyList<global::VContainer.IInjectParameter> parameters)"))
         {
             if (typeMeta.InjectFields.Count <= 0 &&
                 typeMeta.InjectProperties.Count <= 0 &&
@@ -386,13 +384,13 @@ static class Emitter
             return false;
         }
 
-        using (codeWriter.BeginBlockScope("public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)"))
+        using (codeWriter.BeginBlockScope("public object CreateInstance(global::VContainer.IObjectResolver resolver, global::System.Collections.Generic.IReadOnlyList<global::VContainer.IInjectParameter> parameters)"))
         {
             // Handle Unity components - they shouldn't be instantiated with 'new'
             if (references.UnityEngineComponent != null &&
                 typeMeta.InheritsFrom(references.UnityEngineComponent))
             {
-                codeWriter.AppendLine($"throw new NotSupportedException(\"UnityEngine.Component:{typeMeta.TypeName} cannot be `new`\");");
+                codeWriter.AppendLine($"throw new global::System.NotSupportedException(\"UnityEngine.Component:{typeMeta.TypeName} cannot be `new`\");");
                 return true;
             }
             
