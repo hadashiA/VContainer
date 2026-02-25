@@ -132,7 +132,7 @@ namespace VContainer.Unity
         {
             var registrationBuilder = new ComponentRegistrationBuilder(component).As(typeof(TInterface));
             // Force inject execution
-            builder.RegisterBuildCallback(container => container.Resolve<TInterface>());
+            builder.RegisterBuildCallback(container => container.Resolve<TInterface>(registrationBuilder.Key));
             return builder.Register(registrationBuilder);
         }
 
@@ -151,7 +151,8 @@ namespace VContainer.Unity
                     container.Resolve(
                         registrationBuilder.InterfaceTypes != null
                             ? registrationBuilder.InterfaceTypes[0]
-                            : registrationBuilder.ImplementationType
+                            : registrationBuilder.ImplementationType,
+                        registrationBuilder.Key
                     );
                 }
             );
