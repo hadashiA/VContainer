@@ -24,6 +24,8 @@ namespace VContainer.Unity
 
             var exceptionHandler = container.ResolveOrDefault<EntryPointExceptionHandler>();
 
+            container.Resolve<ContainerLocal<IReadOnlyList<INonLazy>>>();
+
             var initializables = container.Resolve<ContainerLocal<IReadOnlyList<IInitializable>>>().Value;
             for (var i = 0; i < initializables.Count; i++)
             {
