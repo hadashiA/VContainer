@@ -461,6 +461,22 @@ namespace VContainer.Tests.Unity
             Assert.That(created.transform.parent, Is.EqualTo(go3.transform));
         }
 
+        [Test]
+        public void RegisterNonLazyEntryPoint()
+        {
+            SampleNonLazyEntryPoint.InstanceCount = 0;
+
+            var builder = new ContainerBuilder();
+            builder.RegisterEntryPoint<SampleNonLazyEntryPoint>();
+
+            var container = builder.Build();
+            Assert.That(SampleNonLazyEntryPoint.InstanceCount, Is.EqualTo(1));
+
+            var resolved = container.Resolve<INonLazy>();
+            Assert.That(resolved, Is.InstanceOf<SampleNonLazyEntryPoint>());
+            Assert.That(SampleNonLazyEntryPoint.InstanceCount, Is.EqualTo(1));
+        }
+
         [UnityTest]
         public IEnumerator DispatchMonoBehaviour()
         {
