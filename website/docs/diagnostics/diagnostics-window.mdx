@@ -4,28 +4,28 @@ title: VContainer Diagnostics Window
 sidebar_label: Diagnostics Window
 ---
 
-VContainer has an editor tool in Unity for debugging.
+VContainer has an editor tool in Unity for viewing the object dependency graph.
 
 ![](assets/screenshot_diagnostics_window.png)
 
-- In the middle pane, you can see the dependencies that VContainer has built.
-    - Select any row detail in the center pane to see more details about Registration.
-- In the lower pane, you can see where the selected row has been registered. By clicking on the blue link, you can open the corresponding part of the code.
-- In the right pane, you can see the contents of the instance retrieved from the container for the type of the currently selected row.
-    - This is the ToString() of the field/property. If you want a more meaningful value, you can consider overriding ToString().
+- Middle pane shows the dependency tree view of objects registered in the DI container.
+    - Select any row in the middle pane to see more details about Registration.
+- Lower pane shows where the selected row has been registered. Click on the blue link to open the corresponding part of the code.
+- Right pane shows the contents of the instance retrieved from the container for the type of the currently selected row.
+    - This is a list of the instance's fields/properties' `ToString()` outputs. Consider overriding `ToString()` to display a more meaningful value.
 
-To enable this, fllow the steps below:
+To enable this feature, follow the steps below:
 
-- 1. Create `VContainerSettings`
-    - Choose `Assets -> Create -> VContainer -> VContainer Settings`
-- 2. From your VContainerSettings, check to the **Enable Diagnostics**.
+- 1. Create `VContainerSettings`.
+    - Choose `Assets -> Create -> VContainer -> VContainer Settings` from the menu bar.
+- 2. From your VContainerSettings, enable the **Enable Diagnostics** checkbox.
     - ![](assets/screenshot_enable_diagnostics.png)
-- 3. Choose Window -> VContainer Diagnostics to open window as a screenshot
+- 3. Choose `Window -> VContainer Diagnostics` to open window as shown in the screenshot above.
 
 :::warning
 "Enable Diagnostics" will significantly degrade performance; GC allocation will also be greatly increased.
 
-It is recommended to enable it only during development.
+It is recommended to enable this feature only during development.
 :::
 
 :::info
@@ -36,8 +36,8 @@ If VContainerSettings does not load, please make sure that VContainerSettings is
 
 ## DiagnosticsInfo
 
-When "Enable Diagnostics", containers are collecting debugging information internally.
-You can also access this information through the following interface
+When "Enable Diagnostics" is enabled, containers collect debugging information internally.
+Access this information through the following interface:
 
-- `DiagnosticsContext.GetDiagnosticsInfos()` returns list of debug information for all registered instances.
-- `IObjectResolver.Diagnostics?.GetDiagnosticsInfos()` returns list of information for specific container.
+- `DiagnosticsContext.GetDiagnosticsInfos()` returns a list of debug information for all registered instances.
+- `IObjectResolver.Diagnostics?.GetDiagnosticsInfos()` returns a list of information for the specific container.
