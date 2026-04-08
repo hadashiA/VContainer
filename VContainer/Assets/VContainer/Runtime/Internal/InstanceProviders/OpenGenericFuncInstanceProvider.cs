@@ -5,20 +5,20 @@ using TypeParametersKey = VContainer.Internal.OpenGenericTypeParametersKey;
 
 namespace VContainer.Internal
 {
-    public class OpenGenericInstanceProvider : IInstanceProvider, IClosedRegistrationProvider
+    public class OpenGenericFuncInstanceProvider : IInstanceProvider, IClosedRegistrationProvider
     {
-        readonly Lifetime lifetime;
         readonly Type implementationType;
-        readonly IReadOnlyList<IInjectParameter> customParameters;
+        readonly Lifetime lifetime;
+        readonly Func<IObjectResolver, Type[], object> factory;
 
         readonly ConcurrentDictionary<TypeParametersKey, Registration> constructedRegistrations = new ConcurrentDictionary<TypeParametersKey, Registration>();
         readonly Func<TypeParametersKey, Registration> createRegistrationFunc;
 
-        public OpenGenericInstanceProvider(Type implementationType, Lifetime lifetime, List<IInjectParameter> injectParameters)
+        public OpenGenericFuncInstanceProvider(Type implementationType, Lifetime lifetime, Func<IObjectResolver, Type[], object> factory)
         {
             this.implementationType = implementationType;
             this.lifetime = lifetime;
-            customParameters = injectParameters;
+            this.factory = factory;
             createRegistrationFunc = CreateRegistration;
         }
 
@@ -31,8 +31,7 @@ namespace VContainer.Internal
         Registration CreateRegistration(TypeParametersKey key)
         {
             var newType = implementationType.MakeGenericType(key.TypeParameters);
-            var injector = InjectorCache.GetOrBuild(newType);
-            var spawner = new InstanceProvider(injector, customParameters);
+            var spawner = new FuncInstanceProvider(resolver => factory(resolver, key.TypeParameters));
             return new Registration(newType, lifetime, new List<Type>(1) { newType }, spawner, key.Key);
         }
 
@@ -40,5 +39,5 @@ namespace VContainer.Internal
         {
             throw new InvalidOperationException();
         }
-   }
+    }
 }
