@@ -13,6 +13,10 @@ type GraphThemeContext = {
 export function useGraphTheme(): GraphThemeContext {
   const { colorMode } = useColorMode()
   return {
-    theme: { textColor: textColros[colorMode] }
+    theme: {
+      text: {
+        fill: textColros[colorMode]
+      }
+    }
   }
 }

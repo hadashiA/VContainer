@@ -1,10 +1,9 @@
 import * as React from "react"
-import Highlight, { defaultProps, Language } from 'prism-react-renderer';
-import { themes } from "prism-react-renderer";
+import { Highlight, themes } from 'prism-react-renderer';
 
 const indent = (code: string) => code.split(/[\s]+/).join("\n    ")
 
-export const Inline: React.FC<{whitespaces: number}> = ({children}) => {
+export const Inline: React.FC<React.PropsWithChildren<{whitespaces: number}>> = ({children}) => {
   if (React.Children.count(children) != 1) {
     return children
   }
@@ -14,7 +13,7 @@ export const Inline: React.FC<{whitespaces: number}> = ({children}) => {
     return children
   }
 
-  return <Highlight {...defaultProps} code={indent(code)} language="csharp" theme={themes.vsDark}>
+  return <Highlight code={indent(code)} language="csharp" theme={themes.vsDark}>
     {({ className, style, tokens, getLineProps, getTokenProps }) => (
       <pre className={className} style={style}>
         {tokens.map((line, i) => (

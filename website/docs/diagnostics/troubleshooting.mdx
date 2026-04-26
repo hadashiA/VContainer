@@ -1,0 +1,86 @@
+---
+title: Troubleshooting
+---
+
+This page lists common errors you might encounter when using VContainer and how to resolve them.
+
+## Common Exceptions
+
+### `VContainerException: No such registration of type: X`
+
+**Cause:**
+You are trying to `Resolve<X>()` (or inject `X` into a constructor), but `X` has not been registered in the current `LifetimeScope` or any of its parents.
+
+**Solution:**
+1.  Check your `Configure` method in `LifetimeScope`. Ensure `builder.Register<X>(...)` exists.
+2.  If `X` is an interface, ensure you registered it as that interface: `builder.Register<XImpl>(...).As<X>()`.
+3.  If you expect it to be inherited from a parent scope, verify the parent-child connection in the Inspector or code.
+
+### `VContainerException: Circular dependency detected`
+
+**Cause:**
+Class A depends on Class B, and Class B depends on Class A. VContainer cannot create either because they require each other to exist first.
+
+```csharp
+class A { public A(B b) {} }
+class B { public B(A a) {} }
+```
+
+**Solution:**
+1.  **Refactor (Recommended):** This usually indicates a design flaw. Extract the shared logic into a third class `C`, and have both `A` and `B` depend on `C`.
+2.  **Lazy Injection:** If refactoring is impossible, use `Lazy<T>` or `Func<T>` to delay resolution.
+    ```csharp
+    class A { public A(Lazy<B> b) {} }
+    ```
+
+### `VContainerException: Implementation type must be a subclass of ...`
+
+**Cause:**
+You tried to register a type as an interface it doesn't implement.
+```csharp
+// Error if ServiceA does not implement IService
+builder.Register<ServiceA>(Lifetime.Singleton).As<IService>();
+```
+
+**Solution:**
+Ensure `ServiceA` implements `IService`.
+
+## Unity Specific Issues
+
+### MonoBehaviour fields are null after Injection
+
+**Cause:**
+`Awake()` is called *before* VContainer injects dependencies into MonoBehaviours in the scene.
+
+**Solution:**
+1.  Move your initialization logic to `Start()`. VContainer injects after `Awake` but before `Start`.
+2.  Or, implement `IInitializable` if you are using `RegisterEntryPoint`.
+
+### "Multiple constructors found"
+
+**Cause:**
+The class you are trying to register has multiple constructors, and VContainer doesn't know which one to use.
+
+**Solution:**
+Add the `[Inject]` attribute to the constructor you want VContainer to use.
+
+```csharp
+class MyService
+{
+    public MyService() {} // Don't use this
+
+    [Inject]
+    public MyService(Dependency d) {} // Use this!
+}
+```
+
+## Performance Issues
+
+### "GC Allocation is high during Resolve"
+
+**Cause:**
+You might be using `Lifetime.Transient` for heavy objects or frequently resolving objects inside a tight loop (like `Update`).
+
+**Solution:**
+1.  Use `Lifetime.Singleton` or `Lifetime.Scoped` where possible.
+2.  Avoid calling `Resolve()` inside `Update()`. Resolve once in the constructor/Start and cache the reference.

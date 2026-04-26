@@ -6,17 +6,17 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #3333ee;
-  /*--ifm-color-primary-dark: rgb(33, 175, 144);*/
-  /*--ifm-color-primary-darker: rgb(31, 165, 136);*/
-  /*--ifm-color-primary-darkest: rgb(26, 136, 112);*/
-  /*--ifm-color-primary-light: rgb(70, 203, 174);*/
-  /*--ifm-color-primary-lighter: rgb(102, 212, 189);*/
-  /*--ifm-color-primary-lightest: rgb(146, 224, 208);*/
+  /* Palette UX: Professional Blue Palette (Base: #2563eb - Blue 600) */
+  --ifm-color-primary: #2563eb;
+  --ifm-color-primary-dark: #1d4ed8;
+  --ifm-color-primary-darker: #1e40af;
+  --ifm-color-primary-darkest: #1e3a8a;
+  --ifm-color-primary-light: #3b82f6;
+  --ifm-color-primary-lighter: #60a5fa;
+  --ifm-color-primary-lightest: #93c5fd;
+
   --ifm-code-font-size: 95%;
   --ifm-font-weight-semibold: 700;
-  --ifm-menu-color-background-active: none;
-  --ifm-menu-color-background-hover: none;
 
   --ifm-h1-font-size: 2rem;
   --ifm-h2-font-size: 1.5rem;
@@ -42,9 +42,17 @@ h1.docTitle_node_modules-\@docusaurus-theme-classic-lib-theme-DocItem- {
   --ifm-h3-font-size: 1rem;
 }
 
+/* Palette UX: Dark Mode Overrides */
 html[data-theme='dark'] {
-  --ifm-background-color: rgb(17, 17, 34);
-  /*--ifm-font-color-base: #fff;*/
+  /* Background: Neutral Dark (Zinc 950) instead of Blue-ish */
+  --ifm-background-color: #18181b;
+
+  /* Navbar & Footer: Match background for a seamless look */
+  --ifm-navbar-background-color: #18181b;
+  --ifm-footer-background-color: #18181b;
+
+  /* Adjust Text for contrast if needed (Infima defaults are usually fine) */
+  /* --ifm-font-color-base: #e4e4e7; */ /* Zinc 200 */
 }
 
 .docusaurus-highlight-code-line {
@@ -94,14 +102,24 @@ html[data-theme='dark'] {
   color: var(--ifm-font-color-base);
 }
 
-/*.menu>ul.menu__list li>a {*/
-/*  padding-left: 0;*/
-/*  !*padding-right: 0;*!*/
-/*  !*margin: 0;*!*/
-/*}*/
+/* Palette UX: Improved Sidebar styling */
+.menu__link {
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Palette UX: Dark mode sidebar refinements */
+html[data-theme='dark'] .menu__link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--ifm-color-primary-light);
+}
+
+html[data-theme='dark'] .menu__link--active {
+  background-color: rgba(37, 99, 235, 0.15); /* Blue tint based on new primary */
+  color: var(--ifm-color-primary-light);
+}
 
 .menu>ul.menu__list ul.menu__list {
-  border-left: 1px solid rgba(0,27,61,.075);
   border-left: 1px solid var(--ifm-hr-border-color);
   margin-left: 0;
   padding-left: var(--ifm-menu-link-padding-horizontal);
@@ -125,12 +143,7 @@ article + div .row > .col > a {
 
 /* Footer */
 
-.footer--dark {
-  --ifm-footer-background-color: #fafafa;
-  --ifm-footer-link-color: rgb(34, 34, 34);
-  --ifm-footer-color: var(--ifm-footer-link-color);
-  --ifm-footer-title-color: rgb(34, 34, 34);
-}
+/* Palette UX: Footer dark mode override is now handled in html[data-theme='dark'] block */
 
 /* Search Bar */
 

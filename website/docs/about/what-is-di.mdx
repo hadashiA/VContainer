@@ -2,20 +2,20 @@
 title: What is DI ?
 ---
 
-DI (Dependency Injection) is a general technique in OOP that all about removing unconcerned dependencies from your code.
-It brings testability, maintainability, extensibility or any kind of exchangeability to your object graph.
+DI (Dependency Injection) is a general technique in OOP that is all about removing unconcerned dependencies from your code.
+It brings testability, maintainability, extensibility, and exchangeability to your object graph.
 
-In all programming paradigms, the basic design is, weak module coupling and strong module cohesion.
-As you know, OOP (Object Oriented Programming) does it through objects.
-1. Objects hides the details of its responsibility (encapsulation).
+In all programming paradigms, the basic design goal is loose coupling and strong cohesion.
+OOP (Object Oriented Programming) achieves this through objects:
+1. Objects hide the details of their responsibility (encapsulation).
 2. Objects transfer work outside their responsibilities to other objects.
 
-Actually, there is a problem in doing this fundamentally.
+However, there is a fundamental problem with doing this.
 If you write the delegation object in the class code, it means tight coupling at the source code level.
 The only way to exclude an unconcerned dependency from a class is to pass it in from outside.
 
-Thus, if your class receives dependencies externally, it'll need help from the outside.
-DI is a technique that facilitates a place to resolve dependencies completely outside.
+Thus, if your class receives dependencies externally, it requires assistance from the outside.
+DI is a technique that provides a mechanism to resolve dependencies completely externally.
 
 Further reading:
 - [Manning | Dependency Injection in .NET](https://www.manning.com/books/dependency-injection-in-dot-net)
@@ -24,10 +24,10 @@ Further reading:
 
 ## Terminology
 
-- **DI Container:** Have dependent references all at once and execute auto-wiring.
-- **Composition Root:** The place where you make settings to resolve dependencies.
-- **Auto-wiring:** It is a function that allows you to manage services in the container with minimal configuration. DI library usually does this.
-- **IoC (Inversion of Control):** Make the object with control flow responsibility an entry point. In simple and traditional programming, the entry point is where the responsibility for interrupting user input is.
+- **DI Container:** Manages dependent references and executes auto-wiring.
+- **Composition Root:** The place where you configure dependency resolution.
+- **Auto-wiring:** A feature that allows you to manage services in the container with minimal configuration. DI libraries usually handle this.
+- **IoC (Inversion of Control):** Making the object with control flow responsibility the entry point. In simple and traditional programming, the entry point is where the responsibility for interpreting user input lies.
 
 ## Why DI for Unity ?
 
@@ -35,11 +35,11 @@ In Unity, MonoBehaviour is the entry point for our C# code. On the other hand, M
 
 In modern application design, "separation of domain logic and presentation layer (View component)" is important.
 
-It is against this that MonoBehaviour has many roles (event handling, control flow, domain logic calls, etc.) in addition to its behavior as a View.
+Ideally, MonoBehaviour should not have so many roles (event handling, control flow, domain logic calls, etc.) in addition to its behavior as a View.
 
-One of the purposes of DI is IoC (Inversion of Control). With DI containers, we can make pure C# classes the entry point (not MonoBehaviour). This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
+One of the purposes of DI is IoC (Inversion of Control). With DI containers, we can make pure C# classes the entry point (instead of MonoBehaviour). This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
 
-View components are dynamically created / destroyed at run time, while all "features" such as control flow and domain logic have a more stable lifespan.
+View components are dynamically created and destroyed at runtime, while "features" such as control flow and domain logic have a more stable lifespan.
 
 Generally speaking, it's a good idea to make the View layer stateless and separate it from control flow and data management.
 

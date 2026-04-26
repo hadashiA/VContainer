@@ -1,5 +1,6 @@
 ---
 title: Register with Keys
+sidebar_label: Keyed Registrations
 ---
 
 ## Register with Keys
@@ -57,9 +58,9 @@ class WeaponSystem
 }
 ```
 
-See the [Key Attribute](../resolving/constructor-injection#key-attribute) section for more information on using keys in injection.
+See the [Key Attribute](../resolving/constructor-injection.mdx#key-attribute) section for more information on using keys in injection.
 
 :::note
-You might think that this feature allows you to DI anything, but we do not recommend injection fine-grained values.
-Generally, consider creating a factory or provider first and then DI it. It is good practice to consider using a key if it is clearly an unnecessary abstraction or if for some reason it cannot be done.
+You might think that this feature allows you to DI anything, but we do not recommend injecting fine-grained values.
+Generally, consider creating a factory or provider first and then injecting it. It is reasonable to use a key if creating an abstraction is unnecessary or not feasible.
 :::
