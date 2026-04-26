@@ -1,0 +1,160 @@
+---
+title: Best Practices
+---
+
+This section introduces best practices for using VContainer effectively and writing clean, maintainable code.
+
+## Registration
+
+### Prefer `Register` over `Install` methods
+
+Users migrating from other DI libraries (like Zenject) might be tempted to create "Installer" classes or methods named `Install`.
+
+**Bad Practice:**
+```csharp
+public class GameLifetimeScope : LifetimeScope
+{
+    protected override void Configure(IContainerBuilder builder)
+    {
+        // Don't do this
+        new MyGameInstaller().Install(builder);
+    }
+}
+
+public class MyGameInstaller
+{
+    public void Install(IContainerBuilder builder)
+    {
+        builder.Register<ServiceA>(Lifetime.Singleton);
+    }
+}
+```
+
+**Best Practice:**
+Use C# Extension Methods on `IContainerBuilder` to group registrations. This keeps the API consistent with the rest of VContainer.
+
+```csharp
+// Define an extension method
+public static class MyGameContainerExtensions
+{
+    public static void RegisterMyGameServices(this IContainerBuilder builder)
+    {
+        builder.Register<ServiceA>(Lifetime.Singleton);
+        builder.Register<ServiceB>(Lifetime.Singleton);
+    }
+}
+
+public class GameLifetimeScope : LifetimeScope
+{
+    protected override void Configure(IContainerBuilder builder)
+    {
+        // Use it like a native method
+        builder.RegisterMyGameServices();
+    }
+}
+```
+
+### Explicit Lifetime
+
+Always specify the `Lifetime` explicitly. While some libraries default to Singleton or Transient, VContainer requires you to be explicit to avoid ambiguity and accidental object lifecycle issues.
+
+```csharp
+// Clear and readable
+builder.Register<MyService>(Lifetime.Singleton);
+```
+
+## Injection
+
+### Constructor Injection is King
+
+Constructor injection is the most robust form of injection. It ensures that a class cannot be instantiated without its dependencies, making it "complete" and testable.
+
+**Best Practice:**
+```csharp
+public class PlayerController
+{
+    readonly IInputService inputService;
+
+    // The dependencies are clear just by looking at the constructor
+    public PlayerController(IInputService inputService)
+    {
+        this.inputService = inputService;
+    }
+}
+```
+
+### Avoid Property/Field Injection Where Possible
+
+Property and Field injection should generally be reserved for MonoBehaviour classes where you cannot control the constructor (though VContainer can often handle MonoBehaviours too). Field injection hides dependencies and makes unit testing harder because you have to manually set private fields via reflection or helper methods.
+
+### Avoid Service Locator Pattern
+
+Do not inject `IObjectResolver` or `IContainer` into your classes to resolve dependencies manually. This hides what the class actually needs and tightly couples your class to the DI container.
+
+**Bad Practice:**
+```csharp
+public class BadClass
+{
+    readonly IObjectResolver container;
+
+    public BadClass(IObjectResolver container)
+    {
+        this.container = container;
+    }
+
+    public void DoSomething()
+    {
+        // Hidden dependency!
+        var service = container.Resolve<IMyService>();
+        service.Run();
+    }
+}
+```
+
+**Best Practice:**
+Request `IMyService` directly in the constructor.
+
+## Lifecycle Management
+
+### Use Interfaces for Entry Points
+
+Instead of using `MonoBehaviour`'s `Start`, `Update`, `OnDestroy` for your pure C# logic, use VContainer's marker interfaces: `IStartable`, `ITickable`, `IDisposable`, etc.
+
+This decouples your game logic from the Unity Engine (making it testable outside Unity) and provides a unified entry point.
+
+```csharp
+public class GamePresenter : IStartable, ITickable, IDisposable
+{
+    public void Start() { /* Init */ }
+    public void Tick() { /* Update loop */ }
+    public void Dispose() { /* Cleanup */ }
+}
+```
+
+Register it with:
+```csharp
+builder.RegisterEntryPoint<GamePresenter>();
+```
+
+### Leverage Scoping
+
+Don't dump everything into a single Root `LifetimeScope`. Use child scopes for specific contexts like:
+- A specific game level
+- A dynamically loaded character
+- A UI screen
+
+When the scope is disposed (e.g., the GameObject is destroyed or the scene unloads), all `IDisposable` instances created within that scope are automatically disposed. This is excellent for memory management.
+
+## Project Structure
+
+### Composition Root
+
+Keep your `Configure` method in `LifetimeScope` clean. It is your **Composition Root**. It should only contain registration logic. Avoid putting game initialization logic inside `Configure`. Use `IStartable` for initialization.
+
+### Pure C# vs MonoBehaviours
+
+Try to keep as much logic as possible in pure C# classes registered in the container. Use `MonoBehaviour` mainly for:
+- View components (referencing UI elements, Transforms, Colliders).
+- Bridge components that forward Unity events (Collision, Trigger) to your pure C# classes.
+
+This separation concerns (View vs Logic) follows the MVP/MVVM patterns and makes your codebase much more maintainable.
