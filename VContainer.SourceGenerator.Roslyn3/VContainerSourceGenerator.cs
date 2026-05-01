@@ -23,6 +23,7 @@ public class VContainerSourceGenerator : ISourceGenerator
 
         var codeWriter = new CodeWriter();
         var syntaxCollector = (SyntaxCollector)context.SyntaxReceiver!;
+        var generatedTypes = new System.Collections.Generic.HashSet<ISymbol>(SymbolEqualityComparer.Default);
         foreach (var workItem in syntaxCollector.WorkItems)
         {
             if (workItem.TypeDeclarationSyntax is { } typeDeclarationSyntax)
@@ -31,6 +32,8 @@ public class VContainerSourceGenerator : ISourceGenerator
                 var typeDeclarationCandidate = new TypeDeclarationCandidate(typeDeclarationSyntax, semanticModel);
                 if (typeDeclarationCandidate.Analyze(references) is { } typeMeta)
                 {
+                    if (!generatedTypes.Add(typeMeta.Symbol)) continue;
+
                     Execute(typeMeta, codeWriter, references, in context);
                     codeWriter.Clear();
                 }
@@ -42,6 +45,8 @@ public class VContainerSourceGenerator : ISourceGenerator
                 var typeMetas = registerInvocationCandidate.Analyze(references);
                 foreach (var typeMeta in typeMetas)
                 {
+                    if (!generatedTypes.Add(typeMeta.Symbol)) continue;
+
                     Execute(typeMeta, codeWriter, references, in context);
                     codeWriter.Clear();
                 }
