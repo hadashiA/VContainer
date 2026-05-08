@@ -71,15 +71,18 @@ namespace VContainer.Unity
         {
             if (RootLifetimeScope != null && rootLifetimeScopeInstance == null)
             {
-                var activeBefore = RootLifetimeScope.gameObject.activeSelf;
-                RootLifetimeScope.gameObject.SetActive(false);
+                using (new ObjectResolverUnityExtensions.PrefabDirtyScope(RootLifetimeScope.gameObject))
+                {
+                    var activeBefore = RootLifetimeScope.gameObject.activeSelf;
+                    RootLifetimeScope.gameObject.SetActive(false);
 
-                rootLifetimeScopeInstance = Instantiate(RootLifetimeScope);
-                SetName(rootLifetimeScopeInstance, RootLifetimeScope);
-                DontDestroyOnLoad(rootLifetimeScopeInstance);
-                rootLifetimeScopeInstance.gameObject.SetActive(true);
+                    rootLifetimeScopeInstance = Instantiate(RootLifetimeScope);
+                    SetName(rootLifetimeScopeInstance, RootLifetimeScope);
+                    DontDestroyOnLoad(rootLifetimeScopeInstance);
+                    rootLifetimeScopeInstance.gameObject.SetActive(true);
 
-                RootLifetimeScope.gameObject.SetActive(activeBefore);
+                    RootLifetimeScope.gameObject.SetActive(activeBefore);
+                }
             }
             return rootLifetimeScopeInstance;
         }
