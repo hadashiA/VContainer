@@ -165,4 +165,14 @@ namespace VContainer.Tests.Unity
             => throw new System.NotImplementedException();
     }
 #endif
+
+    public class SampleNonLazyEntryPoint : INonLazy
+    {
+        public static int InstanceCount;
+
+        public SampleNonLazyEntryPoint()
+        {
+            InstanceCount++;
+        }
+    }
 }
