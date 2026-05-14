@@ -14,13 +14,13 @@ VContainer has an editor tool in Unity for viewing the object dependency graph.
 - Right pane shows the contents of the instance retrieved from the container for the type of the currently selected row.
     - This is a list of the instance's fields/properties' `ToString()` outputs. Consider overriding `ToString()` to display a more meaningful value.
 
-To enable this feature, follow the steps below:
+To enable this, follow the steps below:
 
-- 1. Create `VContainerSettings`.
-    - Choose `Assets -> Create -> VContainer -> VContainer Settings` from the menu bar.
-- 2. From your VContainerSettings, enable the **Enable Diagnostics** checkbox.
+- 1. Create `VContainerSettings`
+    - Choose `Assets -> Create -> VContainer -> VContainer Settings`
+- 2. From your VContainerSettings, check **Enable Diagnostics**.
     - ![](assets/screenshot_enable_diagnostics.png)
-- 3. Choose `Window -> VContainer Diagnostics` to open window as shown in the screenshot above.
+- 3. Choose `Window -> VContainer Diagnostics` to open the window as shown in the screenshot.
 
 :::warning
 "Enable Diagnostics" will significantly degrade performance; GC allocation will also be greatly increased.
@@ -36,8 +36,8 @@ If VContainerSettings does not load, please make sure that VContainerSettings is
 
 ## DiagnosticsInfo
 
-When "Enable Diagnostics" is enabled, containers collect debugging information internally.
-Access this information through the following interface:
+When "Enable Diagnostics" is on, containers collect debugging information internally.
+You can also access this information through the following interface:
 
 - `DiagnosticsContext.GetDiagnosticsInfos()` returns a list of debug information for all registered instances.
 - `IObjectResolver.Diagnostics?.GetDiagnosticsInfos()` returns a list of information for the specific container.

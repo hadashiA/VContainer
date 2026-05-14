@@ -1,0 +1,38 @@
+---
+title: Register Open Generics
+sidebar_label: Open Generics
+---
+
+VContainer supports registering open generic types. This allows you to register a generic definition once and have the container automatically construct the correct concrete type when requested.
+
+```csharp
+class GenericType<T> : IGenericService<T>
+{
+    // ...
+}
+```
+
+```csharp
+// Register the open generic type
+builder.Register(typeof(GenericType<>), Lifetime.Singleton)
+    .AsImplementedInterfaces();
+```
+
+It can be resolved like this:
+
+```csharp
+class SomeService
+{
+    // VContainer automatically creates GenericType<int>
+    public SomeService(IGenericService<int> service)
+    {
+        /* ... */
+    }
+}
+```
+
+In this case, the concrete type `GenericType<int>` is constructed at runtime.
+
+:::info
+We have confirmed that this works with IL2CPP from Unity 2022.1 onwards. Older versions or specific strict stripping configurations may require you to ensure the generic types are preserved (e.g., using a `link.xml` or by using them explicitly in code).
+:::

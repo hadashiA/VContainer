@@ -63,5 +63,22 @@ class LevelLoader
 
         // ... Unloading some assets
     }
+
+    // Example with Addressables
+    public async UniTask LoadFromAddressableAsync(string key)
+    {
+        var prefab = await Addressables.LoadAssetAsync<GameObject>(key);
+        var lifetimeScopePrefab = prefab.GetComponent<LifetimeScope>();
+
+        if (lifetimeScopePrefab != null)
+        {
+            instantScope = currentScope.CreateChildFromPrefab(
+                lifetimeScopePrefab,
+                builder =>
+                {
+                    // Extra registrations...
+                });
+        }
+    }
 }
 ```

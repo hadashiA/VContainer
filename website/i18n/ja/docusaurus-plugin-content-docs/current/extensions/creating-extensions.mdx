@@ -1,0 +1,156 @@
+---
+title: Creating Extensions
+sidebar_label: Creating Extensions
+---
+
+VContainer is designed to be easily extensible. If you are a library author or want to create a reusable integration for a third-party library (like a networking stack, a serialization library, or a logging framework), you can create standard extensions that look and feel like native VContainer features.
+
+## The Pattern
+
+The standard pattern for VContainer extensions involves:
+
+1.  **Extension Methods on `IContainerBuilder`**: To provide an easy registration API.
+2.  **Wrapper/Adapter Classes**: To bridge the third-party library with VContainer's lifecycle.
+3.  **Marker Interfaces (Optional)**: If you need to hook into the PlayerLoop (Start, Update, etc.).
+
+## Example: Integrating a Hypothetical "SuperLogger"
+
+Let's say you have a third-party library called `SuperLogger` that needs to be initialized with a config and disposed when the game ends.
+
+### 1. Create the Service Definition
+
+First, define how the user will consume the library. Usually, you register the library's main class or an interface.
+
+```csharp
+// The 3rd party library might look like this:
+public class SuperLogger
+{
+    public SuperLogger(LoggerConfig config) { ... }
+    public void Log(string message) { ... }
+    public void Flush() { ... }
+    public void Close() { ... }
+}
+```
+
+### 2. Create a Lifetime Manager (Adapter)
+
+If the library needs specific initialization or cleanup (Disposable), create a wrapper or an adapter that implements VContainer's lifecycle interfaces (`IStartable`, `IDisposable`).
+
+```csharp
+using VContainer;
+using VContainer.Unity;
+
+// This class manages the lifecycle of SuperLogger
+public class SuperLoggerService : IDisposable
+{
+    public SuperLogger Logger { get; }
+
+    public SuperLoggerService(SuperLogger logger)
+    {
+        Logger = logger;
+    }
+
+    public void Dispose()
+    {
+        Logger.Flush();
+        Logger.Close();
+    }
+}
+```
+
+### 3. Create Registration Extensions
+
+Create a static class with extension methods for `IContainerBuilder`. This is where the magic happens.
+
+```csharp
+using VContainer;
+
+public static class SuperLoggerContainerExtensions
+{
+    // The user will call: builder.RegisterSuperLogger(config);
+    public static RegistrationBuilder RegisterSuperLogger(
+        this IContainerBuilder builder,
+        LoggerConfig config,
+        Lifetime lifetime = Lifetime.Singleton)
+    {
+        // 1. Register the Configuration instance
+        builder.RegisterInstance(config);
+
+        // 2. Register the 3rd party library itself
+        //    (Assuming it can be created via constructor injection if config is registered)
+        var registrationBuilder = builder.Register<SuperLogger>(lifetime);
+
+        // 3. Register our Adapter/Manager
+        //    We register it as interfaces, so VContainer treats it as a lifecycle object.
+        //    Note: We use the same Lifetime!
+        builder.Register<SuperLoggerService>(lifetime).AsImplementedInterfaces().AsSelf();
+
+        // Return the builder so users can chain calls (like .As...)
+        // In this complex case, we might return the registration of the main service.
+        return registrationBuilder;
+    }
+}
+```
+
+### 4. Handling PlayerLoop Events
+
+If your library needs to run every frame (like a network client polling for messages), implement `ITickable`.
+
+```csharp
+public class NetworkPoller : ITickable
+{
+    readonly NetworkClient client;
+
+    public NetworkPoller(NetworkClient client)
+    {
+        this.client = client;
+    }
+
+    public void Tick()
+    {
+        client.Poll();
+    }
+}
+```
+
+And in your extension method:
+
+```csharp
+public static void RegisterNetworkClient(this IContainerBuilder builder)
+{
+    builder.Register<NetworkClient>(Lifetime.Singleton);
+
+    // Register the poller as an EntryPoint so VContainer runs Tick() automatically.
+    builder.RegisterEntryPoint<NetworkPoller>();
+}
+```
+
+## Usage
+
+Now, the user can easily use your extension in their `LifetimeScope`:
+
+```csharp
+public class GameLifetimeScope : LifetimeScope
+{
+    protected override void Configure(IContainerBuilder builder)
+    {
+        var config = new LoggerConfig { ... };
+
+        // Clean and simple!
+        builder.RegisterSuperLogger(config);
+    }
+}
+```
+
+## Advanced: Compiler Symbols (Integration Style)
+
+If you are maintaining a library that supports VContainer optionally, you can use preprocessor directives (like `VCONTAINER_INTEGRATION`) to only compile the extension methods if VContainer is present in the project.
+
+This is how `UniTask` and `ECS` integrations are handled within VContainer's own codebase, but for external libraries, you would typically distribute a separate `.asmdef` or use `version defines` in `package.json` to detect VContainer.
+
+## Checklist for Library Authors
+
+1.  **Don't force dependencies:** If possible, keep your core library separate from the VContainer integration code.
+2.  **Use `RegisterEntryPoint`:** For things that need to run on `Start`, `Update`, etc.
+3.  **Respect Scoping:** Allow the user to pass a `Lifetime` parameter. Don't assume everything is a Singleton.
+4.  **Dispose Correctly:** Always implement `IDisposable` and register it if your library holds unmanaged resources.
