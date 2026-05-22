@@ -343,6 +343,7 @@ namespace VContainer.Internal
                 type = type.BaseType;
             }
 
+            injectMethods?.Reverse();
             return new InjectTypeInfo(
                 analyzedType,
                 injectConstructor,
