@@ -6,7 +6,7 @@ namespace VContainer.Internal
 {
     public class OpenGenericInstanceProvider : IInstanceProvider
     {
-        class TypeParametersKey
+        protected class TypeParametersKey
         {
             public readonly Type[] TypeParameters;
             public readonly object Key;
@@ -70,7 +70,7 @@ namespace VContainer.Internal
             return constructedRegistrations.GetOrAdd(typeParametersKey, createRegistrationFunc);
         }
 
-        Registration CreateRegistration(TypeParametersKey key)
+        protected virtual Registration CreateRegistration(TypeParametersKey key)
         {
             var newType = implementationType.MakeGenericType(key.TypeParameters);
             var injector = InjectorCache.GetOrBuild(newType);
