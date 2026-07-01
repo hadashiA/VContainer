@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using VContainer.Internal;
 
@@ -57,6 +56,45 @@ namespace VContainer
             Func<IObjectResolver, TInterface> implementationConfiguration,
             Lifetime lifetime)
             => builder.Register(new FuncRegistrationBuilder(container => implementationConfiguration(container), typeof(TInterface), lifetime));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder Register(
+            this IContainerBuilder builder,
+            Type interfaceType,
+            Func<IObjectResolver, Type, object> implementationFactory,
+            Lifetime lifetime)
+        {
+            return builder.Register(new OpenGenericFuncRegistrationBuilder(
+                interfaceType,
+                (resolver, args) => implementationFactory(resolver, args[0]),
+                lifetime)).As(interfaceType);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder Register(
+            this IContainerBuilder builder,
+            Type interfaceType,
+            Func<IObjectResolver, Type, Type, object> implementationFactory,
+            Lifetime lifetime)
+        {
+            return builder.Register(new OpenGenericFuncRegistrationBuilder(
+                interfaceType,
+                (resolver, args) => implementationFactory(resolver, args[0], args[1]),
+                lifetime)).As(interfaceType);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static RegistrationBuilder Register(
+            this IContainerBuilder builder,
+            Type interfaceType,
+            Func<IObjectResolver, Type, Type, Type, object> implementationFactory,
+            Lifetime lifetime)
+        {
+            return builder.Register(new OpenGenericFuncRegistrationBuilder(
+                interfaceType,
+                (resolver, args) => implementationFactory(resolver, args[0], args[1], args[2]),
+                lifetime)).As(interfaceType);
+        }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RegistrationBuilder RegisterInstance(
