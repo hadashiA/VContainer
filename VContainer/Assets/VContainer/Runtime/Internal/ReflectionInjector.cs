@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Reflection;
 
 namespace VContainer.Internal
 {
@@ -31,6 +30,12 @@ namespace VContainer.Internal
 
         public object CreateInstance(IObjectResolver resolver, IReadOnlyList<IInjectParameter> parameters)
         {
+#if UNITY_2020_1_OR_NEWER
+            if (typeof(UnityEngine.Component).IsAssignableFrom(injectTypeInfo.Type))
+            {
+                throw new NotSupportedException($"UnityEngine.Component:{injectTypeInfo.Type.Name} cannot be `new`");
+            }
+#endif
             var parameterInfos = injectTypeInfo.InjectConstructor.ParameterInfos;
             var parameterKeys = injectTypeInfo.InjectConstructor.ParameterKeys;
             var parameterValues = CappedArrayPool<object>.Shared8Limit.Rent(parameterInfos.Length);
