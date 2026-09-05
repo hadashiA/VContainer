@@ -171,7 +171,14 @@ namespace VContainer.Unity
             DisposeCore();
             if (this != null)
             {
-                Destroy(gameObject);
+                if (Application.isPlaying)
+                {
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    DestroyImmediate(gameObject);
+                }
             }
         }
 
