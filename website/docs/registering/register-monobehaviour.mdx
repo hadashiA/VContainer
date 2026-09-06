@@ -1,5 +1,6 @@
 ---
 title: Register MonoBehaviour
+sidebar_label: MonoBehaviours
 ---
 
 ## Register from LifetimeScope's `[SerializeField]`
@@ -14,10 +15,10 @@ builder.RegisterComponent(yourBehaviour);
 ```
 
 :::note
-RegisterComponent is similar to RegisterInstance. The only difference is that `MonoBehaviour`s registered with RegisterComponent will be injected even if not Resolved.
+`RegisterComponent` is similar to `RegisterInstance`. The key difference is that `MonoBehaviour`s registered with `RegisterComponent` will have dependencies injected into them even if they are not explicitly resolved.
 :::
 
-## Register from scene with `LifetimeScope`
+## Register from Scene with `LifetimeScope`
 
 ```csharp
 builder.RegisterComponentInHierarchy<YourBehaviour>();
@@ -27,7 +28,7 @@ builder.RegisterComponentInHierarchy<YourBehaviour>();
 RegisterComponentInHierarchy always has a `Scoped` lifetime because the lifetime is equal to the scene.
 :::
 
-## Register component that Instantiate from prefab when resolving
+## Register Component Instantiated from Prefab upon Resolution
 
 ```csharp
 [SerializeField]
@@ -38,20 +39,20 @@ YourBehaviour prefab;
 builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped);
 ```
 
-## Register component that with new GameObject when resolving
+## Register Component on New GameObject upon Resolution
 
 ```csharp
 builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "NewGameObjectName");
 ```
 
-## Register component as interface
+## Register Component as Interface
 
 ```csharp
 builder.RegisterComponentInHierarchy<YourBehaviour>()
     .AsImplementedInterfaces();
 ```
 
-## Register component to specific parent Transform
+## Register Component under Specific Parent Transform
 
 ```csharp
 // Instantiate new GameObject under the specified transform
@@ -80,7 +81,7 @@ builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped)
 
 ## Register as `DontDestroyOnLoad`
 
-RegsiterComponent* method chain can be DontDestroyOnLoad.
+`RegisterComponent*` method chain supports DontDestroyOnLoad.
 
 ```csharp
 // Instantiate new GameObject as DontDestroyOnLoad
@@ -92,7 +93,7 @@ builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped)
     .DontDestroyOnLoad();
 ```
 
-## Grouping MonoBehaviour's Registration
+## Grouping MonoBehaviour Registrations
 
 ```csharp
 builder.UseComponents(components =>
@@ -137,4 +138,26 @@ builder.RegisterComponentInNewPrefab(prefab, Lifetime.Scoped)
     .UnderTransform(parentTransform);
 builder.RegisterComponentOnNewGameObject<YourBehaviour>(Lifetime.Scoped, "name")
     .UnderTransform(parentTransform);
+```
+
+## Register Multiple Components from Hierarchy
+
+`RegisterComponentInHierarchy<T>()` registers **one** component found in the scene. If you want to register and inject into **all** instances of a specific component type in the scene, you need to find them manually and register them.
+
+```csharp
+var weapons = FindObjectsOfType<FireballWeapon>();
+foreach (var weapon in weapons)
+{
+    builder.RegisterComponent(weapon);
+}
+```
+
+To ensure dependencies are injected into all of them (even if they are not resolved elsewhere), you can register a build callback that resolves them as a collection:
+
+```csharp
+// Force injection for all registered FireballWeapon instances
+builder.RegisterBuildCallback(container =>
+{
+    container.Resolve<IEnumerable<FireballWeapon>>();
+});
 ```

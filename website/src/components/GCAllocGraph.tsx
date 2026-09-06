@@ -107,8 +107,7 @@ export function GCAllocGraph({ height }: { height: number } ): JSX.Element {
         }
       ]}
       animate={true}
-      motionStiffness={90}
-      motionDamping={15}
+      motionConfig="gentle"
     />
   </div>
 }

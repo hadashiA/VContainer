@@ -1,5 +1,6 @@
 ---
 title: Register using delegate
+sidebar_label: Register via Delegate
 ---
 
 Instance creation can be delegated to a lambda expression or another method or class.
@@ -42,11 +43,11 @@ builder.Register(container =>
 }, Lifetime.Scoped);
 
 ```
-See [Use Container directory](../resolving/container-api) more information.
+See [Container API](../resolving/container-api.mdx) for more information.
 
 :::note
 These delegates will be executed only once during scope construction.
-If you want to create an instance at any time during runtime, please refer to [Register Factory](./register-factory).
+If you want to create an instance at any time during runtime, please refer to [Register Factory](./register-factory.mdx).
 :::
 
 

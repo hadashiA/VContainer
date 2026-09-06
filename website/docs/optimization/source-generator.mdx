@@ -11,7 +11,7 @@ However, there is an option to improve execution performance by replacing it wit
 
 Source Generator is part of Roslyn's functionality as a C# compiler tool.
 It is a feature that allows additional source code to be plugged in without contaminating the human-written source code.
-Since the added code is in C#, it is more debuggable and maintainable than IL code generation or ExpressionTee at runtime.
+Since the added code is in C#, it is more debuggable and maintainable than IL code generation or ExpressionTree at runtime.
 While there are programming languages out there that have mechanisms such as "macros" built into their syntax, Source Generator has one thing in common in that it generates source code at compile time.
 This is a standard meta-programming approach in the new .NET environment.
 
@@ -24,15 +24,15 @@ Since VContainer 1.13.0, we have moved to Roslyn Source Generator.
 
 ### 1. Add `VContainer.SourceGenerator.dll` to your project.
 
-Download `VContainer.SourceGenerator.dll from the release page.
+Download `VContainer.SourceGenerator.dll` from the release page.
 https://github.com/hadashiA/VContainer/releases
 
-And Add this to somewhere under Assets/ folder in your project.
+And add this to somewhere under `Assets/` folder in your project.
 
 ### 2. Mark as `RoslynAnalyzer`
 
-Select `VcContainer.SourceGenerator.dll` in project.
-And, click label icon in bottom of the inspector window.
+Select `VContainer.SourceGenerator.dll` in the project.
+And, click the label icon at the bottom of the inspector window.
 Enter “RoslynAnalyzer” into the text input window in the Asset Labels sub-menu.
 
 ![](./assets/screenshot_roslynanalyzer.png)

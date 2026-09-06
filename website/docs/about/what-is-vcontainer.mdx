@@ -13,30 +13,30 @@ hide_title: true
 import {BenchmarkGraph} from "../../src/components/BenchmarkGraph"
 import {GCAllocGraph} from "../../src/components/GCAllocGraph"
 
-The extra fast DI (Dependency Injection) for Unity Game Engine. "V" means making Unity's initial "U" more thinner and solid..!
+The extra fast DI (Dependency Injection) for Unity Game Engine. "V" stands for making Unity's initial "U" thinner and more solid!
 
-- **Fast Resolve:** Basically [5-10x faster](#performance) than Zenject.
+- **Fast Resolve:** Basically [5–10x faster](#performance) than Zenject.
 - **Minimum GC Allocation:** In Resolve, we have **zero allocation** without spawned instances.
 - **Small code size:** Few internal types and few .callvirt.
-- **Assisting correct DI way:** Provides simple and transparent API, and carefully select features. This prevents the DI declaration from becoming overly complex.
+- **Promotes correct DI patterns:** Provides a simple and transparent API with carefully selected features. This prevents DI declarations from becoming overly complex.
 - **Immutable Container:** Thread safety and robustness.
 
 #### Features
 
-- [Constructor Injection](../resolving/constructor-injection) / [Method Injection](../resolving/method-injection) / [Property & Field Injection](../resolving/property-field-injection)
-- [Plain C# entry point on own PlayerLoopSystem](../integrations/entrypoint)
-- [Flexible scoping](../scoping/lifetime-overview)
-  - Application can freely create nested Lifetime Scope with any async way for you like.
-- [Accelerated mode with Roslyn Source Generator](../optimization/source-generator)
-- [Diagnostics Window](../diagnostics/diagnostics-window)
-- [UniTask Integration](../integrations/unitask)
-- [ECS Integration](../integrations/ecs) *beta*
+- [Constructor Injection](../resolving/constructor-injection.mdx) / [Method Injection](../resolving/method-injection.mdx) / [Property & Field Injection](../resolving/property-field-injection.mdx)
+- [Plain C# entry point on own PlayerLoopSystem](../integrations/entrypoint.mdx)
+- [Flexible scoping](../scoping/lifetime-overview.mdx)
+  - Applications can freely create nested Lifetime Scopes in any async manner you like.
+- [Accelerated mode with Roslyn Source Generator](../optimization/source-generator.mdx)
+- [Diagnostics Window](../diagnostics/diagnostics-window.mdx)
+- [UniTask Integration](../integrations/unitask.mdx)
+- [ECS Integration](../integrations/ecs.mdx) *beta*
 
 ## DI + Inversion of Control for Unity
 
 ![](assets/vcontainer@2x.png)
 
-DI containers we can make pure C # classes the entry point (not MonoBehaviour). This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
+With DI containers, we can make pure C# classes the entry point (instead of MonoBehaviour). This means that the control flow and other domain logic can be separated from the function of MonoBehaviour as a view component.
 
 Further reading:
 - [Manning | Dependency Injection in .NET](https://www.manning.com/books/dependency-injection-in-dot-net)
@@ -48,8 +48,8 @@ Further reading:
 
 <BenchmarkGraph height={260} />
 
-- By default, both VContainer and Zenject use reflection at runtime.
-- "VContainer (CodeGen)" means optimization by pre-generating IL code of Inject methods by ILPostProcessor. See [Optimization](../optimization/codegen) section for more information.
+- By default, VContainer and Zenject use reflection at runtime.
+- "VContainer (CodeGen)" means optimization by pre-generating IL code of Inject methods by ILPostProcessor. See [Optimization](../optimization/codegen.mdx) section for more information.
 
 ### GC Alloc result in the Resolve Complex test case (Unity Editor profiled)
 
@@ -74,7 +74,7 @@ public class GameLifetimeScope : LifetimeScope
 }
 ```
 
-Where definitions of classes are
+Where the class definitions are:
 
 ```csharp
 public interface IRouteSearch
@@ -120,13 +120,13 @@ public class ActorPresenter : IStartable
 
     void IStartable.Start()
     {
-        // Scheduled at Start () on VContainer's own PlayerLoopSystem.
+        // Scheduled at Start() on VContainer's own PlayerLoopSystem.
     }
 }
 ```
 
-- In this example, the routeSearch of CharacterService is automatically set as the instance of AStarRouteSearch when CharacterService is resolved.
-- Further, VContainer can have a Pure C# class as an entry point. (Various timings such as Start, Update, etc. can be specified.) This facilitates "separation of domain logic and presentation".
+- In this example, the `routeSearch` field of `CharacterService` is automatically set as the instance of `AStarRouteSearch` when `CharacterService` is resolved.
+- Furthermore, VContainer can use a pure C# class as an entry point. (Various timings such as Start, Update, etc., can be specified.) This facilitates "separation of domain logic and presentation".
 
 ### Flexible Scoping with async
 
@@ -140,7 +140,7 @@ public void LoadLevel()
     // Create a child scope
     instantScope = currentScope.CreateChild();
 
-    // Create a child scope with LifetimeScope prefab
+    // Create a child scope with a LifetimeScope prefab
     instantScope = currentScope.CreateChildFromPrefab(lifetimeScopePrefab);
 
     // Create a child with additional registration
@@ -174,7 +174,7 @@ class SceneLoader
 
     public SceneLoader(LifetimeScope currentScope)
     {
-        currentScope = currentScope; // Inject the LifetimeScope to which this class belongs
+        this.currentScope = currentScope; // Inject the LifetimeScope to which this class belongs
     }
 
     IEnumerator LoadSceneAsync()
@@ -194,7 +194,7 @@ class SceneLoader
     // UniTask example
     async UniTask LoadSceneAsync()
     {
-        using (LifetimeScope.EnqueueParent(parent))
+        using (LifetimeScope.EnqueueParent(currentScope))
         {
             await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
         }
@@ -214,7 +214,7 @@ using (LifetimeScope.Enqueue(builder =>
 }
 ```
 
-See [scoping](../scoping/lifetime-overview) for more information.
+See [scoping](../scoping/lifetime-overview.mdx) for more information.
 
 ## UniTask
 
@@ -234,16 +234,16 @@ public class FooController : IAsyncStartable
 builder.RegisterEntryPoint<FooController>();
 ```
 
-See [integration](../integrations/unitask) for more information.
+See [integration](../integrations/unitask.mdx) for more information.
 
 ## Diagnostics Window
 
 ![](../diagnostics/assets/screenshot_diagnostics_window.png)
 
-See [diagnostics](../diagnostics/diagnostics-window) for more information.
+See [diagnostics](../diagnostics/diagnostics-window.mdx) for more information.
 
 ## Getting Started
 
-- [Installation](../getting-started/installation)
-- [Hello World](../getting-started/hello-world)
-- [Comparing to Zenject](../comparing/comparing-to-zenject)
+- [Installation](../getting-started/installation.mdx)
+- [Hello World](../getting-started/hello-world.mdx)
+- [Comparing to Zenject](../comparing/comparing-to-zenject.mdx)

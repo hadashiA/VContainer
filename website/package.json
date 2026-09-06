@@ -15,22 +15,44 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@docusaurus/core": "3.1.0",
-    "@docusaurus/preset-classic": "3.1.0",
+    "@docusaurus/core": "3.9.2",
+    "@docusaurus/preset-classic": "3.9.2",
+    "@docusaurus/theme-mermaid": "3.9.2",
     "@mdx-js/react": "^3.0.0",
     "@nivo/bar": "^0.84.0",
     "@nivo/core": "^0.84.0",
     "clsx": "^2.0.0",
-    "docusaurus-lunr-search": "^3.3.2",
+    "docusaurus-lunr-search": "3.3.2",
     "prism-react-renderer": "^2.3.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.1.0",
-    "@docusaurus/tsconfig": "3.1.0",
-    "@docusaurus/types": "3.1.0",
+    "@docusaurus/module-type-aliases": "3.9.2",
+    "@docusaurus/tsconfig": "3.9.2",
+    "@docusaurus/types": "3.9.2",
     "typescript": "~5.2.2"
+  },
+  "overrides": {
+    "ajv@^8": "^8.18.0",
+    "brace-expansion@^1": "^1.1.12",
+    "brace-expansion@^2": "^2.0.2",
+    "cross-spawn": "^7.0.6",
+    "d3-color": "^3.1.0",
+    "dompurify": "^3.4.0",
+    "follow-redirects": "^1.16.0",
+    "lodash": "^4.18.1",
+    "lodash-es": "^4.18.1",
+    "micromatch": "^4.0.8",
+    "node-forge": "^1.4.0",
+    "path-to-regexp@^0.1": "^0.1.13",
+    "path-to-regexp@^1": "^1.9.0",
+    "picomatch@^2": "^2.3.2",
+    "qs": "^6.15.1",
+    "semver@^7": "^7.7.4",
+    "serialize-javascript": "^7.0.5",
+    "webpack": "~5.104.1",
+    "ws@^7": "^7.5.10"
   },
   "browserslist": {
     "production": [

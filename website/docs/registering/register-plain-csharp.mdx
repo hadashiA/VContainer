@@ -1,8 +1,8 @@
 ---
-title: Register Plain C# Type
+title: Plain C# Classes
 ---
 
-There are various ways to use Register.
+There are various ways to use `Register`.
 Let's take the following complex type as an example.
 
 ```csharp
@@ -39,7 +39,7 @@ class ClassA
 }
 ```
 
-## Register as multiple Interface
+## Register as Multiple Interfaces
 
 ```csharp
 builder.Register<ServiceA>(Lifetime.Singleton)
@@ -60,7 +60,7 @@ class ClassB
 }
 ```
 
-## Register all implemented interfaces automatically
+## Register All Implemented Interfaces Automatically
 
 ```csharp
 builder.Register<ServiceA>(Lifetime.Singleton)
@@ -81,7 +81,7 @@ class ClassB
 }
 ```
 
-## Register all implemented interfaces and concrete type
+## Register All Implemented Interfaces and Concrete Type
 
 ```csharp
 builder.Register<ServiceA>(Lifetime.Singleton)
@@ -108,7 +108,7 @@ class ClassC
 }
 ```
 
-## Register lifecycle marker interfaces
+## Register Lifecycle Marker Interfaces
 
 ```csharp
 class GameController : IStartable, ITickable, IDisposable { /* ... */ }
@@ -156,112 +156,6 @@ builder.RegisterEntryPointExceptionHandler(ex => ...);
 
 See the [Plain C# Entry point](../integrations/entrypoint) section for more information.
 
-## Register instance
-
-```csharp
-// ...
-var obj = new ServiceA();
-// ...
-
-builder.RegisterInstance(obj);
-```
-
-:::note
-`RegisterIntance` always has a `Singleton` lifetime, so it has no arguments.
-:::
-
-It can resolve like this:
-
-```csharp
-class ClassA
-{
-    public ClassA(ServiceA serviceA) { /* ... */ }
-}
-```
-
-:::note
-Instances registered with RegisterInstance are not managed by the container.
-
-- Dispose will not be executed automatically.
-- Method Injection will not be executed automatically
-
-If you want the container to manage the created instances, consider using the following instead
-
-- [Register(_ => instance, ...)](./register-using-delegate)
-- [RegisterComponent(...)](./register-monobehaviour)
-:::
-
-## Register instance as interface
-
-Use `As*` declarations.
-
-```csharp
-builder.RegisterInstance<IInputPort>(serviceA);
-
-builder.RegisterInstance(serviceA)
-    .As<IServiceA, IInputPort>();
-
-builder.RegisterInstance(serviceA)
-    .AsImplementedInterfaces();
-```
-
-
-## Register type-specific parameters
-
-If the types are not unique, but you have a dependency you want to inject at startup, you can use the following:
-
-```csharp
-builder.Register<SomeService>(Lifetime.Singleton)
-    .WithParameter<string>("http://example.com");
-```
-
-Or, you can name a paramter with a key.
-
-```csharp
-builder.Register<SomeService>(Lifetime.Singleton)
-    .WithParameter("url", "http://example.com");
-```
-
-It can resolve like this:
-
-```csharp
-class SomeService
-{
-    public SomeService(string url) { /* ... */ }
-}
-```
-
-This Register only works when being injected into `SomeService`.
-
-```csharp
-class OtherClass
-{
-    // ! Error
-    public OtherClass(string hogehoge) { /* ... */ }
-}
-```
-
 ## Register Open Generics
 
-```csharp
-class GenericType<T>
-{
-    // ...
-}
-```
-
-```csharp
-builder.Register(typeof(GenericType<>), Lifetime.Singleton);
-```
-
-It can resolve like this:
-
-```csharp
-class SomeService
-{
-    public SomeService(GenericType<int> closedGenericType) { /* ... */ }
-}
-```
-
-In this case, the concrete type is constructed at runtime.
-We have confirmed that this works with IL2CPP from Unity 2022.1 onwards, but older versions may not support dynamic typedefs.
+VContainer supports registering open generic types. See [Open Generics](./register-generics) for more details.

@@ -1,0 +1,176 @@
+---
+title: Common Recipes
+---
+
+This section provides code snippets for common patterns and problems.
+
+## Factory with Object Pooling
+
+VContainer does not have a built-in Object Pool, but you can easily integrate standard C# pooling solutions or `UnityEngine.Pool`.
+
+```csharp
+using UnityEngine.Pool;
+using VContainer;
+
+public class Bullet : MonoBehaviour
+{
+    // ...
+}
+
+public class BulletPool : IDisposable
+{
+    readonly IObjectPool<Bullet> pool;
+    readonly Bullet prefab;
+    readonly Transform parent;
+
+    public BulletPool(Bullet prefab, Transform parent)
+    {
+        this.prefab = prefab;
+        this.parent = parent;
+        this.pool = new ObjectPool<Bullet>(
+            createFunc: () => GameObject.Instantiate(prefab, parent),
+            actionOnGet: target => target.gameObject.SetActive(true),
+            actionOnRelease: target => target.gameObject.SetActive(false),
+            actionOnDestroy: target => GameObject.Destroy(target.gameObject)
+        );
+    }
+
+    public Bullet Spawn() => pool.Get();
+    public void Despawn(Bullet bullet) => pool.Release(bullet);
+
+    public void Dispose() => pool.Clear();
+}
+
+// Registration
+builder.Register<BulletPool>(Lifetime.Scoped)
+    .WithParameter(bulletPrefab)
+    .WithParameter(bulletParent);
+```
+
+## State Machine Setup
+
+A common pattern in games is the State Machine. VContainer can help manage state dependencies.
+
+```csharp
+// 1. Define the State Interface
+public interface IState
+{
+    void Enter();
+    void Tick();
+    void Exit();
+}
+
+// 2. Define States
+public class IdleState : IState
+{
+    readonly PlayerAnimation animation;
+    public IdleState(PlayerAnimation animation) => this.animation = animation;
+
+    public void Enter() => animation.Play("Idle");
+    public void Tick() { /* ... */ }
+    public void Exit() { /* ... */ }
+}
+
+public class AttackState : IState
+{
+    // States can request their own dependencies!
+    readonly IWeapon weapon;
+    public AttackState(IWeapon weapon) => this.weapon = weapon;
+    /* ... */
+}
+
+// 3. Register States and the Machine
+builder.Register<IdleState>(Lifetime.Scoped);
+builder.Register<AttackState>(Lifetime.Scoped);
+builder.Register<StateMachine>(Lifetime.Scoped);
+
+// 4. State Machine Implementation
+public class StateMachine : ITickable
+{
+    IState currentState;
+    readonly IObjectResolver container;
+
+    public StateMachine(IObjectResolver container)
+    {
+        this.container = container;
+    }
+
+    public void ChangeState<T>() where T : IState
+    {
+        currentState?.Exit();
+        // Resolve the state on demand.
+        // Since states are Scoped, they can share data if needed, or be Transient.
+        currentState = container.Resolve<T>();
+        currentState.Enter();
+    }
+
+    public void Tick() => currentState?.Tick();
+}
+```
+
+## Wrapping Configuration (ScriptableObject)
+
+Instead of injecting the entire huge `GameSettings` ScriptableObject into every class, wrap individual settings or register sub-settings.
+
+```csharp
+[CreateAssetMenu]
+public class GameConfiguration : ScriptableObject
+{
+    public PlayerSettings Player;
+    public AudioSettings Audio;
+}
+
+[Serializable]
+public class PlayerSettings
+{
+    public float MoveSpeed;
+}
+
+// In LifetimeScope
+public class GameLifetimeScope : LifetimeScope
+{
+    [SerializeField] GameConfiguration config;
+
+    protected override void Configure(IContainerBuilder builder)
+    {
+        // Don't just register 'config'.
+        // Register the specific settings so classes only depend on what they need.
+        builder.RegisterInstance(config.Player);
+        builder.RegisterInstance(config.Audio);
+    }
+}
+
+// Usage
+public class PlayerController
+{
+    readonly float moveSpeed;
+
+    // Depends only on PlayerSettings, not the whole GameConfiguration
+    public PlayerController(PlayerSettings settings)
+    {
+        this.moveSpeed = settings.MoveSpeed;
+    }
+}
+```
+
+## Facade Pattern (Sub-Container)
+
+If you have a complex system (like a Vehicle) that has its own internal dependencies which shouldn't leak to the main game, use a child scope as a Facade.
+
+```csharp
+public class VehiclePrefab : LifetimeScope
+{
+    // This Configure runs when the prefab is instantiated via VContainer
+    protected override void Configure(IContainerBuilder builder)
+    {
+        builder.Register<Engine>(Lifetime.Scoped);
+        builder.Register<Wheel>(Lifetime.Scoped);
+        // ...
+    }
+}
+
+// Main Scope
+// When you create this prefab, VContainer automatically creates a child scope for it.
+// The 'Engine' and 'Wheel' are private to this vehicle instance.
+container.Instantiate(vehiclePrefab);
+```

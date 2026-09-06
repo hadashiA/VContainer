@@ -1,0 +1,139 @@
+---
+title: Migration from Zenject
+---
+
+This guide is designed to help you migrate an existing project from Zenject (Extenject) to VContainer.
+
+## Conceptual Differences
+
+| Feature | Zenject | VContainer | Note |
+|:--|:--|:--|:--|
+| **Composition Root** | `MonoInstaller`, `ScriptableObjectInstaller` | `LifetimeScope` | VContainer unifies the concept of Scope and Installer into `LifetimeScope`. |
+| **Registration** | `Container.Bind<T>()` | `builder.Register<T>(Lifetime)` | VContainer requires explicit Lifetime. |
+| **Entry Points** | `IInitializable`, `ITickable`, etc. | `IStartable`, `ITickable`, etc. | Very similar, but VContainer runs on its own PlayerLoopSystem. |
+| **Injection** | `[Inject]` | `[Inject]` | Compatible (VContainer uses its own attribute class). |
+| **Sub-Containers** | `SceneContext`, `GameObjectContext` | `LifetimeScope` (Child) | VContainer uses nested `LifetimeScope`s for everything. |
+
+## Step-by-Step Migration
+
+### 1. Replace Installers with LifetimeScope
+
+In Zenject, you likely have a `SceneContext` and multiple `MonoInstaller`s attached to it.
+
+**Zenject:**
+```csharp
+public class GameInstaller : MonoInstaller
+{
+    public override void InstallBindings()
+    {
+        Container.Bind<IFoo>().To<Foo>().AsSingle();
+    }
+}
+```
+
+**VContainer:**
+Replace the `SceneContext` with a `GameLifetimeScope` (which inherits from `LifetimeScope`). Move the installation logic into `Configure`.
+
+```csharp
+public class GameLifetimeScope : LifetimeScope
+{
+    protected override void Configure(IContainerBuilder builder)
+    {
+        builder.Register<IFoo, Foo>(Lifetime.Singleton);
+    }
+}
+```
+
+### 2. Update Registration Syntax
+
+Use the [Returning Users Guide](../comparing/comparing-to-zenject.mdx) to map your bindings.
+
+*   `AsSingle()` -> `Lifetime.Singleton`
+*   `AsCached()` -> `Lifetime.Scoped`
+*   `AsTransient()` -> `Lifetime.Transient`
+*   `BindInterfacesAndSelfTo<T>()` -> `builder.Register<T>(...).AsImplementedInterfaces().AsSelf()`
+
+### 3. Phases and Entry Points
+
+**Zenject:**
+```csharp
+public class MySystem : IInitializable
+{
+    public void Initialize() { ... }
+}
+// Automatic if BindInterfacesTo is used
+```
+
+**VContainer:**
+VContainer does not automatically hook up interfaces unless you use `RegisterEntryPoint`.
+
+```csharp
+public class MySystem : IStartable // VContainer uses IStartable instead of IInitializable (mostly)
+{
+    public void Start() { ... }
+}
+
+// In Configure:
+builder.RegisterEntryPoint<MySystem>();
+```
+
+### 4. Remove `[Inject]` from Constructors
+
+VContainer automatically injects constructors. You strictly **do not** need `[Inject]` on constructors unless you have multiple constructors and need to select one.
+
+**Zenject:**
+```csharp
+public class Foo
+{
+    [Inject] // Remove this!
+    public Foo(IBar bar) { ... }
+}
+```
+
+**VContainer:**
+```csharp
+public class Foo
+{
+    public Foo(IBar bar) { ... } // Works automatically
+}
+```
+
+### 5. Signals
+
+VContainer does not include a SignalBus. We recommend:
+*   [MessagePipe](https://github.com/Cysharp/MessagePipe) (Optimized for VContainer)
+*   [VitalRouter](https://github.com/hadashiA/VitalRouter)
+
+### 6. Factories
+
+**Zenject:** `PlaceholderFactory<T>`
+**VContainer:** `Func<T>` or `builder.RegisterFactory`
+
+If you used heavy custom factories in Zenject:
+```csharp
+public class EnemyFactory : PlaceholderFactory<Enemy> { }
+```
+
+In VContainer, just register a `Func`:
+```csharp
+builder.RegisterFactory<Enemy>(container =>
+{
+    return () => container.Instantiate(prefab);
+}, Lifetime.Scoped);
+```
+
+Or implement a simple factory class:
+```csharp
+public class EnemyFactory
+{
+    readonly IObjectResolver container;
+    public EnemyFactory(IObjectResolver container) => this.container = container;
+
+    public Enemy Create() => container.Instantiate(prefab);
+}
+```
+
+## Common Pitfalls
+
+*   **No "ProjectContext"**: VContainer uses a generic root `LifetimeScope` (optional) or `VContainerSettings` for project-level config.
+*   **No "Inject" into everything**: Zenject often injects into everything that moves. VContainer is stricter. You must explicitly register instances or use `InjectGameObject` if you want to inject into existing MonoBehaviours.

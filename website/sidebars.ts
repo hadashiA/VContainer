@@ -22,6 +22,13 @@ const sidebars: SidebarsConfig = {
       'getting-started/installation',
       'getting-started/hello-world',
     ],
+    'Best Practices': [
+      'best-practices',
+      'recipes/common-recipes',
+    ],
+    'Testing': [
+      'testing/unit-testing',
+    ],
     'Resolving': [
       'resolving/constructor-injection',
       'resolving/method-injection',
@@ -30,7 +37,10 @@ const sidebars: SidebarsConfig = {
       'resolving/container-api',
     ],
     'Registering': [
-      'registering/register-type',
+      'registering/register-plain-csharp',
+      'registering/register-instance',
+      'registering/register-parameters',
+      'registering/register-generics',
       'registering/register-using-delegate',
       'registering/register-factory',
       'registering/register-monobehaviour',
@@ -46,14 +56,19 @@ const sidebars: SidebarsConfig = {
       'integrations/messagepipe',
       'integrations/ecs',
     ],
+    'Extensions': [
+      'extensions/creating-extensions',
+    ],
     'Scoping': [
       'scoping/lifetime-overview',
       'scoping/generate-child-via-scene',
       'scoping/generate-child-with-code-first',
       'scoping/project-root-lifetimescope',
+      'scoping/instance-sharing-example',
     ],
     'Diagnostics (Debugging)': [
-      'diagnostics/diagnostics-window'
+      'diagnostics/diagnostics-window',
+      'diagnostics/troubleshooting',
     ],
     'Optimization': [
       'optimization/source-generator',
@@ -62,7 +77,8 @@ const sidebars: SidebarsConfig = {
       'optimization/codegen',
     ],
     'Comparing to other libraries': [
-      'comparing/comparing-to-zenject'
+      'comparing/comparing-to-zenject',
+      'comparing/migration-from-zenject',
     ]
   },
 };

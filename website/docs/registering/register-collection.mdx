@@ -1,10 +1,11 @@
 ---
 title: Register Collection
+sidebar_label: Collections
 ---
 
-VContainer supports automatically resolving particular types implicitly to support special relationships.
+VContainer supports implicit resolution of collection types.
 
-Duplicate registered interfaces can be resolved together with `IEnumerable<T>` or `IReadOnlyList<T>`.
+Multiple registrations of the same interface can be resolved together with `IEnumerable<T>` or `IReadOnlyList<T>`.
 
 ```csharp
 builder.Register<IDisposable, A>(Lifetime.Scoped);
@@ -30,3 +31,18 @@ class ClassA
 :::note
 This is mainly used by internal functions such as the `ITickable` marker, etc.
 :::
+
+## Resolve Empty Collection
+
+If you resolve a collection `IEnumerable<T>` or `IReadOnlyList<T>` but no `T` is registered, VContainer returns an empty collection. It does not throw an exception.
+
+```csharp
+// No registrations for IService
+class ClassA
+{
+    public ClassA(IEnumerable<IService> services)
+    {
+        // services is empty (not null)
+    }
+}
+```

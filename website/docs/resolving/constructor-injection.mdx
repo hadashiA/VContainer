@@ -3,7 +3,7 @@ id: constructor-injection
 title: Constructor Injection
 ---
 
-In general, dependencies are constructed and injected when they're resolved for the first time (with [some](../registering/register-factory) [exceptions](../registering/register-type#register-instance)).
+In general, dependencies are constructed and injected when they're resolved for the first time (with [some](../registering/register-factory.mdx) [exceptions](../registering/register-instance.mdx#register-instance)).
 
 When registering a class that needs dependencies, provide a constructor that takes them as arguments. VContainer will take care of the rest.
 
@@ -86,7 +86,7 @@ class TestClass
 ```
 
 :::note
-The `Key` attribute must be used with types that have been registered with the corresponding key using the `.Keyed()` method. See the [Register with Keys](../registering/register-with-keys) section for more information.
+The `Key` attribute must be used with types that have been registered with the corresponding key using the `.Keyed()` method. See the [Register with Keys](../registering/register-with-keys.mdx) section for more information.
 :::
 
 ## `MonoBehaviour`
