@@ -571,6 +571,55 @@ namespace VContainer.Tests
         }
 
         [Test]
+        public void SelfCircularDependency()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<HasSelfCircularDependency>(Lifetime.Transient);
+
+            var injector = InjectorCache.GetOrBuild(typeof(HasSelfCircularDependency));
+
+            if (injector is ReflectionInjector)
+            {
+                Assert.Throws<VContainerException>(() => builder.Build());
+            }
+        }
+
+        [Test]
+        public void DiamondDependencyIsNotCircular()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<DiamondRoot>(Lifetime.Transient);
+            builder.Register<DiamondLeft>(Lifetime.Transient);
+            builder.Register<DiamondRight>(Lifetime.Transient);
+            builder.Register<DiamondLeaf>(Lifetime.Transient);
+
+            Assert.DoesNotThrow(() => builder.Build());
+        }
+
+        [Test]
+        public void DeepAcyclicChainIsNotCircular()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<AcyclicChainA>(Lifetime.Transient);
+            builder.Register<AcyclicChainB>(Lifetime.Transient);
+            builder.Register<AcyclicChainC>(Lifetime.Transient);
+            builder.Register<AcyclicChainD>(Lifetime.Transient);
+
+            Assert.DoesNotThrow(() => builder.Build());
+        }
+
+        [Test]
+        public void SharedDependencyAcrossRootsIsNotCircular()
+        {
+            var builder = new ContainerBuilder();
+            builder.Register<DiamondLeft>(Lifetime.Transient);
+            builder.Register<DiamondRight>(Lifetime.Transient);
+            builder.Register<DiamondLeaf>(Lifetime.Transient);
+
+            Assert.DoesNotThrow(() => builder.Build());
+        }
+
+        [Test]
         public void Inject()
         {
             var builder = new ContainerBuilder();
