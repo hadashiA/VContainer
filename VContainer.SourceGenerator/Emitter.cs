@@ -150,7 +150,7 @@ static class Emitter
             {
                 var first = model.InjectMethods.First();
                 diagnostics.Add(new DiagnosticInfo(
-                    DiagnosticDescriptors.GenericsNotSupported,
+                    DiagnosticDescriptors.MultipleInjectMethodNotSupported,
                     first.Location ?? model.Location,
                     first.Name));
                 error = true;
