@@ -3,11 +3,12 @@ title: VContainer + ECS (beta)
 sidebar_label: ECS (beta)
 ---
 
-VContainer supports integration between Unity's ECS (Entity Component System) and regular C# World.
-( This is an experimental feature. Any feedback is wellcome! :0 )
+VContainer supports integration between Unity's ECS (Entity Component System) and the regular C# World.
+(This is an experimental feature. Any feedback is welcome! :0 )
 
 :::caution
 Currently, this feature requires Unity 2019.3 or later versions.
+Some features (e.g. `RegisterUnmanagedSystemIntoWorld`) require Unity 2022.2 or later.
 :::
 
 ## Setup
@@ -15,16 +16,16 @@ Currently, this feature requires Unity 2019.3 or later versions.
 ECS features for VContainer is enabled if the project has the `com.unity.entities` package installed.
 
 - Currently, ECS is a preview version. You may need the settings: `[Windows] -> [Package Manager]` and `[Advanced] -> [Show preview packages]`.
-- Select package of `Entities` and Press `[Install]`.
+- Select the `Entities` package and press `[Install]`.
 
 If the `com.unity.entities` package exists, the `VCONTAINER_ECS_INTEGRATION` symbol is defined and the following features are enabled.
 
 ## When using Unity's default World
 
-By default, ECS will automatically instantiate classes that inherits the `ComponentSystemBase` defined in your project, add it to the default world, and running on it.
+By default, ECS will automatically instantiate classes that inherit the `ComponentSystemBase` defined in your project, add them to the default world, and run them.
 
-In this mode, you can use method injection to ECS `System`.
-( The constructor is automatically used by Unity, so it cannot be used.)
+In this mode, you can use method injection for ECS `System`s.
+(The constructor is automatically used by Unity, so it cannot be used.)
 
 ```csharp
 class SystemA : SystemBase
@@ -68,7 +69,7 @@ builder.UseDefaultWorld(systems =>
 });
 ```
 
-Internaly, this is an automation of the following processes:
+Internally, this is an automation of the following processes:
 
 ```csharp
 var system = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SystemA>();
@@ -76,7 +77,7 @@ system.Construct(settings);
 ```
 
 :::note
-In default (`UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` is **not** used), The SystemGroup to which the System belongs can be controlled by Attribute ( e.g: `[UpdateInGroup(typeof(SystemGroupType))]` .
+By default (`UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` is **not** used), the SystemGroup to which the System belongs can be controlled by attributes (e.g., `[UpdateInGroup(typeof(SystemGroupType))]`).
 :::
 
 
@@ -122,10 +123,10 @@ ECS also allows you to create and register your own system.
 
 There are two ways to disable Unity's automatic system bootstrap.
 
-- By setting the define symbol `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` will disable all World and System auto-bootstrap.
-- Or, By adding the `[DisableAutoCreation]` attribute to the class definition to disable auto bootstrap per system.
+- Setting the define symbol `UNITY_DISABLE_AUTOMATIC_SYSTEM_BOOTSTRAP` will disable all World and System auto-bootstrapping.
+- Alternatively, adding the `[DisableAutoCreation]` attribute to the class definition will disable auto-bootstrapping per system.
 
-For System that have auto bootstrap disabled, constructor injection can be used.
+For Systems that have auto-bootstrapping disabled, constructor injection can be used.
 
 ```csharp
 public class SystemA : SystemBase
@@ -145,18 +146,21 @@ public class SystemA : SystemBase
 }
 ```
 
-To use this System, you need to set up World yourself.
+To use this System, you need to set up the World yourself.
 
-VContainer supports to instantiate of World and configuration.
+VContainer supports the instantiation of Worlds and their configuration.
 
 ```csharp
-// Register of new World under the control of VContainer.
+// Register a new World under the control of VContainer.
 builder.RegisterNewWorld("My World 1", Lifetime.Scoped);
 
-// Register System by specifying the name of World to be added.
+// Register a System by specifying the name of the World to be added.
 builder.RegisterSystemIntoWorld<SystemA>("My World 1");
 // builder.RegisterSystemIntoWorld<SystemB>("My World 1");
 // builder.RegisterSystemIntoWorld<SystemC>("My World 1");
+
+// For Unity 2022.2+ (Unmanaged System)
+builder.RegisterUnmanagedSystemIntoWorld<MyUnmanagedSystem>("My World 1");
 
 // Other dependencies can be injected into the System.
 builder.Register<ServiceA>(Lifetime.Singleton);
@@ -175,7 +179,7 @@ builder.UseNewWorld("My World 1", Lifetime.Scoped, systems =>
 });
 ```
 
-Internaly, If you use above methods, the following setup will be performed automatically:
+Internally, if you use the above methods, the following setup will be performed automatically:
 
 ```csharp title="YourLifetimeScope.cs"
 // When resolving world ...
@@ -218,13 +222,13 @@ builder.RegisterSystemIntoWorld<SystemA>("My World 1")
     .IntoGroup<PresentationSystemGroup>();
 ```
 
-#### Lifeime of World and Systems
+#### Lifetime of World and Systems
 
-`RegisterNewWorld(...)` or `UseNewWorld(...)` can accept Lifetime as an argument.
+`RegisterNewWorld(...)` or `UseNewWorld(...)` can accept `Lifetime` as an argument.
 
-- This new World  is placed under the control of VContainer.
-- World holds System. Therefore, the lifetime of System is the same as World.
-- If `Lifetime.Scoped` is specified, when the scope is destroyed, Dispose of all the systems belonging to that World will be called.
+- This new World is placed under the control of VContainer.
+- The World holds Systems. Therefore, the lifetime of the Systems is the same as the World.
+- If `Lifetime.Scoped` is specified, when the scope is destroyed, `Dispose` will be called on all systems belonging to that World.
 
 
 ```csharp
@@ -298,7 +302,7 @@ class ClassA
     public ClassA(World world) { /* ... */ }
 }
 
-// When multiple worlds is registered
+// When multiple worlds are registered
 class ClassA
 {
     public ClassA(IEnumerable<World> worlds)

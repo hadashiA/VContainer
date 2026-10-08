@@ -1,0 +1,130 @@
+---
+title: Unit Testing
+---
+
+One of the primary benefits of Dependency Injection is that it makes your code significantly easier to test. By designing your classes to receive dependencies via their constructor, you can easily substitute those dependencies with mock objects during testing.
+
+## Testing Pure C# Logic
+
+The best way to test your game logic is to test the classes in isolation, without involving VContainer or Unity at all.
+
+### Example
+
+Suppose you have a `PlayerController` that depends on an `IInputService`.
+
+```csharp
+public interface IInputService
+{
+    bool IsJumpPressed { get; }
+}
+
+public class PlayerController
+{
+    readonly IInputService input;
+    public bool IsJumping { get; private set; }
+
+    public PlayerController(IInputService input)
+    {
+        this.input = input;
+    }
+
+    public void Tick()
+    {
+        if (input.IsJumpPressed)
+        {
+            IsJumping = true;
+        }
+    }
+}
+```
+
+### Writing the Test
+
+You don't need VContainer to test this. Just instantiate the class and pass a mock implementation.
+
+```csharp
+using NUnit.Framework;
+
+public class PlayerControllerTests
+{
+    // A simple mock for testing
+    class MockInput : IInputService
+    {
+        public bool IsJumpPressed { get; set; }
+    }
+
+    [Test]
+    public void TestJump()
+    {
+        // 1. Arrange
+        var mockInput = new MockInput();
+        var controller = new PlayerController(mockInput);
+
+        // 2. Act
+        mockInput.IsJumpPressed = true;
+        controller.Tick();
+
+        // 3. Assert
+        Assert.IsTrue(controller.IsJumping);
+    }
+}
+```
+
+:::tip
+For more complex mocking, libraries like [NSubstitute](https://nsubstitute.github.io/) or [Moq](https://github.com/moq/moq4) are highly recommended.
+:::
+
+## Integration Testing with VContainer
+
+Sometimes you want to verify that your configuration is correct or that multiple components interact correctly when wired up. In these cases, you can create a `Container` explicitly in your test.
+
+```csharp
+[Test]
+public void TestContainerConfiguration()
+{
+    var builder = new ContainerBuilder();
+
+    // Register your actual production code
+    builder.Register<PlayerController>(Lifetime.Scoped);
+
+    // Register mocks for external dependencies
+    builder.RegisterInstance<IInputService>(new MockInput());
+
+    // Build the container
+    using (var container = builder.Build())
+    {
+        // Resolve and Verify
+        var controller = container.Resolve<PlayerController>();
+        Assert.IsNotNull(controller);
+    }
+}
+```
+
+### Testing Entry Points
+
+If you are using [Entry Points](../integrations/entrypoint.mdx), you might want to simulate the PlayerLoop (Start, Tick, etc.).
+
+```csharp
+[Test]
+public void TestEntryPointLifecycle()
+{
+    var builder = new ContainerBuilder();
+    builder.RegisterEntryPoint<MyGameLoop>(Lifetime.Singleton);
+
+    using (var container = builder.Build())
+    {
+        // Manually trigger the lifecycle events
+        var startables = container.Resolve<IEnumerable<IStartable>>();
+        foreach (var startable in startables)
+        {
+            startable.Start();
+        }
+
+        // Assert that your game loop started correctly
+    }
+}
+```
+
+:::warning
+While integration tests are useful, they can be slower and more brittle than pure unit tests. Prefer standard unit tests for verifying logic.
+:::

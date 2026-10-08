@@ -40,6 +40,16 @@ class SceneLoader
             await SceneManager.LoadSceneAsync("...", LoadSceneMode.Additive);
         }
     }
+
+    // Addressables example
+    async UniTask LoadAddressableSceneAsync(string key)
+    {
+        // LifetimeScope.EnqueueParent works with Addressables too
+        using (LifetimeScope.EnqueueParent(parent))
+        {
+            await Addressables.LoadSceneAsync(key, LoadSceneMode.Additive);
+        }
+    }
 }
 ```
 
@@ -51,7 +61,7 @@ var parent = LifetimeScope.Find<BaseLifetimeScope>();
 
 #### How to add additional registers to the next scene
 
-Often, you may want to add additional Registers to the loaded scenes.
+Often, you may want to add additional registrations to the loaded scenes.
 
 For example, when context is finalized after assets are loaded asynchronously.
 

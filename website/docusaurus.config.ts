@@ -1,5 +1,5 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import lunrSearchPlugin from "docusaurus-lunr-search";
 
@@ -19,6 +19,13 @@ const config: Config = {
     locales: ['en', 'ja'],
   },
 
+  markdown: {
+    mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    }
+  },
+  themes: ['@docusaurus/theme-mermaid'],
   presets: [
     [
       'classic',
@@ -72,8 +79,8 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/hadashiA/VContainer/releases',
-          'label': 'v1.15.0',
+          href: 'https://github.com/hadashiA/VContainer/releases/tag/1.17.0',
+          'label': 'v1.17.0',
           position: 'right',
         },
         {

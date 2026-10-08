@@ -1,0 +1,52 @@
+---
+title: Register Instance
+---
+
+## Register Instance
+
+```csharp
+// ...
+var obj = new ServiceA();
+// ...
+
+builder.RegisterInstance(obj);
+```
+
+:::note
+`RegisterInstance` always has a `Singleton` lifetime, so it has no arguments.
+:::
+
+It can resolve like this:
+
+```csharp
+class ClassA
+{
+    public ClassA(ServiceA serviceA) { /* ... */ }
+}
+```
+
+:::note
+Instances registered with RegisterInstance are not managed by the container.
+
+- Dispose will not be executed automatically.
+- Method Injection will not be executed automatically
+
+If you want the container to manage the created instances, consider using the following instead
+
+- [Register(_ => instance, ...)](./register-using-delegate)
+- [RegisterComponent(...)](./register-monobehaviour)
+:::
+
+## Register Instance as Interface
+
+Use `As*` declarations.
+
+```csharp
+builder.RegisterInstance<IInputPort>(serviceA);
+
+builder.RegisterInstance(serviceA)
+    .As<IServiceA, IInputPort>();
+
+builder.RegisterInstance(serviceA)
+    .AsImplementedInterfaces();
+```

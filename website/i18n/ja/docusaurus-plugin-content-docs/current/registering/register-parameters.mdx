@@ -1,0 +1,38 @@
+---
+title: Register Parameters
+---
+
+## Register Type-Specific Parameters
+
+If the types are not unique, but you have a dependency you want to inject at startup, you can use the following:
+
+```csharp
+builder.Register<SomeService>(Lifetime.Singleton)
+    .WithParameter<string>("http://example.com");
+```
+
+Alternatively, you can name a parameter with a key.
+
+```csharp
+builder.Register<SomeService>(Lifetime.Singleton)
+    .WithParameter("url", "http://example.com");
+```
+
+It can resolve like this:
+
+```csharp
+class SomeService
+{
+    public SomeService(string url) { /* ... */ }
+}
+```
+
+This registration only applies when being injected into `SomeService`.
+
+```csharp
+class OtherClass
+{
+    // ! Error
+    public OtherClass(string someString) { /* ... */ }
+}
+```

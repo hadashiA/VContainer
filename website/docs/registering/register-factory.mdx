@@ -4,7 +4,7 @@ title: Registering Factories
 sidebar_label: Factories
 ---
 
-VContainer generally constructs registered dependencies the first time they're resolved (except for [registered instances](./register-type#register-instance)). If you need finer control over when a dependency is created, you can register and use a factory function.
+VContainer generally constructs registered dependencies the first time they're resolved (except for [registered instances](./register-instance.mdx#register-instance)). If you need finer control over when a dependency is created, you can register and use a factory function.
 
 Factory functions are [`Func<>`](https://docs.microsoft.com/en-us/dotnet/api/system.func-1) delegates that are resolved like any other dependency. They can be used to create one or more other dependencies at any time.
 
@@ -12,7 +12,7 @@ Factory functions are [`Func<>`](https://docs.microsoft.com/en-us/dotnet/api/sys
 Despite what the name "factory" might suggest, factories can return existing objects instead of creating new ones. This can be useful for mapping multiple dependencies of the same type to different keys, such as a unique controller service for each player in a local multiplayer game.
 :::
 
-In the following example, dependency resolution will happen only once. Dependency resolution will not occur in this particular `Create()` method (that's what the constructor is for), although you can explicitly use the [`IObjectResolver` API](../resolving/container-api) within a factory if you'd like.
+In the following example, dependency resolution will happen only once. Dependency resolution will not occur automatically in this particular `Create()` method (that is what the constructor is for), although you can explicitly use the [`IObjectResolver` API](../resolving/container-api.mdx) within a factory if you wish.
 
 
 ```csharp
@@ -87,7 +87,7 @@ builder.RegisterFactory<int, Foo>(container => // container is an IObjectResolve
 }, Lifetime.Scoped);
 ```
 
-This version requires a [`Lifetime`](../scoping/lifetime-overview) that specifies how often the inner `Func<>` is generated, i.e. how often the outer `Func<>` is called.
+This version requires a [`Lifetime`](../scoping/lifetime-overview.mdx) that specifies how often the inner `Func<>` is generated, i.e. how often the outer `Func<>` is called.
 
 Factories with dependencies are resolved in exactly the same way, as shown below.
 
@@ -122,7 +122,7 @@ builder.RegisterFactory<CharacterType, CharacterActor>(container =>
 }, Lifetime.Scoped);
 ```
 
-See the [Container API page](../resolving/container-api) for more information.
+See the [Container API page](../resolving/container-api.mdx) for more information.
 
 :::note
 Using a lambda function for a `Func<>` registration is shorthand for a common case. In complex scenarios, consider defining and registering your own factory class.
@@ -130,7 +130,7 @@ Using a lambda function for a `Func<>` registration is shorthand for a common ca
 
 ## Registering factory methods
 
-Factories can be registered as any delegate that can be converted to a `Func<>`, including methods. This way, all factories can be used as `Func<>`s no matter how complicated the underlying implementation is. Here's how you would do that.
+Factories can be registered as any delegate that can be converted to a `Func<>`, including methods. This way, all factories can be used as `Func<>`s no matter how complicated the underlying implementation is.
 
 Suppose we have this class...
 
@@ -162,4 +162,95 @@ var foo3 = factory(3);
 
 var originalFactoryObject = container.Resolve<FooFactory>(); // The factory object is there if you need it.
 // If FooFactory implements IDisposable, it'll be called when the IObjectResolver is disposed.
+```
+
+## Concrete Factory Class
+
+While `Func<...>` is convenient, sometimes you may want to define a concrete factory interface and implementation for better testability or to encapsulate complex creation logic.
+
+```csharp
+public interface IEnemyFactory
+{
+    Enemy Create(string id, Vector3 position);
+}
+
+public class EnemyFactory : IEnemyFactory
+{
+    readonly IObjectResolver container;
+    readonly EnemyData data;
+
+    public EnemyFactory(IObjectResolver container, EnemyData data)
+    {
+        this.container = container;
+        this.data = data;
+    }
+
+    public Enemy Create(string id, Vector3 position)
+    {
+        var prefab = data.GetPrefab(id);
+        // Use Instantiate to inject dependencies into the new enemy instance
+        var enemy = container.Instantiate(prefab, position, Quaternion.identity);
+        return enemy;
+    }
+}
+```
+
+Registering and using it:
+
+```csharp
+builder.Register<EnemyFactory>(Lifetime.Singleton).As<IEnemyFactory>();
+```
+
+```csharp
+public class GameLoop
+{
+    readonly IEnemyFactory enemyFactory;
+
+    public GameLoop(IEnemyFactory enemyFactory)
+    {
+        this.enemyFactory = enemyFactory;
+    }
+
+    public void Spawn()
+    {
+        var enemy = enemyFactory.Create("boss", Vector3.zero);
+    }
+}
+```
+
+## Async Factory
+
+If you need to perform asynchronous operations (like loading assets) within a factory, you can register a factory that returns a `UniTask<T>` (or `Task<T>`).
+
+```csharp
+// Example using Cysharp.Threading.Tasks (UniTask)
+builder.RegisterFactory<string, UniTask<Texture>>(container =>
+{
+    return async key =>
+    {
+        // Example: Async load via Addressables
+        var texture = await Addressables.LoadAssetAsync<Texture>(key);
+        return texture;
+    };
+}, Lifetime.Scoped);
+```
+
+You can inject and use it as follows:
+
+```csharp
+class TexturePresenter
+{
+    readonly Func<string, UniTask<Texture>> textureFactory;
+
+    public TexturePresenter(Func<string, UniTask<Texture>> textureFactory)
+    {
+        this.textureFactory = textureFactory;
+    }
+
+    public async UniTask ShowAsync(string key)
+    {
+        var texture = await textureFactory(key);
+        // Use texture...
+    }
+}
 ```

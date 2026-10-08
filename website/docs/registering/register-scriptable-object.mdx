@@ -1,8 +1,9 @@
 ---
 title: Register ScriptableObject
+sidebar_label: ScriptableObjects
 ---
 
-It is useful to register the setting information saved as ScriptableObject Asset as follows.
+It is useful to register configuration data saved as ScriptableObject assets as follows.
 
 ```csharp
 [Serializable]
@@ -33,9 +34,9 @@ public class GameSettings : ScriptableObject
 }
 ```
 
-And
-- Create `GameSettings` assets from menu.
-- Register the created asset with LifetimeScope.
+And:
+- Create a `GameSettings` asset from the menu.
+- Register the created asset within the `LifetimeScope`.
 
 ```csharp
 public class SomeLifetimeScope : LifetimeScope
