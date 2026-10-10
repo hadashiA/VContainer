@@ -131,9 +131,9 @@ namespace VContainer.Internal
         {
             if (hashTable.TryGet(openGenericType, key, out var openGenericRegistration))
             {
-                if (openGenericRegistration.Provider is OpenGenericInstanceProvider implementationRegistration)
+                if (openGenericRegistration.Provider is IClosedRegistrationProvider implementationRegistration)
                 {
-                    registration = implementationRegistration.GetClosedRegistration(interfaceType, typeParameters);
+                    registration = implementationRegistration.GetClosedRegistration(interfaceType, typeParameters, key);
                     return true;
                 }
             }
