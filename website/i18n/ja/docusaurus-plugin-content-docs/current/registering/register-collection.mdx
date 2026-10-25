@@ -27,6 +27,8 @@ class ClassA
 }
 ```
 
+If only one type is registered, you get a collection with a single element. If no type is registered, you get an empty collection; resolving does not throw an exception.
+
 :::note
 This is mainly used by internal functions such as the `ITickable` marker, etc.
 :::
