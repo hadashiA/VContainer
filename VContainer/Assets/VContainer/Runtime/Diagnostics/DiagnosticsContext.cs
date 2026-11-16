@@ -30,7 +30,7 @@ namespace VContainer.Diagnostics
             {
                 return collectors
                     .SelectMany(x => x.Value.GetDiagnosticsInfos())
-                    .Where(x => x.ResolveInfo.MaxDepth <= 1)
+                    .Where(x => x.ResolveInfo != null && x.ResolveInfo.MaxDepth <= 1)
                     .ToLookup(x => x.ScopeName);
             }
         }
@@ -50,7 +50,7 @@ namespace VContainer.Diagnostics
 
         internal static DiagnosticsInfo FindByRegistration(Registration registration)
         {
-            return GetDiagnosticsInfos().FirstOrDefault(x => x.ResolveInfo.Registration == registration);
+            return GetDiagnosticsInfos().FirstOrDefault(x => x.ResolveInfo != null && x.ResolveInfo.Registration == registration);
         }
 
         public static void RemoveCollector(string name)
