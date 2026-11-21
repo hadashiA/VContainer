@@ -58,6 +58,11 @@ namespace VContainer.Diagnostics
         public object TraceResolve(Registration registration, Func<Registration, object> resolving)
         {
             var current = DiagnositcsContext.FindByRegistration(registration);
+            if (current != null && current.ScopeName != ScopeName && registration.Lifetime == Lifetime.Scoped)
+            {
+                current = GetOrCreateLocalInfo(current, registration);
+            }
+
             var owner = resolveCallStack.Value.Count > 0 ? resolveCallStack.Value.Peek() : null;
 
             if (!(registration.Provider is CollectionInstanceProvider) && current != null && current != owner)
@@ -85,6 +90,25 @@ namespace VContainer.Diagnostics
                 return instance;
             }
             return resolving(registration);
+        }
+
+        private DiagnosticsInfo GetOrCreateLocalInfo(DiagnosticsInfo source, Registration registration)
+        {
+            lock (diagnosticsInfos)
+            {
+                foreach (var info in diagnosticsInfos)
+                {
+                    if (info.ResolveInfo?.Registration == registration)
+                        return info;
+                }
+
+                var localInfo = new DiagnosticsInfo(ScopeName, source.RegisterInfo)
+                {
+                    ResolveInfo = new ResolveInfo(registration)
+                };
+                diagnosticsInfos.Add(localInfo);
+                return localInfo;
+            }
         }
 
         private static void SetResolveTime(DiagnosticsInfo current, long elapsedMilliseconds)
