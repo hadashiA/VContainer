@@ -15,6 +15,7 @@ namespace VContainer.Tests.Unity
         public ServiceA ServiceA;
         public ServiceA ServiceAInAwake;
         public bool StartCalled;
+        public int ConstructCalls;
         public int UpdateCalls;
 
         void Start() => StartCalled = true;
@@ -28,6 +29,7 @@ namespace VContainer.Tests.Unity
         [Inject]
         public void Construct(ServiceA serviceA)
         {
+            ConstructCalls += 1;
             ServiceA = serviceA;
         }
     }

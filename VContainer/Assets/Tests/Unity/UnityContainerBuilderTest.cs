@@ -119,6 +119,26 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void RegisterComponentInHierarchyResolvedFromChildInjectsOnce()
+        {
+            var root = new GameObject("Root");
+            var go = new GameObject("SampleBehaviour");
+            go.transform.SetParent(root.transform);
+            var component = go.AddComponent<SampleMonoBehaviour>();
+            var parent = LifetimeScope.Create(builder =>
+            {
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>().UnderTransform(root.transform);
+            });
+
+            var child = parent.CreateChild();
+            var resolved = child.Container.Resolve<SampleMonoBehaviour>();
+
+            Assert.That(resolved, Is.EqualTo(component));
+            Assert.That(component.ConstructCalls, Is.EqualTo(1));
+        }
+
+        [Test]
         public void RegisterComponentInHierarchyAsInterfaces()
         {
             var go = new GameObject("Parent");
