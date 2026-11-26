@@ -35,7 +35,7 @@ namespace VContainer.SourceGenerator
             title: "[Inject] exists in multiple methods",
             messageFormat: "Multiple [Inject] methods exists in '{0}'",
             category: Category,
-            defaultSeverity: DiagnosticSeverity.Error,
+            defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
 
         public static readonly DiagnosticDescriptor NestedNotSupported = new(
