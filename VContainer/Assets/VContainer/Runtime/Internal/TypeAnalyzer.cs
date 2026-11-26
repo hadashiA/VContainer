@@ -213,6 +213,12 @@ namespace VContainer.Internal
         [ThreadStatic]
         static Stack<DependencyInfo> circularDependencyChecker;
 
+        [ThreadStatic]
+        static HashSet<Type> acyclicTypes;
+
+        [ThreadStatic]
+        static int funcCyclesAllowed;
+
         static readonly Func<Type, InjectTypeInfo> AnalyzeFunc = Analyze;
 
         public static InjectTypeInfo Analyze(Type type)
@@ -370,6 +376,9 @@ namespace VContainer.Internal
             // ThreadStatic
             if (circularDependencyChecker == null)
                 circularDependencyChecker = new Stack<DependencyInfo>();
+            if (acyclicTypes == null)
+                acyclicTypes = new HashSet<Type>();
+            acyclicTypes.Clear();
 
             for (var i = 0; i < registrations.Count; i++)
             {
@@ -380,6 +389,13 @@ namespace VContainer.Internal
 
         static void CheckCircularDependencyRecursive(DependencyInfo current, Registry registry, Stack<DependencyInfo> stack)
         {
+            // A type whose whole subtree was walked without reaching a cycle (Func-allowed ones included) reaches none from any path.
+            if (acyclicTypes.Contains(current.ImplementationType))
+            {
+                return;
+            }
+            var funcCyclesAllowedBefore = funcCyclesAllowed;
+
             var i = 0;
             foreach (var dependency in stack)
             {
@@ -388,6 +404,7 @@ namespace VContainer.Internal
                     // When instantiated by Func, the abstract type cycle is user-avoidable.
                     if (current.Dependency.Provider is FuncInstanceProvider)
                     {
+                        funcCyclesAllowed++;
                         return;
                     }
 
@@ -464,6 +481,11 @@ namespace VContainer.Internal
             }
 
             stack.Pop();
+
+            if (funcCyclesAllowed == funcCyclesAllowedBefore)
+            {
+                acyclicTypes.Add(current.ImplementationType);
+            }
         }
     }
 }
