@@ -82,6 +82,33 @@ namespace VContainer.Tests.Unity
         }
 
         [Test]
+        public void CreateChildFromRootLifetimeScopeParentsToRoot()
+        {
+            var rootTemplate = new GameObject("RootLifetimeScope");
+            rootTemplate.SetActive(false);
+            var rootScope = rootTemplate.AddComponent<LifetimeScope>();
+            var settings = ScriptableObject.CreateInstance<VContainerSettings>();
+            settings.RootLifetimeScope = rootScope;
+            LifetimeScope root = null;
+
+            try
+            {
+                root = settings.GetOrCreateRootLifetimeScopeInstance();
+                var child = root.CreateChild();
+
+                Assert.That(root.IsRoot, Is.True);
+                Assert.That(child.transform.parent, Is.EqualTo(root.transform));
+            }
+            finally
+            {
+                Object.DestroyImmediate(settings);
+                if (root != null)
+                    Object.Destroy(root.gameObject);
+                Object.Destroy(rootTemplate);
+            }
+        }
+
+        [Test]
         public void CreateChildFromPrefab()
         {
             var parent = LifetimeScope.Create(builder =>
