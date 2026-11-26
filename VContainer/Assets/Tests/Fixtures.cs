@@ -294,6 +294,91 @@ namespace VContainer.Tests
         [Inject] public HasCircularDependencyMsg1 Prop { get; set; }
     }
 
+    class HasSelfCircularDependency
+    {
+        public HasSelfCircularDependency(HasSelfCircularDependency self)
+        {
+            if (self == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class DiamondLeaf
+    {
+    }
+
+    class DiamondLeft
+    {
+        public DiamondLeft(DiamondLeaf leaf)
+        {
+            if (leaf == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class DiamondRight
+    {
+        public DiamondRight(DiamondLeaf leaf)
+        {
+            if (leaf == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class DiamondRoot
+    {
+        public DiamondRoot(DiamondLeft left, DiamondRight right)
+        {
+            if (left == null || right == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class AcyclicChainA
+    {
+        public AcyclicChainA(AcyclicChainB b)
+        {
+            if (b == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class AcyclicChainB
+    {
+        public AcyclicChainB(AcyclicChainC c)
+        {
+            if (c == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class AcyclicChainC
+    {
+        public AcyclicChainC(AcyclicChainD d)
+        {
+            if (d == null)
+            {
+                throw new ArgumentException();
+            }
+        }
+    }
+
+    class AcyclicChainD
+    {
+    }
+
     class HasMethodInjection : I1
     {
         public I2 Service2;
