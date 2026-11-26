@@ -63,6 +63,19 @@ namespace VContainer.Tests.Unity
 
             Assert.That(container.Resolve<IComponent>(), Is.EqualTo(component));
         }
+
+        [Test]
+        public void RegisterComponentAsInterfacesWithKey()
+        {
+            var component = new GameObject("SampleBehaviour").AddComponent<SampleMonoBehaviour>();
+            var builder = new ContainerBuilder();
+            builder.Register<ServiceA>(Lifetime.Transient);
+            builder.RegisterComponent(component).AsImplementedInterfaces().Keyed("Key");
+
+            var container = builder.Build();
+
+            Assert.That(container.Resolve<IComponent>("Key"), Is.EqualTo(component));
+        }
         
         [Test]
         public void RegisterComponentUsingBaseClass()
@@ -132,6 +145,26 @@ namespace VContainer.Tests.Unity
             });
 
             var resolved = lifetimeScope.Container.Resolve<IComponent>();
+
+            Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
+            Assert.That(((SampleMonoBehaviour)resolved).transform, Is.EqualTo(go.transform));
+        }
+
+        [Test]
+        public void RegisterComponentInHierarchyAsInterfacesWithKey()
+        {
+            var go = new GameObject("Parent");
+            go.AddComponent<SampleMonoBehaviour>();
+
+            var lifetimeScope = LifetimeScope.Create(builder =>
+            {
+                builder.Register<ServiceA>(Lifetime.Transient);
+                builder.RegisterComponentInHierarchy<SampleMonoBehaviour>()
+                    .AsImplementedInterfaces()
+                    .Keyed("Key");
+            });
+
+            var resolved = lifetimeScope.Container.Resolve<IComponent>("Key");
 
             Assert.That(resolved, Is.InstanceOf<SampleMonoBehaviour>());
             Assert.That(((SampleMonoBehaviour)resolved).transform, Is.EqualTo(go.transform));
